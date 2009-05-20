@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.1//EN"
+        "http://tuckey.org/res/dtds/urlrewrite3.1.dtd">
+<!--
+    Configuration file for UrlRewriteFilter
+    http://code.google.com/p/urlrewritefilter/
+-->
+<urlrewrite>
+	<rule>
+		<from>/posts/list/(.*)$</from>
+		<to type="permanent-redirect">%{context-path}/topics/list/$1</to>
+	</rule>
+</urlrewrite>
+

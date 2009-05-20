@@ -1,0 +1,16 @@
+<#assign hasMessageContents = message?exists/>
+<#if hasMessageContents>
+	<#assign hasMessageContents = user?exists && user.notifyText()/>
+</#if>
+<#if !hasMessageContents>
+Hello, 
+
+You received this email because a new topic of was created in our forum. The topic title is "${topic.title}",
+and you can use the following URL to read it: 
+
+${path}
+
+If you no longer want to receive notifications for this forum, please access ${unwatch}
+<#else>
+<#include "mailNewReplyWithContents.txt"/>
+</#if>

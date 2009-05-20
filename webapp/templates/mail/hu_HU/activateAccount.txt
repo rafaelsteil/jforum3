@@ -1,0 +1,10 @@
+Üdv ${user.username},
+
+A fórum regisztrációját az alábbi oldalon fejezheti be:
+${url}
+
+Emlékeztetõül a felhasználói neve: ${user.username}
+
+---
+Üdvözlettel,
+a Fórum

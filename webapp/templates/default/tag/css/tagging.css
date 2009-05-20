@@ -1,0 +1,85 @@
+.tagging{
+	bottom:0;
+	position:absolute;
+}
+.tagging-container{
+	height:50px !important;
+	position:relative;
+}
+.tagging-image{
+	background-image:url(../images/tag.png);
+	float:left;
+	height:16px;
+	width:16px;
+}
+.tagging-intro{
+}
+.tagging-list{
+}
+.tagging-list-item{
+	color:red;
+	font-size:12px;
+	font-weight:bold;
+	padding:0 5px;
+}
+.tagging-link{
+}
+.tag b {
+	background:transparent url(../images/tag_bg.gif) no-repeat scroll left 0;
+	display:block;
+	float:left;
+	height:18px;
+	margin:0;
+	padding:0 0 0 8px;
+}	
+.tag a {
+	background:transparent url(../images/tag_bg.gif) repeat-x scroll left -20px;
+	display:block;
+	float:left;
+	height:18px;
+	line-height:16px;
+	margin:0;
+	padding:1px 2px;
+	text-decoration:none;
+	white-space:nowrap;
+}
+.tag_front {
+	background:transparent url(../images/tag_bg.gif) no-repeat scroll right -40px;
+}
+.tag {
+	float:left;
+	font-size:12px;
+	height:18px;
+	margin:2px 0;
+	padding:0 8px 0 0;
+}	
+a {
+	line-height:100%;
+	vertical-align:middle;
+}
+a.largest {
+	font-size: 30px;
+}
+a.verylarge {
+	font-size: 26px;
+}
+
+a.large {
+	font-size: 22px;
+}
+
+a.medium {
+	font-size: 18px;
+}
+
+a.small {
+	font-size: 14px;
+}
+
+a.verysmall {
+	font-size: 12px;
+}
+
+a.smallest {
+	font-size: 10px;
+}

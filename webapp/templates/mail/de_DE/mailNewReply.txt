@@ -1,0 +1,12 @@
+<#setting number_format = "#"/>
+Hallo, 
+
+Sie erhalten diese E-Mail, weil zum Thema "${topic.title}" bei ${forumName} seit Ihrem letzten Besuch
+neue Beiträge hinzugekommen sind. Sie können die folgende URL nutzen, um die Beiträge zu lesen.
+Sie werden keine weiteren Benachrichtigungen mehr bekommen, bevor Sie das Thema gelesen haben.
+
+${path}
+
+Wenn Sie für dieses Thema keine Benachrichtigungen mehr bekommen wollen, benutzen Sie bitte diese URL:
+
+${unwatch}

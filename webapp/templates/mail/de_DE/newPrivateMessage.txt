@@ -1,0 +1,7 @@
+<#setting number_format = "#"/>
+Hallo ${user.username},
+
+Sie haben neue private Mitteilungen bei ${forumName}. Sie können Sie mit dem folgenden Link lesen:
+
+${path}
+

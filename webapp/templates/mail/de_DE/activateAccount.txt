@@ -1,0 +1,8 @@
+Hallo ${user.username}
+
+Jemand, wahrscheinlich Sie selbst, hat sich bei ${forumName} registriert. 
+Bitte benutzen Sie die folgende URL, um die Registrierung abzuschließen.
+
+${url}
+
+Ihr Username lautet: ${user.username}

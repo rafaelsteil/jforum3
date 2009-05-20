@@ -1,0 +1,18 @@
+<#assign hasMessageContents = message?exists/>
+<#if hasMessageContents>
+	<#assign hasMessageContents = user?exists && user.notifyText()/>
+</#if>
+<#if !hasMessageContents>
+Olá,
+
+Recebeu este e-mail porque o tópico "${topic.title}" recebeu uma nova resposta desde a sua última visita.
+Pode usar a URL abaixo para ler as mensagens. Não receberá novas notificações antes de ler este tópico.
+
+${path}
+
+Se desejar parar de receber notificações para este tópico, clique no link abaixo:
+
+${unwatch}
+<#else>
+<#include "mailNewReplyWithContents.txt"/>
+</#if>

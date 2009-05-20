@@ -1,0 +1,12 @@
+Olá, este é o sumário do fórum desta semana.
+
+<#list posts as post>
+
+Assunto: ${post.subject}
+Link: ${url}posts/list/${post.topicId}.page
+Autor: ${post.postUsername}
+Texto:
+${post.text}
+-------------
+
+</#list>

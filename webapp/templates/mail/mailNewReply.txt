@@ -1,0 +1,10 @@
+Hi, 
+
+You received this email because the topic "<% print topic.subject %>" has received an answer since your last visit. 
+You may use the following URL to read the messages. You will not get more notifications until you read the topic. 
+
+${path}
+
+If you no longer want to receive notifications for this topic, please access the URL
+
+${unwatch}

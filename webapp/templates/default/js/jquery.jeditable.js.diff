@@ -1,0 +1,44 @@
+--- jquery.jeditable.original.js	2007-09-02 13:52:52.000000000 -0300
++++ jquery.jeditable.pack.js	2007-09-02 13:52:42.000000000 -0300
+@@ -102,6 +102,8 @@
+                 || jQuery.editable.types['defaults'].element;
+ 
+     callback = callback || function() { };
++
++	var isSubmitAllowed = settings.beforesubmit || function () { return true; };
+           
+     jQuery(this).attr('title', settings.tooltip);
+ 
+@@ -246,7 +248,9 @@
+             e.preventDefault(); 
+             
+             /* if this input type has a call before submit hook, call it */
+-            submit.apply(f, [settings, self]);            
++            submit.apply(f, [settings, self]);
++
++			var submitdata = {};      
+ 
+             /* check if given target is function */
+             if (jQuery.isFunction(settings.target)) {
+@@ -254,9 +258,9 @@
+                 self.innerHTML = str;
+                 self.editing = false;
+                 callback.apply(self, [self.innerHTML, settings]);
+-            } else {
++            } else if (isSubmitAllowed(submitdata)) {
+                 /* add edited content and id of edited element to POST */
+-                var submitdata = {};
++                
+                 submitdata[i.name] = jQuery(i).val();
+                 submitdata[settings.id] = self.id;
+                 /* add extra data to be POST:ed */
+@@ -274,6 +278,9 @@
+                     callback.apply(self, [self.innerHTML, settings]);
+                 });
+             }
++			else {
++				reset();
++			}
+                         
+             return false;
+         });

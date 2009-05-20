@@ -1,0 +1,6 @@
+<#setting number_format = "#"/>
+Olá ${user.username},
+
+Possui uma nova mensagem privada no ${forumName}. Pode lê-la clicando no link abaixo:
+
+${path}

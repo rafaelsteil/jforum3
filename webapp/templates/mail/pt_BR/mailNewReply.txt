@@ -1,0 +1,11 @@
+<#setting number_format = "#"/>
+Olá,
+ 
+você recebeu este e-mail porque o tópico "${topic.title}" recebeu uma nova resposta desde sua última visita.
+Você pode usar a URL abaixo para ler as mensagens. Você não receberá novas notificações antes de ler este tópico.
+
+${path}
+
+Se você deseja parar de receber notificações para este tópico, clique no link abaixo:
+
+${unwatch}

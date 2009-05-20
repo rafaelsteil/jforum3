@@ -1,0 +1,8 @@
+${user.username} 您好
+
+有人, 應該是您, 在 ${forumName} 申請註冊為會員.
+請利用下列的網址完成註冊程序.
+
+${url}
+
+記住: 您的會員名稱是: ${user.username}

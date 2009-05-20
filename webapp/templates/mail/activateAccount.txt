@@ -1,0 +1,14 @@
+Hi ${user.username}
+
+Someone, probably you, registered at ${forumName}
+Please use the following URL to complete the registration.
+
+${url}
+
+If you prefer to enter this information manually, go to ${manualUrl} and
+enter the following information:
+
+User ID: ${user.id}
+Auth code: ${user.getActivationKey()}
+
+Remember: your username is: ${user.username}

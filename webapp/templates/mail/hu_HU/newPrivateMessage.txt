@@ -1,0 +1,10 @@
+<#setting number_format = "#"/>
+Üdv ${user.username}, 
+
+Önnek ú privát üzenete érkezett a fórumon keresztül. El tudja olvasni az alábbi oldalon:
+
+${path}
+
+---
+Üdvölettel, 
+a Fórum

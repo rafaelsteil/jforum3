@@ -1,0 +1,14 @@
+Olá ${user.username},
+
+Recebeu este e-mail porque registou-se no ${forumName}.
+Por favor, use o link abaixo para finalizar o seu registo:
+
+${url}
+
+Se preferir inserir a informação manualmente, visite ${manualUrl} e
+insira a seguinte informação:
+
+ID de Utilizador: ${user.id}
+Código de Autenticação: ${user.getActivationKey()}
+
+Lembre-se: o seu username é: ${user.username}

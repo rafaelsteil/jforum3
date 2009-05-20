@@ -1,0 +1,14 @@
+Hallo,
+
+dies ist die Forum-Zusammenfassung für diese Woche.
+
+<#list posts as post>
+
+Betreff: ${post.subject}
+Link: ${url}posts/list/${post.topicId}.page
+Absender: ${post.postUsername}
+Text:
+${post.text}
+-------------
+
+</#list>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	
+    <display-name>JForum 3 - Powering Communities</display-name>
+    <description>Open Source Java Forum Software</description>
+    
+	<listener>
+		<listener-class>beanface.el.functor.InstallFunctorListener</listener-class>
+	</listener>
+	
+	<listener>
+  		<listener-class>net.jforum.core.UserSessionListener</listener-class>
+  	</listener>
+
+	<!-- JForum2 URL Compatibility. Uncoment if necessary -->
+	<!-- For more information, check http://code.google.com/p/urlrewritefilter -->
+	<!-- 
+	<filter>
+		<filter-name>JForum2_UrlRewriteFilter</filter-name>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+		
+		<init-param>
+			<param-name>statusEnabled</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>JForum2_UrlRewriteFilter</filter-name>
+		<url-pattern>/posts/list/*</url-pattern>
+	</filter-mapping>
+	 -->
+	
+	<!-- 
+	<context-param>
+		<param-name>org.vraptor.component.ParameterInfoProvider</param-name>
+		<param-value>org.vraptor.component.ParanamerParameterInfoProvider</param-value>
+	</context-param>
+	 -->
+    
+    <context-param>
+    	<param-name>org.vraptor.url.LogicLocator</param-name>
+		<param-value>net.jforum.core.support.vraptor.DefaultLogicLocator</param-value>
+    </context-param>
+    
+    <context-param>
+    	<param-name>org.vraptor.url.ViewLocator</param-name>
+		<param-value>net.jforum.core.support.vraptor.DefaultViewLocator</param-value>
+    </context-param>
+    
+    <filter>
+		<filter-name>hibernateSessionViewFilter</filter-name>
+		<filter-class>net.jforum.core.support.hibernate.OpenSessionInViewFilter</filter-class>
+	</filter>
+	
+	<!-- 
+	<filter>
+		<filter-name>JForumCasLogoutFilter</filter-name>
+		<filter-class>com.redwahoo.forum.LogoutFilter</filter-class>
+	</filter>
+	
+	<filter>
+		<filter-name>CAS Filter</filter-name>
+		<filter-class>edu.yale.its.tp.cas.client.filter.CASFilter</filter-class>
+			<init-param>
+				<param-name>edu.yale.its.tp.cas.client.filter.loginUrl</param-name>
+				<param-value>https://www.govdex.gov.au/cas/login</param-value>
+			</init-param>
+			<init-param>
+				<param-name>edu.yale.its.tp.cas.client.filter.validateUrl</param-name>
+				<param-value>https://www.govdex.gov.au/cas/serviceValidate</param-value>
+			</init-param>
+			<init-param>
+				<param-name>edu.yale.its.tp.cas.client.filter.serverName</param-name>
+				<param-value>192.168.0.21:8080</param-value>
+			</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>CAS Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> 
+	
+	<filter-mapping>
+		<filter-name>JForumCasLogoutFilter</filter-name>
+		<url-pattern>/user/logout.page</url-pattern>
+	</filter-mapping>
+	-->
+	
+	<filter-mapping>
+		<filter-name>hibernateSessionViewFilter</filter-name>
+	  	<url-pattern>*.page</url-pattern> 
+	</filter-mapping>
+	
+	<!-- Clickstream -->
+	<!--
+	<filter>
+		<filter-name>clickstream-jforum</filter-name>
+		<filter-class>net.jforum.util.legacy.clickstream.ClickstreamFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>clickstream-jforum</filter-name>
+		<url-pattern>*.page</url-pattern>
+	</filter-mapping>
+	-->
+
+	<!-- JForum -->
+	<servlet>
+		<servlet-name>jforum</servlet-name>
+		<servlet-class>net.jforum.JForumServlet</servlet-class>
+		
+		<!-- Relative path to the web application where JForum is installed.
+			The default choice is to have JForum in the root directory (the best), but
+			if you want to put it in any other regular directory, you should specify
+			the path in this directive. 
+			
+			Please note that it should be relative to the root directory of the web application. 
+		-->
+		<init-param>
+			<param-name>install.dir</param-name>
+			<param-value>/</param-value>
+		</init-param>
+
+		<!-- 
+		<load-on-startup>0</load-on-startup>
+		 -->
+	</servlet>
+
+	<servlet-mapping>
+    	<servlet-name>jforum</servlet-name>
+    	<url-pattern>*.page</url-pattern>
+    </servlet-mapping>
+    
+    <error-page>
+    	<exception-type>java.lang.Exception</exception-type>
+    	<location>/templates/default/error.jsp</location>
+    </error-page>
+    
+    <session-config>
+    	<session-timeout>10</session-timeout>
+    </session-config>
+    
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

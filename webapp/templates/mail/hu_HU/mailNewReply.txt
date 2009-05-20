@@ -1,0 +1,11 @@
+<#setting number_format = "#"/>
+Üdv, 
+
+ezt az e-mail-t azért kapta, mert a "${topic.title}" témában hozzászólás történt az utolsó belépése óta. 
+A hozzászólásokat az alábbi oldalon nézheti meg.
+(Nem fog több értesítést kapni, a legközelebbi belépéséig.) 
+
+${path}
+
+Ha nem szeretne értesítéseket kapni errõl a témáról a jövõben, kérem kattintson ide:
+${unwatch}

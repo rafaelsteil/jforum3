@@ -1,0 +1,106 @@
+#shout-box {
+	background:#FFFFFF none repeat scroll 0 0;
+	border:1px solid #006699;
+	/*bottom:0;*/
+	color:white;
+	display:block;
+	font-family:Arial,Helvetica,sans-serif;
+	font-size:11px;
+	overflow:hidden;
+	padding:5px;
+    position:relative;
+    top:0;
+    right:0;
+	/*right:10px;*/
+	width:500px;
+	z-index:40;
+}
+.window-container {
+  z-index: 40; 
+  overflow:hidden;/*must have*/
+  width:515px;
+  bottom:0;
+  right:10px;
+  display:block;
+  position:fixed;
+  _position:absolute;
+  _top:expression(document.body.scrollTop+document.body.clientHeight-this.clientHeight);
+}
+
+.window-container IFRAME
+{
+ display:none;/*sorry for IE5*/ 
+ display/**/:block;/*sorry for IE5*/
+ position:absolute;/*must have*/
+ top:0;/*must have*/
+ left:0;/*must have*/
+ z-index:-1;/*must have*/
+ filter:mask();/*must have*/
+ width:2000px;/*must have for any big value*/
+ height:3000px/*must have for any big value*/;
+}
+.title-bar{
+	text-align:center;
+}
+.widown-title{
+	line-height:25px;
+}
+.window-button{
+	cursor:pointer;
+	font-size:0;
+	height:14px;
+	line-height:0;
+	position:absolute;
+	right:10px;
+	top:8px;
+	width:14px;
+	z-index:35;
+}
+.maximize-button{
+	background-image:url(../images/max_icon.gif);
+}
+.minimize-button{
+	background-image:url(../images/min_icon.gif);
+}
+#shoutbox-response{
+	float:right;
+}
+.shoutbox-list {
+  border-bottom: 1px solid #627C98;
+  padding: 5px;
+  display: none;
+}
+#shoutbox-list {
+  background:#3E5468 none repeat scroll 0 0;
+  text-align: left;
+  margin: 0px auto;
+  height:300px;
+  overflow-y:scroll;
+}
+#shoutbox-form {
+  text-align: left;
+  margin-bottom:0;
+}
+.shoutbox-list-time {
+  color: #8DA2B4;
+}
+.shoutbox-list-nick {
+  margin-left: 5px;
+  font-weight: bold;
+}
+.shoutbox-list-message {
+  margin-left: 5px;
+}
+.shoutbox-list-del {
+	background-image:url(../images/x_to_hide.gif);
+	cursor:pointer;
+	float:right;
+	height:14px;
+	width:13px;
+}
+.shoutbox-list-del :hover {
+	background-image:url(../images/x_to_hide_hover.gif) no-repeat;
+}
+.shout-list-operation{
+	float:right;
+}

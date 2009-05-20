@@ -1,0 +1,12 @@
+Üdv, ez a heti fórum-összefoglaló.
+
+<#list posts as post>
+
+Téma: ${post.subject}
+Link: ${url}posts/list/${post.topicId}.page
+Küldõ: ${post.postUsername}
+Szöveg:
+${post.text}
+-------------
+
+</#list>

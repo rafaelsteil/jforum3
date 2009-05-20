@@ -1,0 +1,30 @@
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:remove var="extraArgs"/>
+
+<c:choose>
+	<c:when test="${page != info.thisPage}">
+		<c:choose>
+			<c:when test="${!isSearch}">
+				<c:if test="${page > 1}">
+					<c:set var="extraArgs" value="/${page}"/>
+				</c:if>
+				
+				<c:if test="${info.id > 0}">
+					<c:set var="extraArgs" value="${extraArgs}/${info.id}"/>
+				</c:if>
+				
+				<a href="<jforum:url address='${info.baseUrl}${extraArgs}'/>">${page}</a>	
+			</c:when>
+			<c:otherwise>
+				<c:set var="extraArgs">params.query=${searchParams.query}&params.matchType=${searchParams.matchType}&params.forum.id=${searchParams.forum.id}&params.sort=${searchParams.sort}&params.sortType=${searchParams.sortType}&params.start=${page}</c:set>
+				
+				<a href="<jforum:url address='${info.baseUrl}'/>?${extraArgs}">${page}</a>
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
+		<span class="current">${page}</span>
+	</c:otherwise>
+</c:choose>
+
