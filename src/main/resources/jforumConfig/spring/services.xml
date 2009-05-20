@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="net.jforum.services.CategoryService" class="net.jforum.services.CategoryService" autowire="constructor"/>
+	<bean id="net.jforum.services.ForumService" class="net.jforum.services.ForumService" autowire="constructor"/>
+	<bean id="net.jforum.services.TopicService" class="net.jforum.services.TopicService" autowire="constructor"/>
+	<bean id="net.jforum.services.MostUsersEverOnlineService" class="net.jforum.services.MostUsersEverOnlineService" autowire="constructor"/>
+	<bean id="net.jforum.services.SmilieService" class="net.jforum.services.SmilieService" autowire="constructor"/>
+	<bean id="net.jforum.services.GroupService" class="net.jforum.services.GroupService" autowire="constructor"/>
+	<bean id="net.jforum.services.RankingService" class="net.jforum.services.RankingService" autowire="constructor"/>
+	<bean id="net.jforum.services.PostService" class="net.jforum.services.PostService" autowire="constructor"/>
+	<bean id="net.jforum.services.ViewService" class="net.jforum.services.ViewService" scope="request" autowire="constructor"/>
+	<bean id="net.jforum.services.ModerationService" class="net.jforum.services.ModerationService" autowire="constructor"/>
+	<bean id="net.jforum.services.PrivateMessageService" class="net.jforum.services.PrivateMessageService" autowire="constructor"/>
+	<bean id="net.jforum.services.TopicWatchService" class="net.jforum.services.TopicWatchService" autowire="constructor"/>
+	<bean id="net.jforum.services.RSSService" class="net.jforum.services.RSSService" autowire="constructor"/>
+	<bean id="net.jforum.services.LostPasswordService" class="net.jforum.services.LostPasswordService" autowire="constructor"/>
+	<bean id="net.jforum.services.UserService" class="net.jforum.services.UserService" autowire="constructor"/>
+	<bean id="net.jforum.services.AttachmentService" class="net.jforum.services.AttachmentService" autowire="constructor"/>
+	<bean id="net.jforum.services.PollService" class="net.jforum.services.PollService" autowire="constructor"/>
+	<bean id="net.jforum.services.ConfigService" class="net.jforum.services.ConfigService" autowire="constructor"/>
+	
+	<bean id="net.jforum.services.MessageFormatService" class="net.jforum.services.MessageFormatService">
+		<property name="formatters" ref="net.jforum.formatters.PostFormatters"/>
+	</bean>
+	
+	<!-- Avatar -->
+	<bean id="net.jforum.services.AvatarService" class="net.jforum.services.AvatarService" autowire="constructor"/>
+	
+	<!-- Plugins -->
+	<bean id="net.jforum.plugins.tagging.TagService" class="net.jforum.plugins.tagging.TagService" autowire="constructor"/>
+	<bean id="net.jforum.plugins.shoutbox.ShoutBoxService" class="net.jforum.plugins.shoutbox.ShoutBoxService" autowire="constructor"/>
+	<bean id="net.jforum.plugins.shoutbox.ShoutService" class="net.jforum.plugins.shoutbox.ShoutService" autowire="constructor"/>
+</beans>

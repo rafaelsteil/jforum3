@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<aop:aspectj-autoproxy />
+	
+	<bean id="org.hibernate.SessionFactory" class="net.jforum.core.support.hibernate.FakeSessionFactory"/>
+	<bean id="evictionRules" class="net.jforum.core.support.hibernate.CacheEvictionRules" autowire="constructor"/>
+	
+	<bean id="net.jforum.services.CategoryService" class="net.jforum.core.support.hibernate.AOPTestCategoryService"/>
+	<bean id="net.jforum.services.ForumService" class="net.jforum.core.support.hibernate.AOPTestForumService"/>
+	<bean id="net.jforum.services.TopicService" class="net.jforum.core.support.hibernate.AOPTestTopicService"/>
+	<bean id="net.jforum.services.PostService" class="net.jforum.core.support.hibernate.AOPTestPostService"/>
+	<bean id="net.jforum.services.GroupService" class="net.jforum.core.support.hibernate.AOPTestGroupService"/>
+	<bean id="net.jforum.services.ModerationService" class="net.jforum.core.support.hibernate.AOPTestModerationService"/>
+	<bean id="net.jforum.repository.ConfigRepository" class="net.jforum.core.support.hibernate.AOPTestConfigDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.UserRepository" class="net.jforum.core.support.hibernate.AOPTestUserDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.SmilieRepository" class="net.jforum.core.support.hibernate.AOPTestSmilieDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.RankingRepository" class="net.jforum.core.support.hibernate.AOPTestRankingDAO" autowire="constructor"/>
+</beans>

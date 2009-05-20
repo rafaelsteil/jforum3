@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+		
+	<bean id="net.jforum.util.JForumConfig" class="net.jforum.util.JForumConfig" autowire="constructor"/>
+	<bean id="net.jforum.util.I18n" class="net.jforum.util.I18n" autowire="constructor"/>
+	<bean id="net.jforum.core.SessionManager" class="net.jforum.core.SessionManager" autowire="constructor"/>
+	<bean id="net.jforum.util.SafeHtml" class="net.jforum.util.SafeHtml" autowire="constructor"/>
+	<bean id="net.jforum.core.support.vraptor.ViewPropertyBag" class="net.jforum.core.support.vraptor.ViewPropertyBag" scope="request" autowire="constructor"/>
+	<bean id="net.jforum.sso.LoginAuthenticator" class="net.jforum.sso.DefaultLoginAuthenticator" autowire="constructor"/>
+	<bean id="net.jforum.util.GroupInteractionFilter" class="net.jforum.util.GroupInteractionFilter"/>
+	<bean id="net.jforum.util.HibernateAwareTask" class="net.jforum.util.HibernateAwareTask" autowire="constructor"/>
+	
+	<!-- Request operations -->
+	<bean id="net.jforum.extensions.PostReportCounterOperation" class="net.jforum.extensions.PostReportCounterOperation" scope="request" autowire="constructor"/>
+	
+	<bean id="net.jforum.extensions.RequestOperationChain" class="net.jforum.extensions.RequestOperationChain">
+		<property name="operations">
+			<list>
+				<value>net.jforum.extensions.PostReportCounterOperation</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Access Rules -->
+	<bean id="net.jforum.security.EditUserRule" class="net.jforum.security.EditUserRule" autowire="constructor"/>
+	<bean id="net.jforum.security.AdministrationRule" class="net.jforum.security.AdministrationRule"/>
+	<bean id="net.jforum.security.CreateNewTopicRule" class="net.jforum.security.CreateNewTopicRule" autowire="constructor"/>
+	<bean id="net.jforum.security.AuthenticatedRule" class="net.jforum.security.AuthenticatedRule"/>
+	<bean id="net.jforum.security.AccessForumRule" class="net.jforum.security.AccessForumRule" autowire="constructor"/>
+	<bean id="net.jforum.security.ReplyTopicRule" class="net.jforum.security.ReplyTopicRule" autowire="constructor"/>
+	<bean id="net.jforum.security.ModerationRule" class="net.jforum.security.ModerationRule" autowire="constructor"/>
+	<bean id="net.jforum.security.PrivateMessageOwnerRule" class="net.jforum.security.PrivateMessageOwnerRule" autowire="constructor"/>
+	<bean id="net.jforum.security.PrivateMessageEnabledRule" class="net.jforum.security.PrivateMessageEnabledRule"/>
+	<bean id="net.jforum.security.ChangePostRule" class="net.jforum.security.ChangePostRule" autowire="constructor"/>
+	<bean id="net.jforum.security.DownloadAttachmentRule" class="net.jforum.security.DownloadAttachmentRule" autowire="constructor"/>
+	
+	<!-- Email -->
+	<bean id="net.jforum.util.mail.SpammerFactory" class="net.jforum.util.mail.SpammerFactory" autowire="constructor"/>
+	
+	<bean id="net.jforum.util.mail.SpammerTaskExecutor" class="net.jforum.util.mail.SpammerTaskExecutor">
+		<constructor-arg>
+			<bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"/>
+		</constructor-arg>
+	</bean>
+
+	<!-- Factory Beans -->
+	<bean id="javax.servlet.http.HttpServletRequest" class="net.jforum.core.support.spring.HttpServletRequestFactoryBean">
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="javax.servlet.http.HttpServletResponse" class="net.jforum.core.support.spring.HttpServletResponseFactoryBean">
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="net.jforum.security.RoleManager" class="net.jforum.core.support.spring.RoleManagerFactoryBean" autowire="constructor">
+		<aop:scoped-proxy/>
+	</bean>
+</beans>

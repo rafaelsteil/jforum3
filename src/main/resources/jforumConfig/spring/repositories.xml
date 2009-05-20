@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="net.jforum.repository.CategoryRepository" class="net.jforum.core.hibernate.CategoryDAO" autowire="constructor"/>
+
+	<bean id="net.jforum.repository.ForumRepository" class="net.jforum.core.hibernate.ForumDAO" autowire="constructor">
+		<property name="jforumConfig" ref="net.jforum.util.JForumConfig"/>
+	</bean>
+
+	<bean id="net.jforum.repository.GroupRepository" class="net.jforum.core.hibernate.GroupDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.UserRepository" class="net.jforum.core.hibernate.UserDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.RankingRepository" class="net.jforum.core.hibernate.RankingDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.BanlistRepository" class="net.jforum.core.hibernate.BanlistDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.SmilieRepository" class="net.jforum.core.hibernate.SmilieDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.TopicRepository" class="net.jforum.core.hibernate.TopicDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.ConfigRepository" class="net.jforum.core.hibernate.ConfigDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.PostRepository" class="net.jforum.core.hibernate.PostDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.RecentTopicsRepository" class="net.jforum.core.hibernate.RecentTopicsDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.PrivateMessageRepository" class="net.jforum.core.hibernate.PrivateMessageDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.TopicWatchRepository" class="net.jforum.core.hibernate.TopicWatchDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.SearchRepository" class="net.jforum.core.hibernate.SearchDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.SessionRepository" class="net.jforum.core.hibernate.SessionDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.RSSRepository" class="net.jforum.core.hibernate.RSSDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.BadWordRepository" class="net.jforum.core.hibernate.BadWordDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.PostReportRepository" class="net.jforum.core.hibernate.PostReportDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.PollRepository" class="net.jforum.core.hibernate.PollDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.ThemeRepository" class="net.jforum.core.hibernate.ThemeDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.AttachmentRepository" class="net.jforum.core.hibernate.AttachmentDAO" autowire="constructor"/>
+	
+	<!-- Avatar -->	
+	<bean id="net.jforum.repository.AvatarRepository" class="net.jforum.core.hibernate.AvatarDAO" autowire="constructor" />
+	
+	<!-- Plugins -->
+	<bean id="net.jforum.plugins.tagging.TagRepository" class="net.jforum.plugins.tagging.TagDAO" autowire="constructor"/>
+	<bean id="net.jforum.plugins.shoutbox.ShoutBoxRepository" class="net.jforum.plugins.shoutbox.ShoutBoxDAO" autowire="constructor"/>
+	<bean id="net.jforum.plugins.shoutbox.ShoutRepository" class="net.jforum.plugins.shoutbox.ShoutDAO" autowire="constructor"/>
+	<bean id="net.jforum.plugins.post.ForumLimitedTimeRepository" class="net.jforum.plugins.post.ForumLimitedTimeDAO" autowire="constructor"/>
+</beans>

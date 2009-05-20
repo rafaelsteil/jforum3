@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bb-config>
+	<tag name="tag1">
+		<regex>tag1-regex</regex>		
+		<replace>tag1-replace</replace>
+	</tag>
+
+	<tag name="tag2" alwaysProcess="true">
+		<regex>tag2-regex</regex>
+		<replace>tag2-replace</replace>
+	</tag>
+</bb-config>

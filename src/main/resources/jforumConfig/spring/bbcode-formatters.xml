@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="net.jforum.formatters.BBConfigFormatter" class="net.jforum.formatters.BBConfigFormatter"/>
+	
+	<bean class="net.jforum.formatters.BBCodeConfigParser">
+		<constructor-arg value="classpath:/jforumConfig/bb_config.xml"/>
+		<constructor-arg ref="net.jforum.formatters.BBConfigFormatter"/>
+	</bean>
+	
+	<bean id="net.jforum.formatters.PostFormatters" class="net.jforum.formatters.PostFormatters">
+		<property name="formatters">
+			<!--  Order matters -->	
+			<list>
+				<bean class="net.jforum.formatters.HtmlEntitiesFormatter"/>
+				<bean class="net.jforum.formatters.NewLineToHtmlBreakFormatter"/>
+				<bean class="net.jforum.formatters.SafeHtmlTagsFormatter" autowire="constructor"/>
+				<bean class="net.jforum.formatters.SmiliesFormatter" autowire="constructor"/>
+				<ref bean="net.jforum.formatters.BBConfigFormatter"/>
+				<bean class="net.jforum.formatters.SafeHtmlAttributesFormatter" autowire="constructor"/>
+			</list>
+		</property>
+	</bean>
+</beans>

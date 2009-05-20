@@ -1,0 +1,154 @@
+<ehcache>
+
+    <!-- Sets the path to the directory where cache .data files are created.
+
+         If the path is a Java System Property it is replaced by
+         its value in the running VM.
+
+         The following properties are translated:
+         user.home - User's home directory
+         user.dir - User's current working directory
+         java.io.tmpdir - Default temp file path -->
+    <diskStore path="java.io.tmpdir"/>
+
+    <!-- Add your cache configuration settings here.
+        If you do not have a configuration for your cache a WARNING will be issued when the
+        CacheManager starts
+
+        The following attributes are required for defaultCache:
+
+        name              - Sets the name of the cache. This is used to identify the cache. It must be unique.
+        maxInMemory       - Sets the maximum number of objects that will be created in memory
+        eternal           - Sets whether elements are eternal. If eternal,  timeouts are ignored and the element
+                            is never expired.
+        timeToIdleSeconds - Sets the time to idle for an element before it expires. Is only used
+                            if the element is not eternal. Idle time is now - last accessed time
+        timeToLiveSeconds - Sets the time to live for an element before it expires. Is only used
+                            if the element is not eternal. TTL is now - creation time
+        overflowToDisk    - Sets whether elements can overflow to disk when the in-memory cache
+                            has reached the maxInMemory limit.
+	-->
+	
+	<!-- Category -->
+	<cache name="net.jforum.entities.Category"
+		maxElementsInMemory="100"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Category.forums -->
+	<cache name="categoryDAO.getForums"
+		maxElementsInMemory="300"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Forum -->
+	<cache name="net.jforum.entities.Forum"
+		maxElementsInMemory="300"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Group -->
+	<cache name="net.jforum.entities.Group"
+		maxElementsInMemory="50"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Group.roles -->
+	<cache name="net.jforum.entities.Group.roles"
+		maxElementsInMemory="100"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Ranking -->
+	<cache name="net.jforum.entities.Ranking"
+		maxElementsInMemory="50"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<cache name="rankingDAO"
+		maxElementsInMemory="50"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Role -->
+	<cache name="net.jforum.entities.Role"
+		maxElementsInMemory="100"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Role.roleValues -->
+	<cache name="net.jforum.entities.Role.roleValues"
+		maxElementsInMemory="500"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Smilie -->
+	<cache name="net.jforum.entities.Smilie"
+		maxElementsInMemory="500"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<cache name="smilieDAO"
+		maxElementsInMemory="500"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Config -->
+	<cache name="net.jforum.entities.Config"
+		maxElementsInMemory="10"
+		eternal="true"
+		overflowToDisk="false"/>
+	
+	<cache name="configDAO"
+		maxElementsInMemory="10"
+		eternal="true"
+		overflowToDisk="false"/>
+		
+	<!-- Topic -->
+	<cache name="net.jforum.entities.Topic"
+		maxElementsInMemory="1500"
+		eternal="false"
+		timeToIdleSeconds="600"
+		timeToLiveSeconds="18000"
+		overflowToDisk="true"/>
+		
+	<!-- User -->
+	<cache name="net.jforum.entities.User"
+		maxElementsInMemory="300"
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="720"
+		overflowToDisk="true"/>
+		
+	<!-- User.groups -->
+	<cache name="net.jforum.entities.User.groups"
+		maxElementsInMemory="20"
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="720"
+		overflowToDisk="true"/>
+	
+	<!-- Query Cache -->
+	<cache name="org.hibernate.cache.StandardQueryCache"
+		maxElementsInMemory="200"
+		eternal="false"
+		timeToIdleSeconds="3600"
+		timeToLiveSeconds="18000"
+		overflowToDisk="true"/>
+		
+	<!-- Timestamp Cache -->
+	<cache name="org.hibernate.cache.UpdateTimestampsCache"
+		maxElementsInMemory="10000"
+		timeToIdleSeconds="3601"
+		timeToLiveSeconds="18001"
+		eternal="true"
+		overflowToDisk="true"/>
+
+    <!--Default Cache configuration. These will applied to caches programmatically created through the CacheManager -->
+	<defaultCache
+		maxElementsInMemory="2000"
+		eternal="false"
+		timeToIdleSeconds="1200"
+		timeToLiveSeconds="3600"
+		overflowToDisk="true"/>
+</ehcache>

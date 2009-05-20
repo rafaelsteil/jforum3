@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bb-config>
+	<!-- CODE -->
+	<tag name="code">
+		<regex>(?s)\[code\](.*?)\[/code\]</regex>		
+		<replace>
+		<![CDATA[
+        <textarea name="code" class="java" cols="60" rows="10">$1</textarea>
+		]]>
+		</replace>
+	</tag>
+
+	<tag name="code-highlight">
+		<regex>(?s)(?i)\[code=['"]?(.*?[^'"])['"]?\](.*?)\[/code\]</regex>
+		<replace>
+		<![CDATA[
+        <textarea name="code" class="$1" cols="60" rows="10">$2</textarea>
+		]]>
+		</replace>
+	</tag>
+	
+	<tag name="openSimpleQuote">
+		<regex>(?i)\[quote\]</regex>
+		<replace>
+		<![CDATA[
+		<blockquote class="uncited">
+			<div>
+		]]>
+		</replace>
+	</tag>
+	
+	<tag name="openQuote">
+		<regex>(?i)\[quote=['"]?(.*?[^'"])['"]?\]</regex>
+		<replace>
+		<![CDATA[
+		<blockquote>
+			<div>
+				<cite>$1 wrote:</cite>
+		]]>
+		</replace>
+	</tag>
+	
+	<tag name="closeQuote">
+		<regex>(?i)\[/quote\]</regex>
+		<replace>
+		<![CDATA[
+		</div>
+		</blockquote>
+		]]>
+		</replace>
+	</tag>
+
+	<!-- B -->
+	<tag name="b">
+		<regex>(?s)(?i)\[b\](.*?)\[/b\]</regex>
+		<replace>
+		<![CDATA[
+		<strong>$1</strong>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- I -->
+	<tag name="i">
+		<regex>(?s)(?i)\[i\](.*?)\[/i\]</regex>
+		<replace>
+		<![CDATA[
+		<i>$1</i>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- U -->
+	<tag name="u">
+		<regex>(?s)(?i)\[u\](.*?)\[/u\]</regex>
+		<replace>
+		<![CDATA[
+		<u>$1</u>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- LIST -->
+	<tag name="list">
+		<regex>(?s)(?i)\[list\](.*?)\[/list\]</regex>
+		<replace>
+		<![CDATA[
+		<li>$1</li>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- IMG -->
+	<tag name="img">
+		<regex>(?i)\[img\](.*?)\[/img\]</regex>
+		<replace>
+		<![CDATA[
+		<img src="$1" border="0" />
+		]]>
+		</replace>
+	</tag>
+    
+	<!-- Flash -->
+	<tag name="flash">
+		<regex>(?i)\[flash\](.*?)\[/flash\]</regex>
+		<replace>
+		<![CDATA[
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="750" height="500" title="flash">
+			<param name="movie" value="$1" />
+			<param name="quality" value="high" />
+			<embed src="$1" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="750" height="500" />
+		</object>
+		]]>
+		</replace>
+	</tag>
+
+	<!-- Windows Media -->
+	<tag name="wmv">
+		<regex>(?i)\[wmv\](.*?)\[/wmv\]</regex>
+		<replace>
+		<![CDATA[
+		<object id="mediaPlayer" width="320" height="285" 
+			classid="CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95" 
+			codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=5,1,52,701"
+			standby="Loading Microsoft Windows Media Player components..." type="application/x-oleobject">
+			<param name="fileName" value="$1" />
+			<param name="animationatStart" value="true" />
+			<param name="transparentatStart" value="true" />
+			<param name="autoStart" value="true" />
+			<param name="showControls" value="true" />
+			<param name="loop" value="false" />
+			<embed src="$1" width="320" height="285" type="application/x-mplayer2"
+			pluginspage="http://microsoft.com/windows/mediaplayer/en/download/"
+			id="mediaPlayer" name="mediaPlayer" displaysize="4" autosize="-1" 
+			bgcolor="darkblue" showcontrols="true" showtracker="-1" 
+			showdisplay="0" showstatusbar="-1" videoborder3d="-1"
+			autostart="true" designtimesp="5311" loop="false">
+			</embed>
+		</object>
+		]]>
+		</replace>
+	</tag>
+	
+    <!-- Real Media -->
+	<tag name="rm">
+		<regex>(?i)\[rm\](.*?)\[/rm\]</regex>
+		<replace>
+		<![CDATA[
+		<object id="rvocx" classid="clsid:CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA" width="320" height="240">
+			<param name="src" value="$1" />
+			<param name="autostart" value="true" />
+			<param name="controls" value="ImageWindow" />
+			<param name="console" value="video" />
+			<param name="loop" value="false" />
+			<embed src="$1" width="320" height="240" 
+			type="audio/x-pn-realaudio-plugin" controls="ImageWindow" console="video" autostart="true" loop="false">
+			</embed>
+        </object>
+	    <br />
+        <object id="rvocx" classid="clsid:CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA" width="320" height="30" />
+			<param name="src" value="$1" />
+			<param name="autostart" value="true" />
+			<param name="controls" value="ControlPanel" />
+			<param name="console" value="video" />
+			<embed src="$1" width="320" height="30" 
+			type="audio/x-pn-realaudio-plugin" controls="ControlPanel" console="video" autostart="true">
+			</embed>
+		</object>
+		]]>
+		</replace>
+	</tag>
+				
+	<!-- Automatic URL matching -->
+	<tag name="auto-url" alwaysProcess="true">
+		<regex>(^|[\n ]|\()([\w]+?://[^ \"\n\r\t&lt;\)\[]*)</regex>
+		<replace>
+		<![CDATA[
+		$1<a class="snap_shots" href="$2" target="_blank" rel="nofollow">$2</a>
+		]]>
+		</replace>
+	</tag>
+
+	<tag name="auto-url-simple" alwaysProcess="true">
+		<regex>(^|[\n ]\()(www\.[^ \"\t\n\r&lt;\)\[]*)</regex>
+		<replace>
+		<![CDATA[
+		$1<a class="snap_shots" href="http://$2" target="_blank" rel="nofollow">$2</a>
+		]]>
+		</replace>
+	</tag>
+
+	<tag name="auto-ftp-simple" alwaysProcess="true">
+		<regex>(^|[\n ]\()(ftp\.[^ \"\t\n\r&lt;\)\[]*)</regex>
+		<replace>
+		<![CDATA[
+		$1<a class="snap_shots" href="ftp://$2" target="_blank" rel="nofollow">$2</a>
+		]]>
+		</replace>
+	</tag>
+
+	<tag name="auto-email" alwaysProcess="true">
+		<regex>(^|[\n ])([a-z0-9&amp;\-_.]+?)@([\w\-]+\.([\w\-\.]+\.)*[\w]+)</regex>
+		<replace>
+		<![CDATA[
+		$1<a class="snap_shots" href="mailto:$2@$3">$2@$3</a>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- URL -->
+	<tag name="simple-url">
+		<regex>(?i)\[url\](.*?)\[/url\]</regex>
+		<replace>
+		<![CDATA[
+		<a class="snap_shots" href="$1" target="_blank" rel="nofollow">$1</a>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- URL=?? -->
+	<tag name="descriptive-url">
+		<regex>(?i)\[url=['"]?(.*?[^'"])['"]?\](.*?)\[/url\]</regex>
+		<replace>
+		<![CDATA[
+		<a class="snap_shots" href="$1" target="_blank" rel="nofollow">$2</a>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- COLOR -->
+	<tag name="color">
+		<regex>(?s)(?i)\[color=['"]?(.*?[^'"])['"]?\](.*?)\[/color\]</regex>
+		<replace>
+		<![CDATA[
+		<font color='$1'>$2</font>
+		]]>
+		</replace>
+	</tag>
+
+	<!-- SIZE -->
+	<tag name="size">
+		<regex>(?s)(?i)\[size=['"]?(.*?[^'"])['"]?\](.*?)\[/size\]</regex>
+		<replace>
+		<![CDATA[
+		<span style="font-size: $1px; line-height: normal;">$2</span>
+		]]>
+		</replace>
+	</tag>
+
+	<!-- Google -->
+	<tag name="google">
+		<regex>(?i)\[google\](.*?)\[/google\]</regex>
+		<replace>
+		<![CDATA[
+		<a class="snap_shots" href="http://www.google.com/search?q=$1" target="_blank">$1</a>
+		]]>
+		</replace>
+	</tag>
+	
+	<!-- YouTube -->
+	<tag name="youtube">
+		<regex>
+			(?i)\[youtube\]http\:\/\/(.*?)youtube.com\/watch\?v\=(.*?)\[/youtube\]
+		</regex>
+		<replace>
+			<![CDATA[
+                <object width="425" height="350">
+                    <param name="movie" value="http://$1youtube.com/v/$2"></param>
+                    <param name="wmode" value="transparent"></param>
+                    <embed src="http://$1youtube.com/v/$2" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed>
+                </object>
+                ]]>
+		</replace>
+	</tag>
+</bb-config>

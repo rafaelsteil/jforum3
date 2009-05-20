@@ -1,0 +1,1 @@
+UPDATE jforum_topics set need_moderate = 1 WHERE topic_id <> 6

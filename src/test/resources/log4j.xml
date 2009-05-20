@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+	<appender name="jforum-stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %5p [%-20c{1}] %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="jforum.log" class="org.apache.log4j.RollingFileAppender">
+		<param name="MaxFileSize"  value="1024KB"/>
+		<param name="MaxBackupIndex" value="4"/>
+
+		<param name="File" value="/tmp/jforum3.log"/>
+		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%-c{1}] - %m%n"/>
+	   </layout>
+	</appender>
+	
+	<category name="net.jforum">
+		<priority value="info" />
+		<appender-ref ref="jforum-stdout" />
+	</category>
+
+	<category name="org.hibernate">
+		<priority value="warn"/>
+		<appender-ref ref="jforum-stdout"/>
+	</category>
+</log4j:configuration>

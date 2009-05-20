@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<aop:aspectj-autoproxy />
+	<bean class="net.jforum.core.support.hibernate.CacheEvictionRules" autowire="constructor"/>
+	
+	<bean id="org.hibernate.SessionFactory" class="org.hinjector.spring.HInjectorAnnotationSessionFactoryBean">
+	 
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${database.dialect}</prop>
+				<prop key="hibernate.connection.url">${database.url}</prop>
+				<prop key="hibernate.connection.driver_class">${database.driver}</prop>
+				<prop key="hibernate.connection.username">${database.username}</prop>
+				<prop key="hibernate.connection.password">${database.password}</prop>
+				<!--
+				<prop key="hibernate.default_schema">${database.default.schema}</prop>
+				-->
+				
+				<prop key="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</prop>
+				
+				<prop key="hibernate.c3p0.idle_test_period">600</prop>
+				<prop key="hibernate.c3p0.timeout">7200</prop>
+				<prop key="hibernate.c3p0.min_size">10</prop>
+				<prop key="hibernate.c3p0.max_size">50</prop>
+				
+				<prop key="hibernate.use_sql_comments">true</prop>
+				<prop key="hibernate.show_sql">${database.debug.show.sql}</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.cache.use_structured_entries">true</prop>
+				<prop key="hibernate.cache.use_query_cache">${database.cache.enabled}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${database.cache.enabled}</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+				<prop key="hibernate.generate_statistics">${database.statistics}</prop>
+				
+				<prop key="hibernate.cache.query_cache_factory">net.jforum.core.support.hibernate.QueryCacheFactory</prop>
+				
+				<prop key="hibernate.search.default.indexBase">${lucene.index.write.path}</prop>
+				<prop key="hibernate.search.analyzer">${lucene.analyzer}</prop>
+				<prop key="hibernate.search.autoregister_listeners">true</prop>
+				<prop key="hibernate.search.default.batch.merge_factor">${lucene.batch.size}</prop>
+				<prop key="hibernate.search.worker.batch_size">${lucene.batch.size}</prop>
+			</props>
+		</property>
+		
+		<property name="annotatedClasses">
+			<list>
+				<value>net.jforum.entities.Category</value>
+				<value>net.jforum.entities.Forum</value>
+				<value>net.jforum.entities.Group</value>
+				<value>net.jforum.entities.User</value>
+				<value>net.jforum.entities.Ranking</value>
+				<value>net.jforum.entities.Banlist</value>
+				<value>net.jforum.entities.Smilie</value>
+				<value>net.jforum.entities.Post</value>
+				<value>net.jforum.entities.Topic</value>
+				<value>net.jforum.entities.Config</value>
+				<value>net.jforum.entities.Role</value>
+				<value>net.jforum.entities.PrivateMessage</value>
+				<value>net.jforum.entities.TopicWatch</value>
+				<value>net.jforum.entities.Session</value>
+				<value>net.jforum.entities.BadWord</value>
+				<value>net.jforum.entities.Avatar</value>
+				<value>net.jforum.entities.PostReport</value>
+				<value>net.jforum.entities.Poll</value>
+				<value>net.jforum.entities.PollOption</value>
+				<value>net.jforum.entities.PollVoter</value>
+				<value>net.jforum.entities.Attachment</value>
+				
+				<!-- Plugins -->
+				<value>net.jforum.plugins.tagging.Tag</value>
+				<value>net.jforum.plugins.shoutbox.ShoutBox</value>
+				<value>net.jforum.plugins.shoutbox.Shout</value>
+				<value>net.jforum.plugins.post.ForumLimitedTime</value>
+			</list>
+		</property>
+	</bean>
+</beans>
