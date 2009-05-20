@@ -1,0 +1,1087 @@
+/* Cascading Style Sheet for HTML export */
+
+/* Light Blue style */
+
+/* Compatibility notes:
+ * 
+ * Names starting with "#" are ID selectors meaning they point to one specific single object/element
+ *
+ */
+
+/* This stylesheet expects the following HTML structure
+body#page
+	table#pageHeader
+		tr
+			td.left  (rowspan 3)
+			td.right
+				div.utilities
+					span.command (0+)
+						a
+							img
+							span.label
+		tr
+		   td.right
+				div.mapName
+		tr
+		   td.right
+				div.contactInformation
+				
+	col left is optional sidebar navigation
+		col.main
+		col.right
+		
+		tr#breadcrumbsAndPageNavigation
+			td.left (0-1: include if sideNav)
+				div.box (0+)
+					... (see div.box contents below)
+					
+			Optional Breadcrumb and pageNavigation		
+				td.breadcrumbs
+				td.pageNavigation
+				
+			td.right
+			
+   <BODY MAIN CONTENT>
+
+	<TOPIC>
+			
+	<TOP COMMAND>
+	
+	table#pageFooter
+		tr
+			td.left      (rowspan = 2, could be used for image)
+			td.center    (rowspan = 2)
+    			div.footerText
+			td.right		
+			   div.hyperlink
+		tr
+		   td.right
+			   div.lastUpdated
+ */
+ 
+
+
+/* GLOBAL SYTLE global styling, sets overall style of page */
+
+body {
+	font-family: Verdana;
+	margin: 0px; /* increase to have page float on background */
+	padding: 0px; 
+	font-size: 8pt;
+}
+
+li {
+	margin-bottom: .3em; /* make list items more compact than default */
+}
+
+img {
+	border: 0; /* by default, images should not have a border */
+}
+
+.emptyImage {						/* used for special effects */
+	float:left;
+	margin: 0px;			/* distance to outline */
+}
+	
+
+/* all headers in boxes */
+.header {
+	clear: both;    /* floating element below */
+}
+
+/* link styles */ 
+a {
+	text-decoration: underline; /* set to "none" to hide underlines on links */
+}
+
+a img {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+/* remove link underline from some special elements: Header and Overview Map */
+#mapPageHeader a, {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+a:link {
+	color: #0066CC;
+}
+
+a:visited {
+	color: #993399;
+}
+
+/* Note: hover selector should be last in order to take precedence in :visited AND :hover situation */
+a:hover {
+	color: #FF3300;
+}
+
+/* special link styles */
+a.noHover:hover {
+	background-color:transparent;	/* If you don't want images wrapped in <a> to have hover effect, make it <a class="noHover"> */
+}
+
+a:active {
+	color: #FF3300;
+}
+
+
+/*********************************************************************************/
+/*** Styles of specific modules **************************************************/
+/*********************************************************************************/
+
+/* MODULE:  HEADER --------------------------------------------*/
+#pageHeader {
+	width: 100%;
+	border-bottom: 1px solid #C0C0C0;
+	background-image: url(../images/header_background.gif);
+	background-repeat: repeat-y;
+	background-color: #6487DC; 			/* same color as on right side in backgound image */
+}
+
+
+#pageHeader td {
+	padding-left: 6px;
+	padding-right: 6px;
+}	
+
+#pageHeader div {
+	/*margin-bottom: .2em;	*/ 
+}
+
+/* logo image on left side of header */	
+#pageHeader .left {
+	width: auto;
+	margin-right: 8px;
+	vertical-align: middle;
+}
+
+/* header information */
+#pageHeader .right {
+	margin-left: 8px;
+	width: 100%;					/* helps to left align text */
+	color: White;
+}
+
+#pageHeader .right .utilities  {
+	text-align: right;
+	font-size: 8pt;
+	vertical-align: top;
+}
+
+.utilities_toc {
+	display: show;					/* show table of content link */
+}
+
+/* link style in header */
+/* note: Order is important. If ambiguous, last has precedence. */ 
+#pageHeader a:link {
+	color: White;
+}
+
+#pageHeader a:visited {
+	color: White;
+}
+
+#pageHeader a:hover {
+   color: #BEDBF7;
+}
+
+#pageHeader a:active {
+	color: #FF3300;
+}
+
+/* note: Order is important. If ambiguous, last has precedence. */ 
+#pageHeader .right .utilities  a:link {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+#pageHeader .right .utilities  a:visited {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+#pageHeader .right .utilities  a:hover {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+#pageHeader .right .utilities  a:active {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+#pageHeader .right .mapName {
+	text-align: left;
+	font-family: Arial;
+	font-size: 15pt;
+	vertical-align: middle;
+}
+
+#pageHeader .right .contactInformation{
+	text-align: right;
+	font-size: 7pt;
+	vertical-align: bottom;
+	/*margin-right: 4px;			*/	/* to right align with commands in utilities */
+}
+
+
+/* MODULE:  BODY (main content) ------------------------------------------ */
+table#pageBody {
+	width: 100%;
+}
+
+.bodyColumn {
+	padding: 0px;
+	vertical-align: top;
+	text-align: left;
+	width: 100%;
+}
+
+
+/* width of second body column: liquid width for content */
+#pageBody col.main {
+	width:auto;
+}
+
+#pageBody col.right {
+	width: auto;						
+}
+
+/* some padding values for the core table in used page body */
+table#pageBody tr td {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+table#pageBody td.main {
+	padding-left: 10px;			/* indent main topic content */
+	padding-right: 20px;       /* and leave some space on the right */
+}
+
+table#pageBody td.breadcrumbs {
+	vertical-align: top;
+	padding-left: 10px;			/* indent main topic content */
+}
+
+table#pageBody td.pageNavigation {
+	padding-right: 20px; /* and leave some space on the right */
+}
+
+.topicDivider {
+	border-top: 1px solid #C0C0C0;
+	height: 0.1em;
+	font-size: 2pt;				/* I need a very narrow divider */
+}
+
+
+/* MODULE: FOOTER  ------------------------------------------------------------*/
+#pageFooter {
+	width: 100%;
+	background-color: #6487DC;;
+	border-top: 1px solid #C0C0C0;
+	font-size: 8pt;
+	color: White;
+}
+
+
+#pageFooter td {
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+#pageFooter div {
+/*	margin-bottom: .2em;	*/
+}
+
+/* link style in footer */
+
+#pageFooter a:link {
+	color: White;
+}
+
+#pageFooter a:visited {
+	color: White;
+}
+
+#pageFooter a:hover {
+   color: #BEDBF7;
+}
+
+#pageFooter a:active {
+	color: #FF3300;
+}
+
+/* reserved for image */
+#pageFooter .left {
+	width: 0px;
+	margin-right: 0px;
+}
+
+#pageFooter .center {
+	width: 65%;					/* helps to left align text */
+	text-align: left;
+	vertical-align: top;
+}
+
+#pageFooter .center .footerText {
+}
+
+/* Last update and hyperlink */
+#pageFooter .right {
+	width: 35%;
+	text-align: right;
+}
+
+#pageFooter .right .hyperlink {
+	vertical-align: top;
+}
+
+#pageFooter .right .lastUpdated {
+	vertical-align: bottom;
+}
+
+/* MODULE BREADCRUMBS AND PREV / NEXT NAVIGATION --------------------------------------------------*/
+.breadcrumbs {
+	font-size: 7pt;
+	text-align: left;
+	width: 70%;
+	vertical-align: top;
+	color: #0066CC;
+	padding-top: 4px;
+	padding-bottom: 2px;
+}
+
+.breadcrumbs a:visited {
+	color: #0066CC;						/* don't show visited colors for breadcrumbs */
+}
+	
+.breadcrumbs .breadcrumb {
+	white-space: nowrap; /* set to "nowrap" to stop breadcrumbs from breaking in the middle */
+}
+	
+/* move the previous / next links to the right side */
+.pageNavigation {
+	text-align: right;
+	font-size: 7pt;
+	width: 30%;
+	vertical-align: middle;
+}
+
+.pageNavigation a:visited {
+	color: #0066CC;						/* don't show visited colors for prev/next navigation */
+}
+
+
+/*----------------------------------------------------------------------------------*/	
+/* MODULE: TOPIC ------------------------------------------------------------------ */
+/*----------------------------------------------------------------------------------*/	
+/*
+		tr.topic (0+)
+			td.main (colspan = 2)
+				tr.topicHeader
+					td.topicImageColumn
+					   img.topicImage
+					td.topicLineColumn
+						span.outlineNumber
+						span.topicLine
+						span.topicIcons
+							img.topicIcon
+				div.body
+				<partial map>
+					div.topicTextNotes
+					   div Notes
+				<callouts>
+				<task planning>
+				<data container>
+				<review comments>
+				<related>
+			td.right	
+*/
+
+.topic .main .body {
+	clear: both;
+}
+
+.topicHeader {
+	vertical-align: middle;	
+	clear:both;      
+}
+
+.topicImageColumn {
+}
+
+.topicImage {
+	margin-right: 6px;			/* distance to outline */
+}
+
+.topicTopicLineColumn {
+}
+
+.outlineNumberFirst {			/* first topic on page */
+	display: visible;         	/* set to none or visible to hide/show outlineNumbers   */
+	font-size:  11pt;
+	font-weight: bold;
+}
+
+.outlineNumber {					/* other topics on page */
+	display: visible;         	/* set to none or visible to hide/show outlineNumbers   */
+	font-size:  10pt;
+	font-weight: bold;
+}
+	
+.topicLineFirst {					/* first topic on page */
+	font-size:  11pt;
+	font-weight: bold;
+}	
+	
+.topicLine {						/* other topics on page */
+	font-size:  10pt;
+	font-weight: bold;
+}	
+
+/* group of icons */
+.topicIcons {
+	margin-left: 4px;				/* distance to topic text */
+	vertical-align: middle;	   /* center icons around text (important for single line callouts) */
+}
+
+/* single icons */
+.topicIcon {
+	margin-right: 3px;			/* distance between icons */
+}
+
+
+/* <div> around whole text notes */
+.topicTextNotes {
+	font-size: 9pt;	
+	margin-left: 0.3em;							
+	margin-top: 0.5em;
+}
+
+.topicTextNotes div {
+	margin-bottom: 0.8em;						/* distance between paragraphs */	
+}
+
+.topicTextNotes table {
+	margin-bottom: 0.7em;						/* some space below tables and before next paragraph starts */	
+}
+
+.topicTextNotes table div {
+	margin-left: 0.3em;							/* some left and right cell padding */
+	margin-right: 0.3em;
+}
+
+.topicTextNotes .lastTableNotesDiv {
+	margin-bottom: 0em;						  /* no bottom margin for last paragraph in Notes */		
+}
+
+
+/* <div> around whole text notes in callouts */
+.callouts .topicTextNotes {
+	font-size: 8pt;	
+	margin-left: 0px;							
+}
+
+/* single link, so far used in callout section */
+.topicHyperlink {
+	font-size: 8pt;	
+}
+
+/* the icon behind the link */
+.topicHyperlinkIcon {
+	vertical-align: bottom;
+}
+
+
+
+/* commands: active buttons / hot spots or links */
+.command {
+	white-space: nowrap;
+}
+
+.command img {
+	display: inline; /* set to none or inline to hide or show command icons */
+	vertical-align: bottom;
+	margin-left: 2px;
+}
+
+.command .label {
+	display: inline;  /* set to none or inline to hide or show command text labels */
+	vertical-align: middle;
+}
+
+
+
+/* MODULE: BOX - MAP GRAPHICS SNIPPET ---------------------------------------------------*/
+/*
+		div.partialMapArea
+		   table.partialMapTable
+				div.SubTopicItems
+				  div.subtopicitem
+				     img
+					  a
+				div.partialMap
+					img
+*/
+
+.partialMapArea {
+	vertical-align: top;
+	margin-bottom: 10px;    /* some distance below this block */
+}
+
+table#partialMapTable tr td {
+	padding: 0px; 
+}
+
+.subTopicItems {
+	clear: both;
+	font-size: 8pt;				
+	font-weight: normal;
+	margin-left:  10px;
+	margin-right:  50px;
+}
+
+.subtopicitem {
+	margin-top: 3px;
+	margin-bottom: 2px;
+}
+
+.partialMap {
+	margin-top: 5px;
+	margin-bottom: 5px;
+   	display: visible;           /* this value will be set during the export depending on user setting in property inspector */
+}
+	
+
+/* MODULE: CALLOUT -SECTION---------------------------------------------------------------------*/
+/*
+		div.callouts
+			div.callout
+				div.calloutHeader
+				   span topicIcons 
+					   img.topicIcon
+				tr.calloutBody
+					div.calloutImage
+					   img.topicImage
+					div.topicTextNotes 
+					   div Notes
+					   span a.topicGyperlink a.topicHyperlinkIcon
+*/
+
+/* all callouts */
+.callouts {
+	background-color: #F4F4F4;
+	width: 360px;	
+	margin-left: 30px;
+	margin-bottom: 8px;
+	border-top: 3px solid #6487DC;
+	border-bottom: 3px solid #6487DC;
+}
+
+/* single callout */
+.callout {
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-top: 0px;
+	margin-bottom: 3px;
+}
+
+/* topic text and icons */
+.calloutHeader {
+	font-size: 8pt;
+	font-weight: bold;
+	color: Gray;
+	padding-left: 4px;			/* align with text notes */
+}
+
+.calloutBody {
+	vertical-align: top;
+	text-align: left;
+}
+
+.calloutImage {
+	padding-left: 4px;  			/* align with text notes */
+}
+
+
+/* -----------------------------------------------------*/
+/* COLLAPSIBLE BOXES
+/*-------------------------------------------------------*/
+/*
+	div.<special box name>Area     (need "Area" string for collapse button script)		
+	  div.collapsiblebox (1+) 
+	    div.header
+			 span.title
+			img.expandOrCollapseButton
+		 div.body
+			(varies)
+*/
+
+/* the body class is important for the collapse script. It follows the initial .collapsiblebox statement */
+.body {
+	clear: both;
+}
+
+.clearFloat {
+	clear: both;	/* needed to hold down bottom border sometimes */
+}
+
+
+.collapsiblebox {
+	clear: both;
+	width: 360px;
+	padding-bottom: 0px;
+	background-color: #8CAAE7;
+	border: 1px solid #C0C0C0;
+	margin-bottom: 8px;
+	margin-left: 30px;
+}
+
+.legend .collapsiblebox {
+	margin-left: 0px;						/* overide for the legend box */
+}
+
+.collapsiblebox .title {
+	padding: 3px;
+	padding-left: 6px;
+	font-size: 8pt;
+	text-align: left;
+	font-weight: bold;
+	color: White;
+	float: left;
+}
+
+.collapsiblebox .expandOrCollapseButton {
+	float: right;
+	text-align: right;
+	margin-top: 2px;
+	margin-left: 8px;
+	margin-right: 4px;
+	vertical-align: middle;
+	display: inline; /* set to none to hide button(s); set to inline to show */
+}
+
+.collapsiblebox .body {
+	clear: both;
+	padding-bottom: 1px;
+	padding-left: 0px;
+	padding-right: 0px;
+	background-color: #EEF3FF;
+}
+
+/* generic style for lists in boxes e.g. task information or about box */
+.property {
+	clear: both;
+	height: 1em;				/* since I'm using spans, I need some more line spacing */
+}
+
+.property .label {
+	width: 15 em;
+	font-size: 7pt;
+	color: gray;
+	text-indent: 6px;
+}
+
+.property .value {
+	width: auto;
+	font-size: 8pt;
+	color: #0066CC;
+}
+
+
+/* MODULES:  BOX - TASK INFORMATION ---------------------------------------------------------- */
+.taskInformationArea .body {
+	display: none;				/* collapse when first shown */
+}
+
+/* MODULES:  BOX - TEXT MARKERS INFORMATION ---------------------------------------------------------- */
+.textMarkersArea .body {
+    display: none;
+}
+
+/* MODULES:  BOX - DATA CONTAINER ---------------------------------------------------------- */
+
+.dataContainerArea .body {
+	display: none;				/* collapse when first shown */
+}
+
+.dataContainerTable {
+    table-layout: fixed;
+    width: 100%;
+    clear: both;
+	height: 1em;				/* since I'm using spans, I need some more line spacing */
+}
+
+.dataContainerTableColumnHeader {
+	width: 15 em;
+	font-size: 7pt;
+	color: gray;								/* STYLE */
+	text-indent: 6px;
+}
+
+.dataContainerTableRowHeader {
+	width: 15 em;
+	font-size: 7pt;
+	color: gray;								/* STYLE */
+	text-indent: 6px;
+}
+
+.dataContainerTableCell {
+	width: auto;
+	font-size: 8pt;
+	color: #0066CC;                      /* STYLE */
+}
+
+.dataContainerCustomProperties {
+   width: 100%;
+   clear: both;
+	height: 1em;				/* since I'm using spans, I need some more line spacing */
+}
+
+.dataContainerCustomPropertyGroup {
+	width: 15 em;
+	font-size: 7pt;
+	color: white;				
+	background-color: gray;				
+	text-indent: 6px;
+}
+
+.dataContainerCustomPropertyName{
+	width: 15 em;
+	font-size: 7pt;
+	color: gray;								/* STYLE */
+	text-indent: 6px;
+}
+
+.dataContainerCustomPropertyNameInGroup{
+	width: 15 em;
+	font-size: 7pt;
+	color: gray;								/* STYLE */
+	text-indent: 12px;
+}
+
+.dataContainerCustomPropertyValue{
+	width: auto;
+	font-size: 8pt;
+	color: #0066CC;                      /* STYLE */
+}
+
+.dataContainerImage {
+	margin-right: 1px;			/* distance to outline */
+}
+
+
+/* MODULES:  BOX - REVIEW COMMMENT ---------------------------------------------------------- */
+.comment {
+	clear: both;
+}
+
+.commentsArea .body {
+	display: none;				/* collapse when first shown */
+	font-size: 8pt;
+	color: #0066CC;
+}
+
+.comment .userName {
+	font-weight: bold;
+	float: left;
+	margin-bottom: 0px;
+	padding-left: 6px;
+}
+
+.comment .date {
+	font-weight: bold;
+	float: right;
+	margin-bottom: 0px;
+	padding-right: 6px;
+}
+
+.comment .text {
+	clear: both;
+	padding-bottom: 4px;			/* makes bottom 'border' bigger on opera */
+	padding-right: 6px;
+	padding-left: 6px;
+}
+
+
+/* MODULE: RELATED SECTION  ----------------------------------------------------------------------*/
+/*
+		div.relatedSection
+			div.oneRelatedSection
+				a topicHyperlink
+			div.relatedSectionBody
+				div.relatedItem
+					span relatedItemBullet
+					a topicHyperlink
+					a topicHyperlink    (optional callout link)
+					img topicHyperlinkIcon 
+*/
+
+.relatedSection {
+}
+
+.oneRelatedSection {
+	margin-top: 16px;
+	margin-bottom: 8px;	
+}
+
+.relatedSectionHeader {
+	font-size: 8pt;
+	font-weight: bold;
+	padding-left: 4px;			/* align with text notes */
+}
+
+.relatedItem {
+	font-size: 8pt;
+	margin-top: 1px;
+	margin-bottom: 2px;
+}
+
+.relatedItemBullet {
+	padding-left: 4px;			/* align with text notes */
+}
+
+/* the icon behind the link */
+.relatedItem .topicHyperlinkIcon {
+	vertical-align: middle;
+}
+
+/* MODULE: TOP COMMAND ----------------------------------------------------------*/
+.topCommand {
+   vertical-align: bottom;
+	font-size: 7pt;
+	margin-top: 10mm;
+	margin-bottom: 2mm;
+}
+
+.topCommand  a:link {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+.topCommand  a:visited {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+	color: #0066CC;						/* don't show visited colors for prev/next navigation */
+}
+
+.topCommand  a:hover {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+.topCommand  a:active {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+
+
+					
+/**********************************************************************************************/
+/******** OTHER WINDOW LAYOUTS ****************************************************************/
+/**********************************************************************************************/
+/* WINDOW: LEGEND ------------------------------------------------------------- */
+/*
+	.div legend
+	   .div collapsiblebox
+		   .div body
+				.div legendGroup
+				.div legendItem
+					.div item
+					.div label
+*/
+
+.legend {
+	margin-left: 6px;
+	margin-top: 6px;
+	font-size: 8pt;
+	color: #0066CC;
+	width: 200px;
+}
+
+/* set with of both divs to avoid right border if text wraps */
+.legend .collapsiblebox  {
+	width: 200px;
+}
+
+.legend .collapsiblebox .body {
+	width: 200px;
+}
+	
+.legendGroup
+{
+	clear: both;
+	font-weight: bold;
+	float: left;
+	margin-top:  5px;
+	margin-bottom:  4px;
+	margin-left: 0px;
+}
+
+.legendItem
+{
+	clear: both;
+	margin-left: 5px;
+}
+
+.legendItem .item {
+	float: left;
+	margin-right: 6px;
+}
+
+.legendItem .label {
+	float: left;
+	margin-right: 2px;
+}
+
+
+/* WINDOW: CONTENT ------------------------------------------------------------- */
+/* 
+	div.Page
+		table.pageBody
+			col.TOCContents
+				div.body
+					div.contentItem1[1-9]
+						div.outlineNumber
+						div.topicLine
+							a topicHyperlink
+			col.TOCAbout
+				div.collapsiblebox
+					div.header
+					div.body
+						div.mapPreview
+							img
+						div.property
+							div.label
+							div.value
+
+*/
+
+.TOCContents {
+	text-align: left;		
+	vertical-align: top;
+	width: 90%;
+}
+
+.TOCContents .body {
+	margin: 15px;		
+	margin-right: 5px;	
+	color: #0066CC;
+	font-size: 8pt;
+	font-weight: normal;
+}
+
+.TOCAbout {
+	text-align: right;		
+	vertical-align: top;
+	width: 10%;
+}
+
+.TOCAbout .collapsiblebox {
+	margin: 15px;			
+	margin-right: 5px;	
+}
+
+.TOCAbout .property {
+	margin-top: 5px;			
+}
+
+.TOCAbout .property .label {
+	float: left;
+	text-align: left;
+	width: 7.5em;			
+}
+
+.TOCAbout .property .value {
+	float: left;
+	text-align: left;
+	margin-left: 1.0em;				
+}
+
+.mapPreview {
+	padding-top: 10px;
+	padding-bottom: 16px;
+	text-align: center;
+	border-bottom: 1px solid #C0C0C0;
+}
+
+.contentItem1 {
+	margin-top: 5px;
+	clear: both;
+}
+	
+.contentItem2 {
+	margin-top: 3px;
+	margin-left: 2em;
+	clear: both;
+}
+
+.contentItem3 {
+	margin-left: 4em;
+	clear: both;
+}
+
+.contentItem4 {
+	margin-left: 6em;
+	clear: both;
+}
+
+.contentItem5 {
+	margin-left: 8em;
+	clear: both;
+}
+
+.contentItem6 {
+	margin-left: 10em;
+	clear: both;
+}
+
+.contentItem7 {
+	margin-left: 12em;
+	clear: both;
+}
+
+.contentItem8 {
+	margin-left: 14em;
+	clear: both;
+}
+
+.contentItem9 {
+	margin-left: 16em;
+	clear: both;
+}
+
+.contentItemX {
+	margin-left: 18em;
+	clear: both;
+}
+
+
+/* WINDOW: OVERVIEW MAP ------------------------------------------------------------- */
+/*
+		body overviewMapBody 
+			.div overviewDiv
+			   img mapOverview
+				img mapDetailed
+*/
+
+
+.overviewMapBody {
+	background-color: Gray;
+}
+
+.overviewDiv {
+	cursor: hand;
+	text-align: center;
+	margin-top: 10px;				/* remove once we can center horizontally */
+}
+
+img#mapOverview, img#mapDetailed {
+	margin: 0px;
+}
+
+body#mapPageFooter {
+	font-family: Verdana;
+	font-size: 8pt;
+	text-align: center;
+	padding-top: 3px;
+	vertical-align: middle;
+	color: white;
+	background-color: #6487DC; 			
+}
+
+
+

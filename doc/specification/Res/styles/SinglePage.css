@@ -1,0 +1,109 @@
+/* Cascading Style Sheet for HTML export */
+
+/* MODULE: SINGLE PAGE */
+/* LIGHT BLUE */
+
+/* This stylesheet expects the following HTML structure
+		  
+
+*/
+
+.outlineColumn {
+	padding-left: 10px;					/* leave some space on the left side */
+}
+
+.utilities_toc {
+	display: none;							/* hide table of contents link in header */
+}
+
+.topicDivider {
+/*   border-width:  0px;		*/			/* hide divider line */
+   margin-top: 10px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	display: show;							
+}
+
+.topicTextNotes {
+	font-size: 8pt;						/* use smaller notes font for long one page documents */
+}
+
+.outlineNumberSecond {							/* main topics */
+	font-size:  9pt;
+	font-weight: bold;
+	display: visible;         	/* set to none or visible to hide/show outlineNumbers   */
+}
+	
+.topicLineSecond {								/* main topics */
+	font-size:  9pt;
+	font-weight: bold;
+}	
+
+.outlineNumber {							/* other topics on page */
+	font-size:  8pt;
+}
+	
+.topicLine {								/* other topics on page */
+	font-size:  8pt;
+}	
+
+
+.TOCbody {
+	margin-left: 3px;						/* indent toc slightly to align it with topics */
+}
+
+/* note: Order is important. If ambiguous, last has precedence. */ 
+.TOCbody a:link {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+.TOCbody a:visited {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+.TOCbody  a:hover {
+	text-decoration: underline; /* set to "none" to hide underlines on links */
+}
+.TOCbody a:active {
+	text-decoration: none; /* set to "none" to hide underlines on links */
+}
+
+.TOCcontentItem1 {
+	margin-top: 1em;
+	font-weight: bold;
+	clear: both;
+}
+
+.TOCcontentItem1 a:link {
+	font-size: 9pt;
+}
+	
+.TOCcontentItem2 {
+	margin-top: 0.3em;
+	font-weight: bold;
+	margin-left: 2em;
+	clear: both;
+}
+
+.TOCcontentItem3 {
+	margin-top: 0.2em;
+	margin-left: 4em;
+	clear: both;
+}
+
+.TOCcontentItem4 {
+	margin-top: 0.2em;
+	margin-left: 4em;
+	clear: both;
+}
+
+.TOCcontentItem5 {
+	margin-top: 0.2em;
+	margin-left: 4em;
+	clear: both;
+}
+
+.TOCcontentItemX {
+	margin-left: 4em;
+	clear: both;
+}
