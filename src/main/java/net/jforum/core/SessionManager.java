@@ -69,8 +69,8 @@ public class SessionManager {
 		if (!userSession.isBot()) {
 			this.preventDuplicates(userSession);
 
-			if (userSession.getUser().getId() == config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
-				anonymousSessions.put(userSession.getSessionId(), userSession);
+			if (userSession.getUser().getId() == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
+				this.anonymousSessions.put(userSession.getSessionId(), userSession);
 			}
 			else {
 				UserSession existing = this.isUserInSession(userSession.getUser().getId());
@@ -80,7 +80,7 @@ public class SessionManager {
 					this.remove(existing.getSessionId());
 				}
 				else {
-					Session session = sessionRepository.get(userSession.getUser().getId());
+					Session session = this.sessionRepository.get(userSession.getUser().getId());
 
 					if (session != null && session.getLastVisit() != null) {
 						userSession.setLastVisit(session.getLastVisit().getTime());
@@ -89,7 +89,7 @@ public class SessionManager {
 
 				this.checkIfIsModerator(userSession);
 
-				loggedSessions.put(userSession.getSessionId(), userSession);
+				this.loggedSessions.put(userSession.getSessionId(), userSession);
 			}
 		}
 	}
@@ -99,13 +99,13 @@ public class SessionManager {
 		roleManager.setGroups(userSession.getUser().getGroups());
 
 		if (roleManager.isModerator()) {
-			moderatorsOnline++;
+			this.moderatorsOnline++;
 		}
 	}
 
 	public void computeAllOnlineModerators() {
-		moderatorsOnline = 0;
-		Collection<UserSession> sessions = loggedSessions.values();
+		this.moderatorsOnline = 0;
+		Collection<UserSession> sessions = this.loggedSessions.values();
 
 		for (UserSession session : sessions) {
 			this.checkIfIsModerator(session);
@@ -113,7 +113,7 @@ public class SessionManager {
 	}
 
 	public boolean isModeratorOnline() {
-		return moderatorsOnline > 0;
+		return this.moderatorsOnline > 0;
 	}
 
 	/**
@@ -132,18 +132,18 @@ public class SessionManager {
 	 * @param sessionId The session id to remove
 	 */
 	public synchronized void remove(String sessionId) {
-		if (loggedSessions.containsKey(sessionId)) {
+		if (this.loggedSessions.containsKey(sessionId)) {
 			UserSession userSession = this.getUserSession(sessionId);
 
 			if (userSession.getRoleManager() != null
-				&& userSession.getRoleManager().isModerator() && moderatorsOnline > 0) {
-				moderatorsOnline--;
+				&& userSession.getRoleManager().isModerator() && this.moderatorsOnline > 0) {
+				this.moderatorsOnline--;
 			}
 
-			loggedSessions.remove(sessionId);
+			this.loggedSessions.remove(sessionId);
 		}
 		else {
-			anonymousSessions.remove(sessionId);
+			this.anonymousSessions.remove(sessionId);
 		}
 	}
 
@@ -153,8 +153,8 @@ public class SessionManager {
 	 * @return <code>ArrayList</code> with the sessions. Each entry is an <code>UserSession</code> object.
 	 */
 	public List<UserSession> getAllSessions() {
-		List<UserSession> list = new ArrayList<UserSession>(loggedSessions.values());
-		list.addAll(anonymousSessions.values());
+		List<UserSession> list = new ArrayList<UserSession>(this.loggedSessions.values());
+		list.addAll(this.anonymousSessions.values());
 
 		return list;
 	}
@@ -165,7 +165,7 @@ public class SessionManager {
 	 * @return A list with the user sessions
 	 */
 	public Collection<UserSession> getLoggedSessions() {
-		return loggedSessions.values();
+		return this.loggedSessions.values();
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class SessionManager {
 	 * @return the number of logged users
 	 */
 	public int getTotalLoggedUsers() {
-		return loggedSessions.size();
+		return this.loggedSessions.size();
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class SessionManager {
 	 * @return the nuber of anonymous users
 	 */
 	public int getTotalAnonymousUsers() {
-		return anonymousSessions.size();
+		return this.anonymousSessions.size();
 	}
 
 	/**
@@ -193,8 +193,8 @@ public class SessionManager {
 	 * @return the user session
 	 */
 	public UserSession getUserSession(String sessionId) {
-		UserSession us = anonymousSessions.get(sessionId);
-		return us != null ? us : loggedSessions.get(sessionId);
+		UserSession us = this.anonymousSessions.get(sessionId);
+		return us != null ? us : this.loggedSessions.get(sessionId);
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class SessionManager {
 	 * @return The number of session elements currently online (without bots)
 	 */
 	public int getTotalUsers() {
-		return anonymousSessions.size() + loggedSessions.size();
+		return this.anonymousSessions.size() + this.loggedSessions.size();
 	}
 
 	/**
@@ -221,7 +221,7 @@ public class SessionManager {
 	 * @return The respective {@link UserSession} if the user is already registered, or <code>null</code> otherwise.
 	 */
 	public UserSession isUserInSession(int userId) {
-		for (UserSession us : loggedSessions.values()) {
+		for (UserSession us : this.loggedSessions.values()) {
 			if (us.getUser().getId() == userId) {
 				return us;
 			}
@@ -237,12 +237,12 @@ public class SessionManager {
 	 * @throws IOException
 	 */
 	public UserSession refreshSession(HttpServletRequest request, HttpServletResponse response) {
-		boolean isSSOAuthentication = ConfigKeys.TYPE_SSO.equals(config.getValue(ConfigKeys.AUTHENTICATION_TYPE));
+		boolean isSSOAuthentication = ConfigKeys.TYPE_SSO.equals(this.config.getValue(ConfigKeys.AUTHENTICATION_TYPE));
 		request.setAttribute("sso", isSSOAuthentication);
-		request.setAttribute("ssoLogout", config.getValue(ConfigKeys.SSO_LOGOUT));
+		request.setAttribute("ssoLogout", this.config.getValue(ConfigKeys.SSO_LOGOUT));
 
 		UserSession userSession = this.getUserSession(request.getSession().getId());
-		int anonymousUserId = config.getInt(ConfigKeys.ANONYMOUS_USER_ID);
+		int anonymousUserId = this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID);
 
 		if (userSession == null) {
 			userSession = new UserSession();
@@ -255,12 +255,12 @@ public class SessionManager {
 					this.checkSSO(userSession, request);
 				}
 				else {
-					boolean autoLoginEnabled = config.getBoolean(ConfigKeys.AUTO_LOGIN_ENABLED);
+					boolean autoLoginEnabled = this.config.getBoolean(ConfigKeys.AUTO_LOGIN_ENABLED);
 					boolean autoLoginSuccess = autoLoginEnabled && this.checkAutoLogin(userSession);
 
 					if (!autoLoginSuccess) {
 						userSession.becomeAnonymous(anonymousUserId);
-						userSession.setUser(userRepository.get(anonymousUserId));
+						userSession.setUser(this.userRepository.get(anonymousUserId));
 					}
 				}
 			}
@@ -273,7 +273,7 @@ public class SessionManager {
 			SSO sso;
 
 			try {
-				sso = (SSO) Class.forName(config.getValue(ConfigKeys.SSO_IMPLEMENTATION)).newInstance();
+				sso = (SSO) Class.forName(this.config.getValue(ConfigKeys.SSO_IMPLEMENTATION)).newInstance();
 			}
 			catch (Exception e) {
 				throw new ForumException(e);
@@ -297,7 +297,7 @@ public class SessionManager {
 
 				// FIXME: Force a reload of the user instance, because if it's kept in the usersession,
 				// changes made to the group (like permissions) won't be seen.
-				User user = userRepository.get(userSession.getUser().getId());
+				User user = this.userRepository.get(userSession.getUser().getId());
 
 				if (user == null) {
 					// FIXME: now what? we didn't find the user, so something must be wrong
@@ -312,7 +312,7 @@ public class SessionManager {
 		else {
 			// FIXME: Force a reload of the user instance, because if it's kept in the usersession,
 			// changes made to the group (like permissions) won't be seen.
-			userSession.setUser(userRepository.get(userSession.getUser().getId()));
+			userSession.setUser(this.userRepository.get(userSession.getUser().getId()));
 		}
 
 		userSession.ping();
@@ -324,7 +324,7 @@ public class SessionManager {
 					+ ". As we have a problem, will force the user to become anonymous. Session ID: " + request.getSession().getId());
 			userSession.becomeAnonymous(anonymousUserId);
 
-			User anonymousUser = userRepository.get(userSession.getUser().getId());
+			User anonymousUser = this.userRepository.get(userSession.getUser().getId());
 
 			if (anonymousUser == null) {
 				logger.warn("Could not find the anonymous user in the database. Tried using id " + anonymousUserId);
@@ -355,10 +355,10 @@ public class SessionManager {
 	public void storeSession(String sessionId) {
 		UserSession userSession = this.getUserSession(sessionId);
 
-		if (userSession != null && userSession.getUser().getId() != config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
+		if (userSession != null && userSession.getUser().getId() != this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
 			Session session = userSession.asSession();
 			session.setLastVisit(session.getLastAccessed());
-			sessionRepository.add(session);
+			this.sessionRepository.add(session);
 		}
 	}
 
@@ -369,27 +369,27 @@ public class SessionManager {
 	 * @return <code>true</code> if auto login was enabled and the user was sucessfuly logged in.
 	 */
 	private boolean checkAutoLogin(UserSession userSession) {
-		Cookie userIdCookie = userSession.getCookie(config.getValue(ConfigKeys.COOKIE_USER_ID));
-		Cookie hashCookie = userSession.getCookie(config.getValue(ConfigKeys.COOKIE_USER_HASH));
-		Cookie autoLoginCookie = userSession.getCookie(config.getValue(ConfigKeys.COOKIE_AUTO_LOGIN));
+		Cookie userIdCookie = userSession.getCookie(this.config.getValue(ConfigKeys.COOKIE_USER_ID));
+		Cookie hashCookie = userSession.getCookie(this.config.getValue(ConfigKeys.COOKIE_USER_HASH));
+		Cookie autoLoginCookie = userSession.getCookie(this.config.getValue(ConfigKeys.COOKIE_AUTO_LOGIN));
 
 		if (hashCookie != null && userIdCookie != null
-				&& !userIdCookie.getValue().equals(config.getValue(ConfigKeys.ANONYMOUS_USER_ID))
+				&& !userIdCookie.getValue().equals(this.config.getValue(ConfigKeys.ANONYMOUS_USER_ID))
 				&& autoLoginCookie != null && "1".equals(autoLoginCookie.getValue())) {
 			String userId = userIdCookie.getValue();
 			String uidHash = hashCookie.getValue();
 
-			User user = userRepository.get(Integer.parseInt(userId));
+			User user = this.userRepository.get(Integer.parseInt(userId));
 
 			if (user == null || user.isDeleted() || StringUtils.isEmpty(user.getSecurityHash())) {
-				userSession.becomeAnonymous(config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
+				userSession.becomeAnonymous(this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
 				return false;
 			}
 
 			String securityHash = MD5.hash(user.getSecurityHash());
 
 			if (!securityHash.equals(uidHash)) {
-				userSession.becomeAnonymous(config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
+				userSession.becomeAnonymous(this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
 				return false;
 			}
 			else {
@@ -421,35 +421,35 @@ public class SessionManager {
 	 */
 	private void checkSSO(UserSession userSession, HttpServletRequest request) {
 		try {
-			SSO sso = (SSO)Class.forName(config.getValue(ConfigKeys.SSO_IMPLEMENTATION)).newInstance();
-			sso.setConfig(config);
+			SSO sso = (SSO)Class.forName(this.config.getValue(ConfigKeys.SSO_IMPLEMENTATION)).newInstance();
+			sso.setConfig(this.config);
 			String username = sso.authenticateUser(request);
 
 			logger.info(String.format("SSO authenticated an user with username %s. Session ID %s", username, request.getSession().getId()));
 
 			if (StringUtils.isEmpty(username)) {
 				logger.warn(String.format("checkSSO found an empty / null username. Going anonymous. Session ID %s", request.getSession().getId()));
-				userSession.becomeAnonymous(config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
+				userSession.becomeAnonymous(this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
 			}
 			else {
-				SSOUtils utils = new SSOUtils(userRepository);
+				SSOUtils utils = new SSOUtils(this.userRepository);
 				boolean userExists = utils.userExists(username);
 
 				logger.info(String.format("SSO user %s exists? %s", username, userExists));
 
 				if (!userExists) {
 					String email = (String)userSession.getAttribute(
-						config.getValue(ConfigKeys.SSO_EMAIL_ATTRIBUTE));
+						this.config.getValue(ConfigKeys.SSO_EMAIL_ATTRIBUTE));
 
 					String password = (String)userSession.getAttribute(
-						config.getValue(ConfigKeys.SSO_PASSWORD_ATTRIBUTE));
+						this.config.getValue(ConfigKeys.SSO_PASSWORD_ATTRIBUTE));
 
 					if (email == null) {
-						email = config.getValue(ConfigKeys.SSO_DEFAULT_EMAIL);
+						email = this.config.getValue(ConfigKeys.SSO_DEFAULT_EMAIL);
 					}
 
 					if (password == null) {
-						password = config.getValue(ConfigKeys.SSO_DEFAULT_PASSWORD);
+						password = this.config.getValue(ConfigKeys.SSO_DEFAULT_PASSWORD);
 					}
 
 					utils.register(password, email);
@@ -470,7 +470,7 @@ public class SessionManager {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new ForumException("Error while executing SSO actions: " + e);
+			throw new ForumException("Error while executing SSO actions: " + e, e);
 		}
 	}
 }

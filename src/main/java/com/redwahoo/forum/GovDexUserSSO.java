@@ -41,14 +41,14 @@ public class GovDexUserSSO implements SSO {
 		HttpSession session = request.getSession();
 
 		ApplicationContext springContext = (ApplicationContext)session.getServletContext().getAttribute(ConfigKeys.SPRING_CONTEXT);
-		userRepository = (UserRepository) springContext.getBean(UserRepository.class.getName());
-		groupRepository = (GroupRepository) springContext.getBean(GroupRepository.class.getName());
+		this.userRepository = (UserRepository) springContext.getBean(UserRepository.class.getName());
+		this.groupRepository = (GroupRepository) springContext.getBean(GroupRepository.class.getName());
 
 		String username = (String)session.getAttribute(CASFilter.CAS_FILTER_USER);
 
 		if (!StringUtils.isEmpty(username)) {
 			username = username.trim().toLowerCase();
-			User user = userRepository.getByUsername(username);
+			User user = this.userRepository.getByUsername(username);
 
 			RemoteUserDetails rud = new RemoteUserDetails();
 			rud.getDetails(username);
@@ -67,12 +67,12 @@ public class GovDexUserSSO implements SSO {
 				user.setPassword(pass);
 
 				SessionFactory sessionFactory = (SessionFactory)springContext.getBean(SessionFactory.class.getName());
-				userRepository.add(user);
+				this.userRepository.add(user);
 				sessionFactory.getCurrentSession().getTransaction().commit();
 				sessionFactory.getCurrentSession().clear();
 				sessionFactory.getCurrentSession().beginTransaction();
 
-				user = userRepository.get(user.getId());
+				user = this.userRepository.get(user.getId());
 
 				logger.info(String.format("Added new user. Username is %s, id is %d. Session ID: %s", user.getUsername(), user.getId(), request.getSession().getId()));
 			}
@@ -80,11 +80,14 @@ public class GovDexUserSSO implements SSO {
 				username = username.toLowerCase();
 
 				 // Synchronize user membership
-				user.setUsername(rud.getUsername().trim().toLowerCase());
+				if (!StringUtils.isEmpty(rud.getUsername())) {
+					user.setUsername(rud.getUsername().trim().toLowerCase());
+				}
+
 				user.setEmail(rud.getEmail());
 				user.setLastName(rud.getFullname());
 
-				userRepository.update(user);
+				this.userRepository.update(user);
 
 				logger.info(String.format("Updated user. username %s, session ID %s", user.getUsername(), request.getSession().getId()));
 			}
@@ -108,13 +111,13 @@ public class GovDexUserSSO implements SSO {
 			remoteUser = remoteUser.toLowerCase();
 		}
 
-		if (config == null){
+		if (this.config == null){
 			ServletContext context = request.getSession().getServletContext();
 			ApplicationContext springContext = (ApplicationContext)context.getAttribute(ConfigKeys.SPRING_CONTEXT);
 			config = (JForumConfig) springContext.getBean(JForumConfig.class.getName());
 		}
 
-		int anonymousUserId = config.getInt(ConfigKeys.ANONYMOUS_USER_ID);
+		int anonymousUserId = this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID);
 		int userID = anonymousUserId;
 		String sessionUsername = "";
 
@@ -191,7 +194,7 @@ public class GovDexUserSSO implements SSO {
             Group group = new Group();
             group.setName(groupName);
             group.setDescription("LDAP Group");
-            groupRepository.add(group);
+            this.groupRepository.add(group);
 
             user.addGroup(group);
         }
@@ -213,6 +216,6 @@ public class GovDexUserSSO implements SSO {
 		}
 
 		//save the group changes
-		userRepository.update(user);
+		this.userRepository.update(user);
 	}
 }

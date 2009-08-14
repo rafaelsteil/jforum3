@@ -76,32 +76,32 @@ public abstract class Spammer {
 		String authProperty = this.authProperty(ssl);
 		String localhostProperty = this.localhostProperty(ssl);
 
-		mailProperties.put(hostProperty, config.getValue(ConfigKeys.MAIL_SMTP_HOST));
-		mailProperties.put(portProperty, config.getValue(ConfigKeys.MAIL_SMTP_PORT));
+		this.mailProperties.put(hostProperty, config.getValue(ConfigKeys.MAIL_SMTP_HOST));
+		this.mailProperties.put(portProperty, config.getValue(ConfigKeys.MAIL_SMTP_PORT));
 
 		String localhost = this.config.getValue(ConfigKeys.MAIL_SMTP_LOCALHOST);
 
 		if (!StringUtils.isEmpty(localhost)) {
-			mailProperties.put(localhostProperty, localhost);
+			this.mailProperties.put(localhostProperty, localhost);
 		}
 
-		mailProperties.put("mail.mime.address.strict", "false");
-		mailProperties.put("mail.mime.charset", this.config.getValue(ConfigKeys.MAIL_CHARSET));
-		mailProperties.put(authProperty, this.config.getValue(ConfigKeys.MAIL_SMTP_AUTH));
+		this.mailProperties.put("mail.mime.address.strict", "false");
+		this.mailProperties.put("mail.mime.charset", this.config.getValue(ConfigKeys.MAIL_CHARSET));
+		this.mailProperties.put(authProperty, this.config.getValue(ConfigKeys.MAIL_SMTP_AUTH));
 
-		username = this.config.getValue(ConfigKeys.MAIL_SMTP_USERNAME);
-		password = this.config.getValue(ConfigKeys.MAIL_SMTP_PASSWORD);
+		this.username = this.config.getValue(ConfigKeys.MAIL_SMTP_USERNAME);
+		this.password = this.config.getValue(ConfigKeys.MAIL_SMTP_PASSWORD);
 
 		messageFormat = this.config.getValue(ConfigKeys.MAIL_MESSSAGE_FORMAT).equals("html")
 			? MESSAGE_HTML
 			: MESSAGE_TEXT;
 
-		session = Session.getInstance(mailProperties);
+		this.session = Session.getInstance(mailProperties);
 	}
 
 	public boolean dispatchMessages() {
 		try {
-			if (config.getBoolean(ConfigKeys.MAIL_SMTP_AUTH)) {
+			if (this.config.getBoolean(ConfigKeys.MAIL_SMTP_AUTH)) {
 				this.dispatchAuthenticatedMessage();
 			}
 			else {
@@ -116,18 +116,18 @@ public abstract class Spammer {
 	}
 
 	protected JForumConfig getConfig() {
-		return config;
+		return this.config;
 	}
 
 	private void dispatchAnonymousMessage() throws AddressException, MessagingException {
-		int sendDelay = config.getInt(ConfigKeys.MAIL_SMTP_DELAY);
+		int sendDelay = this.config.getInt(ConfigKeys.MAIL_SMTP_DELAY);
 
-		for (User user : users) {
+		for (User user : this.users) {
 			if (StringUtils.isEmpty(user.getEmail())) {
 				continue;
 			}
 
-			if (needCustomization) {
+			if (this.needCustomization) {
 				this.defineUserMessage(user);
 			}
 
@@ -137,8 +137,8 @@ public abstract class Spammer {
 				logger.trace("Sending mail to: " + user.getEmail());
 			}
 
-			message.setRecipient(Message.RecipientType.TO, address);
-			Transport.send(message, new Address[] { address });
+			this.message.setRecipient(Message.RecipientType.TO, address);
+			Transport.send(this.message, new Address[] { address });
 
 			if (sendDelay > 0) {
 				this.waitUntilNextMessage(sendDelay);
@@ -148,10 +148,10 @@ public abstract class Spammer {
 
 	private void dispatchAuthenticatedMessage() throws NoSuchProviderException {
 		if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
-			int batchSize = config.getInt(ConfigKeys.MAIL_BATCH_SIZE);
-			int total = (int)Math.ceil((double)users.size() / (double)batchSize);
+			int batchSize = this.config.getInt(ConfigKeys.MAIL_BATCH_SIZE);
+			int total = (int)Math.ceil((double)this.users.size() / (double)batchSize);
 
-			Iterator<User> iterator = users.iterator();
+			Iterator<User> iterator = this.users.iterator();
 
 			for (int i = 0; i < total; i++) {
 				this.dispatchNoMoreThanBatchSize(iterator, batchSize);
@@ -160,12 +160,12 @@ public abstract class Spammer {
 	}
 
 	private void dispatchNoMoreThanBatchSize(Iterator<User> iterator, int batchSize) throws NoSuchProviderException {
-		boolean ssl = config.getBoolean(ConfigKeys.MAIL_SMTP_SSL);
-		Transport transport = session.getTransport(ssl ? "smtps" : "smtp");
+		boolean ssl = this.config.getBoolean(ConfigKeys.MAIL_SMTP_SSL);
+		Transport transport = this.session.getTransport(ssl ? "smtps" : "smtp");
 
 		try {
-			String host = config.getValue(ConfigKeys.MAIL_SMTP_HOST);
-			int sendDelay = config.getInt(ConfigKeys.MAIL_SMTP_DELAY);
+			String host = this.config.getValue(ConfigKeys.MAIL_SMTP_HOST);
+			int sendDelay = this.config.getInt(ConfigKeys.MAIL_SMTP_DELAY);
 
 			transport.connect(host, username, password);
 
@@ -177,7 +177,7 @@ public abstract class Spammer {
 						continue;
 					}
 
-					if (needCustomization) {
+					if (this.needCustomization) {
 						this.defineUserMessage(user);
 					}
 
@@ -187,8 +187,8 @@ public abstract class Spammer {
 						logger.debug("Sending mail to: " + user.getEmail());
 					}
 
-					message.setRecipient(Message.RecipientType.TO, address);
-					transport.sendMessage(message, new Address[] { address });
+					this.message.setRecipient(Message.RecipientType.TO, address);
+					transport.sendMessage(this.message, new Address[] { address });
 
 					if (sendDelay > 0) {
 						this.waitUntilNextMessage(sendDelay);
@@ -210,7 +210,7 @@ public abstract class Spammer {
 
 	private void defineUserMessage(User user) {
 		try {
-			templateParams.put("user", user);
+			this.templateParams.put("user", user);
 
 			String text = this.processTemplate();
 
@@ -238,31 +238,31 @@ public abstract class Spammer {
 	 * @throws MailException
 	 */
 	protected void prepareMessage(String subject, String messageFile) throws MailException {
-		if (messageId == null) {
-			message = new MimeMessage(session);
+		if (this.messageId == null) {
+			this.message = new MimeMessage(session);
 		}
 		else {
-			message = new IdentifiableMimeMessage(session);
-			((IdentifiableMimeMessage) message).setMessageId(messageId);
+			this.message = new IdentifiableMimeMessage(session);
+			((IdentifiableMimeMessage) this.message).setMessageId(this.messageId);
 		}
 
-		templateParams.put("forumName", config.getValue(ConfigKeys.FORUM_NAME));
+		this.templateParams.put("forumName", this.config.getValue(ConfigKeys.FORUM_NAME));
 
 		try {
-			message.setSentDate(new Date());
-			message.setFrom(new InternetAddress(config.getValue(ConfigKeys.MAIL_SENDER)));
-			message.setSubject(subject, config.getValue(ConfigKeys.MAIL_CHARSET));
+			this.message.setSentDate(new Date());
+			this.message.setFrom(new InternetAddress(this.config.getValue(ConfigKeys.MAIL_SENDER)));
+			this.message.setSubject(subject, this.config.getValue(ConfigKeys.MAIL_CHARSET));
 
-			if (inReplyTo != null) {
-				message.addHeader("In-Reply-To", inReplyTo);
+			if (this.inReplyTo != null) {
+				this.message.addHeader("In-Reply-To", this.inReplyTo);
 			}
 
 			this.createTemplate(messageFile);
-			needCustomization = this.isCustomizationNeeded();
+			this.needCustomization = this.isCustomizationNeeded();
 
 			// If we don't need to customize any part of the message,
 			// then build the generic text right now
-			if (!needCustomization) {
+			if (!this.needCustomization) {
 				String text = this.processTemplate();
 				this.defineMessageText(text);
 			}
@@ -281,11 +281,11 @@ public abstract class Spammer {
 	private void defineMessageText(String text) throws MessagingException {
 
 		if (messageFormat == MESSAGE_TEXT) {
-			message.setText(text);
+			this.message.setText(text);
 		}
 		else {
-			String charset = config.getValue(ConfigKeys.MAIL_CHARSET);
-			message.setContent(text.replaceAll("\n", "<br />"), "text/html; charset=" + charset);
+			String charset = this.config.getValue(ConfigKeys.MAIL_CHARSET);
+			this.message.setContent(text.replaceAll("\n", "<br />"), "text/html; charset=" + charset);
 		}
 	}
 
@@ -297,7 +297,7 @@ public abstract class Spammer {
 	 * @throws Exception
 	 */
 	protected void createTemplate(String templateName) throws Exception {
-		templateFile = new File(config.getValue(ConfigKeys.APPLICATION_PATH) + templateName);
+		this.templateFile = new File(this.config.getValue(ConfigKeys.APPLICATION_PATH) + templateName);
 	}
 
 	/**
@@ -308,8 +308,8 @@ public abstract class Spammer {
 	 * @return the generated content
 	 */
 	protected String processTemplate() throws Exception {
-		return templateEngine.createTemplate(templateFile)
-			.make(templateParams).toString();
+		return this.templateEngine.createTemplate(this.templateFile)
+			.make(this.templateParams).toString();
 	}
 
 	/**
@@ -318,7 +318,7 @@ public abstract class Spammer {
 	 * @param params the parameters to the template
 	 */
 	protected void setTemplateParams(Map<String, Object> params) {
-		templateParams = params;
+		this.templateParams = params;
 	}
 
 	/**
@@ -327,7 +327,7 @@ public abstract class Spammer {
 	 * @return true if there is a need for customized emails
 	 */
 	private boolean isCustomizationNeeded() {
-		for (User user : users) {
+		for (User user : this.users) {
 			if (user.getNotifyText()) {
 				return true;
 			}

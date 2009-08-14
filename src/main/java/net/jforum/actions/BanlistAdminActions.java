@@ -37,6 +37,6 @@ public class BanlistAdminActions {
 	}
 
 	public void list() {
-		propertyBag.put("banlist", repository.getAllBanlists());
+		this.propertyBag.put("banlist", this.repository.getAllBanlists());
 	}
 }

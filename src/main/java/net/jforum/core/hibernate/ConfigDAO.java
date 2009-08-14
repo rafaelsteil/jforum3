@@ -40,7 +40,7 @@ public class ConfigDAO extends HibernateGenericDAO<Config> implements ConfigRepo
 	 * @see net.jforum.repository.ConfigRepository#getByName(java.lang.String)
 	 */
 	public Config getByName(String configName) {
-		return (Config)this.session().createCriteria(persistClass)
+		return (Config)this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("name", configName))
 			.setCacheable(true)
 			.setCacheRegion("configDAO")
@@ -50,6 +50,6 @@ public class ConfigDAO extends HibernateGenericDAO<Config> implements ConfigRepo
 
 	@SuppressWarnings("unchecked")
 	public List<Config> getAll() {
-		return this.session().createCriteria(persistClass).list();
+		return this.session().createCriteria(this.persistClass).list();
 	}
 }

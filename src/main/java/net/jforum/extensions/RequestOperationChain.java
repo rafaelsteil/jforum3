@@ -29,8 +29,8 @@ public class RequestOperationChain implements ApplicationContextAware {
 	}
 
 	public void callAllOperations() {
-		for (String operationClassName : operations) {
-			RequestOperation operation = (RequestOperation)applicationContext.getBean(operationClassName);
+		for (String operationClassName : this.operations) {
+			RequestOperation operation = (RequestOperation)this.applicationContext.getBean(operationClassName);
 			operation.execute();
 		}
 	}

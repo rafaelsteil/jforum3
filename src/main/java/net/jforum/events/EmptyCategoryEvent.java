@@ -48,4 +48,10 @@ public class EmptyCategoryEvent implements Event<Category> {
 	 */
 	public void beforeDeleted(Category entity) {}
 
+	/**
+	 * @see net.jforum.events.Event#beforeUpdated(java.lang.Object)
+	 */
+	public void beforeUpdated(Category entity) {
+	}
+
 }

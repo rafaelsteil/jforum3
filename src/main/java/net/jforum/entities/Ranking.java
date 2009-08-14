@@ -30,11 +30,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "jforum_ranks")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Ranking implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_ranks_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -57,28 +52,28 @@ public class Ranking implements Serializable {
 	 * @return int
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return String
 	 */
 	public String getImage() {
-		return image;
+		return this.image;
 	}
 
 	/**
 	 * @return String
 	 */
 	public boolean isSpecial() {
-		return special;
+		return this.special;
 	}
 
 	/**
 	 * @return String
 	 */
 	public String getTitle() {
-		return (title == null ? "" : title);
+		return (this.title == null ? "" : this.title);
 	}
 
 	/**
@@ -121,14 +116,14 @@ public class Ranking implements Serializable {
 	 * @return
 	 */
 	public int getMin() {
-		return min;
+		return this.min;
 	}
 
 	/**
 	 * @param i
 	 */
 	public void setMin(int i) {
-		min = i;
+		this.min = i;
 	}
 
 	/**

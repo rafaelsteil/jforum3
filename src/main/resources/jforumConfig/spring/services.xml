@@ -21,6 +21,7 @@
 	<bean id="net.jforum.services.AttachmentService" class="net.jforum.services.AttachmentService" autowire="constructor"/>
 	<bean id="net.jforum.services.PollService" class="net.jforum.services.PollService" autowire="constructor"/>
 	<bean id="net.jforum.services.ConfigService" class="net.jforum.services.ConfigService" autowire="constructor"/>
+	<bean id="net.jforum.services.ModerationLogService" class="net.jforum.services.ModerationLogService" autowire="constructor"/>
 	
 	<bean id="net.jforum.services.MessageFormatService" class="net.jforum.services.MessageFormatService">
 		<property name="formatters" ref="net.jforum.formatters.PostFormatters"/>

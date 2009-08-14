@@ -22,7 +22,9 @@ CREATE TABLE jforum_categories (
   category_title varchar(100) NOT NULL default '',
   category_order INT NOT NULL default '0',
   category_moderated TINYINT(1) DEFAULT '0',
-  PRIMARY KEY  (category_id)
+  category_theme_id INT,
+  PRIMARY KEY  (category_id),
+  KEY (category_theme_id)
 ) TYPE=InnoDB;
 
 --
@@ -49,10 +51,8 @@ CREATE TABLE jforum_forums (
   forum_last_post_id INT default '0',
   forum_moderated TINYINT(1) DEFAULT '0',
   forum_allow_anonymous_posts tinyint(1) default 0,
-  theme_id INT,
   PRIMARY KEY  (forum_id),
-  KEY (category_id),
-  KEY (theme_id)
+  KEY (category_id)
 ) TYPE=InnoDB;
 
 --
@@ -330,8 +330,7 @@ CREATE TABLE jforum_vote_desc (
   vote_text varchar(255) NOT NULL,
   vote_start datetime,
   vote_length int(11) default '0',
-  PRIMARY KEY  (vote_id),
-  INDEX(topic_id)
+  PRIMARY KEY  (vote_id)
 ) TYPE=InnoDB;
 
 --

@@ -33,7 +33,7 @@ public class SpringPlugin implements VRaptorPlugin {
 		long startTime = System.currentTimeMillis();
 		LOG.info("Loading Spring root WebApplicationContext");
 
-		final String configFile = properties.get(CONFIG_FILE_KEY);
+		final String configFile = this.properties.get(CONFIG_FILE_KEY);
 		String contextName = this.getContextName(application);
 
 		LOG.info("Configuration file for Spring is " + configFile);

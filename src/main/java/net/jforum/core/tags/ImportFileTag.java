@@ -24,21 +24,21 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 
-import net.jforum.util.ConfigKeys;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.taglibs.standard.tag.common.core.NullAttributeException;
+
+import net.jforum.util.ConfigKeys;
 
 /**
  * @author Bill
  *
  */
 public abstract class ImportFileTag extends JForumTag {
-
+	
 	protected String charEncoding;                // 'charEncoding' attrib.
-
+	
 	protected String url;                                // 'url' attribute
-
+	
 	/**
 	 * @param charEncoding the charEncoding to set
 	 */
@@ -49,7 +49,7 @@ public abstract class ImportFileTag extends JForumTag {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
+	
 	/**
 	 * @see javax.servlet.jsp.tagext.SimpleTagSupport#doTag()
 	 */
@@ -58,19 +58,19 @@ public abstract class ImportFileTag extends JForumTag {
 		// check the URL
 		if (StringUtils.isEmpty(url))
 		    throw new NullAttributeException("import", "url");
-
+		
 		String jsp = this.getFile(url);
-
+		
 		ServletRequest request  = this.request();
 		ServletResponse respose = this.response();
 		HttpSession session = ((HttpServletRequest)request).getSession();
 		ServletContext servletContext = session.getServletContext();
-
+		
 		String jspPath = servletContext.getRealPath(jsp);
 		File jspFile = new File(jspPath);
 		if(!jspFile.exists())
 			return ;
-
+		
 		respose.flushBuffer();
 		RequestDispatcher rd = this.pageContext().getRequest().getRequestDispatcher(jsp);
 		try {

@@ -47,6 +47,12 @@ public interface Event<T> {
 	public void deleted(T entity);
 
 	/**
+	 * Execute before an entity is updated
+	 * @param entity
+	 */
+	public void beforeUpdated(T entity);
+
+	/**
 	 * Executed after an entity was updated
 	 * @param entity
 	 */

@@ -25,6 +25,7 @@ import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Config;
 import net.jforum.repository.ConfigRepository;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 
@@ -38,10 +39,10 @@ public class JForumConfig extends PropertiesConfiguration {
 
 	public JForumConfig(ConfigRepository configRepository, HibernateAwareTask hibernateTask) {
 		this.setReloadingStrategy(new FileChangedReloadingStrategy());
+		this.setDelimiterParsingDisabled(true);
 
 		try {
-			this.load(this.getClass().getResourceAsStream("/jforumConfig/SystemGlobals.properties"));
-			this.loadCustomProperties();
+			loadProps();
 
 			hibernateTask.execute(new HibernateRunnable() {
 				public void run() {
@@ -61,9 +62,17 @@ public class JForumConfig extends PropertiesConfiguration {
 		this.loadUrlPatterns();
 	}
 
-	public String getListAsString(String key) {
-		String value = this.getList(key).toString();
-		return value.substring(1, value.length() - 1);
+	public JForumConfig() {
+		try {
+			loadProps();
+		} catch (Exception e) {
+			throw new ForumException(e);
+		}
+	}
+
+	private void loadProps() throws ConfigurationException, Exception {
+		this.load(this.getClass().getResourceAsStream("/jforumConfig/SystemGlobals.properties"));
+		this.loadCustomProperties();
 	}
 
 	private void loadCustomProperties() throws Exception {
@@ -83,7 +92,7 @@ public class JForumConfig extends PropertiesConfiguration {
 
 	private void loadDatabaseProperties() throws Exception{
 		if (configRepository != null) {
-			List<Config> databasesProperties = configRepository.getAll();
+			List<Config> databasesProperties = this.configRepository.getAll();
 
 			for (Config config : databasesProperties) {
 				this.clearProperty(config.getName());
@@ -101,7 +110,7 @@ public class JForumConfig extends PropertiesConfiguration {
 	}
 
 	public UrlPattern getUrlPattern(String name) {
-		return urlPatterns.get(name);
+		return this.urlPatterns.get(name);
 	}
 
 	/**
@@ -135,7 +144,7 @@ public class JForumConfig extends PropertiesConfiguration {
 				String name = (String)entry.getKey();
 				String value = (String)entry.getValue();
 
-				urlPatterns.put(name, new UrlPattern(value));
+				this.urlPatterns.put(name, new UrlPattern(value));
 			}
 		}
 		catch (IOException e) {

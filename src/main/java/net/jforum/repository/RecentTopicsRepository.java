@@ -23,5 +23,9 @@ public interface RecentTopicsRepository extends Repository<Topic> {
 	 * @param count how many topics should be retrieved
 	 * @return a list of most recent topics, from all forums
 	 */
-	public List<Topic> getRecentTopics(int count);
+	public List<Topic> getNewTopics(int count);
+
+	public List<Topic> getUpdatedTopics(int count);
+
+	public List<Topic> getHotTopics(int count);
 }

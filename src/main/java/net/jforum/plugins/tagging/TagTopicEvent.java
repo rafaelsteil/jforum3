@@ -25,7 +25,7 @@ public class TagTopicEvent extends EmptyTopicEvent {
 	public TagTopicEvent(TagRepository repository) {
 		this.repository = repository;
 	}
-
+	
 	/**
 	 * The actions are:
 	 * <ul>
@@ -38,5 +38,5 @@ public class TagTopicEvent extends EmptyTopicEvent {
 		for(Tag tag : tags)
 			repository.remove(tag);
 	}
-
+	
 }

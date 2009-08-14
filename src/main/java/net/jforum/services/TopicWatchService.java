@@ -30,7 +30,7 @@ public class TopicWatchService {
 	 * @see {@link TopicWatchRepository#isUserSubscribed(Topic, User))
 	 */
 	public boolean isUserSubscribed(Topic topic, User user) {
-		return repository.isUserSubscribed(topic, user);
+		return this.repository.isUserSubscribed(topic, user);
 	}
 
 	/**
@@ -39,14 +39,14 @@ public class TopicWatchService {
 	 * @param user the user who wants to watch
 	 */
 	public void watch(Topic topic, User user) {
-		boolean isUserSubscribed = repository.isUserSubscribed(topic, user);
+		boolean isUserSubscribed = this.repository.isUserSubscribed(topic, user);
 
 		if (!isUserSubscribed) {
 			TopicWatch watch = new TopicWatch();
 			watch.setTopic(topic);
 			watch.setUser(user);
 
-			repository.add(watch);
+			this.repository.add(watch);
 		}
 	}
 
@@ -56,6 +56,6 @@ public class TopicWatchService {
 	 * @param user the user who wants to unwatch
 	 */
 	public void unwatch(Topic topic, User user) {
-		repository.removeSubscription(topic, user);
+		this.repository.removeSubscription(topic, user);
 	}
 }

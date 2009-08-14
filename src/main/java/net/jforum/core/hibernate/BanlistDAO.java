@@ -30,6 +30,6 @@ public class BanlistDAO extends HibernateGenericDAO<Banlist> implements BanlistR
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Banlist> getAllBanlists() {
-		return this.session().createCriteria(persistClass).list();
+		return this.session().createCriteria(this.persistClass).list();
 	}
 }

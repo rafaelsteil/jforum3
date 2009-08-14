@@ -51,7 +51,7 @@ public class AttachmentQuota {
 	 * @return <code>true</code> if the size is greater than quota's limit.
 	 */
 	public boolean exceedsQuota(long size) {
-		if (type == AttachmentQuota.KB) {
+		if (this.type == AttachmentQuota.KB) {
 			return (size > this.size * 1024);
 		}
 
@@ -59,18 +59,18 @@ public class AttachmentQuota {
 	}
 
 	public int getSizeInBytes() {
-		if (type == AttachmentQuota.KB) {
-			return (size * 1024);
+		if (this.type == AttachmentQuota.KB) {
+			return (this.size * 1024);
 		}
 
-		return (size * 1024 * 1024);
+		return (this.size * 1024 * 1024);
 	}
 
 	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class AttachmentQuota {
 	 * @return Returns the id.
 	 */
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class AttachmentQuota {
 	 * @return Returns the size.
 	 */
 	public int getSize() {
-		return size;
+		return this.size;
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class AttachmentQuota {
 	 * @return Returns the type.
 	 */
 	public int getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class AttachmentQuota {
 		}
 
 		AttachmentQuota other = (AttachmentQuota) obj;
-		return id.equals(other.id);
+		return this.id.equals(other.id);
 	}
 
 	@Override

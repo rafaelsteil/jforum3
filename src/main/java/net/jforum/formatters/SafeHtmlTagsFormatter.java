@@ -26,6 +26,6 @@ public class SafeHtmlTagsFormatter implements Formatter {
 	 * @see net.jforum.formatters.Formatter#format(java.lang.String, net.jforum.formatters.PostOptions)
 	 */
 	public String format(String text, PostOptions postOptions) {
-		return safeHtml.makeSafe(text);
+		return this.safeHtml.makeSafe(text);
 	}
 }

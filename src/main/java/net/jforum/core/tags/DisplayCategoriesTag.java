@@ -25,14 +25,15 @@ public class DisplayCategoriesTag extends JForumTag {
 	private List<Category> categories;
 	private RoleManager roleManager;
 	private String var;
+	private boolean isModerator;
 
 	/**
 	 * @see javax.servlet.jsp.tagext.SimpleTagSupport#doTag()
 	 */
 	@Override
 	public void doTag() throws JspException, IOException {
-		for (Category category : categories) {
-			if (roleManager.isCategoryAllowed(category)) {
+		for (Category category : this.categories) {
+			if (this.roleManager.isCategoryAllowed(category.getId())) {
 				this.setAttribute(var, category);
 				this.invokeJspBody();
 			}
@@ -49,5 +50,9 @@ public class DisplayCategoriesTag extends JForumTag {
 
 	public void setItems(List<Category> categories) {
 		this.categories = categories;
+	}
+
+	public void setModerator(boolean isModerator) {
+		this.isModerator = isModerator;
 	}
 }

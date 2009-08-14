@@ -25,6 +25,7 @@ public class DisplayForumsTag extends JForumTag {
 	private String var;
 	private List<Forum> forums;
 	private RoleManager roleManager;
+	private boolean isModerator;
 
 	/**
 	 * @see javax.servlet.jsp.tagext.SimpleTagSupport#doTag()
@@ -33,10 +34,12 @@ public class DisplayForumsTag extends JForumTag {
 	public void doTag() throws JspException, IOException {
 		int counter = 1;
 
-		for (Forum forum : forums) {
-			if (roleManager.isForumAllowed(forum.getId())) {
-				this.setAttribute(var, forum);
-				this.setAttribute(var + "Counter", counter);
+		for (Forum forum : this.forums) {
+			if (!this.isModerator && this.roleManager.isForumAllowed(forum.getId())
+				|| this.isModerator && this.roleManager.getCanModerateForum(forum.getId())
+				|| this.roleManager.isAdministrator()) {
+				this.setAttribute(this.var, forum);
+				this.setAttribute(this.var + "Counter", counter);
 				this.invokeJspBody();
 
 				counter++;
@@ -54,5 +57,9 @@ public class DisplayForumsTag extends JForumTag {
 
 	public void setItems(List<Forum> forums) {
 		this.forums = forums;
+	}
+
+	public void setModerator(boolean isModerator) {
+		this.isModerator = isModerator;
 	}
 }

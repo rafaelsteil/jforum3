@@ -12,6 +12,7 @@ package net.jforum.security;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.Post;
 import net.jforum.entities.UserSession;
@@ -22,9 +23,11 @@ import net.jforum.repository.PostRepository;
  */
 public class ChangePostRule implements AccessRule {
 	private final PostRepository repository;
+	private final SessionManager sessionManager;
 
-	public ChangePostRule(PostRepository repository) {
+	public ChangePostRule(PostRepository repository, SessionManager sessionManager) {
 		this.repository = repository;
+		this.sessionManager = sessionManager;
 	}
 
 	/**
@@ -38,10 +41,14 @@ public class ChangePostRule implements AccessRule {
 		}
 
 		int postId = this.findPostId(request);
-		Post post = repository.get(postId);
+		Post post = this.repository.get(postId);
 
 		if (roleManager.isModerator() && roleManager.getCanModerateForum(post.getForum().getId())) {
 			return true;
+		}
+
+		if(roleManager.getPostOnlyWithModeratorOnline() && !sessionManager.isModeratorOnline()) {
+			return false;
 		}
 
 		return userSession.isLogged() && userSession.getUser().getId() == post.getUser().getId();

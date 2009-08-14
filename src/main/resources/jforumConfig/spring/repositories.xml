@@ -28,6 +28,7 @@
 	<bean id="net.jforum.repository.PollRepository" class="net.jforum.core.hibernate.PollDAO" autowire="constructor"/>
 	<bean id="net.jforum.repository.ThemeRepository" class="net.jforum.core.hibernate.ThemeDAO" autowire="constructor"/>
 	<bean id="net.jforum.repository.AttachmentRepository" class="net.jforum.core.hibernate.AttachmentDAO" autowire="constructor"/>
+	<bean id="net.jforum.repository.ModerationLogRepository" class="net.jforum.core.hibernate.ModerationLogDAO" autowire="constructor"/>
 	
 	<!-- Avatar -->	
 	<bean id="net.jforum.repository.AvatarRepository" class="net.jforum.core.hibernate.AvatarDAO" autowire="constructor" />

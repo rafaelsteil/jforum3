@@ -21,8 +21,10 @@ CREATE TABLE jforum_categories (
   category_id INTEGER NOT NULL PRIMARY KEY DEFAULT NEXTVAL('jforum_categories_seq'),
   category_title VARCHAR(100) NOT NULL DEFAULT '',
   category_order INTEGER NOT NULL DEFAULT 0,
-  category_moderated boolean default false
+  category_moderated boolean default false,
+  category_theme_id INTEGER,
 );
+CREATE INDEX idx_categories_themes_id ON jforum_categories(category_theme_id);
 
 --
 -- Table structure for table 'jforum_config'
@@ -47,11 +49,9 @@ CREATE TABLE jforum_forums (
   forum_last_post_id INTEGER,
   forum_moderated boolean default false,
   forum_allow_anonymous_posts boolean default false,
-  theme_id INTEGER,
   PRIMARY KEY(forum_id)
 );
 CREATE INDEX idx_forums_categories_id ON jforum_forums(category_id);
-CREATE INDEX idx_forums_themes_id ON jforum_forums(theme_id);
 
 --
 -- Table structure for table 'jforum_forums_watch'

@@ -26,7 +26,7 @@ public class HInjectorAnnotationSessionFactoryBean extends AnnotationSessionFact
 	 */
 	@Override
 	protected SessionFactory wrapSessionFactoryIfNecessary(SessionFactory rawSf) {
-		return new SpringSessionFactory(applicationContext, rawSf);
+		return new SpringSessionFactory(this.applicationContext, rawSf);
 	}
 
 	/**

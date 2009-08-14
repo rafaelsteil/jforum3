@@ -40,10 +40,10 @@ public class SSOUtils {
 	public boolean userExists(String username) {
 		this.username = username;
 
-		user = userRepository.getByUsername(username);
-		exists = user != null;
+		this.user = this.userRepository.getByUsername(username);
+		this.exists = this.user != null;
 
-		return exists;
+		return this.exists;
 	}
 
 	/**
@@ -56,19 +56,19 @@ public class SSOUtils {
 	 * @see #getUser()
 	 */
 	public void register(String password, String email) {
-		if (exists) {
+		if (this.exists) {
 			return;
 		}
 
 		// Is a new user for us. Register him
-		user = new User();
+		this.user = new User();
 
-		user.setUsername(username);
+		user.setUsername(this.username);
 		user.setPassword(password);
 		user.setEmail(email);
 		user.setActive(true);
 
-		userRepository.add(user);
+		this.userRepository.add(user);
 	}
 
 	/**
@@ -77,6 +77,6 @@ public class SSOUtils {
 	 * @return the user
 	 */
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 }

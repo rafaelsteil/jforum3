@@ -62,7 +62,7 @@ public class MessageId {
 	 * @return the topic id represented by this instance
 	 */
 	public int getTopicId() {
-		return topicId;
+		return this.topicId;
 	}
 
 	/**

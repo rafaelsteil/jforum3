@@ -34,7 +34,7 @@ public class PostExtensioin {
 	private ViewPropertyBag propertyBag;
 	private TagService tagService;
 	private PostRepository postRepository;
-
+	
 	public PostExtensioin(PostRepository postRepository,
 			ViewPropertyBag propertyBag, TagService tagService) {
 		this.postRepository = postRepository;
@@ -46,38 +46,38 @@ public class PostExtensioin {
 	public void edit(){
 		//boolean isEdit =(boolean) propertyBag.get("isEdit");
 		Post post = (Post) propertyBag.get("post");
-
+		
 		if(post == null)
 			return;
-
+		
 		Topic topic = post.getTopic();
 		if(post.equals(topic.getFirstPost())){
 			propertyBag.put("tags", tagService.getTagString(topic));
 		}
 	}
-
+	
 	@Extends(Actions.EDITSAVE)
 	public void editSave(@Parameter(key = "post") Post post,@Parameter(key = "tags") String tagString){
-		post = postRepository.get(post.getId());
-
+		post = this.postRepository.get(post.getId());
+		
 		if(post == null)
 			return ;
-
+		
 		Topic topic = post.getTopic();
 		if(post.equals(topic.getFirstPost())){
 			List<Tag> tags = tagService.getTag(topic);
 			if(tagService.getTagString(topic).equals(tagString.trim()))
 				return ; //no changed
-
+			
 			//changed. remove all the old tags
-			tagService.remove(tags);
-
+			this.tagService.remove(tags);
+			
 			//add the new tag if not empty
 			if(StringUtils.isNotEmpty(tagString)){
-				tagService.addTag(tagString, topic);
+				this.tagService.addTag(tagString, topic);
 			}
 		}
-
+		
 	}
-
+	
 }

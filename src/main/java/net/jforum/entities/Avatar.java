@@ -122,7 +122,7 @@ public class Avatar implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Integer.valueOf(id).hashCode();
+		return Integer.valueOf(this.id).hashCode();
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class ThemeActions {
 	}
 
 	public void list() {
-		propertyBag.put("themes", repository.getAll());
+		this.propertyBag.put("themes", this.repository.getAll());
 	}
 
 	public void add() {
@@ -50,22 +50,22 @@ public class ThemeActions {
 	}
 
 	public void addSave(@Parameter(key = "theme") Theme theme) {
-		repository.add(theme);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.add(theme);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void edit(@Parameter(key = "themeId") int themeId) {
-		propertyBag.put("theme", repository.get(themeId));
+		this.propertyBag.put("theme", this.repository.get(themeId));
 	}
 
 	public void editSave(@Parameter(key = "theme") Theme theme) {
-		repository.update(theme);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.update(theme);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void delete(@Parameter(key = "themeId") int themeId) {
-		Theme theme = repository.get(themeId);
-		repository.remove(theme);
-		viewService.redirectToAction(Actions.LIST);
+		Theme theme = this.repository.get(themeId);
+		this.repository.remove(theme);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

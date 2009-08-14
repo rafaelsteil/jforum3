@@ -34,11 +34,11 @@ public class DownloadAttachmentRule implements AccessRule {
 	 * @see net.jforum.security.AccessRule#shouldProceed(net.jforum.entities.UserSession, javax.servlet.http.HttpServletRequest)
 	 */
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
-		if (!userSession.isLogged() && !config.getBoolean(ConfigKeys.ATTACHMENTS_ANONYMOUS)) {
+		if (!userSession.isLogged() && !this.config.getBoolean(ConfigKeys.ATTACHMENTS_ANONYMOUS)) {
 			return false;
 		}
 
-		Attachment attachment = repository.get(Integer.parseInt(request.getParameter("attachmentId")));
+		Attachment attachment = this.repository.get(Integer.parseInt(request.getParameter("attachmentId")));
 
 		if (!userSession.getRoleManager().isAttachmentsAlllowed(attachment.getPost().getForum().getId())
 			&& !userSession.getRoleManager().getCanDownloadAttachments(attachment.getPost().getForum().getId())) {

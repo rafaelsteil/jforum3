@@ -71,7 +71,7 @@ public class SearchResult extends PaginatedResult<Post> {
 
 			if (!roleManager.isForumAllowed(post.getForum().getId())) {
 				iter.remove();
-				totalRecords--;
+				this.totalRecords--;
 			}
 		}
 

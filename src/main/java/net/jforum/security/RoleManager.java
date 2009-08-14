@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 import net.jforum.actions.helpers.PermissionOptions;
-import net.jforum.entities.Category;
+import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
+import net.jforum.entities.User;
 import net.jforum.util.SecurityConstants;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Provide access to all roles from a set of groups.
@@ -36,20 +38,28 @@ public class RoleManager {
 	 * @param groups the groups to add
 	 */
 	public void setGroups(List<Group> groups) {
-		roles = new HashMap<String, Role>();
+		this.roles = new HashMap<String, Role>();
+
+		List<String> shouldIntersectValues = Arrays.asList(new String[] {SecurityConstants.FORUM_READ_ONLY, SecurityConstants.FORUM_REPLY_ONLY});
 
 		if (groups != null) {
 			for (Group group : groups) {
 				List<Role> currentGroupRoles = group.getRoles();
 
 				for (Role role : currentGroupRoles) {
-					Role existingRole = roles.get(role.getName());
+					Role existingRole = this.roles.get(role.getName());
 
 					if (existingRole == null) {
-						roles.put(role.getName(), new Role(role));
+						this.roles.put(role.getName(), new Role(role));
 					}
 					else {
-						existingRole.getRoleValues().addAll(role.getRoleValues());
+						// this always works because when saving permissions we add an 0 id forum
+						// if no readonly/replyonly forum is added
+						if(shouldIntersectValues.contains(role.getName())) {
+							existingRole.getRoleValues().retainAll(role.getRoleValues());
+						} else {
+							existingRole.getRoleValues().addAll(role.getRoleValues());
+						}
 					}
 				}
 			}
@@ -176,7 +186,7 @@ public class RoleManager {
 	 * @return true if it can moderate the forum
 	 */
 	public boolean getCanModerateForum(int forumId) {
-		return this.roleExists(SecurityConstants.MODERATE_FORUM, forumId);
+		return isAdministrator() || this.roleExists(SecurityConstants.MODERATE_FORUM, forumId);
 	}
 
 	/**
@@ -209,18 +219,17 @@ public class RoleManager {
 	 * @param categoryId the category id
 	 * @return true if access is allowed
 	 */
-	@Deprecated // stop passing IDs around!
 	public boolean isCategoryAllowed(int categoryId) {
 		return this.roleExists(SecurityConstants.CATEGORY, categoryId);
 	}
 
-	/**
-	 * Check if it has access to the category
-	 * @param categoryId the category id
-	 * @return true if access is allowed
-	 */
-	public boolean isCategoryAllowed(Category category) {
-		return this.roleExists(SecurityConstants.CATEGORY, category.getId());
+	public boolean isCategoryModerated(List<Forum> forumsOfACategory) {
+		for (Forum forum : forumsOfACategory) {
+			if(this.roleExists(SecurityConstants.MODERATE_FORUM, forum.getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -320,6 +329,8 @@ public class RoleManager {
 		permissions.setCanHaveProfilePicture(this.getCanHaveProfilePicture());
 		permissions.setPostOnlyWithModeratorOnline(this.getPostOnlyWithModeratorOnline());
 		permissions.setPmOnlyToModerators(this.roleExists(SecurityConstants.PM_ONLY_TO_MODERATORS));
+		permissions.setCanViewActivityLog(this.roleExists(SecurityConstants.VIEW_MODERATION_LOG));
+		permissions.setCanViewFullActivityLog(this.roleExists(SecurityConstants.VIEW_FULL_MODERATION_LOG));
 
 		return permissions;
 	}
@@ -334,6 +345,20 @@ public class RoleManager {
 	}
 
 	private Role get(String name) {
-		return roles.get(name);
+		return this.roles.get(name);
+	}
+
+	public boolean getCanEditUser(User userToEdit, List<Group> groups) {
+		if(isAdministrator()) {
+			return true;
+		}
+		for (Group group : groups) {
+			for (Group group2 : userToEdit.getGroups()) {
+				if(group.equals(group2)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

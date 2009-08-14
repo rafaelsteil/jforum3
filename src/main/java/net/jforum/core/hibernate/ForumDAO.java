@@ -143,6 +143,7 @@ public class ForumDAO extends HibernateGenericDAO<Forum> implements ForumReposit
 			.setProjection(Projections.rowCount())
 			.add(Restrictions.eq("pendingModeration", false))
 			.add(Restrictions.eq("forum", forum))
+			.add(Restrictions.eq("movedId", 0))
 			.setCacheable(true)
 			.setCacheRegion("forumDAO.getTotalTopics#" + forum.getId())
 			.setComment("forumDAO.getTotalTopics")
@@ -159,7 +160,7 @@ public class ForumDAO extends HibernateGenericDAO<Forum> implements ForumReposit
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Topic> getTopics(Forum forum, int startFrom, int count) {
-		boolean includeMoved = config == null || !config.getBoolean(ConfigKeys.QUERY_IGNORE_TOPIC_MOVED);
+		boolean includeMoved = this.config == null || !this.config.getBoolean(ConfigKeys.QUERY_IGNORE_TOPIC_MOVED);
 
 		Criteria criteria = this.session().createCriteria(Topic.class)
 			.createAlias("firstPost", "fp")
@@ -214,7 +215,7 @@ public class ForumDAO extends HibernateGenericDAO<Forum> implements ForumReposit
 	}
 
 	private int getMaxDisplayOrder() {
-		Integer displayOrder = (Integer)this.session().createCriteria(persistClass)
+		Integer displayOrder = (Integer)this.session().createCriteria(this.persistClass)
 			.setProjection(Projections.max("displayOrder"))
 			.uniqueResult();
 
@@ -239,6 +240,17 @@ public class ForumDAO extends HibernateGenericDAO<Forum> implements ForumReposit
 
 		Date firstRegisteredUserDate = (Date)this.session().createQuery("select min(u.registrationDate) from User u").uniqueResult();
 		s.setUsersPerDay(firstRegisteredUserDate != null ? (double)s.getUsers() / this.daysUntilToday(today, firstRegisteredUserDate) : 0);
+
+		return s;
+	}
+
+	public ForumStats getForumStats(List<Group> groups) {
+		ForumStats s = new ForumStats();
+
+		// Total users
+		s.setTotalUsers(((Number)this.session().createQuery("select count(*) from User u where u.groups in (:groups)")
+			.setParameterList("groups", groups)
+			.uniqueResult()).intValue());
 
 		return s;
 	}

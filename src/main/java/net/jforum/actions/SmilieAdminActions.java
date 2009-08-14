@@ -51,7 +51,7 @@ public class SmilieAdminActions {
 	 * List all smilies
 	 */
 	public void list() {
-		propertyBag.put("smilies", repository.getAllSmilies());
+		this.propertyBag.put("smilies", this.repository.getAllSmilies());
 	}
 
 	/**
@@ -67,22 +67,22 @@ public class SmilieAdminActions {
 	 */
 	public void addSave(@Parameter(key = "smilie") Smilie smilie,
 		@Parameter(key = "image") UploadedFileInformation image) {
-		service.add(smilie, image);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.add(smilie, image);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * Shows the page to edit a existing smilie
 	 */
 	public void edit(@Parameter(key = "smilieId") int smilieId) {
-		propertyBag.put("smilie", repository.get(smilieId));
-		viewService.renderView(Actions.ADD);
+		this.propertyBag.put("smilie", this.repository.get(smilieId));
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void editSave(@Parameter(key = "smilie") Smilie smilie,
 		@Parameter(key = "image") UploadedFileInformation image) {
-		service.update(smilie, image);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.update(smilie, image);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class SmilieAdminActions {
 	 * @param smiliesId
 	 */
 	public void delete(@Parameter(key = "smiliesId") int... smiliesId) {
-		service.delete(smiliesId);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.delete(smiliesId);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

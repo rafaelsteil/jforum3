@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.exceptions.AccessRuleException;
+import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
+import net.jforum.repository.UserRepository;
 
 /**
  * Check if the user can edit his profile
@@ -23,6 +25,11 @@ import net.jforum.entities.UserSession;
  * @author Rafael Steil
  */
 public class EditUserRule implements AccessRule {
+	private final UserRepository repository;
+
+	public EditUserRule(UserRepository repository) {
+		this.repository = repository;
+	}
 
 	/**
 	 * Applies the following rules:
@@ -35,10 +42,13 @@ public class EditUserRule implements AccessRule {
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		int userId = this.findUserId(request);
 
-		return userSession.isLogged()
-			&& (userSession.getUser().getId() == userId
-				|| userSession.getRoleManager().isAdministrator()
-				|| userSession.getRoleManager().isCoAdministrator());
+		boolean logged = userSession.isLogged();
+		if(logged && userSession.getUser().getId() == userId) {
+			return true;
+		}
+
+		User user = repository.get(userId);
+		return logged && userSession.getRoleManager().getCanEditUser(user, userSession.getUser().getGroups());
 	}
 
 	private int findUserId(HttpServletRequest request) {

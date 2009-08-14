@@ -30,7 +30,7 @@ public class TopicWatchPostEvent extends EmptyPostEvent {
 	@Override
 	public void added(Post post) {
 		if (post.shouldNotifyReplies()) {
-			service.watch(post.getTopic(), post.getUser());
+			this.service.watch(post.getTopic(), post.getUser());
 		}
 	}
 }

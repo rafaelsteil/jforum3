@@ -67,6 +67,12 @@ public abstract class AbstractListener<EventType extends Event<TargetType>, Targ
 		}
 	}
 
+	protected void fireBeforeUpdated(TargetType entity) {
+		for (EventType event : this.events) {
+			event.beforeUpdated(entity);
+		}
+	}
+
 	protected void fireUpdated(TargetType entity) {
 		for (EventType event : this.events) {
 			event.updated(entity);

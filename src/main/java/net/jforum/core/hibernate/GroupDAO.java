@@ -32,14 +32,14 @@ public class GroupDAO extends HibernateGenericDAO<Group> implements GroupReposit
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Group> getAllGroups() {
-		return this.session().createCriteria(persistClass).list();
+		return this.session().createCriteria(this.persistClass).list();
 	}
 
 	/**
 	 * @see net.jforum.repository.GroupRepository#getByName(java.lang.String)
 	 */
 	public Group getByName(String groupName) {
-		return (Group) this.session().createCriteria(persistClass)
+		return (Group) this.session().createCriteria(this.persistClass)
 			   .add(Restrictions.eq("name", groupName))
 			   .uniqueResult();
 	}
@@ -57,6 +57,6 @@ public class GroupDAO extends HibernateGenericDAO<Group> implements GroupReposit
 		}
 		super.remove(group);
 	}
-
-
+	
+	
 }

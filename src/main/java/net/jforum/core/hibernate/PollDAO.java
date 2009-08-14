@@ -38,7 +38,7 @@ public class PollDAO implements PollRepository {
 	}
 
 	private Session session() {
-		return sessionFactory.getCurrentSession();
+		return this.sessionFactory.getCurrentSession();
 	}
 
 	/**

@@ -13,10 +13,6 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
  * @author Rafael Steil
  */
 public class SpringSessionFactory extends HInjectorSessionFactory {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
 	private final ApplicationContext beanRegistry;
 
 	public SpringSessionFactory(ApplicationContext beanRegistry, SessionFactory original) {
@@ -28,14 +24,14 @@ public class SpringSessionFactory extends HInjectorSessionFactory {
 	 * @see org.hibernate.SessionFactory#openSession()
 	 */
 	public Session openSession() throws HibernateException {
-		return this.getOriginal().openSession(new SpringInterceptor(beanRegistry, this.getOriginal()));
+		return this.getOriginal().openSession(new SpringInterceptor(this.beanRegistry, this.getOriginal()));
 	}
 
 	/**
 	 * @see org.hibernate.SessionFactory#openSession(java.sql.Connection)
 	 */
 	public Session openSession(Connection connection) {
-		return this.getOriginal().openSession(connection, new SpringInterceptor(beanRegistry, this.getOriginal()));
+		return this.getOriginal().openSession(connection, new SpringInterceptor(this.beanRegistry, this.getOriginal()));
 	}
 
 	/**

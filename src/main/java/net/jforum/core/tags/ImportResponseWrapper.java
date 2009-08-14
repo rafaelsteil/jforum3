@@ -41,7 +41,7 @@ public class ImportResponseWrapper extends HttpServletResponseWrapper {
 	 * resource uses a Writer. And we decode the OutputStream's bytes using OUR
 	 * tag's 'charEncoding' attribute, or ISO-8859-1 as the default. We thus
 	 * ignore setLocale() and setContentType() in this wrapper.
-	 *
+	 * 
 	 * In other words, the target's asserted encoding is used to convert from a
 	 * Writer to an OutputStream, which is typically the medium through with the
 	 * target will communicate its ultimate response. Since we short-circuit
@@ -64,7 +64,6 @@ public class ImportResponseWrapper extends HttpServletResponseWrapper {
 
 	/** A ServletOutputStream we convey, tied to this Writer. */
 	private ServletOutputStream sos = new ServletOutputStream() {
-		@Override
 		public void write(int b) throws IOException {
 			bos.write(b);
 		}
@@ -88,7 +87,6 @@ public class ImportResponseWrapper extends HttpServletResponseWrapper {
 	}
 
 	/** Returns a Writer designed to buffer the output. */
-	@Override
 	public PrintWriter getWriter() {
 		if (isStreamUsed)
 			throw new IllegalStateException(Resources
@@ -98,7 +96,6 @@ public class ImportResponseWrapper extends HttpServletResponseWrapper {
 	}
 
 	/** Returns a ServletOutputStream designed to buffer the output. */
-	@Override
 	public ServletOutputStream getOutputStream() {
 		if (isWriterUsed)
 			throw new IllegalStateException(Resources
@@ -108,18 +105,15 @@ public class ImportResponseWrapper extends HttpServletResponseWrapper {
 	}
 
 	/** Has no effect. */
-	@Override
 	public void setContentType(String x) {
 		// ignore
 	}
 
 	/** Has no effect. */
-	@Override
 	public void setLocale(Locale x) {
 		// ignore
 	}
 
-	@Override
 	public void setStatus(int status) {
 		this.status = status;
 	}

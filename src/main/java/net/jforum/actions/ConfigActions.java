@@ -46,7 +46,7 @@ public class ConfigActions {
 	private final JForumConfig config;
 	private final ViewService viewService;
 
-	public ConfigActions(ConfigService service, ViewPropertyBag propertyBag, VRaptorServletRequest request,
+	public ConfigActions(ConfigService service, ViewPropertyBag propertyBag, VRaptorServletRequest request, 
 			JForumConfig config, ViewService viewService) {
 		this.service = service;
 		this.propertyBag = propertyBag;
@@ -56,13 +56,13 @@ public class ConfigActions {
 	}
 
 	public void list(){
-		propertyBag.put("locales", this.loadLocaleNames());
-		propertyBag.put("config", config);
+		this.propertyBag.put("locales", this.loadLocaleNames());
+		this.propertyBag.put("config", this.config);
 	}
 
 	public void save() {
-		service.save(request);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.save(this.request);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	private List<String> loadLocaleNames() {

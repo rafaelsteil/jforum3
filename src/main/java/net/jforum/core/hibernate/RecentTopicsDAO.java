@@ -28,13 +28,37 @@ public class RecentTopicsDAO extends HibernateGenericDAO<Topic> implements Recen
 	}
 
 	/**
-	 * @see net.jforum.repository.RecentTopicsRepository#getRecentTopics(int)
+	 * @see net.jforum.repository.RecentTopicsRepository#getNewTopics(int)
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Topic> getRecentTopics(int count) {
-		return this.session().createCriteria(persistClass)
+	public List<Topic> getNewTopics(int count) {
+		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("pendingModeration", false))
 			.addOrder(Order.desc("id"))
+			.setMaxResults(count)
+			.setCacheable(true)
+			.setCacheRegion("recentTopicsDAO")
+			.setComment("recentTopicsDAO.getRecentTopics")
+			.list();
+	}
+
+	public List<Topic> getUpdatedTopics(int count) {
+		return this.session().createCriteria(this.persistClass)
+			.add(Restrictions.eq("pendingModeration", false))
+			.createAlias("lastPost", "lastPost")
+			.addOrder(Order.desc("lastPost.id"))
+			.setMaxResults(count)
+			.setCacheable(true)
+			.setCacheRegion("recentTopicsDAO")
+			.setComment("recentTopicsDAO.getRecentTopics")
+			.list();
+	}
+
+	public List<Topic> getHotTopics(int count) {
+		return this.session().createCriteria(this.persistClass)
+			.add(Restrictions.eq("pendingModeration", false))
+			.createAlias("lastPost", "lastPost")
+			.addOrder(Order.desc("totalReplies"))
 			.setMaxResults(count)
 			.setCacheable(true)
 			.setCacheRegion("recentTopicsDAO")

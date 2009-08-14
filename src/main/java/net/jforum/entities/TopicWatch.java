@@ -33,11 +33,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "jforum_topics_watch")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class TopicWatch implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_topics_watch_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -59,7 +54,7 @@ public class TopicWatch implements Serializable {
 	 * @return the id
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -73,7 +68,7 @@ public class TopicWatch implements Serializable {
 	 * @return the topicId
 	 */
 	public Topic getTopic() {
-		return topic;
+		return this.topic;
 	}
 
 	/**
@@ -87,7 +82,7 @@ public class TopicWatch implements Serializable {
 	 * @return the userId
 	 */
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	/**
@@ -101,14 +96,14 @@ public class TopicWatch implements Serializable {
 	 * @return the read
 	 */
 	public boolean isRead() {
-		return read;
+		return this.read;
 	}
 
 	/**
 	 * Mark this instance as read
 	 */
 	public void markAsRead() {
-		read = true;
+		this.read = true;
 	}
 
 	/**

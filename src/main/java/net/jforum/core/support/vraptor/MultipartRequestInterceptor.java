@@ -29,7 +29,7 @@ public class MultipartRequestInterceptor implements Interceptor {
 	private final File temporaryDirectory;
 
 	public MultipartRequestInterceptor() throws IOException {
-		temporaryDirectory = new File(System.getProperty("java.io.tmpdir"));
+		this.temporaryDirectory = new File(System.getProperty("java.io.tmpdir"));
 	}
 
 	@SuppressWarnings( { "unchecked", "deprecation" })
@@ -44,7 +44,7 @@ public class MultipartRequestInterceptor implements Interceptor {
 		LOG.debug("Trying to parse multipart request.");
 
 		// Create a factory for disk-based file items
-		DiskFileItemFactory factory = new DiskFileItemFactory(4096 * 16, temporaryDirectory);
+		DiskFileItemFactory factory = new DiskFileItemFactory(4096 * 16, this.temporaryDirectory);
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Using repository [" + factory.getRepository() + "]");

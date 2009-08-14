@@ -82,7 +82,7 @@ public class AttachmentExtension {
 	 * @return Returns the allow.
 	 */
 	public boolean isAllowed() {
-		return allow;
+		return this.allow;
 	}
 
 	/**
@@ -96,21 +96,21 @@ public class AttachmentExtension {
 	 * @return Returns the comment.
 	 */
 	public String getComment() {
-		return description;
+		return this.description;
 	}
 
 	/**
 	 * @param comment The comment to set.
 	 */
 	public void setComment(String comment) {
-		description = comment;
+		this.description = comment;
 	}
 
 	/**
 	 * @return Returns the extension.
 	 */
 	public String getExtension() {
-		return extension;
+		return this.extension;
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class AttachmentExtension {
 	 * @return Returns the extensionGroupId.
 	 */
 	public AttachmentExtensionGroup getExtensionGroup() {
-		return extensionGroup;
+		return this.extensionGroup;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class AttachmentExtension {
 	 * @return Returns the id.
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class AttachmentExtension {
 	 * @return Returns the unknown.
 	 */
 	public boolean isUnknown() {
-		return unknown;
+		return this.unknown;
 	}
 
 	/**

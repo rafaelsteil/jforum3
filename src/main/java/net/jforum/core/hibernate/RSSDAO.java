@@ -35,7 +35,7 @@ public class RSSDAO implements RSSRepository {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Topic> getForumTopics(Forum forum, int count) {
-		return sessionFactory.getCurrentSession().createCriteria(Topic.class)
+		return this.sessionFactory.getCurrentSession().createCriteria(Topic.class)
 			.add(Restrictions.eq("forum", forum))
 			.add(Restrictions.eq("pendingModeration", false))
 			.addOrder(Order.desc("date"))

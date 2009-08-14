@@ -39,7 +39,8 @@ public class SearchDAO implements SearchRepository {
 
 	@SuppressWarnings("unchecked")
 	public SearchResult search(SearchParams params) throws ParseException {
-		FullTextQuery query = this.createQuery(params.buildQuery());
+		String buildQuery = params.buildQuery();
+		FullTextQuery query = this.createQuery(buildQuery);
 
 		query.setFirstResult(params.getStart());
 		query.setMaxResults(params.getMaxResults());
@@ -60,7 +61,7 @@ public class SearchDAO implements SearchRepository {
 		QueryParser parser = new QueryParser("text", new StandardAnalyzer());
 		Query luceneQuery = parser.parse(criteria);
 
-		return Search.createFullTextSession(sessionFactory.getCurrentSession())
+		return Search.createFullTextSession(this.sessionFactory.getCurrentSession())
 			.createFullTextQuery(luceneQuery, Post.class);
 	}
 }

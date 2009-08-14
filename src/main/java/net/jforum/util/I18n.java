@@ -39,10 +39,10 @@ public class I18n {
 	 */
 	public void changeBoardDefaultLanguage(String newDefaultLanguage) {
 		if (!this.isLanguageLoaded(newDefaultLanguage)) {
-			this.loadLanguage(newDefaultLanguage, config.getValue(ConfigKeys.I18N_DEFAULT_ADMIN));
+			this.loadLanguage(newDefaultLanguage, this.config.getValue(ConfigKeys.I18N_DEFAULT_ADMIN));
 		}
 
-		defaultLocaleName = newDefaultLanguage;
+		this.defaultLocaleName = newDefaultLanguage;
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class I18n {
 	 * @param language The language to load
 	 */
 	public void load(String language) {
-		this.loadLanguage(language, defaultLocaleName);
+		this.loadLanguage(language, this.defaultLocaleName);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class I18n {
 	 * @return String With the message
 	 */
 	public String getFormattedMessage(String key, String language, Object[] args) {
-		return MessageFormat.format(messages.get(language).getProperty(key), args);
+		return MessageFormat.format(this.messages.get(language).getProperty(key), args);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class I18n {
 	 * @return String
 	 */
 	public String getFormattedMessage(String key, Object[] args) {
-		return this.getFormattedMessage(key, defaultLocaleName, args);
+		return this.getFormattedMessage(key, this.defaultLocaleName, args);
 	}
 
 	public Object[] params(Object... args) {
@@ -92,11 +92,11 @@ public class I18n {
 	 * @return String With the localized message
 	 */
 	public String getMessage(String key, String language) {
-		Properties p = messages.get(language);
+		Properties p = this.messages.get(language);
 
 		if (p == null) {
 			this.load(language);
-			p = messages.get(language);
+			p = this.messages.get(language);
 		}
 
 		return p.getProperty(key);
@@ -108,7 +108,7 @@ public class I18n {
 	 * @return string with the localized message
 	 */
 	public String getMessage(String key) {
-		return this.getMessage(key, defaultLocaleName);
+		return this.getMessage(key, this.defaultLocaleName);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class I18n {
 	 * @return boolean
 	 */
 	public boolean isLanguageLoaded(String language) {
-		return messages.containsKey(language);
+		return this.messages.containsKey(language);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class I18n {
 	 * @return <code>true</code> if the language is a valid and registered translation.
 	 */
 	public boolean languageExists(String language) {
-		return (localeNames.getProperty(language) != null);
+		return (this.localeNames.getProperty(language) != null);
 	}
 
 	/**
@@ -137,14 +137,14 @@ public class I18n {
 	private void loadConfiguration() {
 		this.loadLocales();
 
-		defaultLocaleName = config.getValue(ConfigKeys.I18N_DEFAULT_ADMIN);
+		this.defaultLocaleName = this.config.getValue(ConfigKeys.I18N_DEFAULT_ADMIN);
 		this.loadLanguage(defaultLocaleName, null);
 
-		String custom = config.getValue(ConfigKeys.I18N_DEFAULT);
+		String custom = this.config.getValue(ConfigKeys.I18N_DEFAULT);
 
 		if (!custom.equals(defaultLocaleName)) {
 			this.loadLanguage(custom, defaultLocaleName);
-			defaultLocaleName = custom;
+			this.defaultLocaleName = custom;
 		}
 	}
 
@@ -153,7 +153,7 @@ public class I18n {
 	 */
 	private void loadLocales() {
 		try {
-			localeNames.load(this.getClass().getResourceAsStream("/jforumConfig/languages/locales.properties"));
+			this.localeNames.load(this.getClass().getResourceAsStream("/jforumConfig/languages/locales.properties"));
 		}
 		catch (IOException e) {
 			throw new ForumException(e);
@@ -174,16 +174,16 @@ public class I18n {
 				this.loadLanguage(mergeWith, null);
 			}
 
-			p.putAll(messages.get(mergeWith));
+			p.putAll(this.messages.get(mergeWith));
 		}
 
 		try {
-			p.load(this.getClass().getResourceAsStream("/jforumConfig/languages/" + localeNames.getProperty(language)));
+			p.load(this.getClass().getResourceAsStream("/jforumConfig/languages/" + this.localeNames.getProperty(language)));
 		}
 		catch (IOException e) {
 			throw new ForumException(e);
 		}
 
-		messages.put(language, p);
+		this.messages.put(language, p);
 	}
 }

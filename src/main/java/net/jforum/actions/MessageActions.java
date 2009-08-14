@@ -39,8 +39,8 @@ public class MessageActions {
 	 * Displays an "access is denied" message
 	 */
 	public void accessDenied() {
-		propertyBag.put("message", i18n.getMessage("Message.accessDenied"));
-		viewService.renderView(Actions.MESSAGE);
+		this.propertyBag.put("message", this.i18n.getMessage("Message.accessDenied"));
+		this.viewService.renderView(Actions.MESSAGE);
 	}
 
 	/**
@@ -48,10 +48,10 @@ public class MessageActions {
 	 * @param forumId
 	 */
 	public void topicWaitingModeration(@Parameter(key = "forumId") int forumId) {
-		propertyBag.put("message", i18n.getFormattedMessage("PostShow.waitingModeration",
-			i18n.params(viewService.buildUrl(Domain.FORUMS, Actions.SHOW, forumId))));
+		this.propertyBag.put("message", this.i18n.getFormattedMessage("PostShow.waitingModeration",
+			this.i18n.params(this.viewService.buildUrl(Domain.FORUMS, Actions.SHOW, forumId))));
 
-		viewService.renderView(Actions.MESSAGE);
+		this.viewService.renderView(Actions.MESSAGE);
 	}
 
 	/**
@@ -59,9 +59,9 @@ public class MessageActions {
 	 * @param forumId
 	 */
 	public void replyWaitingModeration(@Parameter(key = "topicId") int topicId) {
-		propertyBag.put("message", i18n.getFormattedMessage("PostShow.waitingModeration",
-				i18n.params(viewService.buildUrl(Domain.TOPICS, Actions.LIST, topicId))));
+		this.propertyBag.put("message", this.i18n.getFormattedMessage("PostShow.waitingModeration",
+				this.i18n.params(this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, topicId))));
 
-		viewService.renderView(Actions.MESSAGE);
+		this.viewService.renderView(Actions.MESSAGE);
 	}
 }

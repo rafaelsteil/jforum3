@@ -38,7 +38,7 @@ public class UserService {
 
 	public UserService(UserRepository userReposistory, GroupRepository groupRepository,
 		JForumConfig config, LoginAuthenticator loginAuthenticator, AvatarService avatarService) {
-		userRepository = userReposistory;
+		this.userRepository = userReposistory;
 		this.groupRepository = groupRepository;
 		this.config = config;
 		this.loginAuthenticator = loginAuthenticator;
@@ -64,11 +64,11 @@ public class UserService {
 		user.setPassword(MD5.hash(user.getPassword()));
 
 		if (user.getGroups().size() == 0) {
-			Group defaultGroup = groupRepository.get(config.getInt(ConfigKeys.DEFAULT_USER_GROUP));
+			Group defaultGroup = this.groupRepository.get(this.config.getInt(ConfigKeys.DEFAULT_USER_GROUP));
 			user.addGroup(defaultGroup);
 		}
 
-		userRepository.add(user);
+		this.userRepository.add(user);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class UserService {
 			throw new ValidationException("Cannot update an user without an id");
 		}
 
-		User currentUser = userRepository.get(user.getId());
+		User currentUser = this.userRepository.get(user.getId());
 		this.copyUpdatableProperties(user, currentUser);
 
 		Avatar userAvatar = user.getAvatar();
@@ -92,17 +92,17 @@ public class UserService {
 
 		if (userAvatar == null || !userAvatar.equals(currentAvatar)) {
 			if (currentAvatar != null && currentAvatar.getAvatarType() == AvatarType.AVATAR_UPLOAD) {
-				avatarService.delete(currentAvatar);
+				this.avatarService.delete(currentAvatar);
 			}
 
 			currentUser.setAvatar(userAvatar);
 		}
 
-		if (changeUsername) {
+		if (changeUsername && StringUtils.isNotEmpty(user.getUsername())) {
 			currentUser.setUsername(user.getUsername());
 		}
 
-		userRepository.update(currentUser);
+		this.userRepository.update(currentUser);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class UserService {
 	 * @return the hash
 	 */
 	public String generateAutoLoginSecurityHash(int userId) {
-		String systemHash = MD5.hash(config.getValue(ConfigKeys.USER_HASH_SEQUENCE) + userId);
+		String systemHash = MD5.hash(this.config.getValue(ConfigKeys.USER_HASH_SEQUENCE) + userId);
 		return MD5.hash(System.currentTimeMillis() + systemHash);
 	}
 
@@ -139,6 +139,7 @@ public class UserService {
 		to.setNotifyReply(from.getNotifyReply());
 		to.setOccupation(from.getOccupation());
 		to.setViewEmailEnabled(from.isViewEmailEnabled());
+		to.setViewOnlineEnabled(from.isViewOnlineEnabled());
 		to.setSignature(from.getSignature());
 		to.setWebsite(from.getWebsite());
 		to.setYim(from.getYim());
@@ -155,7 +156,7 @@ public class UserService {
 	 * @return an instance of an {@link User}, of null if authentication failed
 	 */
 	public User validateLogin(String username, String password) {
-		return loginAuthenticator.validateLogin(username, MD5.hash(password), null);
+		return this.loginAuthenticator.validateLogin(username, MD5.hash(password), null);
 	}
 
 	/**
@@ -165,15 +166,15 @@ public class UserService {
 	 */
 	public void saveGroups(int userId, int... groupIds) {
 		if (groupIds != null && groupIds.length > 0) {
-			User user = userRepository.get(userId);
+			User user = this.userRepository.get(userId);
 			user.getGroups().clear();
 
 			for (int groupId : groupIds) {
-				Group group = groupRepository.get(groupId);
+				Group group = this.groupRepository.get(groupId);
 				user.addGroup(group);
 			}
 
-			userRepository.update(user);
+			this.userRepository.update(user);
 		}
 	}
 

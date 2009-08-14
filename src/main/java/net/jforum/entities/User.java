@@ -38,6 +38,9 @@ import net.jforum.repository.UserRepository;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Rafael Steil
@@ -47,11 +50,6 @@ import org.hibernate.search.annotations.ContainedIn;
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class User implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_users_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -99,6 +97,7 @@ public class User implements Serializable {
 	private boolean notifyText;
 
 	@Column(name = "username")
+	@Field(store = Store.NO, index = Index.TOKENIZED)
 	private String username;
 
 	@Column(name = "user_password")
@@ -115,6 +114,7 @@ public class User implements Serializable {
 	private Avatar avatar;
 
 	@Column(name = "user_email")
+	@Field(store = Store.NO, index = Index.TOKENIZED)
 	private String email;
 
 	@Column(name = "user_website")
@@ -174,9 +174,11 @@ public class User implements Serializable {
 	private boolean isDeleted;
 
 	@Transient
+	@Field(store = Store.NO, index = Index.TOKENIZED)
 	private String firstName;
 
 	@Transient
+	@Field(store = Store.NO, index = Index.TOKENIZED)
 	private String lastName;
 
 	@Column(name = "security_hash")
@@ -200,35 +202,35 @@ public class User implements Serializable {
 	}
 
 	public void addExtra(String name, Object value) {
-		extra.put(name, value);
+		this.extra.put(name, value);
 	}
 
 	public Object getExtra(String name) {
-		return extra.get(name);
+		return this.extra.get(name);
 	}
 
 	public void setFirstName(String name) {
-		firstName = name;
+		this.firstName = name;
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	public void setLastName(String name) {
-		lastName = name;
+		this.lastName = name;
 	}
 
 	public String getLastNmame() {
-		return lastName;
+		return this.lastName;
 	}
 
 	public String getName() {
-		return firstName + " " + lastName;
+		return this.firstName + " " + this.lastName;
 	}
 
 	public boolean isDeleted() {
-		return isDeleted;
+		return this.isDeleted;
 	}
 
 	public void setDeleted(boolean isDeleted) {
@@ -236,8 +238,8 @@ public class User implements Serializable {
 	}
 
 	public void addGroup(Group group) {
-		if (!groups.contains(group)) {
-			groups.add(group);
+		if (!this.groups.contains(group)) {
+			this.groups.add(group);
 		}
 	}
 
@@ -247,7 +249,7 @@ public class User implements Serializable {
 	 * @return String with the AIM ID
 	 */
 	public String getAim() {
-		return aim;
+		return this.aim;
 	}
 
 	/**
@@ -256,7 +258,7 @@ public class User implements Serializable {
 	 * @return String with the avatar
 	 */
 	public Avatar getAvatar() {
-		return avatar;
+		return this.avatar;
 	}
 
 	/**
@@ -265,7 +267,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean isAvatarEnabled() {
-		return avatarEnabled;
+		return this.avatarEnabled;
 	}
 
 	/**
@@ -274,7 +276,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean isBbCodeEnabled() {
-		return bbCodeEnabled;
+		return this.bbCodeEnabled;
 	}
 
 	/**
@@ -283,7 +285,7 @@ public class User implements Serializable {
 	 * @return String with the format
 	 */
 	public String getDateFormat() {
-		return dateFormat;
+		return this.dateFormat;
 	}
 
 	/**
@@ -292,7 +294,7 @@ public class User implements Serializable {
 	 * @return String with the email
 	 */
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	/**
@@ -301,7 +303,7 @@ public class User implements Serializable {
 	 * @return String with the location
 	 */
 	public String getFrom() {
-		return from;
+		return this.from;
 	}
 
 	/**
@@ -310,7 +312,7 @@ public class User implements Serializable {
 	 * @return String value. Possible values are <code>M</code> or <code>F</code>
 	 */
 	public String getGender() {
-		return gender;
+		return this.gender;
 	}
 
 	/**
@@ -319,7 +321,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean isHtmlEnabled() {
-		return htmlEnabled;
+		return this.htmlEnabled;
 	}
 
 	/**
@@ -328,7 +330,7 @@ public class User implements Serializable {
 	 * @return int value with the id
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -337,7 +339,7 @@ public class User implements Serializable {
 	 * @return String literal
 	 */
 	public String getinterests() {
-		return interests;
+		return this.interests;
 	}
 
 	/**
@@ -346,7 +348,7 @@ public class User implements Serializable {
 	 * @return String value with the language chosen
 	 */
 	public String getLang() {
-		return lang;
+		return this.lang;
 	}
 
 	/**
@@ -355,7 +357,7 @@ public class User implements Serializable {
 	 * @return long value representing the time
 	 */
 	public Date getLastVisit() {
-		return lastVisit;
+		return this.lastVisit;
 	}
 
 	/**
@@ -364,7 +366,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean getNotifyPrivateMessages() {
-		return notifyPrivateMessages;
+		return this.notifyPrivateMessages;
 	}
 
 	/**
@@ -373,7 +375,7 @@ public class User implements Serializable {
 	 * @return String
 	 */
 	public String getOccupation() {
-		return occupation;
+		return this.occupation;
 	}
 
 	/**
@@ -382,7 +384,7 @@ public class User implements Serializable {
 	 * @return String with the password ( in plain/text )
 	 */
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	/**
@@ -391,7 +393,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean isPrivateMessagesEnabled() {
-		return privateMessagesEnabled;
+		return this.privateMessagesEnabled;
 	}
 
 	/**
@@ -400,7 +402,7 @@ public class User implements Serializable {
 	 * @return int
 	 */
 	public Ranking getRanking() {
-		return ranking;
+		return this.ranking;
 	}
 
 	/**
@@ -409,7 +411,7 @@ public class User implements Serializable {
 	 * @return String value with the registration date
 	 */
 	public Date getRegistrationDate() {
-		return registrationDate;
+		return this.registrationDate;
 	}
 
 	/**
@@ -418,7 +420,7 @@ public class User implements Serializable {
 	 * @return String literal with the signature
 	 */
 	public String getSignature() {
-		return signature;
+		return this.signature;
 	}
 
 	/**
@@ -427,7 +429,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean isSmiliesEnabled() {
-		return smiliesEnabled;
+		return this.smiliesEnabled;
 	}
 
 	/**
@@ -436,7 +438,7 @@ public class User implements Serializable {
 	 * @return String value with the timezone
 	 */
 	public String getTimeZone() {
-		return timezone;
+		return this.timezone;
 	}
 
 	/**
@@ -445,7 +447,7 @@ public class User implements Serializable {
 	 * @return int value with the total of messages
 	 */
 	public int getTotalPosts() {
-		return totalPosts;
+		return this.totalPosts;
 	}
 
 	/**
@@ -454,7 +456,7 @@ public class User implements Serializable {
 	 * @return String with the username
 	 */
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	/**
@@ -463,7 +465,7 @@ public class User implements Serializable {
 	 * @return boolean value
 	 */
 	public boolean isViewOnlineEnabled() {
-		return viewOnlineEnabled;
+		return this.viewOnlineEnabled;
 	}
 
 	/**
@@ -472,7 +474,7 @@ public class User implements Serializable {
 	 * @return String with the URL
 	 */
 	public String getWebsite() {
-		return website;
+		return this.website;
 	}
 
 	/**
@@ -481,7 +483,7 @@ public class User implements Serializable {
 	 * @return String with the ID
 	 */
 	public String getYim() {
-		return yim;
+		return this.yim;
 	}
 
 	/**
@@ -490,7 +492,7 @@ public class User implements Serializable {
 	 * @return integer 1 if true
 	 */
 	public boolean isActive() {
-		return active;
+		return this.active;
 	}
 
 	/**
@@ -499,7 +501,7 @@ public class User implements Serializable {
 	 * @return String with the activation key that is created during user registration
 	 */
 	public String getActivationKey() {
-		return activationKey;
+		return this.activationKey;
 	}
 
 	/**
@@ -634,7 +636,7 @@ public class User implements Serializable {
 	 * @param notify <code>true</code> or <code>false</code>
 	 */
 	public void setNotifyPrivateMessages(boolean notify) {
-		notifyPrivateMessages = notify;
+		this.notifyPrivateMessages = notify;
 	}
 
 	/**
@@ -697,7 +699,7 @@ public class User implements Serializable {
 	 * @param smilesEnabled <code>true</code> or <code>false</code>
 	 */
 	public void setSmiliesEnabled(boolean smilesEnabled) {
-		smiliesEnabled = smilesEnabled;
+		this.smiliesEnabled = smilesEnabled;
 	}
 
 	/**
@@ -706,7 +708,7 @@ public class User implements Serializable {
 	 * @param timeZone The Timezone to set
 	 */
 	public void setTimeZone(String timeZone) {
-		timezone = timeZone;
+		this.timezone = timeZone;
 	}
 
 	/**
@@ -742,7 +744,7 @@ public class User implements Serializable {
 	 * @param webSite The webSite to set
 	 */
 	public void setWebsite(String webSite) {
-		website = webSite;
+		this.website = webSite;
 	}
 
 	/**
@@ -758,56 +760,56 @@ public class User implements Serializable {
 	 * @return
 	 */
 	public String getMsn() {
-		return msn;
+		return this.msn;
 	}
 
 	/**
 	 * @param string
 	 */
 	public void setMsn(String string) {
-		msn = string;
+		this.msn = string;
 	}
 
 	/**
 	 * @return
 	 */
 	public boolean getNotifyReply() {
-		return notifyReply;
+		return this.notifyReply;
 	}
 
 	/**
 	 * @param notify
 	 */
 	public void setNotifyReply(boolean notify) {
-		notifyReply = notify;
+		this.notifyReply = notify;
 	}
 
 	/**
 	 * @return
 	 */
 	public boolean isViewEmailEnabled() {
-		return viewEmailEnabled;
+		return this.viewEmailEnabled;
 	}
 
 	/**
 	 * @param b
 	 */
 	public void setViewEmailEnabled(boolean b) {
-		viewEmailEnabled = b;
+		this.viewEmailEnabled = b;
 	}
 
 	/**
 	 * @return
 	 */
 	public boolean getAttachSignature() {
-		return attachSignature;
+		return this.attachSignature;
 	}
 
 	/**
 	 * @param attach
 	 */
 	public void setAttachSignature(boolean attach) {
-		attachSignature = attach;
+		this.attachSignature = attach;
 	}
 
 	/**
@@ -815,7 +817,7 @@ public class User implements Serializable {
 	 */
 	public int getTotalUnreadPrivateMessages() {
 		this.validateUserRepository();
-		return userRepository.getTotalUnreadPrivateMessages(this);
+		return this.userRepository.getTotalUnreadPrivateMessages(this);
 	}
 
 	/**
@@ -851,14 +853,14 @@ public class User implements Serializable {
 	 * @return the notifyAlways
 	 */
 	public boolean getNotifyAlways() {
-		return notifyAlways;
+		return this.notifyAlways;
 	}
 
 	/**
 	 * @return the notifyText
 	 */
 	public boolean getNotifyText() {
-		return notifyText;
+		return this.notifyText;
 	}
 
 	/**
@@ -876,7 +878,7 @@ public class User implements Serializable {
 	}
 
 	public String getSecurityHash() {
-		return securityHash;
+		return this.securityHash;
 	}
 
 	public void setSecurityHash(String securityHash) {
@@ -905,18 +907,18 @@ public class User implements Serializable {
 	 * Increment by 1 the number of posts of this user
 	 */
 	public void incrementTotalPosts() {
-		totalPosts++;
+		this.totalPosts++;
 	}
 
 	/**
 	 * Decrement by 1 the number of posts of this user
 	 */
 	public void decrementTotalPosts() {
-		totalPosts--;
+		this.totalPosts--;
 	}
 
 	private void validateUserRepository() {
-		if (userRepository == null) {
+		if (this.userRepository == null) {
 			throw new IllegalStateException("UserRepository was not set");
 		}
 	}

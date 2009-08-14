@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpSession;
 
 import net.jforum.security.RoleManager;
 import net.jforum.util.ConfigKeys;
+import net.jforum.util.JForumConfig;
 
 import org.apache.log4j.Logger;
 import org.springframework.web.context.request.RequestAttributes;
@@ -52,7 +54,7 @@ public class UserSession  {
 	 */
 	public void markTopicAsRead(int topicId) {
 		if (this.isLogged()) {
-			topicReadTime.put(topicId, System.currentTimeMillis());
+			this.topicReadTime.put(topicId, System.currentTimeMillis());
 		}
 	}
 
@@ -73,7 +75,7 @@ public class UserSession  {
 			return true;
 		}
 
-		Long readTime = topicReadTime.get(topic.getId());
+		Long readTime = this.topicReadTime.get(topic.getId());
 		return readTime != null && postTime <= readTime;
 	}
 
@@ -96,7 +98,7 @@ public class UserSession  {
 			return true;
 		}
 
-		Long readTime = topicReadTime.get(forum.getLastPost().getTopic().getId());
+		Long readTime = this.topicReadTime.get(forum.getLastPost().getTopic().getId());
 		return readTime != null && postTime <= readTime;
 	}
 
@@ -105,15 +107,55 @@ public class UserSession  {
 	}
 
 	public RoleManager getRoleManager() {
-		return roleManager;
+		return this.roleManager;
 	}
 
 	public String getIp() {
-		return this.getRequest().getRemoteAddr();
+		if(new JForumConfig().getBoolean(ConfigKeys.BLOCK_IP)) {
+			return null;
+		}
+
+		HttpServletRequest request = this.getRequest();
+
+		// We look if the request is forwarded
+		// If it is not call the older function.
+		String ip = request.getHeader("X-Pounded-For");
+
+		if (ip != null) {
+			return ip;
+		}
+
+        ip = request.getHeader("x-forwarded-for");
+
+        if (ip == null) {
+        	return request.getRemoteAddr();
+        }
+        else {
+        	// Process the IP to keep the last IP (real ip of the computer on the net)
+            StringTokenizer tokenizer = new StringTokenizer(ip, ",");
+
+            // Ignore all tokens, except the last one
+            for (int i = 0; i < tokenizer.countTokens() -1 ; i++) {
+            	tokenizer.nextElement();
+            }
+
+            ip = tokenizer.nextToken().trim();
+
+            if (ip.equals("")) {
+            	ip = null;
+            }
+        }
+
+        // If the ip is still null, we put 0.0.0.0 to avoid null values
+        if (ip == null) {
+        	ip = "0.0.0.0";
+        }
+
+        return ip;
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(User user) {
@@ -122,7 +164,7 @@ public class UserSession  {
 		if (user == null) {
 			try {
 				throw new RuntimeException("userSession.setUser with null value. See the stack trace for more information about the call stack. Session ID: "
-					+ sessionId);
+					+ this.sessionId);
 			}
 			catch (RuntimeException e) {
 				Writer writer = new StringWriter();
@@ -139,13 +181,13 @@ public class UserSession  {
 	 * @return Start time in miliseconds
 	 */
 	public long getCreationTime() {
-		return creationTime;
+		return this.creationTime;
 	}
 
 	public void setCreationTime(long start) {
-		creationTime = start;
-		lastAccessedTime = start;
-		lastVisit = start;
+		this.creationTime = start;
+		this.lastAccessedTime = start;
+		this.lastVisit = start;
 	}
 
 	/**
@@ -154,7 +196,7 @@ public class UserSession  {
 	 * @return Time in miliseconds
 	 */
 	public long getLastAccessedTime() {
-		return lastAccessedTime;
+		return this.lastAccessedTime;
 	}
 
 	public Date getLastAccessedDate() {
@@ -165,14 +207,14 @@ public class UserSession  {
 	 * @return the lastVisit
 	 */
 	public long getLastVisit() {
-		return lastVisit;
+		return this.lastVisit;
 	}
 
 	/**
 	 * @return the lastVisit as a date
 	 */
 	public Date getLastVisitDate() {
-		return new Date(lastVisit);
+		return new Date(this.lastVisit);
 	}
 
 	/**
@@ -186,7 +228,7 @@ public class UserSession  {
 	 * Updates this instance with the last accessed time of the session
 	 */
 	public void ping() {
-		lastAccessedTime = System.currentTimeMillis();
+		this.lastAccessedTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -195,7 +237,7 @@ public class UserSession  {
 	 * @return A string with the session id
 	 */
 	public String getSessionId() {
-		return sessionId;
+		return this.sessionId;
 	}
 
 	public void setSessionId(String sessionId) {
@@ -298,7 +340,7 @@ public class UserSession  {
 	public Session asSession() {
 		Session session = new Session();
 
-		session.setUserId(user.getId());
+		session.setUserId(this.user.getId());
 		session.setIp(this.getIp());
 		session.setStart(new Date(this.getCreationTime()));
 		session.setLastAccessed(new Date(this.getLastAccessedTime()));
@@ -345,6 +387,6 @@ public class UserSession  {
 	 * @param time
 	 */
 	public void setLastAccessedTime(long time) {
-		lastAccessedTime = time;
+		this.lastAccessedTime = time;
 	}
 }

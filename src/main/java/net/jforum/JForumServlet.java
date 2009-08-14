@@ -55,8 +55,8 @@ public class JForumServlet extends VRaptorServlet {
 		this.config = (JForumConfig)beanFactory.getBean(JForumConfig.class.getName());
 		this.config.setProperty(ConfigKeys.APPLICATION_PATH, this.getServletContext().getRealPath(""));
 
-		sessionManager = (SessionManager)beanFactory.getBean(SessionManager.class.getName());
-		operationChain = (RequestOperationChain)beanFactory.getBean(RequestOperationChain.class.getName());
+		this.sessionManager = (SessionManager)beanFactory.getBean(SessionManager.class.getName());
+		this.operationChain = (RequestOperationChain)beanFactory.getBean(RequestOperationChain.class.getName());
 
 		this.setupViewManager();
 		this.setupExtentionManager(beanFactory);
@@ -75,13 +75,13 @@ public class JForumServlet extends VRaptorServlet {
 		try {
 			RequestContextHolder.setRequestAttributes(attributes, false);
 
-			UserSession userSession = sessionManager.refreshSession(request, response);
+			UserSession userSession = this.sessionManager.refreshSession(request, response);
 
 			request.setAttribute(ConfigKeys.USER_SESSION, userSession);
 			request.setAttribute(ConfigKeys.ROLE_MANAGER, userSession.getRoleManager());
 			request.setAttribute(UserSession.class.getName(), userSession);
 
-			operationChain.callAllOperations();
+			this.operationChain.callAllOperations();
 
 			super.service(request, response);
 		}
@@ -92,7 +92,7 @@ public class JForumServlet extends VRaptorServlet {
 	}
 
 	private void setupViewManager() {
-		ViewManager viewManager = new DefaultViewManager(config.getValue(ConfigKeys.VRAPTOR_VIEW_PATTERN));
+		ViewManager viewManager = new DefaultViewManager(this.config.getValue(ConfigKeys.VRAPTOR_VIEW_PATTERN));
 
 		WebApplication app = (WebApplication)this.getServletContext().getAttribute("webApplication");
 		app.setViewManager(viewManager);

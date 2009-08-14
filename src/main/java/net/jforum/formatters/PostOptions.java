@@ -1,10 +1,10 @@
 /*
  * Copyright (c) JForum Team. All rights reserved.
- *
- * The software in this package is published under the terms of the LGPL
- * license a copy of which has been included with this distribution in the
+ * 
+ * The software in this package is published under the terms of the LGPL 
+ * license a copy of which has been included with this distribution in the 
  * license.txt file.
- *
+ * 
  * The JForum Project
  * http://www.jforum.net
  */
@@ -19,8 +19,8 @@ public class PostOptions {
 	private boolean bbCodeEnabled;
 	private boolean appendSignature;
 	private String contextPath;
-
-	public PostOptions(boolean htmlEnabled, boolean smiliesEnabled,
+	
+	public PostOptions(boolean htmlEnabled, boolean smiliesEnabled, 
 			boolean bbCodeEnabled, boolean appendSignature, String contextPath) {
 		this.htmlEnabled = htmlEnabled;
 		this.smiliesEnabled = smiliesEnabled;
@@ -30,22 +30,22 @@ public class PostOptions {
 	}
 
 	public boolean isHtmlEnabled() {
-		return htmlEnabled;
+		return this.htmlEnabled;
 	}
-
+	
 	public boolean isSmiliesEnabled() {
-		return smiliesEnabled;
+		return this.smiliesEnabled;	
 	}
-
+	
 	public boolean isBbCodeEnabled() {
-		return bbCodeEnabled;
+		return this.bbCodeEnabled;
 	}
-
+	
 	public boolean appendSignature() {
-		return appendSignature;
+		return this.appendSignature;
 	}
-
+	
 	public String contextPath() {
-		return contextPath;
+		return this.contextPath;
 	}
 }

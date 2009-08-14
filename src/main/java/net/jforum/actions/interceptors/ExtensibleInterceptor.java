@@ -54,50 +54,50 @@ public class ExtensibleInterceptor implements Interceptor {
 		//if Directly invoke the extended logicMethod,
 		//redirect to index page
 		LogicRequest logicRequest = flow.getLogicRequest();
-
+		
 		ServletContext servletContext = logicRequest.getServletContext();
 		WebApplication application = (WebApplication)servletContext.getAttribute(WebApplication.class.getName());
 		Introspector introspector = application.getIntrospector();
 		BeanProvider beanProvider = introspector.getBeanProvider();
-
+		
 		if(isExtendedAnnotationPresent(logicRequest)){
 			//redirect to index page
 			ViewService viewService = (ViewService)beanProvider.findAttribute(logicRequest, ViewService.class.getName());
 			viewService.redirectToAction(Domain.FORUMS, Actions.LIST);
 		}
-
+		
 		//TODO: preMethed if need this feature
-
+		
 		//normal logic method execute
 		flow.execute();
 
 		//extend method exectute if need
 		ActionExtensionManager manager = (ActionExtensionManager)servletContext.getAttribute(ActionExtensionManager.class.getName());
-
+		
 		LogicDefinition logicDefinition = logicRequest.getLogicDefinition();
 		List<LogicDefinition> extendedLogicDefinitions = manager.getLogicDefinition(logicDefinition);
-
+		
 		for(LogicDefinition extendedLogicDefinition : extendedLogicDefinitions ){
 			this.execute(extendedLogicDefinition, logicRequest);
 		}
 	}
-
+	
 	private void execute(LogicDefinition extendedLogicDefinition,LogicRequest logicRequest){
-
+		
 		ComponentType extendedComponentType = extendedLogicDefinition.getComponentType();
 		LogicMethod extendedLogicMethod     = extendedLogicDefinition.getLogicMethod();
-
+		
 		WebApplication application = (WebApplication)logicRequest.getServletContext().getAttribute(WebApplication.class.getName());
 		BeanProvider beanProvider = application.getIntrospector().getBeanProvider();
-
+		
 		try {
 			BeanConstructor contructory = extendedComponentType.getConstructor();
 			Object extendedComponent = contructory.newInstance(logicRequest, beanProvider);
-
+			
 			Object[] methodParamObjects = this.readParameter(logicRequest, extendedLogicMethod, extendedComponent);
-
+			
 			extendedLogicMethod.execute(extendedComponent, logicRequest, methodParamObjects);
-
+			
 		} catch (ComponentInstantiationException e) {
 			e.printStackTrace();
 		} catch (LogicException e) {
@@ -106,16 +106,16 @@ public class ExtensibleInterceptor implements Interceptor {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private Object[]readParameter(LogicRequest logicRequest,LogicMethod logicMethod,Object componentInstance) throws SettingException{
 		WebApplication application = (WebApplication)logicRequest.getServletContext().getAttribute(WebApplication.class.getName());
 		Introspector introspector = application.getIntrospector();
-
+		
 		List<MethodParameter> methodParams = logicMethod.getParameters();
-
+		
 		List<ReadParameter> allParams = new ArrayList<ReadParameter>();
 		allParams.addAll(methodParams);
-
+		
 		// instantiate parameters
 		Object[] methodParamObjects = new Object[methodParams.size()];
 		for (int i = 0; i < methodParamObjects.length; i++) {
@@ -125,7 +125,7 @@ public class ExtensibleInterceptor implements Interceptor {
 				methodParamObjects[i] = null;
 			}
 		}
-
+		
 		List<ValidationMessage> problems = introspector.readParameters(allParams, componentInstance, logicRequest, application.getConverterManager(), methodParamObjects);
 
 		if (problems.size() != 0) {
@@ -133,9 +133,9 @@ public class ExtensibleInterceptor implements Interceptor {
 		}
 		return methodParamObjects;
 	}
-
+	
 	private boolean isExtendedAnnotationPresent(LogicRequest logicRequest){
 		return logicRequest.getLogicDefinition().getLogicMethod().getMetadata().isAnnotationPresent(Extends.class);
 	}
-
+	
 }

@@ -25,7 +25,7 @@ public class ForumStats {
 	 * @return Returns the posts.
 	 */
 	public int getPosts() {
-		return posts;
+		return this.posts;
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class ForumStats {
 	 * @return Returns the postsPerDay.
 	 */
 	public double getPostsPerDay() {
-		return postsPerDay;
+		return this.postsPerDay;
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ForumStats {
 	 * @return Returns the topics.
 	 */
 	public int getTopics() {
-		return topics;
+		return this.topics;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class ForumStats {
 	 * @return Returns the topicsPerDay.
 	 */
 	public double getTopicsPerDay() {
-		return topicsPerDay;
+		return this.topicsPerDay;
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class ForumStats {
 	 * @return Returns the users.
 	 */
 	public int getUsers() {
-		return users;
+		return this.users;
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class ForumStats {
 	 * @return Returns the usersPerDay.
 	 */
 	public double getUsersPerDay() {
-		return usersPerDay;
+		return this.usersPerDay;
 	}
 
 	/**

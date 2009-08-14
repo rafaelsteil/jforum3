@@ -22,7 +22,7 @@ public class ShoutBoxEvent extends EmptyCategoryEvent {
 
 	private ShoutBoxRepository repository;
 	private JForumConfig config;
-
+	
 	public ShoutBoxEvent(JForumConfig config, ShoutBoxRepository repository) {
 		this.config = config;
 		this.repository = repository;

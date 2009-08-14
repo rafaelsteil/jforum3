@@ -46,12 +46,12 @@ public class TopicReplyEvent extends EmptyPostEvent {
 	@Override
 	public void added(Post post) {
 		// TODO: should also consider moderated posts (and the respective moderation action)
-		if (config.getBoolean(ConfigKeys.MAIL_NOTIFY_ANSWERS)) {
-			List<User> users = watchRepository.getUsersWaitingNotification(post.getTopic());
+		if (this.config.getBoolean(ConfigKeys.MAIL_NOTIFY_ANSWERS)) {
+			List<User> users = this.watchRepository.getUsersWaitingNotification(post.getTopic());
 
-			Spammer spammer = spammerFactory.newTopicReply(post.getTopic(), users);
+			Spammer spammer = this.spammerFactory.newTopicReply(post.getTopic(), users);
 
-			taskExecutor.dispatch(spammer);
+			this.taskExecutor.dispatch(spammer);
 		}
 	}
 }

@@ -47,17 +47,17 @@ public class RSSActions {
 	 * @param forumId the id of the forum to show
 	 */
 	public void forumTopics(@Parameter(key = "forumId") int forumId) {
-		if (!this.isRSSEnabled() || !userSession.getRoleManager().isForumAllowed(forumId)) {
-			viewService.renderView(Actions.ACCESS_DENIED);
+		if (!this.isRSSEnabled() || !this.userSession.getRoleManager().isForumAllowed(forumId)) {
+			this.viewService.renderView(Actions.ACCESS_DENIED);
 		}
 		else {
-			String contents = rssService.forForum(forumId, viewService);
-			propertyBag.put("contents", contents);
-			viewService.renderView(Actions.RSS);
+			String contents = this.rssService.forForum(forumId, this.viewService);
+			this.propertyBag.put("contents", contents);
+			this.viewService.renderView(Actions.RSS);
 		}
 	}
 
 	private boolean isRSSEnabled() {
-		return config.getBoolean(ConfigKeys.RSS_ENABLED);
+		return this.config.getBoolean(ConfigKeys.RSS_ENABLED);
 	}
 }

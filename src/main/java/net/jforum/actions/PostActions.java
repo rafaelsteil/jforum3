@@ -22,6 +22,7 @@ import net.jforum.actions.interceptors.ExtensibleInterceptor;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
+import net.jforum.entities.ModerationLog;
 import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
@@ -80,15 +81,15 @@ public class PostActions {
 	 */
 	@SecurityConstraint(value = ChangePostRule.class)
 	public void delete(@Parameter(key = "postId") int postId) {
-		Post post = postRepository.get(postId);
+		Post post = this.postRepository.get(postId);
 		Topic topic = post.getTopic();
-		postService.delete(post);
+		this.postService.delete(post);
 
 		if (topic.getTotalPosts() > 0) {
 			this.redirecToListing(topic);
 		}
 		else {
-			viewService.redirectToAction(Domain.FORUMS, Actions.SHOW, topic.getForum().getId());
+			this.viewService.redirectToAction(Domain.FORUMS, Actions.SHOW, topic.getForum().getId());
 		}
 	}
 
@@ -99,26 +100,30 @@ public class PostActions {
 	 */
 	@SecurityConstraint(value = ChangePostRule.class)
 	public void editSave(@Parameter(key = "post") Post post, @Parameter(key = "postOptions") PostFormOptions options,
-			@Parameter(key = "pollOptions", create = true) List<PollOption> pollOptions) {
+			@Parameter(key = "pollOptions", create = true) List<PollOption> pollOptions, @Parameter(key = "moderationLog") ModerationLog moderationLog) {
 		ActionUtils.definePostOptions(post, options);
 		post.getTopic().setType(options.getTopicType());
 
-		Post currentPost = postRepository.get(post.getId());
+		Post currentPost = this.postRepository.get(post.getId());
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
 
-		RoleManager roleManager = userSession.getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAttachmentsAlllowed(currentPost.getForum().getId())) {
-			attachments = attachmentService.processNewAttachments(request);
-			attachmentService.editAttachments(currentPost, request);
+			attachments = this.attachmentService.processNewAttachments(this.request);
+			this.attachmentService.editAttachments(currentPost, request);
 		}
 
 		if (!roleManager.getCanCreatePolls()) {
 			pollOptions = new ArrayList<PollOption>();
 		}
 
-		postService.update(post, roleManager.getCanCreateStickyAnnouncementTopics(), pollOptions, attachments);
-		viewService.redirectToAction(Domain.TOPICS, Actions.LIST, post.getTopic().getId());
+		if (moderationLog != null) {
+			moderationLog.setUser(this.userSession.getUser());
+		}
+
+		this.postService.update(post, roleManager.getCanCreateStickyAnnouncementTopics(), pollOptions, attachments, moderationLog);
+		this.viewService.redirectToAction(Domain.TOPICS, Actions.LIST, post.getTopic().getId());
 	}
 
 	/**
@@ -128,25 +133,25 @@ public class PostActions {
 	@SecurityConstraint(value = ChangePostRule.class)
 	@InterceptedBy(PostEditInterceptor.class)
 	public void edit(@Parameter(key = "postId") int postId) {
-		Post post = postRepository.get(postId);
+		Post post = this.postRepository.get(postId);
 
-		propertyBag.put("isEdit", true);
-		propertyBag.put("post", post);
-		propertyBag.put("topic", post.getTopic());
-		propertyBag.put("forum", post.getTopic().getForum());
-		propertyBag.put("smilies", smilieRepository.getAllSmilies());
+		this.propertyBag.put("isEdit", true);
+		this.propertyBag.put("post", post);
+		this.propertyBag.put("topic", post.getTopic());
+		this.propertyBag.put("forum", post.getTopic().getForum());
+		this.propertyBag.put("smilies", this.smilieRepository.getAllSmilies());
 
-		viewService.renderView(Domain.TOPICS, Actions.ADD);
+		this.viewService.renderView(Domain.TOPICS, Actions.ADD);
 	}
 
 	private void redirecToListing(Topic topic) {
-		Pagination pagination = new Pagination(config, 0).forTopic(topic);
+		Pagination pagination = new Pagination(this.config, 0).forTopic(topic);
 
 		String url = new StringBuilder(pagination.getTotalPages() > 1
-			? viewService.buildUrl(Domain.TOPICS, Actions.LIST, pagination.getTotalPages(), topic.getId())
-			: viewService.buildUrl(Domain.TOPICS, Actions.LIST, topic.getId()))
+			? this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, pagination.getTotalPages(), topic.getId())
+			: this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, topic.getId()))
 			.toString();
 
-		viewService.redirect(url);
+		this.viewService.redirect(url);
 	}
 }

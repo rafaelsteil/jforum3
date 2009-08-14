@@ -44,7 +44,7 @@ public class ViewService {
 	 * @param methodName the action's name to render
 	 */
 	public void renderView(String methodName) {
-		request.setAttribute(ConfigKeys.RENDER_CUSTOM_LOGIC, methodName);
+		this.request.setAttribute(ConfigKeys.RENDER_CUSTOM_LOGIC, methodName);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class ViewService {
 	 */
 	public void renderView(String component, String methodName) {
 		this.renderView(methodName);
-		request.setAttribute(ConfigKeys.RENDER_CUSTOM_COMPONENT, component);
+		this.request.setAttribute(ConfigKeys.RENDER_CUSTOM_COMPONENT, component);
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class ViewService {
 	 * @param args optional arguments.
 	 */
 	public void redirectToAction(String action, Object... args) {
-		LogicRequest logicRequest = (LogicRequest)request.getAttribute("context");
+		LogicRequest logicRequest = (LogicRequest)this.request.getAttribute("context");
 		this.redirectToAction(logicRequest.getRequestInfo().getComponentName(), action, args);
 	}
 
@@ -84,10 +84,10 @@ public class ViewService {
 	 * @param url the url to redirect
 	 */
 	public void redirect(String url) {
-		request.setAttribute(ConfigKeys.IGNORE_VIEW_MANAGER_REDIRECT, "true");
+		this.request.setAttribute(ConfigKeys.IGNORE_VIEW_MANAGER_REDIRECT, "true");
 
 		try {
-			response.sendRedirect(url);
+			this.response.sendRedirect(url);
 		}
 		catch (Exception e) {
 			throw new ForumException(e);
@@ -104,7 +104,7 @@ public class ViewService {
 	 */
 	public String buildUrl(String module, String action, Object... args) {
 		StringBuilder sb = new StringBuilder()
-			.append(request.getContextPath()).append('/')
+			.append(this.request.getContextPath()).append('/')
 			.append(module).append('/')
 			.append(action);
 
@@ -118,7 +118,7 @@ public class ViewService {
 			sb.append(args[args.length - 1]);
 		}
 
-		sb.append(config.getValue(ConfigKeys.SERVLET_EXTENSION));
+		sb.append(this.config.getValue(ConfigKeys.SERVLET_EXTENSION));
 
 		return sb.toString();
 	}
@@ -128,7 +128,7 @@ public class ViewService {
 	 * @return
 	 */
 	public String getContextPath(){
-		return request.getContextPath();
+		return this.request.getContextPath();
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class ViewService {
 	 * @return the forum link, always with a trailing slash
 	 */
 	public String getForumLink() {
-		String forumLink = config.getValue(ConfigKeys.FORUM_LINK);
+		String forumLink = this.config.getValue(ConfigKeys.FORUM_LINK);
 
 		if (forumLink.charAt(forumLink.length() - 1) != '/') {
 			forumLink += "/";
@@ -149,7 +149,7 @@ public class ViewService {
 	 * @return the url
 	 */
 	public String getReferer() {
-		return request.getHeader("Referer");
+		return this.request.getHeader("Referer");
 	}
 
 	/**
@@ -179,19 +179,19 @@ public class ViewService {
 			fis = new FileInputStream(downloadPath);
 			os = response.getOutputStream();
 
-			response.setContentType("application/octet-stream");
+			this.response.setContentType("application/octet-stream");
 
-			if (request.getHeader("User-Agent").indexOf("Firefox") != -1) {
-				response.setHeader("Content-Disposition", "attachment; filename=\""
-					+ new String(realFilename.getBytes(config.getValue(ConfigKeys.ENCODING)),
-						config.getValue(ConfigKeys.DEFAULT_CONTAINER_ENCODING)) + "\";");
+			if (this.request.getHeader("User-Agent").indexOf("Firefox") != -1) {
+				this.response.setHeader("Content-Disposition", "attachment; filename=\""
+					+ new String(realFilename.getBytes(this.config.getValue(ConfigKeys.ENCODING)),
+						this.config.getValue(ConfigKeys.DEFAULT_CONTAINER_ENCODING)) + "\";");
 			}
 			else {
-				response.setHeader("Content-Disposition", "attachment; filename=\""
+				this.response.setHeader("Content-Disposition", "attachment; filename=\""
 					+ this.toUtf8String(realFilename) + "\";");
 			}
 
-			response.setContentLength((int)filesize);
+			this.response.setContentLength((int)filesize);
 
 			int c;
 			byte[] b = new byte[4096];

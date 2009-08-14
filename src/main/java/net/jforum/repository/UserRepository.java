@@ -13,6 +13,8 @@ package net.jforum.repository;
 import java.util.List;
 
 import net.jforum.entities.Group;
+import net.jforum.entities.Post;
+import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 
 /**
@@ -32,6 +34,13 @@ public interface UserRepository extends Repository<User> {
 	 * @return the number of posts
 	 */
 	public int getTotalPosts(User user);
+
+	/**
+	 * Get the number of topics sent by an user
+	 * @param userId the user
+	 * @return the number of posts
+	 */
+	public int getTotalTopics(int userId);
 
 	/**
 	 * Gets a specific <code>User</code>.
@@ -127,4 +136,8 @@ public interface UserRepository extends Repository<User> {
 	 * @return
 	 */
 	public List<User> findByUserName(String username, List<Group> filterGroups);
+
+	public List<Post> getPosts(User user, int start, int recordsPerPage);
+
+	public List<Topic> getTopics(User user, int start, int recordsPerPage);
 }

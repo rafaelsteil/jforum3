@@ -45,7 +45,7 @@ public class ForumAdminActions {
 
 	public ForumAdminActions(ForumService service, ForumRepository forumRepository, CategoryRepository categoryRepository,
 		ViewPropertyBag propertyBag, ViewService viewService, SessionManager sessionManager) {
-		forumService = service;
+		this.forumService = service;
 		this.categoryRepository = categoryRepository;
 		this.forumRepository = forumRepository;
 		this.propertyBag = propertyBag;
@@ -59,27 +59,27 @@ public class ForumAdminActions {
 	 * where the forums are retrieved from.
 	 */
 	public void list() {
-		propertyBag.put("categories", categoryRepository.getAllCategories());
+		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
 	}
 
 	/**
 	 * Removes a list of forums
 	 */
 	public void delete(@Parameter(key = "forumsId") int... forumsId) {
-		RoleManager roleManager = sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
 		if (roleManager.isAdministrator()) {
-			forumService.delete(forumsId);
+			this.forumService.delete(forumsId);
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * Shows the page to add a new forum
 	 */
 	public void add() {
-		propertyBag.put("categories", categoryRepository.getAllCategories());
+		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
 	}
 
 	/**
@@ -87,14 +87,14 @@ public class ForumAdminActions {
 	 * @param forum
 	 */
 	public void addSave(@Parameter(key = "forum") Forum forum) {
-		RoleManager roleManager = sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
-		if (roleManager.isAdministrator() || roleManager.isCategoryAllowed(forum.getCategory())) {
-			forumService.add(forum);
-			propertyBag.put("forum", forum);
+		if (roleManager.isAdministrator() || roleManager.isCategoryAllowed(forum.getCategory().getId())) {
+			this.forumService.add(forum);
+			this.propertyBag.put("forum", forum);
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -102,9 +102,16 @@ public class ForumAdminActions {
 	 * @param forumId
 	 */
 	public void edit(@Parameter(key = "forumId") int forumId) {
-		propertyBag.put("forum", forumRepository.get(forumId));
-		propertyBag.put("categories", categoryRepository.getAllCategories());
-		viewService.renderView(Actions.ADD);
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+
+		if (!roleManager.getCanModerateForum(forumId)) {
+			this.viewService.redirectToAction(Actions.LIST);
+		}
+		else {
+			this.propertyBag.put("forum", this.forumRepository.get(forumId));
+			this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
+			this.viewService.renderView(Actions.ADD);
+		}
 	}
 
 	/**
@@ -112,13 +119,13 @@ public class ForumAdminActions {
 	 * @param forum
 	 */
 	public void editSave(@Parameter(key = "forum") Forum forum) {
-		RoleManager roleManager = sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
-		if (roleManager.isAdministrator() || roleManager.isCategoryAllowed(forum.getCategory())) {
-			forumService.update(forum);
+		if (roleManager.isAdministrator() || roleManager.getCanModerateForum(forum.getId())) {
+			this.forumService.update(forum);
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -126,8 +133,13 @@ public class ForumAdminActions {
 	 * @param forumId the id of the category to change
 	 */
 	public void up(@Parameter(key = "forumId") int forumId) {
-		forumService.upForumOrder(forumId);
-		viewService.redirectToAction(Actions.LIST);
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+
+		if (roleManager.getCanModerateForum(forumId)) {
+			this.forumService.upForumOrder(forumId);
+		}
+
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -135,7 +147,12 @@ public class ForumAdminActions {
 	 * @param forumId the id of the category to change
 	 */
 	public void down(@Parameter(key = "forumId") int forumId) {
-		forumService.downForumOrder(forumId);
-		viewService.redirectToAction(Actions.LIST);
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+
+		if (roleManager.getCanModerateForum(forumId)) {
+			this.forumService.downForumOrder(forumId);
+		}
+
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

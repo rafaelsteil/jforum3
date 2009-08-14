@@ -40,13 +40,13 @@ public class HibernateStatisticsActions {
 	}
 
 	public void list() {
-		boolean statsEnabled = sessionFactory.getStatistics().isStatisticsEnabled();
+		boolean statsEnabled = this.sessionFactory.getStatistics().isStatisticsEnabled();
 
 		if (!statsEnabled) {
-			viewService.renderView("statsDisabled");
+			this.viewService.renderView("statsDisabled");
 		}
 		else {
-			propertyBag.put("stats", sessionFactory.getStatistics());
+			this.propertyBag.put("stats", this.sessionFactory.getStatistics());
 		}
 	}
 }

@@ -64,7 +64,7 @@ public class DefaultLoginAuthenticator implements LoginAuthenticator {
 	 * @see net.jforum.sso.LoginAuthenticator#validateLogin(String, String, java.util.Map)
 	 */
 	public User validateLogin(String username, String password, Map<String, Object> extraParams) {
-		User user = repository.validateLogin(username, password);
+		User user = this.repository.validateLogin(username, password);
 
 		if (user != null && !user.isDeleted() && (user.getActivationKey() == null || user.isActive())) {
 			return user;

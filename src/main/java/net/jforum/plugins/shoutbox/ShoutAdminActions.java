@@ -43,16 +43,16 @@ public class ShoutAdminActions {
 	public void delete(@Parameter(key = "ShoutID") int... shoutId) {
 		if (shoutId != null) {
 			for (int id : shoutId) {
-				Shout shout = repository.get(id);
-				repository.remove(shout);
+				Shout shout = this.repository.get(id);
+				this.repository.remove(shout);
 			}
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void list() {
-		propertyBag.put("shouts", repository.getAll());
+		this.propertyBag.put("shouts", this.repository.getAll());
 	}
 
 	public void add() {
@@ -60,18 +60,18 @@ public class ShoutAdminActions {
 	}
 
 	public void addSave(@Parameter(key = "shout") Shout shout) {
-		repository.add(shout);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.add(shout);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void edit(@Parameter(key = "id") int id) {
-		Shout shout = repository.get(id);
-		propertyBag.put("shout", shout);
-		viewService.renderView(Actions.ADD);
+		Shout shout = this.repository.get(id);
+		this.propertyBag.put("shout", shout);
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void editSave(@Parameter(key = "shout") Shout shout) {
-		repository.update(shout);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.update(shout);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

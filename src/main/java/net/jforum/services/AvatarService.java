@@ -42,10 +42,10 @@ public class AvatarService {
 	}
 
 	public List<Avatar> getGalleryAvatar() {
-		boolean allowGallery = config.getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY);
+		boolean allowGallery = this.config.getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY);
 
 		if (allowGallery) {
-			return repository.getGalleryAvatar();
+			return this.repository.getGalleryAvatar();
 		}
 
 		return new ArrayList<Avatar>();
@@ -73,7 +73,7 @@ public class AvatarService {
 		String imgName = this.processImageUpload(avatar, uploadedFile);
 
 		if (imgName != null) {
-			repository.add(avatar);
+			this.repository.add(avatar);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class AvatarService {
 		this.checkImageSize(avatar);
 
 		// imageUtil.
-		repository.add(avatar);
+		this.repository.add(avatar);
 	}
 
 	/**
@@ -109,10 +109,12 @@ public class AvatarService {
 			throw new ValidationException("update() expects a avatar with an existing id");
 		}
 
+		Avatar current = this.repository.get(avatar.getId());
+		avatar.setAvatarType(current.getAvatarType());
+
 		// upload the img and get the upload img info
 		String imageDiskName = this.processImageUpload(avatar, uploadedFile);
 
-		Avatar current = repository.get(avatar.getId());
 
 		if (imageDiskName != null) {
 			this.deleteImage(current);
@@ -122,7 +124,7 @@ public class AvatarService {
 			current.setWidth(avatar.getWidth());
 		}
 
-		repository.update(current);
+		this.repository.update(current);
 	}
 
 	/**
@@ -133,7 +135,7 @@ public class AvatarService {
 	public void delete(int... avatarId) {
 		if (avatarId != null) {
 			for (int id : avatarId) {
-				Avatar avatar = repository.get(id);
+				Avatar avatar = this.repository.get(id);
 				this.delete(avatar);
 			}
 		}
@@ -146,7 +148,7 @@ public class AvatarService {
 	 */
 	public void delete(Avatar avatar) {
 		if (avatar != null) {
-			repository.remove(avatar);
+			this.repository.remove(avatar);
 			this.deleteImage(avatar);
 		}
 	}
@@ -190,11 +192,11 @@ public class AvatarService {
 	private void isAllowed(Avatar avatar) {
 		this.applyCommonConstraints(avatar);
 
-		boolean allowGallery = config.getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY);
-		boolean allowUpload = config.getBoolean(ConfigKeys.AVATAR_ALLOW_UPLOAD);
+		boolean allowGallery = this.config.getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY);
+		boolean allowUpload = this.config.getBoolean(ConfigKeys.AVATAR_ALLOW_UPLOAD);
 
-		if ((avatar.getAvatarType() == AvatarType.AVATAR_UPLOAD && !allowUpload)
-				|| (avatar.getAvatarType() == AvatarType.AVATAR_GALLERY && !allowGallery)) {
+		if (avatar.getAvatarType() == AvatarType.AVATAR_UPLOAD && !allowUpload
+				|| avatar.getAvatarType() == AvatarType.AVATAR_GALLERY && !allowGallery) {
 			throw new ValidationException(avatar.getAvatarType() + "is not allowed!");
 		}
 	}
@@ -221,7 +223,7 @@ public class AvatarService {
 			// file size check, TODO, reduce the size if possible
 			// Get the number of bytes in the file
 			long size = file.length();
-			long maxSize = config.getLong(ConfigKeys.AVATAR_MAX_SIZE);
+			long maxSize = this.config.getLong(ConfigKeys.AVATAR_MAX_SIZE);
 
 			if (size > maxSize) {
 				throw new ValidationException("File size too big");
@@ -279,7 +281,7 @@ public class AvatarService {
 			String imageName = String.format("%s.%s", MD5.hash(uploadedFile.getCompleteFileName() + System.currentTimeMillis()),
 				upload.getExtension());
 
-			String filePath = String.format("%s/%s/%s", config.getApplicationPath(), config.getValue(configKey), imageName);
+			String filePath = String.format("%s/%s/%s", this.config.getApplicationPath(), this.config.getValue(configKey), imageName);
 
 			upload.saveUploadedFile(filePath);
 
@@ -302,10 +304,10 @@ public class AvatarService {
 	 */
 
 	private void checkImageSize(Avatar avatar) {
-		int maxWidth = config.getInt(ConfigKeys.AVATAR_MAX_WIDTH);
-		int maxHeight = config.getInt(ConfigKeys.AVATAR_MAX_HEIGHT);
-		int minWidth = config.getInt(ConfigKeys.AVATAR_MIN_WIDTH);
-		int minHeight = config.getInt(ConfigKeys.AVATAR_MIN_HEIGHT);
+		int maxWidth = this.config.getInt(ConfigKeys.AVATAR_MAX_WIDTH);
+		int maxHeight = this.config.getInt(ConfigKeys.AVATAR_MAX_HEIGHT);
+		int minWidth = this.config.getInt(ConfigKeys.AVATAR_MIN_WIDTH);
+		int minHeight = this.config.getInt(ConfigKeys.AVATAR_MIN_HEIGHT);
 
 		int height = avatar.getHeight();
 		int width = avatar.getWidth();
@@ -323,7 +325,7 @@ public class AvatarService {
 		}
 		else {
 			String imageName = avatar.getFileName();
-			String imageFilePath = String.format("%s/%s/%s", config.getApplicationPath(), config.getValue(avatarConfigKey), imageName);
+			String imageFilePath = String.format("%s/%s/%s", this.config.getApplicationPath(), this.config.getValue(avatarConfigKey), imageName);
 
 			return new File(imageFilePath);
 		}

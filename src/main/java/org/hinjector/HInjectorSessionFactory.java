@@ -22,18 +22,14 @@ import org.hibernate.stat.Statistics;
  * @Author Fabio Kung
  */
 public abstract class HInjectorSessionFactory implements SessionFactory {
-    /**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-	private final SessionFactory original;
+    private final SessionFactory original;
 
     public HInjectorSessionFactory(SessionFactory original) {
         this.original = original;
     }
 
     protected SessionFactory getOriginal() {
-    	return original;
+    	return this.original;
     }
 
     public Session openSession(Interceptor interceptor) throws HibernateException {

@@ -43,7 +43,7 @@ public class QueryCache extends StandardQueryCache {
 	@Override
 	public void clear() throws CacheException {
 		super.clear();
-		isUpToDate = true;
+		this.isUpToDate = true;
 	}
 
 	/**
@@ -52,6 +52,6 @@ public class QueryCache extends StandardQueryCache {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected boolean isUpToDate(Set spaces, Long timestamp) {
-		return isUpToDate;
+		return this.isUpToDate;
 	}
 }

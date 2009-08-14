@@ -50,10 +50,10 @@ public class PostEditInterceptor implements Interceptor {
 	 * @see org.vraptor.Interceptor#intercept(org.vraptor.LogicFlow)
 	 */
 	public void intercept(LogicFlow flow) throws LogicException, ViewException {
-		boolean isEnabled = config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
+		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 
 		if (isEnabled) {
-			UserSession userSession = sessionManager.getUserSession();
+			UserSession userSession = this.sessionManager.getUserSession();
 			RoleManager roleManager = userSession.getRoleManager();
 
 			if (!roleManager.isAdministrator() && !roleManager.isModerator() && !roleManager.getCanEditPosts()) {
@@ -62,18 +62,22 @@ public class PostEditInterceptor implements Interceptor {
 				HttpServletRequest request = logicRequest.getRequest();
 				int postId = Integer.parseInt(request.getParameter("postId"));
 
-				Post post = postRepository.get(postId);
+				Post post = this.postRepository.get(postId);
 				Forum forum = post.getForum();
 
-				long time = repository.getLimitedTime(forum);
+				long time = this.repository.getLimitedTime(forum);
 
 				if (time > 0) {
 					long duration = (System.currentTimeMillis() - post.getDate().getTime()) / 1000;
 
 					if (duration > time) {
-						viewService.renderView("postTimeLimited", "limited");
+						this.viewService.renderView("postTimeLimited", "limited");
 						return;
 					}
+				}
+				if(roleManager.getPostOnlyWithModeratorOnline() && !sessionManager.isModeratorOnline()) {
+					this.viewService.renderView("canOnlyPostWithModeratorOnline", "moderatorOnline");
+					return;
 				}
 			}
 		}

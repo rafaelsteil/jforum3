@@ -54,13 +54,13 @@ public class RSSService {
 	 * @return the rss contents
 	 */
 	public String forForum(int forumId, ViewService viewService) {
-		Forum forum = forumRepository.get(forumId);
+		Forum forum = this.forumRepository.get(forumId);
 
-		List<Topic> topics = rssRepository.getForumTopics(forum,
-			config.getInt(ConfigKeys.TOPICS_PER_PAGE));
+		List<Topic> topics = this.rssRepository.getForumTopics(forum,
+			this.config.getInt(ConfigKeys.TOPICS_PER_PAGE));
 
 		ChannelFeed feed = new ChannelFeed()
-			.setTitle(i18n.getFormattedMessage("RSS.ForumTopics.title", i18n.params(forum.getName())))
+			.setTitle(this.i18n.getFormattedMessage("RSS.ForumTopics.title", this.i18n.params(forum.getName())))
 			.addLink(this.buildForumLink(viewService, forum))
 			.setDescriptionOrSubtitle(forum.getDescription());
 
@@ -104,7 +104,7 @@ public class RSSService {
 	private String buildForumLink(ViewService viewService, Forum forum) {
 		return new StringBuilder().append(viewService.getForumLink())
 			.append(Domain.FORUMS).append('/').append(Actions.SHOW)
-			.append('/').append(forum.getId()).append(config.getValue(ConfigKeys.SERVLET_EXTENSION))
+			.append('/').append(forum.getId()).append(this.config.getValue(ConfigKeys.SERVLET_EXTENSION))
 			.toString();
 	}
 
@@ -117,7 +117,7 @@ public class RSSService {
 		return new StringBuilder().append(viewService.getForumLink())
 			.append(Domain.TOPICS).append('/').append(Actions.PRE_LIST)
 			.append('/').append(topic.getId()).append('/').append(topic.getLastPost().getId())
-			.append(config.getValue(ConfigKeys.SERVLET_EXTENSION))
+			.append(this.config.getValue(ConfigKeys.SERVLET_EXTENSION))
 			.toString();
 	}
 
@@ -127,7 +127,7 @@ public class RSSService {
 	 * @return the formatted date
 	 */
 	private String formatDate(Date date) {
-		SimpleDateFormat df = new SimpleDateFormat(config.getValue(
+		SimpleDateFormat df = new SimpleDateFormat(this.config.getValue(
 			ConfigKeys.RSS_DATE_TIME_FORMAT), Locale.ENGLISH);
 		return df.format(date);
 	}

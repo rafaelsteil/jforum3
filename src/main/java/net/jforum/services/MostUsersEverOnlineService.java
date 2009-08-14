@@ -28,7 +28,7 @@ public class MostUsersEverOnlineService {
 	}
 
 	public MostUsersEverOnline getMostRecentData(int totalCurrentUsers) {
-		Config config = repository.getByName(ConfigKeys.MOST_USERS_EVER_ONLINE);
+		Config config = this.repository.getByName(ConfigKeys.MOST_USERS_EVER_ONLINE);
 
 		if (config == null) {
 			MostUsersEverOnline most = new MostUsersEverOnline();
@@ -39,7 +39,7 @@ public class MostUsersEverOnlineService {
 			config.setName(ConfigKeys.MOST_USERS_EVER_ONLINE);
 			config.setValue(most.getDate().getTime() + "/" + most.getTotal());
 
-			repository.add(config);
+			this.repository.add(config);
 
 			return most;
 
@@ -56,7 +56,7 @@ public class MostUsersEverOnlineService {
 
 				config.setValue(most.getDate().getTime() + "/" + most.getTotal());
 
-				repository.update(config);
+				this.repository.update(config);
 
 				return most;
 			}

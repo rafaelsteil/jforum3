@@ -32,38 +32,38 @@ public class TagAdminActions {
 	private ViewService viewService;
 	private ViewPropertyBag propertyBag;
 	private TagRepository repository;
-
+	
 	public TagAdminActions(ViewPropertyBag propertyBag,
 			ViewService viewService,TagRepository repository) {
 		this.propertyBag = propertyBag;
 		this.repository = repository;
 		this.viewService = viewService;
 	}
-
+	
 	public void delete(@Parameter(key = "tags") String... tags) {
 		if (tags != null) {
 			for (String tag : tags) {
-				repository.remove(tag);
+				this.repository.remove(tag);
 			}
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void list() {
-		propertyBag.put("tags", repository.getAll());
+		this.propertyBag.put("tags", this.repository.getAll());
 	}
 
 	public void add() {
 	}
 
 	public void edit(@Parameter(key = "name") String tag) {
-		propertyBag.put("name", tag);
-		viewService.renderView(Actions.ADD);
+		this.propertyBag.put("name", tag);
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void editsave(@Parameter(key = "oldTag") String oldTag,@Parameter(key = "newTag") String newTag) {
-		repository.update(oldTag,newTag);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.update(oldTag,newTag);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

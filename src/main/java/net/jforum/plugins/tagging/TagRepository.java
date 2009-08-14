@@ -26,7 +26,7 @@ public interface TagRepository extends Repository<Tag> {
 	List<Tag> getTags(Topic topic);
 
 	/**
-	 * remove all the tag where tag name is ?
+	 * remove all the tag where tag name is ? 
 	 * @param tag
 	 */
 	void remove(String tag);
@@ -36,7 +36,7 @@ public interface TagRepository extends Repository<Tag> {
 	 * @return
 	 */
 	List<String> getAll();
-
+	
 	/**
 	 * get all the distinct tag names.
 	 * @param start
@@ -50,7 +50,7 @@ public interface TagRepository extends Repository<Tag> {
 	 * @param tag
 	 */
 	void update(String oldTag, String newTag);
-
+	
 	/**
 	 * list top ? hot tags
 	 * <name,counts>
@@ -65,23 +65,23 @@ public interface TagRepository extends Repository<Tag> {
 	 * @return
 	 */
 	Map<String,Long> getHotTags(List<Topic> topics,int limit);
-
+	
 	/**
 	 * list the hot tag that belong to the give forum.
 	 * @param topics
 	 * @param limit
 	 * @return
 	 */
-	Map<String,Long> getHotTags(Forum forum,int limit);
-
+	Map<String,Long> getHotTags(Forum forum,int limit);	
+	
 	/**
 	 * list the hot tag that belong to the give forums.
 	 * @param topics
 	 * @param limit
 	 * @return
 	 */
-	Map<String,Long> getAccessableHotTags(List<Forum> forum,int limit);
-
+	Map<String,Long> getAccessableHotTags(List<Forum> forum,int limit);	
+	
 	/**
 	 * count how many tag(str) have in our system
 	 * @param name

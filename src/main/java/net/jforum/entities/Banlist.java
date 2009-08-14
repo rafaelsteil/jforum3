@@ -29,11 +29,6 @@ import org.apache.commons.lang.StringUtils;
 @Entity
 @Table(name = "jforum_banlist")
 public class Banlist implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_banlist_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -53,28 +48,28 @@ public class Banlist implements Serializable {
 	 * @return the id
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return the userId
 	 */
 	public int getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	/**
 	 * @return the ip
 	 */
 	public String getIp() {
-		return ip;
+		return this.ip;
 	}
 
 	/**
 	 * @return the email
 	 */
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	/**

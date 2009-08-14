@@ -30,7 +30,7 @@ public class SmilieDAO extends HibernateGenericDAO<Smilie> implements SmilieRepo
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Smilie> getAllSmilies() {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.setCacheable(true)
 			.setCacheRegion("smilieDAO")
 			.setComment("smilieDAO.getAllSmilies")

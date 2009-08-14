@@ -49,6 +49,7 @@
 		
 		<property name="annotatedClasses">
 			<list>
+				<value>net.jforum.entities.Theme</value>
 				<value>net.jforum.entities.Category</value>
 				<value>net.jforum.entities.Forum</value>
 				<value>net.jforum.entities.Group</value>
@@ -70,6 +71,7 @@
 				<value>net.jforum.entities.PollOption</value>
 				<value>net.jforum.entities.PollVoter</value>
 				<value>net.jforum.entities.Attachment</value>
+				<value>net.jforum.entities.ModerationLog</value>
 				
 				<!-- Plugins -->
 				<value>net.jforum.plugins.tagging.Tag</value>

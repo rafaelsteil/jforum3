@@ -32,6 +32,7 @@ import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
 
+import org.hibernate.ObjectNotFoundException;
 import org.vraptor.annotations.Component;
 import org.vraptor.annotations.InterceptedBy;
 import org.vraptor.annotations.Parameter;
@@ -60,49 +61,49 @@ public class PostReportActions {
 	@SecurityConstraint(ModerationRule.class)
 	public void list() {
 		int[] forumIds = this.getForumIdsToFilter();
-		propertyBag.put("reports", repository.getAll(PostReportStatus.UNRESOLVED, forumIds));
+		this.propertyBag.put("reports", this.repository.getAll(PostReportStatus.UNRESOLVED, forumIds));
 	}
 
 	@SecurityConstraint(ModerationRule.class)
 	public void listResolved(@Parameter(key = "page") int page) {
 		int[] forumIds = this.getForumIdsToFilter();
-		int recordsPerPage = config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		int recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 
-		PaginatedResult<PostReport> reports = repository.getPaginated(
+		PaginatedResult<PostReport> reports = this.repository.getPaginated(
 			new Pagination().calculeStart(page, recordsPerPage), recordsPerPage,
 			PostReportStatus.RESOLVED, forumIds);
 
-		Pagination pagination = new Pagination(config, page).forPostReports(reports.getTotalRecords());
+		Pagination pagination = new Pagination(this.config, page).forPostReports(reports.getTotalRecords());
 
-		propertyBag.put("pagination", pagination);
-		propertyBag.put("reports", reports.getResults());
+		this.propertyBag.put("pagination", pagination);
+		this.propertyBag.put("reports", reports.getResults());
 	}
 
 	@SecurityConstraint(ModerationRule.class)
 	public void resolve(@Parameter(key = "reportId") int reportId) {
-		PostReport report = repository.get(reportId);
+		PostReport report = this.repository.get(reportId);
 
 		if (this.canManipulateReport(report)) {
 			report.setStatus(PostReportStatus.RESOLVED);
-			repository.update(report);
+			this.repository.update(report);
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	@SecurityConstraint(ModerationRule.class)
 	public void delete(@Parameter(key = "reportId") int reportId) {
-		PostReport report = repository.get(reportId);
+		PostReport report = this.repository.get(reportId);
 
 		if (this.canManipulateReport(report)) {
-			repository.remove(report);
+			this.repository.remove(report);
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void report(@Parameter(key = "postId") int postId, @Parameter(key = "description") String description) {
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 
 		if (userSession.isLogged()) {
 			PostReport report = new PostReport();
@@ -113,16 +114,21 @@ public class PostReportActions {
 			Post post = new Post(); post.setId(postId);
 			report.setPost(post);
 
-			repository.add(report);
+			this.repository.add(report);
 		}
 	}
 
 	private boolean canManipulateReport(PostReport report) {
-		int[] forumIds = sessionManager.getUserSession().getRoleManager().getRoleValues(SecurityConstants.FORUM);
+		int[] forumIds = this.sessionManager.getUserSession().getRoleManager().getRoleValues(SecurityConstants.FORUM);
 
 		for (int forumId : forumIds) {
 			// Make sure the user is removing a report from a forum he can moderate
-			if (forumId == report.getPost().getForum().getId()) {
+			try {
+				if (forumId == report.getPost().getForum().getId()) {
+					return true;
+				}
+			}
+			catch (ObjectNotFoundException e) {
 				return true;
 			}
 		}
@@ -132,7 +138,7 @@ public class PostReportActions {
 
 	private int[] getForumIdsToFilter() {
 		int[] forumIds = null;
-		RoleManager roleManager = sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isCoAdministrator()) {
 			forumIds = roleManager.getRoleValues(SecurityConstants.FORUM);

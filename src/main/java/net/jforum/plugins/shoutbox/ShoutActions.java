@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.jforum.entities.Forum;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
+import net.jforum.security.RoleManager;
 import net.jforum.services.ViewService;
 import net.jforum.util.I18n;
 import net.jforum.util.JForumConfig;
@@ -61,8 +63,9 @@ public class ShoutActions {
 	public void shout(@Parameter(key = "shout") Shout shout,@Parameter(key="shoutBoxId")int shoutBoxId){
 		clear();
 		ShoutBox shoutBox = shoutBoxService.get(shoutBoxId);
-		if(shoutBox ==null)
+		if(shoutBox ==null) {
 			return ;
+		}
 
 		shout.setUser(userSession.getUser());
 		shout.setShouterIp(userSession.getIp());
@@ -97,7 +100,7 @@ public class ShoutActions {
 		for(Shout shout : shouts){
 			ShoutBean bean = new ShoutBean(shout,shoutService,viewService.getContextPath());
 			bean.setCanDel(canDel(shout));
-			shoutBeans.add(bean);
+			this.shoutBeans.add(bean);
 		}
 	}
 
@@ -113,21 +116,27 @@ public class ShoutActions {
 			}else{
 				errMsgs.add(i18n.getMessage("ShoutBox.cannotDel"));
 			}
-		}/*else{
-			errMsgs.add(i18n.getMessage("ShoutBox.notfound"));
-		}*/
-
+		}
 	}
 
 	private boolean canDel(Shout shout){
-		User operator = userSession.getUser();
+		User operator = this.userSession.getUser();
 
-		if(operator!=null){
+		if (operator!=null){
 			User owner = shout.getUser();
-			//owner can del his shout, anonymous can not del any shout
-			//or administrator can del
-			return (operator.equals(owner) && shoutService.ANONYMOUS_USER_ID != operator.getId())
-					||userSession.getRoleManager().isAdministrator();
+
+			if (operator.equals(owner) && shoutService.ANONYMOUS_USER_ID != operator.getId()) {
+				return true;
+			}
+
+			RoleManager roleManager = userSession.getRoleManager();
+			boolean coAdminOrModeratorOfThisCategory = false;
+			if(roleManager.isCoAdministrator() || roleManager.isModerator()) {
+				List<Forum> forumsOfACategory = shout.getShoutBox().getCategory().getForums();
+				coAdminOrModeratorOfThisCategory = roleManager.isCategoryModerated(forumsOfACategory);
+			}
+
+			return roleManager.isAdministrator() || coAdminOrModeratorOfThisCategory && roleManager.isCategoryAllowed(shout.getShoutBox().getCategory().getId());
 		}
 		return false;
 	}

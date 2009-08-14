@@ -52,11 +52,11 @@ public class TopicWatchExtension {
 
 	@Extends(Actions.LIST)
 	public void afterList() {
-		UserSession userSession = sessionManager.getUserSession();
-		Topic topic = (Topic)propertyBag.get("topic");
+		UserSession userSession = this.sessionManager.getUserSession();
+		Topic topic = (Topic)this.propertyBag.get("topic");
 
-		propertyBag.put("isUserWatchingTopic", userSession.isLogged()
-			? watchService.isUserSubscribed(topic, userSession.getUser())
+		this.propertyBag.put("isUserWatchingTopic", userSession.isLogged()
+			? this.watchService.isUserSubscribed(topic, userSession.getUser())
 			: false);
 	}
 
@@ -68,10 +68,10 @@ public class TopicWatchExtension {
 	public void watch(@Parameter(key = "page") int page, @Parameter(key = "topicId") int topicId) {
 		Topic topic = new Topic(); topic.setId(topicId);
 
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 
-		watchService.watch(topic, userSession.getUser());
-		viewService.redirectToAction(Actions.LIST, topicId);
+		this.watchService.watch(topic, userSession.getUser());
+		this.viewService.redirectToAction(Actions.LIST, topicId);
 	}
 
 	/**
@@ -82,9 +82,9 @@ public class TopicWatchExtension {
 	public void unwatch(@Parameter(key = "page") int page, @Parameter(key = "topicId") int topicId) {
 		Topic topic = new Topic(); topic.setId(topicId);
 
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 
-		watchService.unwatch(topic, userSession.getUser());
-		viewService.redirectToAction(Actions.LIST, topicId);
+		this.watchService.unwatch(topic, userSession.getUser());
+		this.viewService.redirectToAction(Actions.LIST, topicId);
 	}
 }

@@ -27,14 +27,14 @@ public class ViewPropertyBag {
 	}
 
 	public void put(String key, Object value) {
-		request.setAttribute(key, value);
+		this.request.setAttribute(key, value);
 	}
 
 	public Object get(String key) {
-		return request.getAttribute(key);
+		return this.request.getAttribute(key);
 	}
 
 	public void remove(String key) {
-		request.removeAttribute(key);
+		this.request.removeAttribute(key);
 	}
 }

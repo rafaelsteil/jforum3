@@ -33,11 +33,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "jforum_privmsgs")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PrivateMessage implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_privmsgs_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -156,7 +151,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the time
 	 */
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
 	/**
@@ -170,7 +165,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the text
 	 */
 	public String getText() {
-		return text;
+		return this.text;
 	}
 
 	/**
@@ -184,7 +179,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the subject
 	 */
 	public String getSubject() {
-		return subject;
+		return this.subject;
 	}
 
 	/**
@@ -198,7 +193,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the bbCodeEnabled
 	 */
 	public boolean isBbCodeEnabled() {
-		return bbCodeEnabled;
+		return this.bbCodeEnabled;
 	}
 
 	/**
@@ -212,7 +207,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the htmlEnabled
 	 */
 	public boolean isHtmlEnabled() {
-		return htmlEnabled;
+		return this.htmlEnabled;
 	}
 
 	/**
@@ -226,7 +221,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the smiliesEnabled
 	 */
 	public boolean isSmiliesEnabled() {
-		return smiliesEnabled;
+		return this.smiliesEnabled;
 	}
 
 	/**
@@ -240,7 +235,7 @@ public class PrivateMessage implements Serializable {
 	 * @return the signatureEnabled
 	 */
 	public boolean isSignatureEnabled() {
-		return signatureEnabled;
+		return this.signatureEnabled;
 	}
 
 	/**
@@ -251,14 +246,14 @@ public class PrivateMessage implements Serializable {
 	}
 
 	public boolean isNew() {
-		return type == PrivateMessageType.NEW;
+		return this.type == PrivateMessageType.NEW;
 	}
 
 	/**
 	 * Flag this message as read
 	 */
 	public void markAsRead() {
-		type = PrivateMessageType.READ;
+		this.type = PrivateMessageType.READ;
 	}
 
 	/**
@@ -269,8 +264,8 @@ public class PrivateMessage implements Serializable {
 	public Post asPost() {
 		Post post = new Post();
 
-		post.setSubject(subject);
-		post.setText(text);
+		post.setSubject(this.subject);
+		post.setText(this.text);
 		post.setBbCodeEnabled(this.isBbCodeEnabled());
 		post.setHtmlEnabled(this.isHtmlEnabled());
 		post.setSmiliesEnabled(this.isSmiliesEnabled());

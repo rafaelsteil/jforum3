@@ -36,11 +36,6 @@ import org.hibernate.annotations.CascadeType;
 @Table(name = "jforum_groups")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Group implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_groups_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -57,12 +52,12 @@ public class Group implements Serializable {
 	@Cascade({CascadeType.ALL, CascadeType.DELETE_ORPHAN})
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<Role> roles = new ArrayList<Role>();
-
+	
 	@ManyToMany(mappedBy = "groups")
 	private List<User> users = new ArrayList<User>();
 
 	public boolean roleExist(String roleName) {
-		for (Role role : roles) {
+		for (Role role : this.roles) {
 			if (role.getName().equals(roleName)) {
 				return true;
 			}
@@ -76,12 +71,12 @@ public class Group implements Serializable {
 	 * @param role the role to add
 	 */
 	public void addRole(Role role) {
-		roles.add(role);
+		this.roles.add(role);
 		role.setGroup(this);
 	}
 
 	public List<Role> getRoles() {
-		return roles;
+		return this.roles;
 	}
 
 	/**
@@ -95,21 +90,21 @@ public class Group implements Serializable {
 	 * @return String
 	 */
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	/**
 	 * @return int
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return String
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -168,6 +163,6 @@ public class Group implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return String.format("%d, %s", id, name);
+		return String.format("%d, %s", this.id, this.name);
 	}
 }

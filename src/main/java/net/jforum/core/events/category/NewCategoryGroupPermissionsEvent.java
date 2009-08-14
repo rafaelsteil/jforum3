@@ -44,20 +44,20 @@ public class NewCategoryGroupPermissionsEvent extends EmptyCategoryEvent {
 	 */
 	@Override
 	public void added(Category category) {
-		List<Group> allGroups = groupRepository.getAllGroups();
-		List<Group> userGroups = sessionManager.getUserSession().getUser().getGroups();
+		List<Group> allGroups = this.groupRepository.getAllGroups();
+		List<Group> userGroups = this.sessionManager.getUserSession().getUser().getGroups();
 		List<Group> processedGroups = new ArrayList<Group>();
 
 		for (Group group : userGroups) {
 			if (this.isGoodCandidate(group)) {
 				processedGroups.add(group);
-				groupService.appendRole(group, SecurityConstants.CATEGORY, category.getId());
+				this.groupService.appendRole(group, SecurityConstants.CATEGORY, category.getId());
 			}
 		}
 
 		for (Group group : allGroups) {
 			if (!processedGroups.contains(group) && group.roleExist(SecurityConstants.ADMINISTRATOR)) {
-				groupService.appendRole(group, SecurityConstants.CATEGORY, category.getId());
+				this.groupService.appendRole(group, SecurityConstants.CATEGORY, category.getId());
 			}
 		}
 	}

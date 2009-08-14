@@ -52,7 +52,7 @@ public class PrivateMessageDAO extends HibernateGenericDAO<PrivateMessage> imple
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PrivateMessage> getFromInbox(User user) {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("toUser", user))
 			.add(Restrictions.disjunction()
 				.add(Restrictions.eq("type", PrivateMessageType.NEW))
@@ -68,7 +68,7 @@ public class PrivateMessageDAO extends HibernateGenericDAO<PrivateMessage> imple
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PrivateMessage> getFromSentBox(User user) {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("fromUser", user))
 			.add(Restrictions.eq("type", PrivateMessageType.SENT))
 			.setComment("privateMessageDAO.getFromSentBox")

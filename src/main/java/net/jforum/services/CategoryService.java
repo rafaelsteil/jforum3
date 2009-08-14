@@ -46,7 +46,7 @@ public class CategoryService {
 			throw new ValidationException("This appears to be an existing category (id > 0). Please use update() instead");
 		}
 
-		repository.add(category);
+		this.repository.add(category);
 	}
 
 	/**
@@ -56,8 +56,8 @@ public class CategoryService {
 	public void delete(int... ids) {
 		if (ids != null) {
 			for (int id : ids) {
-				Category c = repository.get(id);
-				repository.remove(c);
+				Category c = this.repository.get(id);
+				this.repository.remove(c);
 			}
 		}
 	}
@@ -68,12 +68,12 @@ public class CategoryService {
 	 */
 	public void update(Category category) {
 		this.applyCommonConstraints(category);
-
+		
 		if (category.getId() == 0) {
 			throw new ValidationException("update() expects a category with an existing id");
 		}
 
-		repository.update(category);
+		this.repository.update(category);
 	}
 
 	/**
@@ -99,8 +99,8 @@ public class CategoryService {
 	 * @param categoryId the id of the category to change
 	 */
 	private void processOrdering(boolean up, int categoryId) {
-		Category toChange = repository.get(categoryId);
-		List<Category> categories = repository.getAllCategories();
+		Category toChange = this.repository.get(categoryId);
+		List<Category> categories = this.repository.getAllCategories();
 
 		int index = categories.indexOf(toChange);
 
@@ -112,8 +112,8 @@ public class CategoryService {
 			toChange.setDisplayOrder(otherCategory.getDisplayOrder());
 			otherCategory.setDisplayOrder(oldOrder);
 
-			repository.update(toChange);
-			repository.update(otherCategory);
+			this.repository.update(toChange);
+			this.repository.update(otherCategory);
 		}
 	}
 

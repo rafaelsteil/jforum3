@@ -19,12 +19,15 @@ import net.jforum.formatters.Formatter;
 import net.jforum.formatters.PostFormatters;
 import net.jforum.formatters.PostOptions;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author Rafael Steil
  */
 public class DisplayFormattedMessageTag extends JForumTag {
 	private static PostFormatters formatters;
 	private Post post;
+	private String rawMessage;
 
 	public DisplayFormattedMessageTag() {
 		if (formatters == null) {
@@ -37,10 +40,19 @@ public class DisplayFormattedMessageTag extends JForumTag {
 	 */
 	@Override
 	public void doTag() throws JspException, IOException {
+		if (this.post == null && !StringUtils.isEmpty(this.rawMessage)) {
+			this.post = new Post();
+			this.post.setText(this.rawMessage);
+		}
+
+		if (post == null) {
+			return;
+		}
+
 		String text = post.getText();
-		PostOptions options = new PostOptions(post.isHtmlEnabled(),
-			post.isSmiliesEnabled(), post.isBbCodeEnabled(),
-			post.isSignatureEnabled(), this.request().getContextPath());
+		PostOptions options = new PostOptions(this.post.isHtmlEnabled(),
+			this.post.isSmiliesEnabled(), this.post.isBbCodeEnabled(),
+			this.post.isSignatureEnabled(), this.request().getContextPath());
 
 		for (Formatter formatter : formatters) {
 			text = formatter.format(text, options);
@@ -51,5 +63,9 @@ public class DisplayFormattedMessageTag extends JForumTag {
 
 	public void setPost(Post post) {
 		this.post = post;
+	}
+
+	public void setRawMessage(String message) {
+		this.rawMessage = message;
 	}
 }

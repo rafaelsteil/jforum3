@@ -13,7 +13,7 @@ package net.jforum.actions.helpers;
 /**
  * @author Rafael Steil
  */
-public class Domain {
+public class Domain{
 	public static final String AVATAR_ADMIN = "adminAvatar";
 	public static final String BAD_WORD_ADMIN = "adminBadWord";
 	public static final String TOPICS = "topics";

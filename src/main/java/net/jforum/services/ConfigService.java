@@ -32,7 +32,7 @@ public class ConfigService {
 				String value = request.getParameter(key);
 
 				String name = key.substring(key.indexOf('_') + 1);
-				Config entry = repository.getByName(name);
+				Config entry = this.repository.getByName(name);
 
 				if (entry == null) {
 					entry = new Config();
@@ -41,13 +41,13 @@ public class ConfigService {
 
 				entry.setValue(value);
 
-				config.clearProperty(name);
-				config.setProperty(name, value);
+				this.config.clearProperty(name);
+				this.config.setProperty(name, value);
 
-				repository.update(entry);
+				this.repository.update(entry);
 			}
 		}
 
-		i18n.changeBoardDefaultLanguage(config.getValue(ConfigKeys.I18N_DEFAULT));
+		this.i18n.changeBoardDefaultLanguage(this.config.getValue(ConfigKeys.I18N_DEFAULT));
 	}
 }

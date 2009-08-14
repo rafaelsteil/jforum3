@@ -35,7 +35,7 @@ public class DefaultViewManager implements ViewManager {
 	 * @param viewManager the default view manager
 	 */
 	public DefaultViewManager(String regexPattern) {
-		replacement = this.translateExpression(regexPattern);
+		this.replacement = this.translateExpression(regexPattern);
 	}
 
 	/**

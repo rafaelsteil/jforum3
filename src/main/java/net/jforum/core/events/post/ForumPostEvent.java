@@ -45,7 +45,7 @@ public class ForumPostEvent extends EmptyPostEvent {
 		}
 
 		if (isLastPost) {
-			Post lastPost = repository.getLastPost(post.getForum());
+			Post lastPost = this.repository.getLastPost(post.getForum());
 			post.getForum().setLastPost(lastPost);
 		}
 	}

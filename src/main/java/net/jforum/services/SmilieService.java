@@ -54,7 +54,7 @@ public class SmilieService {
 
 		smilie.setDiskName(imageDiskName);
 
-		repository.add(smilie);
+		this.repository.add(smilie);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class SmilieService {
 
 		String imageDiskName = this.saveImage(uploadedFile);
 
-		Smilie current = repository.get(smilie.getId());
+		Smilie current = this.repository.get(smilie.getId());
 		current.setCode(smilie.getCode());
 
 		if (imageDiskName != null) {
@@ -79,7 +79,7 @@ public class SmilieService {
 			current.setDiskName(imageDiskName);
 		}
 
-		repository.update(current);
+		this.repository.update(current);
 	}
 
 	/**
@@ -89,8 +89,8 @@ public class SmilieService {
 	public void delete(int... smiliesId) {
 		if (smiliesId != null) {
 			for (int id : smiliesId) {
-				Smilie s = repository.get(id);
-				repository.remove(s);
+				Smilie s = this.repository.get(id);
+				this.repository.remove(s);
 
 				this.deleteImage(s);
 			}
@@ -98,8 +98,8 @@ public class SmilieService {
 	}
 
 	private void deleteImage(Smilie smilie) {
-		String filename = String.format("%s/%s/%s", config.getApplicationPath(),
-			config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
+		String filename = String.format("%s/%s/%s", this.config.getApplicationPath(),
+			this.config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
 			smilie.getDiskName());
 
 		new File(filename).delete();
@@ -114,8 +114,8 @@ public class SmilieService {
 				upload.getExtension());
 
 			upload.saveUploadedFile(String.format("%s/%s/%s",
-				config.getApplicationPath(),
-				config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
+				this.config.getApplicationPath(),
+				this.config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
 				imageName));
 
 			return imageName;

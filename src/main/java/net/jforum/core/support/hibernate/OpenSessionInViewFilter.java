@@ -49,8 +49,8 @@ public class OpenSessionInViewFilter implements Filter {
 		}
 		catch (Exception e) {
 			try {
-				if (sessionFactory.getCurrentSession().getTransaction().isActive()) {
-					sessionFactory.getCurrentSession().getTransaction().rollback();
+				if (this.sessionFactory.getCurrentSession().getTransaction().isActive()) {
+					this.sessionFactory.getCurrentSession().getTransaction().rollback();
 				}
 
 				this.closeSession();
@@ -61,35 +61,35 @@ public class OpenSessionInViewFilter implements Filter {
 		}
 		finally {
 			try {
-				TransactionSynchronizationManager.unbindResource(sessionFactory);
+				TransactionSynchronizationManager.unbindResource(this.sessionFactory);
 			}
 			catch (IllegalStateException e) { }
 		}
 	}
 
 	private void closeSession() {
-		if (sessionFactory.getCurrentSession().isOpen()
-			&& sessionFactory.getCurrentSession().isConnected()) {
-			sessionFactory.getCurrentSession().close();
+		if (this.sessionFactory.getCurrentSession().isOpen()
+			&& this.sessionFactory.getCurrentSession().isConnected()) {
+			this.sessionFactory.getCurrentSession().close();
 		}
 	}
 
 	private void commitAndCloseSession() {
-		sessionFactory.getCurrentSession().getTransaction().commit();
+		this.sessionFactory.getCurrentSession().getTransaction().commit();
 		this.closeSession();
 	}
 
 	private void openAndBindSession() {
-		TransactionSynchronizationManager.bindResource(sessionFactory,
-			new SessionHolder(sessionFactory.openSession()));
+		TransactionSynchronizationManager.bindResource(this.sessionFactory,
+			new SessionHolder(this.sessionFactory.openSession()));
 
-		sessionFactory.getCurrentSession().beginTransaction();
+		this.sessionFactory.getCurrentSession().beginTransaction();
 	}
 
 	private void ensureSessionFactoryIsInitialized() {
-		if (sessionFactory == null) {
-			ApplicationContext context = (ApplicationContext)servletContext.getAttribute(ConfigKeys.SPRING_CONTEXT);
-			sessionFactory = (SessionFactory)context.getBean(SessionFactory.class.getName(), SessionFactory.class);
+		if (this.sessionFactory == null) {
+			ApplicationContext context = (ApplicationContext)this.servletContext.getAttribute(ConfigKeys.SPRING_CONTEXT);
+			this.sessionFactory = (SessionFactory)context.getBean(SessionFactory.class.getName(), SessionFactory.class);
 		}
 	}
 
@@ -97,15 +97,15 @@ public class OpenSessionInViewFilter implements Filter {
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
 	public void init(FilterConfig config) throws ServletException {
-		servletContext = config.getServletContext();
+		this.servletContext = config.getServletContext();
 	}
 
 	/**
 	 * @see javax.servlet.Filter#destroy()
 	 */
 	public void destroy() {
-		if (sessionFactory != null && !sessionFactory.isClosed()) {
-			sessionFactory.close();
+		if (this.sessionFactory != null && !this.sessionFactory.isClosed()) {
+			this.sessionFactory.close();
 		}
 	}
 }

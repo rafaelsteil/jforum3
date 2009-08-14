@@ -44,7 +44,7 @@ public class LostPasswordService {
 
 		String hash = MD5.hash(user.getEmail() + System.currentTimeMillis());
 		user.setActivationKey(hash);
-		userRepository.update(user);
+		this.userRepository.update(user);
 
 		return true;
 	}
@@ -54,10 +54,10 @@ public class LostPasswordService {
 		User user = null;
 
 		if (!StringUtils.isEmpty(username)) {
-			user = userRepository.getByUsername(username);
+			user = this.userRepository.getByUsername(username);
 		}
 		else if (!StringUtils.isEmpty(email)) {
-			user = userRepository.getByEmail(email);
+			user = this.userRepository.getByEmail(email);
 		}
 
 		if (user == null) {

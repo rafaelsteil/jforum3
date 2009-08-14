@@ -101,7 +101,7 @@ public class Attachment {
 	 * @return the downloadCount
 	 */
 	public int getDownloadCount() {
-		return downloadCount;
+		return this.downloadCount;
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class Attachment {
 	 * @return the physicalFilename
 	 */
 	public String getPhysicalFilename() {
-		return physicalFilename;
+		return this.physicalFilename;
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class Attachment {
 	 * @return the realFilename
 	 */
 	public String getRealFilename() {
-		return realFilename;
+		return this.realFilename;
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class Attachment {
 	 * @return the description
 	 */
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class Attachment {
 	 * @return the mimetype
 	 */
 	public String getMimetype() {
-		return mimetype;
+		return this.mimetype;
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class Attachment {
 	 * @return the uploadDate
 	 */
 	public Date getUploadDate() {
-		return uploadDate;
+		return this.uploadDate;
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class Attachment {
 	 * @return the filesize
 	 */
 	public long getFilesize() {
-		return filesize;
+		return this.filesize;
 	}
 
 	/**
@@ -199,7 +199,7 @@ public class Attachment {
 	 * @return the hasThumb
 	 */
 	public boolean isHasThumb() {
-		return hasThumb;
+		return this.hasThumb;
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class Attachment {
 	 * @return Returns the id.
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -252,14 +252,14 @@ public class Attachment {
 	}
 
 	public void incrementDownloadCount() {
-		downloadCount++;
+		this.downloadCount++;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
+		result = prime * result + this.id;
 		return result;
 	}
 
@@ -275,7 +275,7 @@ public class Attachment {
 			return false;
 		}
 		Attachment other = (Attachment) obj;
-		if (id != other.id) {
+		if (this.id != other.id) {
 			return false;
 		}
 		return true;

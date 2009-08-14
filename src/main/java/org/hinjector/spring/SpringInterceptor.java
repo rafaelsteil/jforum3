@@ -11,10 +11,6 @@ import org.springframework.context.ApplicationContext;
  * @author Rafael Steil
  */
 public class SpringInterceptor extends EmptyInterceptor {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
 	private final SessionFactory sessionFactory;
 	private final ApplicationContext beanRegistry;
 
@@ -32,7 +28,7 @@ public class SpringInterceptor extends EmptyInterceptor {
 			return null;
 		}
 
-		Object instance = beanRegistry.getBean(entityName);
+		Object instance = this.beanRegistry.getBean(entityName);
 		this.fillId(entityName, instance, id);
 
 		return instance;

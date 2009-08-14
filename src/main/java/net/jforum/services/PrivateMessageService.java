@@ -41,10 +41,10 @@ public class PrivateMessageService {
 		}
 
 		for (int id : ids) {
-			PrivateMessage pm = repository.get(id);
+			PrivateMessage pm = this.repository.get(id);
 
 			if (this.canDeleteMessage(owner, pm)) {
-				repository.remove(pm);
+				this.repository.remove(pm);
 			}
 		}
 	}
@@ -65,7 +65,7 @@ public class PrivateMessageService {
 			pm.setDate(new Date());
 		}
 
-		repository.add(pm);
+		this.repository.add(pm);
 	}
 
 	private void applySendConstraints(PrivateMessage pm) {

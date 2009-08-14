@@ -13,18 +13,18 @@ package net.jforum.plugins.shoutbox;
 import java.io.Serializable;
 
 /**
- *
- *
+ * 
+ * 
  * @author Bill
  *
  */
 public class ShoutBean implements Serializable {
 
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = -1687281471602604152L;
-
+	
 	//------------ Properties to Serial to JSON/XML ---------------
 	private Integer id;
 	private String  name;
@@ -33,10 +33,10 @@ public class ShoutBean implements Serializable {
 	private boolean  canDel;
 
 	public ShoutBean(Shout shout, ShoutService shoutService,String contexPath) {
-		id          = shout.getId();
-		name        = shoutService.getShouter(shout);
-		message     = shoutService.formatShoutMessage(shout,contexPath);
-		date        = shoutService.formatShoutDate(shout);
+		this.id          = shout.getId();
+		this.name        = shoutService.getShouter(shout);
+		this.message     = shoutService.formatShoutMessage(shout,contexPath);
+		this.date        = shoutService.formatShoutDate(shout);
 	}
 
 	//------------ Getter & Setter ---------------------------------

@@ -26,6 +26,6 @@ public class SafeHtmlAttributesFormatter implements Formatter {
 	 * @see net.jforum.formatters.Formatter#format(java.lang.String, net.jforum.formatters.PostOptions)
 	 */
 	public String format(String text, PostOptions postOptions) {
-		return safeHtml.ensureAllAttributesAreSafe(text);
+		return this.safeHtml.ensureAllAttributesAreSafe(text);
 	}
 }

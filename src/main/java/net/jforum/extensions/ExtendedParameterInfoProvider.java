@@ -24,7 +24,7 @@ import org.vraptor.reflection.StringUtil;
 /**
  * Same as vraptor DefaultParameterInfoProvider,
  * except it search the Parameter in Extends Annotation
- *
+ * 
  * @author Bill
  * @author Guilherme Silveira
  *

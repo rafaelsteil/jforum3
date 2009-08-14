@@ -37,7 +37,7 @@ public class Theme {
 	private String templateName;
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -45,7 +45,7 @@ public class Theme {
 	}
 
 	public String getStyleName() {
-		return styleName;
+		return this.styleName;
 	}
 
 	public void setStyleName(String styleName) {
@@ -53,7 +53,7 @@ public class Theme {
 	}
 
 	public String getTemplateName() {
-		return templateName;
+		return this.templateName;
 	}
 
 	public void setTemplateName(String templateName) {

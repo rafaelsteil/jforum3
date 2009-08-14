@@ -23,6 +23,6 @@ public class SpammerTaskExecutor {
 	}
 
 	public void dispatch(Spammer spammer) {
-		taskExecutor.execute(new EmailSenderTask(spammer));
+		this.taskExecutor.execute(new EmailSenderTask(spammer));
 	}
 }

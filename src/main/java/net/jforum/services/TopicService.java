@@ -21,6 +21,7 @@ import net.jforum.entities.Topic;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
+import net.jforum.repository.UserRepository;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -33,14 +34,16 @@ public class TopicService {
 	private ForumRepository forumRepository;
 	private AttachmentService attachmentService;
 	private PollService pollService;
+	private UserRepository userRepository;
 
 	public TopicService(TopicRepository topicRepository, PostRepository postRepository,
-		ForumRepository forumRepository, AttachmentService attachmentService, PollService pollService) {
+		ForumRepository forumRepository, AttachmentService attachmentService, PollService pollService, UserRepository userRepository) {
 		this.topicRepository = topicRepository;
 		this.postRepository = postRepository;
 		this.forumRepository = forumRepository;
 		this.attachmentService = attachmentService;
 		this.pollService = pollService;
+		this.userRepository = userRepository;
 	}
 
 	/**
@@ -68,10 +71,10 @@ public class TopicService {
 		Post post = topic.getFirstPost();
 		topic.setFirstPost(null);
 
-		pollService.associatePoll(topic, pollOptions);
+		this.pollService.associatePoll(topic, pollOptions);
 
 		topic.setHasAttachment(attachments.size() > 0);
-		topicRepository.add(topic);
+		this.topicRepository.add(topic);
 
 		post.setForum(topic.getForum());
 		post.setTopic(topic);
@@ -79,16 +82,18 @@ public class TopicService {
 		post.setUser(topic.getUser());
 		post.setSubject(topic.getSubject());
 
-		attachmentService.insertAttachments(attachments, post);
-		postRepository.add(post);
+		this.attachmentService.insertAttachments(attachments, post);
+		this.postRepository.add(post);
 
 		topic.setFirstPost(post);
 		topic.setLastPost(post);
 
 		if (!topic.isWaitingModeration()) {
-			Forum forum = forumRepository.get(topic.getForum().getId());
+			Forum forum = this.forumRepository.get(topic.getForum().getId());
 			forum.setLastPost(post);
-			topic.getUser().incrementTotalPosts();
+
+			int userTotalPosts = this.userRepository.getTotalPosts(post.getUser());
+			topic.getUser().setTotalPosts(userTotalPosts);
 		}
 	}
 
@@ -99,14 +104,14 @@ public class TopicService {
 	 * @param attachments
 	 */
 	public void reply(Topic topic, Post post, List<AttachedFile> attachments) {
-		Topic current = topicRepository.get(topic.getId());
+		Topic current = this.topicRepository.get(topic.getId());
 
 		if (StringUtils.isEmpty(post.getSubject())) {
 			post.setSubject(current.getSubject());
 		}
 
 		this.performReplyValidations(post);
-		attachmentService.insertAttachments(attachments, post);
+		this.attachmentService.insertAttachments(attachments, post);
 
 		if (attachments.size() > 0) {
 			current.setHasAttachment(true);
@@ -118,7 +123,7 @@ public class TopicService {
 		post.setDate(new Date());
 		post.setForum(current.getForum());
 
-		postRepository.add(post);
+		this.postRepository.add(post);
 
 		if (!post.isWaitingModeration()) {
 			current.setLastPost(post);

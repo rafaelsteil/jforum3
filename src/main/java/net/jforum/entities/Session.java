@@ -48,7 +48,7 @@ public class Session {
 	 * @return the lastVisit
 	 */
 	public Date getLastVisit() {
-		return lastVisit;
+		return this.lastVisit;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class Session {
 	 * @return the userId
 	 */
 	public int getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class Session {
 	 * @return the sessionStart
 	 */
 	public Date getStart() {
-		return start;
+		return this.start;
 	}
 
 	/**
@@ -90,21 +90,21 @@ public class Session {
 	 * @return the sessionTime
 	 */
 	public Date getLastAccessed() {
-		return lastAccessed;
+		return this.lastAccessed;
 	}
 
 	/**
 	 * @param sessionTime the sessionTime to set
 	 */
 	public void setLastAccessed(Date date) {
-		lastAccessed = date;
+		this.lastAccessed = date;
 	}
 
 	/**
 	 * @return the sessionIp
 	 */
 	public String getIp() {
-		return ip;
+		return this.ip;
 	}
 
 	/**

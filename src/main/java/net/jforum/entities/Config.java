@@ -46,7 +46,7 @@ public class Config {
 	 * @return The Entry name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -55,11 +55,11 @@ public class Config {
 	 * @return The Entry value
 	 */
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class Config {
 	 * @param string The entry name to set
 	 */
 	public void setName(String string) {
-		name = string;
+		this.name = string;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class Config {
 	 * @param string The entry value to set
 	 */
 	public void setValue(String string) {
-		value = string;
+		this.value = string;
 	}
 
 	public void setId(int id) {

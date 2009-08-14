@@ -28,7 +28,7 @@ import org.vraptor.webapp.WebApplication;
 
 /**
  * @author Bill
- *
+ * 
  */
 public class ExternalUserManagementInterceptor implements Interceptor {
 
@@ -42,14 +42,14 @@ public class ExternalUserManagementInterceptor implements Interceptor {
 	 * @see org.vraptor.Interceptor#intercept(org.vraptor.LogicFlow)
 	 */
 	public void intercept(LogicFlow flow) throws LogicException, ViewException {
-		boolean isExternalUserManagement = config.getBoolean(
+		boolean isExternalUserManagement = this.config.getBoolean(
 				ConfigKeys.EXTERNAL_USER_MANAGEMENT, false);
-
+		
 		if(isExternalUserManagement){
 			//forward
 			LogicRequest logicRequest = flow.getLogicRequest();
 			HttpServletRequest request = logicRequest.getRequest();
-
+			
 			WebApplication application = (WebApplication)logicRequest.
 				getServletContext().getAttribute(WebApplication.class.getName());
 			BeanProvider provider = application.getIntrospector().getBeanProvider();
@@ -59,19 +59,19 @@ public class ExternalUserManagementInterceptor implements Interceptor {
 			String contextPath = viewService.getContextPath();
 			String url = request.getRequestURL().toString();
 			String serverName = url.substring(0,url.indexOf(contextPath)+contextPath.length());
-
+			
 			StringBuilder urlBuilder = new StringBuilder(serverName);
 			urlBuilder.append("/")
 					  .append(Domain.FORUMS)
 					  .append("/")
 					  .append(Actions.LIST)
-					  .append(config.getString(ConfigKeys.SERVLET_EXTENSION));
+					  .append(this.config.getString(ConfigKeys.SERVLET_EXTENSION));
 			request.setAttribute("redirectURL", urlBuilder.toString());
-
+			
 			viewService.renderView(Domain.USER, "externalManagement");
 			return; //end the excute flow
 		}
-
+		
 		flow.execute(); //if not external user management, continue the execution flow
 	}
 

@@ -30,11 +30,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "jforum_smilies")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Smilie implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_smilies_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -51,7 +46,7 @@ public class Smilie implements Serializable {
 	 * @return
 	 */
 	public String getCode() {
-		return code;
+		return this.code;
 	}
 
 	/**
@@ -72,7 +67,7 @@ public class Smilie implements Serializable {
 	 * @return
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -86,7 +81,7 @@ public class Smilie implements Serializable {
 	 * @return
 	 */
 	public String getDiskName() {
-		return diskName;
+		return this.diskName;
 	}
 
 	/**

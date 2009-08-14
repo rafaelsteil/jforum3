@@ -29,6 +29,6 @@ public class TopicWatchTopicEvent extends EmptyTopicEvent {
 	 */
 	@Override
 	public void deleted(Topic topic) {
-		repository.removeSubscription(topic);
+		this.repository.removeSubscription(topic);
 	}
 }

@@ -50,7 +50,7 @@ public class AttachmentService {
 	}
 
 	public Attachment getAttachmentForDownload(int attachmentId) {
-		Attachment attachment = repository.get(attachmentId);
+		Attachment attachment = this.repository.get(attachmentId);
 		attachment.incrementDownloadCount();
 		return attachment;
 	}
@@ -134,7 +134,7 @@ public class AttachmentService {
 			post.setHasAttachments(true);
 
 			for (AttachedFile attachedFile : attachedFiles) {
-				String path = config.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR)
+				String path = this.config.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR)
 					+ "/" + attachedFile.getAttachment().getPhysicalFilename();
 
 				attachedFile.getUploadUtils().saveUploadedFile(path);
@@ -152,14 +152,14 @@ public class AttachmentService {
 	private boolean shouldCreateThumb(Attachment attachment) {
 		String extension = attachment.getFileExtension();
 
-		return config.getBoolean(ConfigKeys.ATTACHMENTS_IMAGES_CREATE_THUMB)
+		return this.config.getBoolean(ConfigKeys.ATTACHMENTS_IMAGES_CREATE_THUMB)
 			&& ("jpg".equals(extension) || "jpeg".equals(extension) || "gif".equals(extension) || "png".equals(extension));
 	}
 
 	private void createSaveThumb(String path) {
 		try {
 			BufferedImage image = ImageUtils.resizeImage(path, ImageUtils.IMAGE_JPEG,
-				config.getInt(ConfigKeys.ATTACHMENTS_IMAGES_MAX_THUMB_W), config.getInt(ConfigKeys.ATTACHMENTS_IMAGES_MAX_THUMB_H));
+				this.config.getInt(ConfigKeys.ATTACHMENTS_IMAGES_MAX_THUMB_W), this.config.getInt(ConfigKeys.ATTACHMENTS_IMAGES_MAX_THUMB_H));
 			ImageUtils.saveImage(image, path + "_thumb", ImageUtils.IMAGE_JPEG);
 		}
 		catch (Exception e) {
@@ -182,7 +182,7 @@ public class AttachmentService {
 				if (!StringUtils.isEmpty(deleteId)) {
 					int attachmentId = Integer.parseInt(deleteId);
 
-					Attachment attachment = repository.get(attachmentId);
+					Attachment attachment = this.repository.get(attachmentId);
 					post.getAttachments().remove(attachment);
 
 					this.removeAttachmentFiles(attachment);
@@ -207,7 +207,7 @@ public class AttachmentService {
 
 				int attachmentId = Integer.parseInt(x);
 
-				Attachment attachment = repository.get(attachmentId);
+				Attachment attachment = this.repository.get(attachmentId);
 				attachment.setDescription(request.getParameter("edit_description_" + attachmentId));
 			}
 		}
@@ -244,7 +244,7 @@ public class AttachmentService {
 		StringBuilder dir = new StringBuilder(256);
 		dir.append(year).append('/').append(month).append('/').append(day).append('/');
 
-		new File(config.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/" + dir).mkdirs();
+		new File(this.config.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/" + dir).mkdirs();
 
 		return dir.append(MD5.hash(attachment.getRealFilename() + System.currentTimeMillis()))
 			.append('.').append(attachment.getFileExtension())
@@ -252,6 +252,6 @@ public class AttachmentService {
 	}
 
 	public String buildDownloadPath(Attachment attachment) {
-		return String.format("%s/%s", config.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR), attachment.getPhysicalFilename());
+		return String.format("%s/%s", this.config.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR), attachment.getPhysicalFilename());
 	}
 }

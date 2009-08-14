@@ -25,31 +25,31 @@ public interface ShoutRepository extends Repository<Shout> {
 	 * @return
 	 */
 	List<Shout> getAll();
-
+	
 	/**
 	 * get all the shouts of the give shoutbox
 	 * @param shoubox
 	 * @return
 	 */
 	List<Shout> getAll(ShoutBox shoubox);
-
+	
 	/**
-	 *
+	 * 
 	 * @param start
 	 * @param count
 	 * @return
 	 */
 	List<Shout> getAll(int start,int count);
-
+	
 	/**
-	 *
+	 * 
 	 * @param shoutbox
 	 * @param start
 	 * @param count
 	 * @return
 	 */
 	List<Shout> getAll(ShoutBox shoutbox, int start, int count);
-
+	
 	/**
 	 * get the shouts from the give shout box since lastID
 	 * max displayCount
@@ -59,7 +59,7 @@ public interface ShoutRepository extends Repository<Shout> {
 	 * @return
 	 */
 	List<Shout> getShout(int lastId,ShoutBox shoutBox, int displayCount);
-
+	
 	/**
 	 * get latest Shout from same IP
 	 * @param shouterIp

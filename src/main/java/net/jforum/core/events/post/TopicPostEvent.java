@@ -52,14 +52,14 @@ public class TopicPostEvent extends EmptyPostEvent {
 				this.handleLastPostDeleted(post);
 			}
 
-			int userTotalPosts = userRepository.getTotalPosts(post.getUser());
+			int userTotalPosts = this.userRepository.getTotalPosts(post.getUser());
 			post.getUser().setTotalPosts(userTotalPosts);
 		}
 	}
 
 	private boolean handleEmptyTopic(Post post) {
-		if (topicRepository.getTotalPosts(post.getTopic()) < 1) {
-			topicRepository.remove(post.getTopic());
+		if (this.topicRepository.getTotalPosts(post.getTopic()) < 1) {
+			this.topicRepository.remove(post.getTopic());
 			return true;
 		}
 
@@ -83,7 +83,7 @@ public class TopicPostEvent extends EmptyPostEvent {
 		}
 
 		if (isLastPost) {
-			post.getTopic().setLastPost(topicRepository.getLastPost(post.getTopic()));
+			post.getTopic().setLastPost(this.topicRepository.getLastPost(post.getTopic()));
 		}
 	}
 
@@ -98,7 +98,7 @@ public class TopicPostEvent extends EmptyPostEvent {
 		}
 
 		if (isFirstPost) {
-			Post firstPost = topicRepository.getFirstPost(post.getTopic());
+			Post firstPost = this.topicRepository.getFirstPost(post.getTopic());
 			post.getTopic().setFirstPost(firstPost);
 			post.getTopic().setUser(firstPost.getUser());
 

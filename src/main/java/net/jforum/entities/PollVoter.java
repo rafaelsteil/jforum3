@@ -44,7 +44,7 @@ public class PollVoter {
 	private String ip;
 
 	public Poll getPoll() {
-		return poll;
+		return this.poll;
 	}
 
 	public void setPoll(Poll poll) {
@@ -52,7 +52,7 @@ public class PollVoter {
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(User user) {
@@ -60,7 +60,7 @@ public class PollVoter {
 	}
 
 	public String getIp() {
-		return ip;
+		return this.ip;
 	}
 
 	public void setIp(String ip) {

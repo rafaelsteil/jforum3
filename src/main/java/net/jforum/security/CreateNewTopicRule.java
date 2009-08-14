@@ -49,12 +49,12 @@ public class CreateNewTopicRule implements AccessRule {
 		RoleManager roleManager = userSession.getRoleManager();
 
 		int forumId = this.findForumId(request);
-		Forum forum = repository.get(forumId);
+		Forum forum = this.repository.get(forumId);
 
 		return roleManager.isForumAllowed(forumId)
 			&& (userSession.isLogged() || forum.isAllowAnonymousPosts())
 			&& (!roleManager.isForumReadOnly(forumId) && !roleManager.isForumReplyOnly(forumId))
-			&& (!roleManager.getPostOnlyWithModeratorOnline() || (roleManager.getPostOnlyWithModeratorOnline() && sessionManager.isModeratorOnline()));
+			&& (!roleManager.getPostOnlyWithModeratorOnline() || (roleManager.getPostOnlyWithModeratorOnline() && this.sessionManager.isModeratorOnline()));
 	}
 
 	/**

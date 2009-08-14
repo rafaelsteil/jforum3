@@ -51,7 +51,7 @@ public class TopicWatchDAO extends HibernateGenericDAO<TopicWatch> implements To
 	 * @see net.jforum.repository.TopicWatchRepository#isUserSubscribed(net.jforum.entities.Topic, net.jforum.entities.User)
 	 */
 	public boolean isUserSubscribed(Topic topic, User user) {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("topic", topic))
 			.add(Restrictions.eq("user", user))
 			.setComment("topicWatchDAO.isUserSubscribed")

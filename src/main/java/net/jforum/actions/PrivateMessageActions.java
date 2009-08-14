@@ -78,8 +78,8 @@ public class PrivateMessageActions {
 	 * @param ids the id of the messages to delete
 	 */
 	public void delete(@Parameter(key = "ids") int... ids) {
-		service.delete(sessionManager.getUserSession().getUser(), ids);
-		viewService.redirectToAction(Actions.INBOX);
+		this.service.delete(this.sessionManager.getUserSession().getUser(), ids);
+		this.viewService.redirectToAction(Actions.INBOX);
 	}
 
 	/**
@@ -88,9 +88,9 @@ public class PrivateMessageActions {
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void review(@Parameter(key = "id") int id) {
-		PrivateMessage pm = repository.get(id);
-		propertyBag.put("pm", pm);
-		propertyBag.put("post", pm.asPost());
+		PrivateMessage pm = this.repository.get(id);
+		this.propertyBag.put("pm", pm);
+		this.propertyBag.put("post", pm.asPost());
 	}
 
 	/**
@@ -99,12 +99,12 @@ public class PrivateMessageActions {
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void quote(@Parameter(key = "id") int id) {
-		PrivateMessage pm = repository.get(id);
+		PrivateMessage pm = this.repository.get(id);
 
 		this.send();
 
-		propertyBag.put("pm", pm);
-		propertyBag.put("isPrivateMessageQuote", true);
+		this.propertyBag.put("pm", pm);
+		this.propertyBag.put("isPrivateMessageQuote", true);
 	}
 
 	/**
@@ -113,12 +113,12 @@ public class PrivateMessageActions {
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void reply(@Parameter(key = "id") int id) {
-		PrivateMessage pm = repository.get(id);
+		PrivateMessage pm = this.repository.get(id);
 
 		this.send();
 
-		propertyBag.put("pm", pm);
-		propertyBag.put("isPrivateMessageReply", true);
+		this.propertyBag.put("pm", pm);
+		this.propertyBag.put("isPrivateMessageReply", true);
 	}
 
 	/**
@@ -127,24 +127,24 @@ public class PrivateMessageActions {
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void read(@Parameter(key = "id") int id) {
-		PrivateMessage pm = repository.get(id);
+		PrivateMessage pm = this.repository.get(id);
 
 		if (pm.isNew()) {
 			pm.markAsRead();
 		}
 
-		propertyBag.put("pm", pm);
-		propertyBag.put("post", pm.asPost());
+		this.propertyBag.put("pm", pm);
+		this.propertyBag.put("post", pm.asPost());
 	}
 
 	/**
 	 * Shows the page ot sent messages
 	 */
 	public void sent() {
-		User user = sessionManager.getUserSession().getUser();
-		propertyBag.put("privateMessages", repository.getFromSentBox(user));
-		propertyBag.put("sentbox", true);
-		viewService.renderView(Actions.MESSAGES);
+		User user = this.sessionManager.getUserSession().getUser();
+		this.propertyBag.put("privateMessages", this.repository.getFromSentBox(user));
+		this.propertyBag.put("sentbox", true);
+		this.viewService.renderView(Actions.MESSAGES);
 	}
 
 	/**
@@ -164,17 +164,17 @@ public class PrivateMessageActions {
 		}
 
 		PrivateMessage pm = new PrivateMessage();
-		pm.setFromUser(sessionManager.getUserSession().getUser());
+		pm.setFromUser(this.sessionManager.getUserSession().getUser());
 		pm.setToUser(toUser);
 		pm.setSubject(post.getSubject());
 		pm.setText(post.getText());
-		pm.setIp(sessionManager.getUserSession().getIp());
+		pm.setIp(this.sessionManager.getUserSession().getIp());
 
 		ActionUtils.definePrivateMessageOptions(pm, options);
 
-		service.send(pm);
+		this.service.send(pm);
 
-		viewService.redirectToAction(Actions.INBOX);
+		this.viewService.redirectToAction(Actions.INBOX);
 	}
 
 	/**
@@ -183,10 +183,10 @@ public class PrivateMessageActions {
 	 */
 	public void findUser(@Parameter(key = "username") String username) {
 		if (!StringUtils.isEmpty(username)) {
-			RoleManager roleManager = sessionManager.getUserSession().getRoleManager();
+			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
 			if (roleManager.getCanOnlyContactModerators()) {
-				List<User> users = userRepository.findByUserName(username);
+				List<User> users = this.userRepository.findByUserName(username);
 				List<User> result = new ArrayList<User>();
 
 				for (User user : users) {
@@ -198,32 +198,32 @@ public class PrivateMessageActions {
 					}
 				}
 
-				propertyBag.put("users", result);
+				this.propertyBag.put("users", result);
 			}
 			else {
 				if (roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
-					propertyBag.put("users", userRepository.findByUserName(username));
+					this.propertyBag.put("users", this.userRepository.findByUserName(username));
 				}
 				else {
-					User currentUser = sessionManager.getUserSession().getUser();
-					propertyBag.put("users", userRepository.findByUserName(username, currentUser.getGroups()));
+					User currentUser = this.sessionManager.getUserSession().getUser();
+					this.propertyBag.put("users", this.userRepository.findByUserName(username, currentUser.getGroups()));
 				}
 			}
 		}
 
-		propertyBag.put("username", username);
+		this.propertyBag.put("username", username);
 	}
 
 	/**
 	 * Shows the page to send a new private message
 	 */
 	public void send() {
-		propertyBag.put("post", new Post());
-		propertyBag.put("isPrivateMessage", true);
-		propertyBag.put("attachmentsEnabled", false);
-		propertyBag.put("user", sessionManager.getUserSession().getUser());
-		propertyBag.put("smilies", smilieRepository.getAllSmilies());
-		viewService.renderView(Domain.TOPICS, Actions.ADD);
+		this.propertyBag.put("post", new Post());
+		this.propertyBag.put("isPrivateMessage", true);
+		this.propertyBag.put("attachmentsEnabled", false);
+		this.propertyBag.put("user", this.sessionManager.getUserSession().getUser());
+		this.propertyBag.put("smilies", this.smilieRepository.getAllSmilies());
+		this.viewService.renderView(Domain.TOPICS, Actions.ADD);
 	}
 
 	/**
@@ -231,19 +231,19 @@ public class PrivateMessageActions {
 	 * @param userId
 	 */
 	public void sendTo(@Parameter(key = "userId") int userId) {
-		User recipient = userRepository.get(userId);
+		User recipient = this.userRepository.get(userId);
 
 		if (this.canSendMessageTo(recipient)) {
-			propertyBag.put("pmRecipient", recipient);
+			this.propertyBag.put("pmRecipient", recipient);
 			this.send();
 		}
 		else {
-			viewService.renderView("sendToDenied");
+			this.viewService.renderView("sendToDenied");
 		}
 	}
 
 	private boolean canSendMessageTo(User toUser) {
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 		RoleManager roleManager = userSession.getRoleManager();
 
 		if (roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
@@ -272,15 +272,15 @@ public class PrivateMessageActions {
 	 * Shows the inbox of the current logged user
 	 */
 	public void inbox() {
-		User user = sessionManager.getUserSession().getUser();
-		propertyBag.put("inbox", true);
-		propertyBag.put("privateMessages", repository.getFromInbox(user));
-		viewService.renderView(Actions.MESSAGES);
+		User user = this.sessionManager.getUserSession().getUser();
+		this.propertyBag.put("inbox", true);
+		this.propertyBag.put("privateMessages", this.repository.getFromInbox(user));
+		this.viewService.renderView(Actions.MESSAGES);
 	}
 
 	private User findToUser(int userId, String username) {
 		return userId == 0
-			? userRepository.getByUsername(username)
-			: userRepository.get(userId);
+			? this.userRepository.getByUsername(username)
+			: this.userRepository.get(userId);
 	}
 }

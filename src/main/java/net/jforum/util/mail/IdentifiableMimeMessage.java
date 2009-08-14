@@ -72,8 +72,8 @@ public class IdentifiableMimeMessage extends MimeMessage {
 	 */
 	@Override
 	protected void updateMessageID() throws MessagingException {
-		if (messageId != null) {
-			this.addHeader("Message-ID", messageId);
+		if (this.messageId != null) {
+			this.addHeader("Message-ID", this.messageId);
 		}
 		else {
 			super.updateMessageID();

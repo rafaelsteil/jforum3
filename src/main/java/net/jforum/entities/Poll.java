@@ -34,11 +34,6 @@ import org.hibernate.annotations.CascadeType;
 @Entity
 @Table(name = "jforum_vote_desc")
 public class Poll implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_vote_desc_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -89,7 +84,7 @@ public class Poll implements Serializable {
 	public int getTotalVotes() {
 		int votes = 0;
 
-		for (PollOption option : options) {
+		for (PollOption option : this.options) {
 			votes += option.getVoteCount();
 		}
 
@@ -97,13 +92,13 @@ public class Poll implements Serializable {
 	}
 
 	public boolean isOpen() {
-		if (length == 0) {
+		if (this.length == 0) {
 			return true;
 		}
 
 		Calendar endTime = Calendar.getInstance();
 		endTime.setTime(startDate);
-		endTime.add(Calendar.DAY_OF_YEAR, length);
+		endTime.add(Calendar.DAY_OF_YEAR, this.length);
 
 		return System.currentTimeMillis() < endTime.getTimeInMillis();
 	}

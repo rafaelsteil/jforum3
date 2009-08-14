@@ -32,7 +32,7 @@ public class PrivateMessageOwnerRule implements AccessRule {
 	 * @see net.jforum.security.AccessRule#shouldProceed(net.jforum.entities.UserSession, javax.servlet.http.HttpServletRequest)
 	 */
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
-		PrivateMessage pm = repository.get(this.findId(request));
+		PrivateMessage pm = this.repository.get(this.findId(request));
 		User currentUser = userSession.getUser();
 
 		return pm != null && (pm.getToUser().equals(currentUser) || pm.getFromUser().equals(currentUser));

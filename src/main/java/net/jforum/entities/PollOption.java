@@ -28,11 +28,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "jforum_vote_results")
 public class PollOption implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_vote_results_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -76,9 +71,9 @@ public class PollOption implements Serializable {
 	public int getVotePercentage() {
 		int percent = 0;
 
-		if (poll != null) {
-			int totalCount = poll.getTotalVotes();
-			percent = Math.round(100f * voteCount / totalCount);
+		if (this.poll != null) {
+			int totalCount = this.poll.getTotalVotes();
+			percent = Math.round(100f * this.voteCount / totalCount);
 		}
 
 		return percent;
@@ -93,7 +88,7 @@ public class PollOption implements Serializable {
 	}
 
 	public void incrementVotes() {
-		voteCount++;
+		this.voteCount++;
 	}
 
 	/**
@@ -101,8 +96,8 @@ public class PollOption implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return new StringBuilder(128).append('[').append(id).append(", ")
-			.append(text).append(", ").append(voteCount).append(']')
+		return new StringBuilder(128).append('[').append(this.id).append(", ")
+			.append(this.text).append(", ").append(this.voteCount).append(']')
 			.toString();
 	}
 
@@ -116,9 +111,9 @@ public class PollOption implements Serializable {
 		}
 
 		PollOption po = (PollOption) o;
-		return po.getId() == id
-			&& po.getText().equals(text)
-			&& po.getVoteCount() == voteCount;
+		return po.getId() == this.id
+			&& po.getText().equals(this.text)
+			&& po.getVoteCount() == this.voteCount;
 	}
 
 	/**
@@ -128,9 +123,9 @@ public class PollOption implements Serializable {
 	public int hashCode() {
 		int result = 17;
 
-		result *= 37 + id;
-		result *= 37 + text.hashCode();
-		result *= 37 + voteCount;
+		result *= 37 + this.id;
+		result *= 37 + this.text.hashCode();
+		result *= 37 + this.voteCount;
 
 		return result;
 	}

@@ -17,8 +17,10 @@ import java.util.List;
 import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ValidationException;
+import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
+import net.jforum.repository.ForumRepository;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.RoleManager;
@@ -33,11 +35,13 @@ public class GroupService {
 	private GroupRepository repository;
 	private SessionManager sessionManager;
 	private UserRepository userRepository;
+	private ForumRepository forumRepository;
 
-	public GroupService(GroupRepository repository, SessionManager sessionManager, UserRepository userRepository) {
+	public GroupService(GroupRepository repository, SessionManager sessionManager, UserRepository userRepository, ForumRepository forumRepository) {
 		this.repository = repository;
 		this.sessionManager = sessionManager;
 		this.userRepository = userRepository;
+		this.forumRepository = forumRepository;
 	}
 
 	/**
@@ -52,7 +56,7 @@ public class GroupService {
 	 * @param permissions
 	 */
 	public void savePermissions(int groupId, PermissionOptions permissions) {
-		Group group = repository.get(groupId);
+		Group group = this.repository.get(groupId);
 		RoleManager currentRoles = new RoleManager();
 		currentRoles.setGroups(Arrays.asList(group));
 		group.getRoles().clear();
@@ -67,7 +71,7 @@ public class GroupService {
 		}
 
 		boolean canInteractwithOtherGroups = currentRoles.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS);
-		boolean isSuperAdministrator = sessionManager.getUserSession().getRoleManager().isAdministrator();
+		boolean isSuperAdministrator = this.sessionManager.getUserSession().getRoleManager().isAdministrator();
 
 		this.registerRole(group, SecurityConstants.ADMINISTRATOR, isSuperAdministrator ? permissions.isAdministrator() : isAdministrator);
 		this.registerRole(group, SecurityConstants.CAN_MANAGE_FORUMS, isSuperAdministrator ? permissions.getCanManageForums() : canManageForums);
@@ -90,8 +94,24 @@ public class GroupService {
 		this.registerRole(group, SecurityConstants.TOPIC_LOCK_UNLOCK, permissions.getCanLockUnlock());
 		this.registerRole(group, SecurityConstants.TOPIC_MOVE, permissions.getCanMoveTopics());
 		this.registerRole(group, SecurityConstants.MODERATE_REPLIES, permissions.getModeratedReplies());
-		this.registerRole(group, SecurityConstants.FORUM_REPLY_ONLY, permissions.getReplyOnly());
-		this.registerRole(group, SecurityConstants.FORUM_READ_ONLY, permissions.getReadOnlyForums());
+
+		List<Forum> forums = forumRepository.loadAll();
+		List<Integer> notAllowedForums = new ArrayList<Integer>();
+		for (Forum forum : forums) {
+			notAllowedForums.add(forum.getId());
+		}
+		notAllowedForums.removeAll(permissions.getAllowedForums());
+		permissions.getReplyOnly().addAll(notAllowedForums);
+		permissions.getReadOnlyForums().addAll(notAllowedForums);
+
+		List<Integer> replyOnly = permissions.getReplyOnly();
+		// this ternary server to whitelist replyonly forums at RoleManager
+		this.registerRole(group, SecurityConstants.FORUM_REPLY_ONLY, replyOnly.isEmpty() ? Arrays.asList(new Integer[] {new Integer(0)}) : replyOnly);
+
+		// this ternary server to whitelist readonly forums at RoleManager
+		List<Integer> readOnlyForums = permissions.getReadOnlyForums();
+		this.registerRole(group, SecurityConstants.FORUM_READ_ONLY, readOnlyForums.isEmpty() ? Arrays.asList(new Integer[] {new Integer(0)}) : readOnlyForums);
+
 		this.registerRole(group, SecurityConstants.POLL_VOTE, permissions.getAllowPollVote());
 		this.registerRole(group, SecurityConstants.PRIVATE_MESSAGE, permissions.isPrivateMessageAllowed());
 		this.registerRole(group, SecurityConstants.USER_LISTING, permissions.isUserListingAllowed());
@@ -99,11 +119,13 @@ public class GroupService {
 		this.registerRole(group, SecurityConstants.PROFILE_PICTURE, permissions.getCanHaveProfilePicture());
 		this.registerRole(group, SecurityConstants.POST_ONLY_WITH_MODERATOR_ONLINE, permissions.getPostOnlyWithModeratorOnline());
 		this.registerRole(group, SecurityConstants.PM_ONLY_TO_MODERATORS, permissions.isPmOnlyToModerators());
+		this.registerRole(group, SecurityConstants.VIEW_MODERATION_LOG, permissions.getCanViewActivityLog());
+		this.registerRole(group, SecurityConstants.VIEW_FULL_MODERATION_LOG, permissions.getCanViewFullActivityLog());
 
-		repository.update(group);
+		this.repository.update(group);
 
-		sessionManager.computeAllOnlineModerators();
-		userRepository.changeAllowAvatarState(permissions.getCanHaveProfilePicture(), group);
+		this.sessionManager.computeAllOnlineModerators();
+		this.userRepository.changeAllowAvatarState(permissions.getCanHaveProfilePicture(), group);
 	}
 
 	/**
@@ -117,7 +139,7 @@ public class GroupService {
 			throw new ValidationException("Cannot save an existing (id > 0) group");
 		}
 
-		repository.add(group);
+		this.repository.add(group);
 	}
 
 	/**
@@ -131,7 +153,7 @@ public class GroupService {
 			throw new ValidationException("update() expects a group with an existing id");
 		}
 
-		repository.update(group);
+		this.repository.update(group);
 	}
 
 	/**
@@ -142,8 +164,8 @@ public class GroupService {
 		if (ids != null) {
 			// TODO: Must not delete a group if it has users
 			for (int groupId : ids) {
-				Group group = repository.get(groupId);
-				repository.remove(group);
+				Group group = this.repository.get(groupId);
+				this.repository.remove(group);
 			}
 		}
 	}
@@ -156,7 +178,7 @@ public class GroupService {
 			}
 		}
 
-		repository.update(group);
+		this.repository.update(group);
 	}
 
 	private void applyCommonConstraints(Group group) {

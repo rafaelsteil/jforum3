@@ -30,7 +30,7 @@ import org.vraptor.annotations.Parameter;
 public class TopicExtension {
 	private ViewPropertyBag propertyBag;
 	private TagService tagService;
-
+	
 	public TopicExtension(ViewPropertyBag propertyBag, TagService tagService) {
 		this.propertyBag = propertyBag;
 		this.tagService = tagService;
@@ -39,10 +39,10 @@ public class TopicExtension {
 	@Extends(Actions.ADDSAVE)
 	public void afterSave(@Parameter(key = "tags") String tagString) {
 		if(StringUtils.isNotEmpty(tagString)){
-			Topic topic = (Topic)propertyBag.get("topic");
+			Topic topic = (Topic)this.propertyBag.get("topic");
 			if(topic == null)
 				return;
-
+			
 			tagService.addTag(tagString,topic);
 		}
 	}

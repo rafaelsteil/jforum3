@@ -30,7 +30,7 @@ public class TemplateResourceTag extends JForumTag {
 			.append(this.request().getContextPath())
 			.append('/').append(this.config().getValue(ConfigKeys.TEMPLATE_DIRECTORY)).append('/')
 			.append(this.config().getValue(ConfigKeys.TEMPLATE_NAME))
-			.append(item)
+			.append(this.item)
 			.toString();
 
 		this.write(path);

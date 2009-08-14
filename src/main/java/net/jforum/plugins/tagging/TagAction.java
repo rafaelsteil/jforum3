@@ -22,6 +22,7 @@ import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.core.tags.URLTag;
+import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.TopicRepository;
@@ -46,7 +47,8 @@ public class TagAction {
 	private TopicRepository topicRepository;
 	private UserSession userSession;
 
-	public TagAction(ViewPropertyBag propertyBag, TagService tagService, TopicRepository topicRepository, ViewService viewService, UserSession userSession) {
+	public TagAction(ViewPropertyBag propertyBag, TagService tagService, TopicRepository topicRepository,
+			ViewService viewService, UserSession userSession) {
 		this.propertyBag = propertyBag;
 		this.tagService = tagService;
 		this.topicRepository = topicRepository;
@@ -61,7 +63,7 @@ public class TagAction {
 		try { tag = URLDecoder.decode(tag, URLTag.URL_ENCODE); }
 		catch (UnsupportedEncodingException e) { }
 
-		List<Topic> topics = tagService.search(tag, userSession.getRoleManager());
+		List<Topic> topics = this.tagService.search(tag, this.userSession.getRoleManager());
 
 		propertyBag.put("topics", topics);
 		propertyBag.put("tag", tag);
@@ -69,11 +71,11 @@ public class TagAction {
 
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void reply(@Parameter(key = "topicId") int topicId) {
-		Topic topic = topicRepository.get(topicId);
-
-		propertyBag.put("forum", topic.getForum());
+		Topic topic = this.topicRepository.get(topicId);
+		Forum forum = topic.getForum();
+		propertyBag.put("forum", forum);
 		propertyBag.put("topic", topic);
-		propertyBag.put("tags", tagService.getTagString(topic));
+		propertyBag.put("tags", this.tagService.getTagString(topic));
 	}
 
 	@SecurityConstraint(ReplyTopicRule.class)
@@ -88,7 +90,7 @@ public class TagAction {
 	 * list all the hot tags. the more hot, the bigger font size
 	 */
 	public void list() {
-		Map<String, Integer> hotTagsWithGroupIndex = tagService.getHotTags(200, 7, userSession.getRoleManager());
+		Map<String, Integer> hotTagsWithGroupIndex = this.tagService.getHotTags(200, 7, userSession.getRoleManager());
 
 		Map<String, String> tagClass = new LinkedHashMap<String, String>();
 		for (Map.Entry<String, Integer> entry : hotTagsWithGroupIndex.entrySet()) {

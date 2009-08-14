@@ -62,24 +62,24 @@ public class PostReport {
 		this.id = id;
 		this.description = description;
 
-		date = reportDate;
+		this.date = reportDate;
 		this.status = status;
-		post = new Post();
-		post.setId(postId);
-		post.setSubject(postSubject);
-		post.setTopic(new Topic());
-		post.getTopic().setId(topicId);
-		post.setUser(new User());
-		post.getUser().setUsername(postUser);
-		post.getUser().setId(postUserId);
+		this.post = new Post();
+		this.post.setId(postId);
+		this.post.setSubject(postSubject);
+		this.post.setTopic(new Topic());
+		this.post.getTopic().setId(topicId);
+		this.post.setUser(new User());
+		this.post.getUser().setUsername(postUser);
+		this.post.getUser().setId(postUserId);
 
-		user = new User();
-		user.setUsername(reporterName);
-		user.setId(reporterId);
+		this.user = new User();
+		this.user.setUsername(reporterName);
+		this.user.setId(reporterId);
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -87,7 +87,7 @@ public class PostReport {
 	}
 
 	public Post getPost() {
-		return post;
+		return this.post;
 	}
 
 	public void setPost(Post post) {
@@ -95,7 +95,7 @@ public class PostReport {
 	}
 
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
 	public void setDate(Date date) {
@@ -103,7 +103,7 @@ public class PostReport {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {
@@ -111,7 +111,7 @@ public class PostReport {
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(User user) {

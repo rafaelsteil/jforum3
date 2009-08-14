@@ -104,17 +104,17 @@ public class LuceneAdminActions {
 			}
 		};
 
-		config.addProperty(ConfigKeys.LUCENE_CURRENTLY_INDEXING, "1");
+		this.config.addProperty(ConfigKeys.LUCENE_CURRENTLY_INDEXING, "1");
 
 		Thread thread = new Thread(indexingJob);
 		thread.start();
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void cancelIndexing() {
-		config.addProperty(ConfigKeys.LUCENE_CURRENTLY_INDEXING, "0");
-		viewService.redirectToAction(Actions.LIST);
+		this.config.addProperty(ConfigKeys.LUCENE_CURRENTLY_INDEXING, "0");
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class LuceneAdminActions {
 		ReaderProvider readerProvider = null;
 
 		try {
-			SearchFactory searchFactory = Search.createFullTextSession(sessionFactory
+			SearchFactory searchFactory = Search.createFullTextSession(this.sessionFactory
 				.getCurrentSession()).getSearchFactory();
 
 			DirectoryProvider<?> directoryProvider = searchFactory.getDirectoryProviders(Post.class)[0];
@@ -137,14 +137,14 @@ public class LuceneAdminActions {
 
 			boolean indexExists = IndexReader.indexExists(indexDirectory);
 
-			propertyBag.put("indexExists", indexExists);
+			this.propertyBag.put("indexExists", indexExists);
 
 			if (indexExists) {
-				propertyBag.put("numberOfDocs", indexReader.numDocs());
-				propertyBag.put("indexLocation", indexDirectory);
-				propertyBag.put("totalMessages", forumRepository.getTotalMessages());
-				propertyBag.put("isLocked", IndexReader.isLocked(indexDirectory));
-				propertyBag.put("lastModified", new Date(IndexReader.lastModified(indexDirectory)));
+				this.propertyBag.put("numberOfDocs", indexReader.numDocs());
+				this.propertyBag.put("indexLocation", indexDirectory);
+				this.propertyBag.put("totalMessages", this.forumRepository.getTotalMessages());
+				this.propertyBag.put("isLocked", IndexReader.isLocked(indexDirectory));
+				this.propertyBag.put("lastModified", new Date(IndexReader.lastModified(indexDirectory)));
 			}
 		}
 		catch (IOException e) {

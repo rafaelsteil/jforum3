@@ -16,6 +16,7 @@ import net.jforum.entities.Group;
 import net.jforum.entities.Post;
 import net.jforum.entities.PrivateMessage;
 import net.jforum.entities.PrivateMessageType;
+import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.repository.UserRepository;
 
@@ -38,7 +39,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 * @see net.jforum.repository.UserRepository#getByEmail(java.lang.String)
 	 */
 	public User getByEmail(String email) {
-		return (User)this.session().createCriteria(persistClass)
+		return (User)this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("email", email))
 			.uniqueResult();
 	}
@@ -80,7 +81,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 * @see net.jforum.repository.UserRepository#getByUsername(java.lang.String)
 	 */
 	public User getByUsername(String username){
-		return (User)this.session().createCriteria(persistClass)
+		return (User)this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("username", username))
 			.setComment("userDAO.getByUsername")
 			.uniqueResult();
@@ -101,7 +102,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 */
 	@SuppressWarnings("unchecked")
 	public List<User> findByUserName(String username){
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.ilike("username", username, MatchMode.ANYWHERE))
 			.addOrder(Order.asc("username"))
 			.setComment("userDAO.findByUsername")
@@ -127,7 +128,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 */
 	@SuppressWarnings("unchecked")
 	public List<User> getAllUsers(int start, int count) {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.addOrder(Order.asc("username"))
 			.setFirstResult(start)
 			.setMaxResults(count)
@@ -150,7 +151,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 * @see net.jforum.repository.UserRepository#getLastRegisteredUser()
 	 */
 	public User getLastRegisteredUser(){
-		return (User)this.session().createCriteria(persistClass)
+		return (User)this.session().createCriteria(this.persistClass)
 			.addOrder(Order.desc("registrationDate"))
 			.setMaxResults(1)
 			.setCacheable(false)
@@ -163,7 +164,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 * @see net.jforum.repository.UserRepository#getTotalUsers()
 	 */
 	public int getTotalUsers() {
-		return (Integer)this.session().createCriteria(persistClass)
+		return (Integer)this.session().createCriteria(this.persistClass)
 			.setProjection(Projections.rowCount())
 			.setCacheable(true)
 			.setCacheRegion("userDAO.getTotalUsers")
@@ -175,7 +176,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 * @see net.jforum.repository.UserRepository#validateLogin(String, String)
 	 */
 	public User validateLogin(String username, String password) {
-		return (User)this.session().createCriteria(persistClass)
+		return (User)this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("username", username))
 			.add(Restrictions.eq("password", password))
 			.setComment("userDAO.validateLogin")
@@ -186,9 +187,36 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 	 * @see net.jforum.repository.UserRepository#validateLostPasswordHash(java.lang.String, java.lang.String)
 	 */
 	public User validateLostPasswordHash(String username, String hash) {
-		return (User)this.session().createCriteria(persistClass)
+		return (User)this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("activationKey", hash))
 			.add(Restrictions.eq("username", username))
 			.uniqueResult();
+	}
+
+	public int getTotalTopics(int userId) {
+		return (Integer) this.session().createCriteria(Topic.class)
+			.setProjection(Projections.rowCount())
+			.add(Restrictions.eq("user.id", userId))
+			.uniqueResult();
+	}
+
+	public List<Post> getPosts(User user, int start, int recordsPerPage) {
+		return this.session().createCriteria(Post.class)
+				.add(Restrictions.eq("user", user))
+				.add(Restrictions.eq("moderate", false))
+				.addOrder(Order.desc("id"))
+				.setFirstResult(start)
+				.setMaxResults(recordsPerPage)
+				.list();
+	}
+
+	public List<Topic> getTopics(User user, int start, int recordsPerPage) {
+		return this.session().createCriteria(Topic.class)
+			.add(Restrictions.eq("user", user))
+			.add(Restrictions.eq("pendingModeration", false))
+			.addOrder(Order.desc("id"))
+			.setFirstResult(start)
+			.setMaxResults(recordsPerPage)
+			.list();
 	}
 }

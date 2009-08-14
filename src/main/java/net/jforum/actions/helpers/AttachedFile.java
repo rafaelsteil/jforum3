@@ -26,10 +26,10 @@ public class AttachedFile {
 	}
 
 	public UploadUtils getUploadUtils() {
-		return uploadUtils;
+		return this.uploadUtils;
 	}
 
 	public Attachment getAttachment() {
-		return attachment;
+		return this.attachment;
 	}
 }

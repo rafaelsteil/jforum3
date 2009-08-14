@@ -25,7 +25,7 @@ public class ApproveInfo {
 	 * @return the postId
 	 */
 	public int getPostId() {
-		return postId;
+		return this.postId;
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class ApproveInfo {
 	 * @return the status
 	 */
 	public int getStatus() {
-		return status;
+		return this.status;
 	}
 
 	/**

@@ -31,7 +31,7 @@ public class ShoutBoxDAO extends HibernateGenericDAO<ShoutBox> implements
 	@Deprecated
 	@SuppressWarnings("unchecked")
 	public List<ShoutBox> getAvalibleBoxes(boolean isAnonymous) {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 		.add(Restrictions.eq("isAllowAnonymous", isAnonymous))
 		.add(Restrictions.eq("isDisabled", false))
 		.setCacheable(true)
@@ -53,7 +53,7 @@ public class ShoutBoxDAO extends HibernateGenericDAO<ShoutBox> implements
 	}
 
 	public ShoutBox getShoutBox(Category category) {
-		return (ShoutBox) this.session().createCriteria(persistClass)
+		return (ShoutBox) this.session().createCriteria(this.persistClass)
 		.add(Restrictions.eq("category", category))
 		.setCacheable(true)
 		.setCacheRegion("ShoutBoxDAO")

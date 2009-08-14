@@ -50,4 +50,10 @@ public class EmptyForumEvent implements Event<Forum> {
 	 */
 	public void beforeDeleted(Forum entity) {
 	}
+
+	/**
+	 * @see net.jforum.events.Event#beforeUpdated(java.lang.Object)
+	 */
+	public void beforeUpdated(Forum entity) {
+	}
 }

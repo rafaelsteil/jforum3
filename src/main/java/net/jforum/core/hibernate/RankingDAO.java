@@ -31,7 +31,7 @@ public class RankingDAO extends HibernateGenericDAO<Ranking> implements RankingR
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Ranking> getAllRankings() {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.addOrder(Order.asc("min"))
 			.setCacheable(true)
 			.setCacheRegion("rankingDAO")

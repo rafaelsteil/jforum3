@@ -38,20 +38,20 @@ public class I18nTag extends JForumTag implements DynamicAttributes {
 	 */
 	@Override
 	public void doTag() throws JspException, IOException {
-		if (params.size() == 0) {
-			String message = i18n.getMessage(key);
+		if (this.params.size() == 0) {
+			String message = i18n.getMessage(this.key);
 
 			if (message == null) {
-				throw new IllegalArgumentException(key + " was not found");
+				throw new IllegalArgumentException(this.key + " was not found");
 			}
 
 			this.write(message);
 		}
 		else {
-			String message = i18n.getFormattedMessage(key, params.toArray());
+			String message = i18n.getFormattedMessage(this.key, this.params.toArray());
 
 			if (message == null) {
-				throw new IllegalArgumentException(key + " was not found");
+				throw new IllegalArgumentException(this.key + " was not found");
 			}
 
 			this.write(message);

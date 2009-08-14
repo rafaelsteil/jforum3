@@ -75,7 +75,7 @@ public class PollService {
 		}
 
 		private void processDeletedOptions(List<PollOption> allOptions) {
-			for (Iterator<PollOption> iterator = originalPoll.getOptions().iterator(); iterator.hasNext(); ) {
+			for (Iterator<PollOption> iterator = this.originalPoll.getOptions().iterator(); iterator.hasNext(); ) {
 				PollOption currentOption = iterator.next();
 
 				if (this.findOption(currentOption.getId(), allOptions) == null) {
@@ -87,11 +87,11 @@ public class PollService {
 		private void processNewAndChangedOptions(List<PollOption> allOptions) {
 			for (PollOption option : allOptions) {
 				if (option.getId() == 0) {
-					newOptions.add(option);
-					option.setPoll(originalPoll);
+					this.newOptions.add(option);
+					option.setPoll(this.originalPoll);
 				}
 				else {
-					PollOption originalOption = this.findOption(option.getId(), originalPoll.getOptions());
+					PollOption originalOption = this.findOption(option.getId(), this.originalPoll.getOptions());
 
 					if (originalOption != null && !StringUtils.isEmpty(option.getText())
 							&& !originalOption.getText().equals(option.getText())) {
@@ -100,7 +100,7 @@ public class PollService {
 				}
 			}
 
-			originalPoll.getOptions().addAll(newOptions);
+			this.originalPoll.getOptions().addAll(this.newOptions);
 		}
 
 		private PollOption findOption(int optionId, List<PollOption> options) {

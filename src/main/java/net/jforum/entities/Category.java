@@ -18,6 +18,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -34,11 +36,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "jforum_categories")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Category implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_categories_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
@@ -54,6 +51,10 @@ public class Category implements Serializable {
 	@Column(name = "category_title")
 	private String name;
 
+	@ManyToOne
+	@JoinColumn(name = "category_theme_id")
+	private Theme theme;
+
 	@Transient
 	private CategoryRepository repository;
 
@@ -64,32 +65,32 @@ public class Category implements Serializable {
 	}
 
 	public void setModerated(boolean status) {
-		moderated = status;
+		this.moderated = status;
 	}
 
 	public boolean isModerated() {
-		return moderated;
+		return this.moderated;
 	}
 
 	/**
 	 * @return int
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return String
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
 	 * @return int
 	 */
 	public int getDisplayOrder() {
-		return displayOrder;
+		return this.displayOrder;
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class Category implements Serializable {
 	 * @param order The order to set
 	 */
 	public void setDisplayOrder(int order) {
-		displayOrder = order;
+		this.displayOrder = order;
 	}
 
 	/**
@@ -129,7 +130,7 @@ public class Category implements Serializable {
 		// thus changing the display order of a single forum will not
 		// automatically change its order in the collection, and manually
 		// executing a sort() seemed a worst appraoch
-		return repository.getForums(this);
+		return this.repository.getForums(this);
 	}
 
 	/**
@@ -167,5 +168,13 @@ public class Category implements Serializable {
 			.append(", id=").append(this.getId())
 			.append(", order=").append(this.getDisplayOrder())
 			.toString();
+	}
+
+	public Theme getTheme() {
+		return theme;
+	}
+
+	public void setTheme(Theme theme) {
+		this.theme = theme;
 	}
 }

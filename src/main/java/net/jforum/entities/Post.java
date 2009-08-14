@@ -49,11 +49,6 @@ import org.hibernate.search.annotations.Store;
 @Table(name = "jforum_posts")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Post implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@DocumentId
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_posts_seq")
@@ -118,24 +113,26 @@ public class Post implements Serializable {
 	@OneToMany(mappedBy = "post")
 	@Cascade({ CascadeType.ALL, CascadeType.DELETE_ORPHAN })
 	private List<Attachment> attachments = new ArrayList<Attachment>();
-
 	@Transient
 	private boolean notifyReplies;
 
+	@Transient
+	private Boolean hasEditTimeExpired = Boolean.FALSE;
+
 	public boolean shouldNotifyReplies() {
-		return notifyReplies;
+		return this.notifyReplies;
 	}
 
 	public void setNotifyReplies(boolean notify) {
-		notifyReplies = notify;
+		this.notifyReplies = notify;
 	}
 
 	public void setModerate(boolean status) {
-		moderate = status;
+		this.moderate = status;
 	}
 
 	public boolean isWaitingModeration() {
-		return moderate;
+		return this.moderate;
 	}
 
 	/**
@@ -144,7 +141,7 @@ public class Post implements Serializable {
 	 * @return boolean value representing the result
 	 */
 	public boolean isBbCodeEnabled() {
-		return bbCodeEnabled;
+		return this.bbCodeEnabled;
 	}
 
 	/**
@@ -153,7 +150,7 @@ public class Post implements Serializable {
 	 * @return boolean value representing the result
 	 */
 	public boolean isHtmlEnabled() {
-		return htmlEnabled;
+		return this.htmlEnabled;
 	}
 
 	/**
@@ -162,7 +159,7 @@ public class Post implements Serializable {
 	 * @return int value with the ID
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -171,7 +168,7 @@ public class Post implements Serializable {
 	 * @return boolean representing the result
 	 */
 	public boolean isSignatureEnabled() {
-		return signatureEnabled;
+		return this.signatureEnabled;
 	}
 
 	/**
@@ -180,7 +177,7 @@ public class Post implements Serializable {
 	 * @return boolean representing the result
 	 */
 	public boolean isSmiliesEnabled() {
-		return smiliesEnabled;
+		return this.smiliesEnabled;
 	}
 
 	/**
@@ -189,7 +186,7 @@ public class Post implements Serializable {
 	 * @return long representing the post time
 	 */
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
 	/**
@@ -199,7 +196,7 @@ public class Post implements Serializable {
 	 * @return the forum
 	 */
 	public Forum getForum() {
-		return forum;
+		return this.forum;
 	}
 
 	public void setForum(Forum forum) {
@@ -212,7 +209,7 @@ public class Post implements Serializable {
 	 * @return int value with the topic id
 	 */
 	public Topic getTopic() {
-		return topic;
+		return this.topic;
 	}
 
 	/**
@@ -221,7 +218,7 @@ public class Post implements Serializable {
 	 * @return int value with the user id
 	 */
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	/**
@@ -230,7 +227,7 @@ public class Post implements Serializable {
 	 * @return String value with the user IP
 	 */
 	public String getUserIp() {
-		return userIp;
+		return this.userIp;
 	}
 
 	/**
@@ -323,7 +320,7 @@ public class Post implements Serializable {
 	 * @return String containing the text
 	 */
 	public String getText() {
-		return text;
+		return this.text;
 	}
 
 	/**
@@ -342,7 +339,7 @@ public class Post implements Serializable {
 	 * @return String with the subject
 	 */
 	public String getSubject() {
-		return subject;
+		return this.subject;
 	}
 
 	/**
@@ -369,7 +366,7 @@ public class Post implements Serializable {
 	 * @return Returns the hasAttachments.
 	 */
 	public boolean getHasAttachments() {
-		return hasAttachments;
+		return this.hasAttachments;
 	}
 
 	/**
@@ -384,7 +381,7 @@ public class Post implements Serializable {
 	 * @return the editDate
 	 */
 	public Date getEditDate() {
-		return editDate;
+		return this.editDate;
 	}
 
 	/**
@@ -400,7 +397,7 @@ public class Post implements Serializable {
 	 *            the editCount to set
 	 */
 	public void incrementEditCount() {
-		editCount++;
+		this.editCount++;
 	}
 
 	/**
@@ -409,7 +406,7 @@ public class Post implements Serializable {
 	 * @return int value with the total number of times the post was edited
 	 */
 	public int getEditCount() {
-		return editCount;
+		return this.editCount;
 	}
 
 	/**
@@ -425,7 +422,7 @@ public class Post implements Serializable {
 			return false;
 		}
 
-		return ((Post) o).getId() == id;
+		return ((Post) o).getId() == this.id;
 	}
 
 	/**
@@ -433,12 +430,12 @@ public class Post implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return id;
+		return this.id;
 	}
 
 	public void addAttachment(Attachment attachment) {
 		attachment.setPost(this);
-		attachments.add(attachment);
+		this.attachments.add(attachment);
 	}
 
 	/**
@@ -453,5 +450,16 @@ public class Post implements Serializable {
 	 */
 	public List<Attachment> getAttachments() {
 		return attachments;
+	}
+
+	public Boolean getHasEditTimeExpired() {
+		return hasEditTimeExpired;
+	}
+
+	public void setHasEditTimeExpired(Boolean hasEditTimeExpired) {
+		this.hasEditTimeExpired = hasEditTimeExpired;
+	}
+	public void calculateHasEditTimeExpired(long limitedTime, Date now) {
+		this.hasEditTimeExpired = now.getTime() - date.getTime() > limitedTime;
 	}
 }

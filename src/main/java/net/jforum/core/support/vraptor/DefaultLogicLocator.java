@@ -44,10 +44,10 @@ public class DefaultLogicLocator implements LogicLocator {
 	public LogicMethod locate(VRaptorServletRequest request) throws InvalidURLException, LogicNotFoundException, ComponentNotFoundException {
 		ApplicationContext springContext = (ApplicationContext)request.getSession()
 			.getServletContext().getAttribute(ConfigKeys.SPRING_CONTEXT);
-		config = (JForumConfig)springContext.getBean(JForumConfig.class.getName());
+		this.config = (JForumConfig)springContext.getBean(JForumConfig.class.getName());
 
 		String requestUri = this.extractRequestUri(request.getRequestURI(), request.getContextPath());
-		String servletExtension = config.getValue(ConfigKeys.SERVLET_EXTENSION);
+		String servletExtension = this.config.getValue(ConfigKeys.SERVLET_EXTENSION);
 
 		LogicMethod method = null;
 
@@ -76,7 +76,7 @@ public class DefaultLogicLocator implements LogicLocator {
 			String logicName = request.getParameter("action");
 
 			if (!StringUtils.isEmpty(componentName) && !StringUtils.isEmpty(logicName)) {
-				ComponentType component = manager.getComponent(componentName, logicName);
+				ComponentType component = this.manager.getComponent(componentName, logicName);
 				method = component.getLogic(logicName);
 			}
 		}
@@ -92,7 +92,7 @@ public class DefaultLogicLocator implements LogicLocator {
 				.append('.')
 				.append(urlModel.length - baseLen);
 
-			UrlPattern url = config.getUrlPattern(sb.toString());
+			UrlPattern url = this.config.getUrlPattern(sb.toString());
 
 			if (url == null) {
 				throw new ForumException("Could not find an url mapping for " + sb + ". Have you configured it at urlPattern.properties?");
@@ -104,7 +104,7 @@ public class DefaultLogicLocator implements LogicLocator {
 				}
 			}
 
-			ComponentType component = manager.getComponent(urlModel[componentIndex], urlModel[logicIndex]);
+			ComponentType component = this.manager.getComponent(urlModel[componentIndex], urlModel[logicIndex]);
 			method = component.getLogic(urlModel[logicIndex]);
 		}
 

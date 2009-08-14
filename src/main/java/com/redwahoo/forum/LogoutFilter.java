@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import edu.yale.its.tp.cas.client.filter.CASFilter;
 
 public class LogoutFilter implements Filter{
-
+	
 	public void destroy() {
 	}
 
@@ -22,8 +22,8 @@ public class LogoutFilter implements Filter{
 			FilterChain chain) throws IOException, ServletException {
 
 		// continue jforum logout.page
-		chain.doFilter(request, response);
-
+		chain.doFilter(request, response);		
+		
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession();
 		session.removeAttribute(CASFilter.CAS_FILTER_USER);
@@ -31,5 +31,5 @@ public class LogoutFilter implements Filter{
 
 	public void init(FilterConfig config) throws ServletException {
 	}
-
+	
 }

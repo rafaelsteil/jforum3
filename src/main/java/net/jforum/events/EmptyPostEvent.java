@@ -44,4 +44,10 @@ public class EmptyPostEvent implements Event<Post> {
 	 * @see net.jforum.events.Event#beforeAdd(java.lang.Object)
 	 */
 	public void beforeDeleted(Post entity) { }
+
+	/**
+	 * @see net.jforum.events.Event#beforeUpdated(java.lang.Object)
+	 */
+	public void beforeUpdated(Post entity) {
+	}
 }

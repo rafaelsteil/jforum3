@@ -56,12 +56,12 @@ public class ReplyTopicRule implements AccessRule {
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		RoleManager roleManager = userSession.getRoleManager();
 		int forumId = this.findForumId(request);
-		Forum forum = forumRepository.get(forumId);
+		Forum forum = this.forumRepository.get(forumId);
 
 		return roleManager.isForumAllowed(forumId)
 			&& (userSession.isLogged() || forum.isAllowAnonymousPosts())
 			&& !roleManager.isForumReadOnly(forumId)
-			&& (!roleManager.getPostOnlyWithModeratorOnline() || (roleManager.getPostOnlyWithModeratorOnline() && sessionManager.isModeratorOnline()));
+			&& (!roleManager.getPostOnlyWithModeratorOnline() || (roleManager.getPostOnlyWithModeratorOnline() && this.sessionManager.isModeratorOnline()));
 	}
 
 	private int findForumId(HttpServletRequest request) {
@@ -84,12 +84,12 @@ public class ReplyTopicRule implements AccessRule {
 	}
 
 	private int getForumIdFromPost(int postId) {
-		Post post = postRepository.get(postId);
+		Post post = this.postRepository.get(postId);
 		return post.getForum().getId();
 	}
 
 	private int getForumIdFromTopic(int topicId) {
-		Topic topic = topicRepository.get(topicId);
+		Topic topic = this.topicRepository.get(topicId);
 		return topic.getForum().getId();
 	}
 }

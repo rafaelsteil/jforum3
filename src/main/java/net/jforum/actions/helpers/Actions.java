@@ -36,6 +36,9 @@ public class Actions {
 	public static final String PRE_LIST = "preList";
 	public static final String RSS = "rss";
 	public static final String LIST_RESOLVED = "listResolved";
+	public static final String SHOW_ACTIVITY_LOG = "showActivityLog";
+	public static final String POSTS = "posts";
+	public static final String TOPICS = "topics";
 
 	private Actions() {}
 }

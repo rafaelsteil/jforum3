@@ -34,7 +34,7 @@ public class SpammerFactory {
 	 * @return the spammer instance
 	 */
 	public Spammer newTopicReply(Topic topic, List<User> users) {
-		TopicReplySpammer spammer = new TopicReplySpammer(config);
+		TopicReplySpammer spammer = new TopicReplySpammer(this.config);
 		spammer.prepare(topic, users);
 
 		return spammer;

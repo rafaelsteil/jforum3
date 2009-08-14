@@ -14,10 +14,12 @@ import java.util.Date;
 import java.util.List;
 
 import net.jforum.actions.helpers.AttachedFile;
+import net.jforum.entities.ModerationLog;
 import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.repository.PostRepository;
+import net.jforum.repository.TopicRepository;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -28,11 +30,16 @@ public class PostService {
 	private PostRepository postRepository;
 	private AttachmentService attachmentService;
 	private PollService pollService;
+	private TopicRepository topicRepository;
+	private ModerationLogService moderationLogService;
 
-	public PostService(PostRepository postRepository, AttachmentService attachmentService, PollService pollService) {
+	public PostService(PostRepository postRepository, AttachmentService attachmentService,
+			PollService pollService, TopicRepository topicRepository, ModerationLogService moderationLogService) {
 		this.postRepository = postRepository;
 		this.attachmentService = attachmentService;
 		this.pollService = pollService;
+		this.topicRepository = topicRepository;
+		this.moderationLogService = moderationLogService;
 	}
 
 	/**
@@ -45,8 +52,8 @@ public class PostService {
 	 * @param postId
 	 */
 	public void delete(Post post) {
-		attachmentService.deleteAllAttachments(post);
-		postRepository.remove(post);
+		this.attachmentService.deleteAllAttachments(post);
+		this.postRepository.remove(post);
 	}
 
 	/**
@@ -55,12 +62,14 @@ public class PostService {
 	 * @param canChangeTopicType
 	 * @param pollOptions
 	 * @param attachments
+	 * @param moderationLog
 	 */
 	public void update(Post post, boolean canChangeTopicType, List<PollOption> pollOptions,
-			List<AttachedFile> attachments) {
+			List<AttachedFile> attachments, ModerationLog moderationLog) {
 		this.applySaveConstraints(post);
 
-		Post currentPost = postRepository.get(post.getId());
+		Post currentPost = this.postRepository.get(post.getId());
+		String originalPostMessage = currentPost.getText();
 
 		currentPost.setSubject(post.getSubject());
 		currentPost.setText(post.getText());
@@ -68,14 +77,14 @@ public class PostService {
 		currentPost.incrementEditCount();
 
 		this.copyFormattingOptions(post, currentPost);
-		attachmentService.insertAttachments(attachments, currentPost);
+		this.attachmentService.insertAttachments(attachments, currentPost);
 
 		// TODO: Move to TopicPostEvent (?)
 		Topic currentTopic = currentPost.getTopic();
 
 		currentPost.setHasAttachments(currentPost.getAttachments().size() > 0);
 
-		// TODO: this will ovewrite the topic information about attachments
+		// FIXME: this will ovewrite the topic information about attachments
 		currentTopic.setHasAttachment(currentPost.getHasAttachments());
 
 		if (currentTopic.getFirstPost().equals(currentPost)) {
@@ -88,7 +97,7 @@ public class PostService {
 			if (!currentTopic.isPollEnabled()) {
 				// Set a new poll
 				currentTopic.setPoll(post.getTopic().getPoll());
-				pollService.associatePoll(currentTopic, pollOptions);
+				this.pollService.associatePoll(currentTopic, pollOptions);
 			}
 			else {
 				// Update existing poll
@@ -96,10 +105,15 @@ public class PostService {
 				currentTopic.getPoll().setLength(post.getTopic().getPoll().getLength());
 
 				if (pollOptions != null && pollOptions.size() > 0) {
-					pollService.processChanges(currentTopic.getPoll(), pollOptions);
+					this.pollService.processChanges(currentTopic.getPoll(), pollOptions);
 				}
 			}
 		}
+
+		this.postRepository.update(currentPost);
+		this.topicRepository.update(currentTopic);
+
+		this.moderationLogService.registerPostEdit(moderationLog, currentPost, originalPostMessage);
 	}
 
 	private void copyFormattingOptions(Post from, Post to) {

@@ -33,7 +33,9 @@ import net.jforum.repository.ForumRepository;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.ContainedIn;
-import org.springframework.beans.BeanUtils;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Rafael Steil
@@ -42,15 +44,11 @@ import org.springframework.beans.BeanUtils;
 @Table(name = "jforum_forums")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Forum implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_forums_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
 	@Column(name = "forum_id")
+	@Field(store = Store.NO, index = Index.TOKENIZED)
 	private int id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -98,7 +96,7 @@ public class Forum implements Serializable {
 	}
 
 	public boolean isAllowAnonymousPosts() {
-		return allowAnonymousPosts;
+		return this.allowAnonymousPosts;
 	}
 
 	public void setAllowAnonymousPosts(boolean allowAnonymousPosts) {
@@ -110,11 +108,11 @@ public class Forum implements Serializable {
 	 * @return the last post of this forum
 	 */
 	public Post getLastPost() {
-		return lastPost;
+		return this.lastPost;
 	}
 
 	public void setLastPost(Post post) {
-		lastPost = post;
+		this.lastPost = post;
 	}
 
 	/**
@@ -123,7 +121,7 @@ public class Forum implements Serializable {
 	 * @return String with the description
 	 */
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	/**
@@ -133,7 +131,7 @@ public class Forum implements Serializable {
 	public List<Group> getModerators() {
 		if (this.isModerated()) {
 			this.assertRepository();
-			return repository.getModerators(this);
+			return this.repository.getModerators(this);
 		}
 		else {
 			return new ArrayList<Group>();
@@ -146,7 +144,7 @@ public class Forum implements Serializable {
 	 * @return int value representing the ID
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -155,7 +153,7 @@ public class Forum implements Serializable {
 	 * @return int value representing the ID of the category
 	 */
 	public Category getCategory() {
-		return category;
+		return this.category;
 	}
 
 	/**
@@ -164,7 +162,7 @@ public class Forum implements Serializable {
 	 * @return boolean value. <code>true</code> if the forum is moderated, <code>false</code> if not.
 	 */
 	public boolean isModerated() {
-		return moderated;
+		return this.moderated;
 	}
 
 	/**
@@ -173,7 +171,7 @@ public class Forum implements Serializable {
 	 * @return String with the name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -182,11 +180,11 @@ public class Forum implements Serializable {
 	 * @return int value representing the order of the forum
 	 */
 	public int getDisplayOrder() {
-		return displayOrder;
+		return this.displayOrder;
 	}
 
 	public boolean isUnread() {
-		return unread;
+		return this.unread;
 	}
 
 	/**
@@ -240,11 +238,11 @@ public class Forum implements Serializable {
 	 * @param order The order to set
 	 */
 	public void setDisplayOrder(int order) {
-		displayOrder = order;
+		this.displayOrder = order;
 	}
 
 	public void setUnread(boolean status) {
-		unread = status;
+		this.unread = status;
 	}
 
 	/**
@@ -253,7 +251,7 @@ public class Forum implements Serializable {
 	 */
 	public int getTotalPosts() {
 		this.assertRepository();
-		return repository.getTotalPosts(this);
+		return this.repository.getTotalPosts(this);
 	}
 
 	/**
@@ -262,7 +260,7 @@ public class Forum implements Serializable {
 	 */
 	public int getTotalTopics() {
 		this.assertRepository();
-		return repository.getTotalTopics(this);
+		return this.repository.getTotalTopics(this);
 	}
 
 	/**
@@ -270,7 +268,7 @@ public class Forum implements Serializable {
 	 */
 	public List<Topic> getTopics(int start, int count) {
 		this.assertRepository();
-		return repository.getTopics(this, start, count);
+		return this.repository.getTopics(this, start, count);
 	}
 
 	/**
@@ -279,7 +277,7 @@ public class Forum implements Serializable {
 	public List<Topic> getTopicsPendingModeration() {
 		if (this.isModerated()) {
 			this.assertRepository();
-			return repository.getTopicsPendingModeration(this);
+			return this.repository.getTopicsPendingModeration(this);
 		}
 		else {
 			return new ArrayList<Topic>();
@@ -324,15 +322,8 @@ public class Forum implements Serializable {
 	}
 
 	private void assertRepository() {
-		if (repository == null) {
+		if (this.repository == null) {
 			throw new IllegalStateException("repository was not initialized");
 		}
-	}
-
-	public Forum withCategory(Category category) {
-		Forum result = new Forum();
-		BeanUtils.copyProperties(this, result);
-		result.setCategory(category);
-		return result;
 	}
 }

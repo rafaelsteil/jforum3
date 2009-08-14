@@ -50,24 +50,24 @@ public class ShoutBoxAdminActions {
 	 * List all existing categories
 	 */
 	public void list() {
-		propertyBag.put("shoutboxes", shoutBoxRepository.getAllShoutBoxes());
+		this.propertyBag.put("shoutboxes", this.shoutBoxRepository.getAllShoutBoxes());
 	}
 
 	public void edit(@Parameter(key = "shoutBoxId") int shoutBoxId){
 		ShoutBox shoutbox = shoutBoxService.get(shoutBoxId);
 
-		if (sessionManager.getUserSession().getRoleManager().isCategoryAllowed(shoutbox.getCategory())) {
-			propertyBag.put("shoutbox", shoutbox);
+		if (this.sessionManager.getUserSession().getRoleManager().isCategoryAllowed(shoutbox.getCategory().getId())) {
+			this.propertyBag.put("shoutbox", shoutbox);
 		}
 		else {
-			viewService.redirectToAction(Actions.LIST);
+			this.viewService.redirectToAction(Actions.LIST);
 		}
 	}
 
 	public void editSave(@Parameter(key = "shoutbox") ShoutBox shoutbox){
-		ShoutBox current = shoutBoxRepository.get(shoutbox.getId());
+		ShoutBox current = this.shoutBoxRepository.get(shoutbox.getId());
 
-		if (sessionManager.getUserSession().getRoleManager().isCategoryAllowed(current.getCategory())) {
+		if (this.sessionManager.getUserSession().getRoleManager().isCategoryAllowed(current.getCategory().getId())) {
 			shoutBoxService.update(shoutbox);
 		}
 

@@ -62,7 +62,7 @@ public class UploadUtils {
 	}
 
 	public String getExtension() {
-		String fileName = uploadedFile.getFileName();
+		String fileName = this.uploadedFile.getFileName();
 		return fileName.substring(fileName.lastIndexOf('.') + 1);
 	}
 
@@ -72,7 +72,7 @@ public class UploadUtils {
 		FileInputStream fileInputStream = null;
 
 		try {
-			fileInputStream = new FileInputStream(uploadedFile.getFile());
+			fileInputStream = new FileInputStream(this.uploadedFile.getFile());
 			inputStream = new BufferedInputStream(fileInputStream);
 			outputStream = new FileOutputStream(filename);
 

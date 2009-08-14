@@ -82,7 +82,7 @@ public class ShoutBox implements Serializable {
 	}
 
 	public void setAllowAnonymous(boolean isAllowAnonymous) {
-		allowAnonymous = isAllowAnonymous;
+		this.allowAnonymous = isAllowAnonymous;
 	}
 
 	public boolean isDisabled() {
@@ -90,7 +90,7 @@ public class ShoutBox implements Serializable {
 	}
 
 	public void setDisabled(boolean isDisabled) {
-		disabled = isDisabled;
+		this.disabled = isDisabled;
 	}
 
 	@Override

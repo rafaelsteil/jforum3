@@ -18,7 +18,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
-
 /**
  * @author Rafael Steil
  */
@@ -31,6 +30,11 @@ public class PostEventListener extends AbstractListener<Event<Post>, Post> {
 	@Before("repositoryAdd() && targetRepository() && args(post)")
 	public void beforeAdd(Post post) {
 		this.fireBeforeAdd(post);
+	}
+
+	@Before("repositoryUpdate() && targetRepository() && args(post)")
+	public void beforeUpdated(Post post) {
+		this.fireBeforeUpdated(post);
 	}
 
 	@AfterReturning("repositoryAdd() && targetRepository() && args(post)")

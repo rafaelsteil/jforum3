@@ -56,20 +56,20 @@ public class AvatarAdminActions {
 	public void delete(@Parameter(key = "avatarId") int... avatarId) {
 		if (avatarId != null) {
 			for (int id : avatarId) {
-				Avatar avatar = repository.get(id);
-				repository.remove(avatar);
+				Avatar avatar = this.repository.get(id);
+				this.repository.remove(avatar);
 			}
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * List all avatars
 	 */
 	public void list() {
-		propertyBag.put("GalleryAvatars", repository.getGalleryAvatar());
-		propertyBag.put("UploadedAvatars", repository.getUploadedAvatar());
+		this.propertyBag.put("GalleryAvatars", this.repository.getGalleryAvatar());
+		this.propertyBag.put("UploadedAvatars", this.repository.getUploadedAvatar());
 	}
 
 	public void add() {
@@ -82,22 +82,22 @@ public class AvatarAdminActions {
 	 */
 	public void addSave(@Parameter(key = "avatar")Avatar avatar,
 		@Parameter(key = "image") UploadedFileInformation image) {
-		service.add(avatar, image);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.add(avatar, image);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * Shows the page to edit a existing avatar
 	 */
 	public void edit(@Parameter(key = "avatarId") int avatarId) {
-		propertyBag.put("avatar", repository.get(avatarId));
-		viewService.renderView(Actions.ADD);
+		this.propertyBag.put("avatar", this.repository.get(avatarId));
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void editSave(@Parameter(key = "avatar") Avatar avatar,
 		@Parameter(key = "image") UploadedFileInformation image) {
-		service.update(avatar, image);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.update(avatar, image);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 }

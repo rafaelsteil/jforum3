@@ -38,7 +38,7 @@ public class TagSearchResult extends PaginatedResult<Topic> {
 
 			if (!roleManager.isForumAllowed(topic.getForum().getId())) {
 				it.remove();
-				totalRecords--;
+				this.totalRecords--;
 			}
 		}
 

@@ -32,7 +32,7 @@ public class RoleManagerFactoryBean implements FactoryBean {
 	 */
 	public Object getObject() throws Exception {
 		String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-		UserSession userSession = sessionManager.getUserSession(sessionId);
+		UserSession userSession = this.sessionManager.getUserSession(sessionId);
 		return userSession != null ? userSession.getRoleManager() : null;
 	}
 

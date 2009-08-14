@@ -1,10 +1,10 @@
 /*
  * Copyright (c) JForum Team. All rights reserved.
- *
- * The software in this package is published under the terms of the LGPL
- * license a copy of which has been included with this distribution in the
+ * 
+ * The software in this package is published under the terms of the LGPL 
+ * license a copy of which has been included with this distribution in the 
  * license.txt file.
- *
+ * 
  * The JForum Project
  * http://www.jforum.net
  */
@@ -26,23 +26,18 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "jforum_forums_watch")
 public class ForumWatch implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-
+	
 	@Column(name = "forum_id")
 	private int forumId;
-
+	
 	@Column(name = "user_id")
 	private int userId;
-
+	
 	public ForumWatch() {}
-
+	
 	public ForumWatch(int forumId, int userId) {
 		this.setUserId(userId);
 		this.setForumId(forumId);
@@ -52,7 +47,7 @@ public class ForumWatch implements Serializable {
 	 * @return the forumId
 	 */
 	public int getForumId() {
-		return forumId;
+		return this.forumId;
 	}
 
 	/**
@@ -66,7 +61,7 @@ public class ForumWatch implements Serializable {
 	 * @return the userId
 	 */
 	public int getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	/**
@@ -80,7 +75,7 @@ public class ForumWatch implements Serializable {
 	 * @return the id
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -89,7 +84,7 @@ public class ForumWatch implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
-
+	
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -98,16 +93,16 @@ public class ForumWatch implements Serializable {
 		if (o == this) {
 			return true;
 		}
-
+		
 		if (!(o instanceof ForumWatch)) {
 			return false;
 		}
-
+		
 		ForumWatch fw = (ForumWatch)o;
 		return fw.getForumId() == this.getForumId()
 			&& fw.getUserId() == this.getUserId();
 	}
-
+	
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */

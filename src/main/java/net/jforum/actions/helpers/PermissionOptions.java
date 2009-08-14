@@ -47,9 +47,11 @@ public class PermissionOptions {
 	private boolean canHaveProfilePicture;
 	private boolean postOnlyWithModeratorOnline;
 	private boolean pmOnlyToModerators;
+	private boolean canViewActivityLog;
+	private boolean canViewFullActivityLog;
 
 	public boolean getPostOnlyWithModeratorOnline() {
-		return postOnlyWithModeratorOnline;
+		return this.postOnlyWithModeratorOnline;
 	}
 
 	public void setPostOnlyWithModeratorOnline(boolean postOnlyWithModeratorOnline) {
@@ -57,35 +59,35 @@ public class PermissionOptions {
 	}
 
 	public boolean isPrivateMessageAllowed() {
-		return privateMessageAllowed;
+		return this.privateMessageAllowed;
 	}
 
 	public void setPrivateMessageAllowed(boolean privateMessage) {
-		privateMessageAllowed = privateMessage;
+		this.privateMessageAllowed = privateMessage;
 	}
 
 	public boolean isUserListingAllowed() {
-		return userListingAllowed;
+		return this.userListingAllowed;
 	}
 
 	public void setUserListingAllowed(boolean userListing) {
-		userListingAllowed = userListing;
+		this.userListingAllowed = userListing;
 	}
 
 	public boolean getCanViewProfile() {
-		return canViewProfile;
+		return this.canViewProfile;
 	}
 
 	public void setCanViewProfile(boolean viewProfile) {
-		canViewProfile = viewProfile;
+		this.canViewProfile = viewProfile;
 	}
 
 	public boolean getCanHaveProfilePicture() {
-		return canHaveProfilePicture;
+		return this.canHaveProfilePicture;
 	}
 
 	public void setCanHaveProfilePicture(boolean profilePicture) {
-		canHaveProfilePicture = profilePicture;
+		this.canHaveProfilePicture = profilePicture;
 	}
 
 	/**
@@ -93,7 +95,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public boolean getCanInteractOtherGroups() {
-		return canInteractOtherGroups;
+		return this.canInteractOtherGroups;
 	}
 
 	public void setCanInteractOtherGroups(boolean canInteractOtherGroups) {
@@ -105,7 +107,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getReplyOnly() {
-		return replyOnly;
+		return this.replyOnly;
 	}
 
 	/**
@@ -113,11 +115,11 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getReadOnlyForums() {
-		return readOnly;
+		return this.readOnly;
 	}
 
 	public List<Integer> getAllowedGroups() {
-		return groups;
+		return this.groups;
 	}
 
 	/**
@@ -125,7 +127,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getAttachments() {
-		return attachments;
+		return this.attachments;
 	}
 
 	/**
@@ -133,7 +135,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getHtml() {
-		return html;
+		return this.html;
 	}
 
 	/**
@@ -141,7 +143,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getModerateForums() {
-		return moderateForums;
+		return this.moderateForums;
 	}
 
 	/**
@@ -149,7 +151,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getModeratedReplies() {
-		return moderatedReplies;
+		return this.moderatedReplies;
 	}
 
 	/**
@@ -157,7 +159,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getAllowedCategories() {
-		return categories;
+		return this.categories;
 	}
 
 	/**
@@ -165,7 +167,7 @@ public class PermissionOptions {
 	 * @return
 	 */
 	public List<Integer> getAllowedForums() {
-		return forums;
+		return this.forums;
 	}
 
 	/**
@@ -354,19 +356,19 @@ public class PermissionOptions {
 	 * @param roleExists
 	 */
 	public void setCanManageForums(boolean value) {
-		canManageForums = value;
+		this.canManageForums = value;
 	}
 
 	public boolean getCanManageForums() {
-		return canManageForums;
+		return this.canManageForums;
 	}
 
 	public void setCoAdministrator(boolean value) {
-		isCoAdministrator = value;
+		this.isCoAdministrator = value;
 	}
 
 	public boolean isCoAdministrator() {
-		return isCoAdministrator;
+		return this.isCoAdministrator;
 	}
 
 	public void setPmOnlyToModerators(boolean pmOnlyToModerators) {
@@ -375,5 +377,21 @@ public class PermissionOptions {
 
 	public boolean isPmOnlyToModerators() {
 		return pmOnlyToModerators;
+	}
+
+	public void setCanViewActivityLog(boolean canViewActivityLog) {
+		this.canViewActivityLog = canViewActivityLog;
+	}
+
+	public boolean getCanViewActivityLog() {
+		return canViewActivityLog;
+	}
+
+	public void setCanViewFullActivityLog(boolean canViewFullActivityLog) {
+		this.canViewFullActivityLog = canViewFullActivityLog;
+	}
+
+	public boolean getCanViewFullActivityLog() {
+		return canViewFullActivityLog;
 	}
 }

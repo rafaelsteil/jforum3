@@ -42,9 +42,8 @@
  */
 package net.jforum.util;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -75,14 +74,14 @@ public class SafeHtml {
 	public SafeHtml(JForumConfig config) {
 		this.config = config;
 
-		this.splitAndTrim(ConfigKeys.HTML_TAGS_WELCOME, welcomeTags);
-		this.splitAndTrim(ConfigKeys.HTML_ATTRIBUTES_WELCOME, welcomeAttributes);
-		this.splitAndTrim(ConfigKeys.HTML_LINKS_ALLOW_PROTOCOLS, allowedProtocols);
+		this.splitAndTrim(ConfigKeys.HTML_TAGS_WELCOME, this.welcomeTags);
+		this.splitAndTrim(ConfigKeys.HTML_ATTRIBUTES_WELCOME, this.welcomeAttributes);
+		this.splitAndTrim(ConfigKeys.HTML_LINKS_ALLOW_PROTOCOLS, this.allowedProtocols);
 	}
 
 	private void splitAndTrim(String s, Set<String> data) {
-		if (config.containsKey(s)) {
-			String value = config.getValue(s);
+		if (this.config.containsKey(s)) {
+			String value = this.config.getValue(s);
 			String[] parts = value.split(",");
 
 			for (String part : parts) {
@@ -212,15 +211,16 @@ public class SafeHtml {
 	 */
 	@SuppressWarnings("unchecked")
 	private void checkAndValidateAttributes(Tag tag, boolean checkIfAttributeIsWelcome) {
-		List<Attribute> newAttributes = new ArrayList<Attribute>();
+		Vector<Attribute> newAttributes = new Vector<Attribute>();
 
-		for (Attribute a : (Vector<Attribute>) tag.getAttributesEx()) {
+		for (Iterator<Attribute> iter = tag.getAttributesEx().iterator(); iter.hasNext();) {
+			Attribute a = iter.next();
 			String name = a.getName();
 
 			if (name == null) {
 				newAttributes.add(a);
-
-			} else {
+			}
+			else {
 				name = name.toUpperCase();
 
 				if (a.getValue() == null) {
@@ -230,7 +230,11 @@ public class SafeHtml {
 
 				String value = a.getValue().toLowerCase();
 
-				if ((checkIfAttributeIsWelcome && !this.isAttributeWelcome(name)) || (!this.isAttributeSafe(name, value))) {
+				if (checkIfAttributeIsWelcome && !this.isAttributeWelcome(name)) {
+					continue;
+				}
+
+				if (!this.isAttributeSafe(name, value)) {
 					continue;
 				}
 
@@ -242,7 +246,7 @@ public class SafeHtml {
 			}
 		}
 
-		tag.setAttributesEx(new Vector<Attribute>(newAttributes));
+		tag.setAttributesEx(newAttributes);
 	}
 
 	/**
@@ -294,7 +298,7 @@ public class SafeHtml {
 	 * @return true if it is valid
 	 */
 	private boolean isHrefValid(String href) {
-		if (config.getBoolean(ConfigKeys.HTML_LINKS_ALLOW_RELATIVE) && href.length() > 0 && href.charAt(0) == '/') {
+		if (this.config.getBoolean(ConfigKeys.HTML_LINKS_ALLOW_RELATIVE) && href.length() > 0 && href.charAt(0) == '/') {
 			return true;
 		}
 

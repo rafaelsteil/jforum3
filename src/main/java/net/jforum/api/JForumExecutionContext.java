@@ -27,14 +27,14 @@ public abstract class JForumExecutionContext {
 
 	public JForumExecutionContext(HttpServletRequest request) {
 		this.request = request;
-		context = (ApplicationContext)request.getSession().getServletContext()
+		this.context = (ApplicationContext)request.getSession().getServletContext()
 			.getAttribute(ConfigKeys.SPRING_CONTEXT);
 
-		initialized = context != null;
+		this.initialized = this.context != null;
 	}
 
 	protected HttpServletRequest getReques() {
-		return request;
+		return this.request;
 	}
 
 	/**
@@ -42,13 +42,13 @@ public abstract class JForumExecutionContext {
 	 * @return true if JForum is ready for use
 	 */
 	protected boolean isInitialized() {
-		return initialized;
+		return this.initialized;
 	}
 
 	public abstract void execute();
 
 	@SuppressWarnings("unchecked")
 	protected final <T> T getComponent(Class<T> k) {
-		return (T)context.getBean(k.getName());
+		return (T)this.context.getBean(k.getName());
 	}
 }

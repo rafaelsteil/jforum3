@@ -44,16 +44,16 @@ public class BadWordAdminActions {
 	public void delete(@Parameter(key = "badWordId") int... badWordId) {
 		if (badWordId != null) {
 			for (int id : badWordId) {
-				BadWord word = repository.get(id);
-				repository.remove(word);
+				BadWord word = this.repository.get(id);
+				this.repository.remove(word);
 			}
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void list() {
-		propertyBag.put("words", repository.getAll());
+		this.propertyBag.put("words", this.repository.getAll());
 	}
 
 	public void add() {
@@ -61,18 +61,18 @@ public class BadWordAdminActions {
 	}
 
 	public void addSave(@Parameter(key = "word") BadWord word) {
-		repository.add(word);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.add(word);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void edit(@Parameter(key = "id") int id) {
-		BadWord word = repository.get(id);
-		propertyBag.put("word", word);
-		viewService.renderView(Actions.ADD);
+		BadWord word = this.repository.get(id);
+		this.propertyBag.put("word", word);
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void editSave(@Parameter(key = "word") BadWord word) {
-		repository.update(word);
-		viewService.redirectToAction(Actions.LIST);
+		this.repository.update(word);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

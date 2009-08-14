@@ -47,10 +47,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class Topic implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
 	public static final int TYPE_NORMAL = 0;
 	public static final int TYPE_STICKY = 1;
 	public static final int TYPE_ANNOUNCE = 2;
@@ -140,7 +136,7 @@ public class Topic implements Serializable {
 	}
 
 	public void setPendingModeration(boolean status) {
-		pendingModeration = status;
+		this.pendingModeration = status;
 	}
 
 	public void setRepository(TopicRepository repository) {
@@ -151,7 +147,7 @@ public class Topic implements Serializable {
 	 * @return the movedId
 	 */
 	public int getMovedId() {
-		return movedId;
+		return this.movedId;
 	}
 
 	/**
@@ -159,7 +155,7 @@ public class Topic implements Serializable {
 	 * @return true if it was moved to another forum
 	 */
 	public boolean getHasMoved() {
-		return movedId > 0;
+		return this.movedId > 0;
 	}
 
 	/**
@@ -175,7 +171,7 @@ public class Topic implements Serializable {
 	 * @return int value with the ID
 	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -183,7 +179,7 @@ public class Topic implements Serializable {
 	 * @return all non-pending moderation posts
 	 */
 	public List<Post> getPosts() {
-		return posts;
+		return this.posts;
 	}
 
 	/**
@@ -194,7 +190,7 @@ public class Topic implements Serializable {
 	 */
 	public List<Post> getPosts(int start, int count) {
 		this.assertRepository();
-		return repository.getPosts(this, start, count);
+		return this.repository.getPosts(this, start, count);
 	}
 
 	/**
@@ -203,7 +199,7 @@ public class Topic implements Serializable {
 	 * @return Forum this topic belongs to
 	 */
 	public Forum getForum() {
-		return forum;
+		return this.forum;
 	}
 
 	/**
@@ -212,7 +208,7 @@ public class Topic implements Serializable {
 	 * @return int value with the ID
 	 */
 	public Post getLastPost() {
-		return lastPost;
+		return this.lastPost;
 	}
 
 	/**
@@ -221,7 +217,7 @@ public class Topic implements Serializable {
 	 * @return int value with the status
 	 */
 	public int getStatus() {
-		return status;
+		return this.status;
 	}
 
 	/**
@@ -230,7 +226,7 @@ public class Topic implements Serializable {
 	 * @return int value representing the time
 	 */
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
 	/**
@@ -239,7 +235,7 @@ public class Topic implements Serializable {
 	 * @return String with the topic title
 	 */
 	public String getSubject() {
-		return subject == null ? "" : subject;
+		return this.subject == null ? "" : this.subject;
 	}
 
 	/**
@@ -248,7 +244,7 @@ public class Topic implements Serializable {
 	 * @return int value with the total
 	 */
 	public int getTotalReplies() {
-		return totalReplies;
+		return this.totalReplies;
 	}
 
 	/**
@@ -267,11 +263,11 @@ public class Topic implements Serializable {
 	 * @return int value with the total number of views
 	 */
 	public int getTotalViews() {
-		return totalViews;
+		return this.totalViews;
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	/**
@@ -280,7 +276,7 @@ public class Topic implements Serializable {
 	 * @return int value representing the type
 	 */
 	public int getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -325,21 +321,21 @@ public class Topic implements Serializable {
 	 * @param title The title to set
 	 */
 	public void setSubject(String title) {
-		subject = title;
+		this.subject = title;
 	}
 
 	/**
 	 * Increment by 1 the number of replies of this topic
 	 */
 	public void incrementTotalReplies() {
-		totalReplies++;
+		this.totalReplies++;
 	}
 
 	/**
 	 * Decrement by 1 the number of replies of this topic
 	 */
 	public void decrementTotalReplies() {
-		totalReplies--;
+		this.totalReplies--;
 	}
 
 	/**
@@ -352,7 +348,7 @@ public class Topic implements Serializable {
 	}
 
 	public void setUser(User u) {
-		user = u;
+		this.user = u;
 	}
 
 	public void setPaginate(boolean paginate) {
@@ -360,15 +356,15 @@ public class Topic implements Serializable {
 	}
 
 	public boolean getPaginate() {
-		return paginate;
+		return this.paginate;
 	}
 
 	public void setHasAttachment(boolean b) {
-		hasAttachment = b;
+		this.hasAttachment = b;
 	}
 
 	public boolean getHasAttachment() {
-		return hasAttachment;
+		return this.hasAttachment;
 	}
 
 	/**
@@ -384,7 +380,7 @@ public class Topic implements Serializable {
 			return false;
 		}
 
-		return ((Topic) o).getId() == id;
+		return ((Topic) o).getId() == this.id;
 	}
 
 	/**
@@ -419,14 +415,14 @@ public class Topic implements Serializable {
 	 * Unlock this topic, if locked.
 	 */
 	public void unlock() {
-		status = STATUS_UNLOCKED;
+		this.status = STATUS_UNLOCKED;
 	}
 
 	/**
 	 * Lock this topic
 	 */
 	public void lock() {
-		status = STATUS_LOCKED;
+		this.status = STATUS_LOCKED;
 	}
 
 	/**
@@ -434,7 +430,7 @@ public class Topic implements Serializable {
 	 * @return the first post
 	 */
 	public Post getFirstPost() {
-		return firstPost;
+		return this.firstPost;
 	}
 
 	public void setFirstPost(Post firstPost) {
@@ -449,7 +445,7 @@ public class Topic implements Serializable {
 	 * Increment by 1 the number of views of this topic
 	 */
 	public void incrementViews() {
-		totalViews++;
+		this.totalViews++;
 	}
 
 	/**
@@ -457,7 +453,7 @@ public class Topic implements Serializable {
 	 * @return true if moderation is needed
 	 */
 	public boolean isWaitingModeration() {
-		return pendingModeration;
+		return this.pendingModeration;
 	}
 
 	/**
@@ -465,7 +461,7 @@ public class Topic implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -475,14 +471,14 @@ public class Topic implements Serializable {
 	public String toString() {
 		return new StringBuilder(64)
 			.append('[')
-			.append(id)
-			.append(", ").append(subject)
+			.append(this.id)
+			.append(", ").append(this.subject)
 			.append(']')
 			.toString();
 	}
 
 	private void assertRepository() {
-		if (repository == null) {
+		if (this.repository == null) {
 			throw new IllegalStateException("repository was not initialized");
 		}
 	}
@@ -494,7 +490,7 @@ public class Topic implements Serializable {
 		this.poll = poll;
 
 		if (poll != null) {
-			pollId = poll.getId();
+			this.pollId = poll.getId();
 		}
 	}
 
@@ -506,6 +502,6 @@ public class Topic implements Serializable {
 	}
 
 	public boolean isPollEnabled() {
-		return pollId != null && pollId > 0;
+		return this.pollId != null && this.pollId > 0;
 	}
 }

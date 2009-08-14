@@ -10,10 +10,12 @@
  */
 package net.jforum.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.jforum.actions.helpers.ApproveInfo;
 import net.jforum.entities.Forum;
+import net.jforum.entities.ModerationLog;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.repository.ForumRepository;
@@ -29,12 +31,14 @@ public class ModerationService {
 	private PostRepository postRepository;
 	private ForumRepository forumRepository;
 	private TopicRepository topicRepository;
+	private ModerationLogService moderationLogService;
 
-	public ModerationService(PostRepository postRepository, ForumRepository forumRepository,
-		TopicRepository topicRepository) {
+	public ModerationService(PostRepository postRepository, ForumRepository forumRepository, TopicRepository topicRepository,
+			ModerationLogService moderationLogService) {
 		this.postRepository = postRepository;
 		this.forumRepository = forumRepository;
 		this.topicRepository = topicRepository;
+		this.moderationLogService = moderationLogService;
 	}
 
 	/**
@@ -46,32 +50,36 @@ public class ModerationService {
 	 * Move a set of topics to another forum
 	 * @param toForumId the id of the new forum
 	 * @param topicIds the id of the topics to move
+	 * @param moderationLog
 	 */
-	public void moveTopics(int toForumId, int... topicIds) {
+	public void moveTopics(int toForumId, ModerationLog moderationLog, int... topicIds) {
 		if (ArrayUtils.isEmpty(topicIds)) {
 			return;
 		}
 
-		Forum newForum = forumRepository.get(toForumId);
-		Forum oldForum = topicRepository.get(topicIds[0]).getForum();
+		Forum newForum = this.forumRepository.get(toForumId);
+		Forum oldForum = this.topicRepository.get(topicIds[0]).getForum();
 
-		forumRepository.moveTopics(newForum, topicIds);
+		this.forumRepository.moveTopics(newForum, topicIds);
 
-		newForum.setLastPost(forumRepository.getLastPost(newForum));
-		oldForum.setLastPost(forumRepository.getLastPost(oldForum));
+		newForum.setLastPost(this.forumRepository.getLastPost(newForum));
+		oldForum.setLastPost(this.forumRepository.getLastPost(oldForum));
+
+		this.moderationLogService.registerMovedTopics(moderationLog, topicIds);
 	}
 
 	/**
 	 * Lock or unlock a set of topics
 	 * @param topicIds the id of the topics to lock or unlock
+	 * @param moderationLog
 	 */
-	public void lockUnlock(int... topicIds) {
+	public void lockUnlock(int[] topicIds, ModerationLog moderationLog) {
 		if (ArrayUtils.isEmpty(topicIds)) {
 			return;
 		}
 
 		for (int topicId : topicIds) {
-			Topic topic = topicRepository.get(topicId);
+			Topic topic = this.topicRepository.get(topicId);
 
 			if (topic.isLocked()) {
 				topic.unlock();
@@ -80,16 +88,24 @@ public class ModerationService {
 				topic.lock();
 			}
 		}
+
+		this.moderationLogService.registerLockedTopics(moderationLog, topicIds);
 	}
 
 	/**
 	 * Delete a set of topics.
 	 * @param topics the topics to delete
+	 * @param moderationLog
 	 */
-	public void deleteTopics(List<Topic> topics) {
+	public void deleteTopics(List<Topic> topics, ModerationLog moderationLog) {
+		List<Topic> topicsForModeration = new ArrayList<Topic>();
+
 		for (Topic topic : topics) {
-			topicRepository.remove(topic);
+			topicsForModeration.add(this.topicRepository.get(topic.getId()));
+			this.topicRepository.remove(topic);
 		}
+
+		this.moderationLogService.registerDeleteTopics(topicsForModeration, moderationLog);
 	}
 
 	/**
@@ -104,7 +120,7 @@ public class ModerationService {
 
 		for (ApproveInfo info : infos) {
 			if (!info.defer()) {
-				Post post = postRepository.get(info.getPostId());
+				Post post = this.postRepository.get(info.getPostId());
 
 				if (post != null) {
 					if (info.approve()) {
@@ -117,12 +133,12 @@ public class ModerationService {
 			}
 		}
 
-		Forum forum = forumRepository.get(forumId);
-		forum.setLastPost(forumRepository.getLastPost(forum));
+		Forum forum = this.forumRepository.get(forumId);
+		forum.setLastPost(this.forumRepository.getLastPost(forum));
 	}
 
 	private void denyPost(Post post) {
-		postRepository.remove(post);
+		this.postRepository.remove(post);
 	}
 
 	public void approvePost(Post post) {
@@ -137,6 +153,6 @@ public class ModerationService {
 
 		post.setModerate(false);
 		post.getUser().incrementTotalPosts();
-		topic.setLastPost(topicRepository.getLastPost(topic));
+		topic.setLastPost(this.topicRepository.getLastPost(topic));
 	}
 }

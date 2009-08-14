@@ -208,5 +208,8 @@ public class ConfigKeys {
 	public static final String LUCENE_BATCH_SIZE = "lucene.batch.size";
 	public static final String QUERY_IGNORE_TOPIC_MOVED = "query.ignore.topic.moved";
 
+	public static final String BLOCK_IP = "jforum.block_ip";
+
+
 	private ConfigKeys() { }
 }

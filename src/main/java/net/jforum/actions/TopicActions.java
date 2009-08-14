@@ -13,6 +13,7 @@ package net.jforum.actions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.jforum.actions.helpers.ActionUtils;
@@ -37,6 +38,7 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.entities.util.Pagination;
+import net.jforum.plugins.post.ForumLimitedTimeRepository;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PollRepository;
@@ -81,11 +83,13 @@ public class TopicActions {
 	private PollRepository pollRepository;
 	private AttachmentService attachmentService;
 	private VRaptorServletRequest request;
+	private final ForumLimitedTimeRepository forumLimitedTimeRepository;
 
 	public TopicActions(ViewPropertyBag propertyBag, JForumConfig config, TopicService topicService,
 		ViewService viewService, ForumRepository forumRepository, SmilieRepository smilieRepository,
 		PostRepository postRepository, TopicRepository topicRepository, CategoryRepository categoryRepository,
 		RankingRepository rankingRepository, SessionManager sessionManager, PollRepository pollRepository,
+		ForumLimitedTimeRepository forumLimitedTimeRepository,
 		AttachmentService attachmentService, VRaptorServletRequest request) {
 		this.propertyBag = propertyBag;
 		this.forumRepository = forumRepository;
@@ -99,30 +103,31 @@ public class TopicActions {
 		this.rankingRepository = rankingRepository;
 		this.sessionManager = sessionManager;
 		this.pollRepository = pollRepository;
+		this.forumLimitedTimeRepository = forumLimitedTimeRepository;
 		this.attachmentService = attachmentService;
 		this.request = request;
 	}
 
 	public void preList(@Parameter(key = "topicId") int topicId, @Parameter(key = "postId") int postId) {
-		int count = postRepository.countPreviousPosts(postId);
-		int postsPerPage = config.getInt(ConfigKeys.POSTS_PER_PAGE);
+		int count = this.postRepository.countPreviousPosts(postId);
+		int postsPerPage = this.config.getInt(ConfigKeys.POSTS_PER_PAGE);
 
 		if (topicId == 0) {
-			Post post = postRepository.get(postId);
+			Post post = this.postRepository.get(postId);
 			topicId = post.getTopic().getId();
 		}
 
 		String url = null;
 
 		if (count > postsPerPage) {
-			int page = new Pagination().calculeStart(count, postsPerPage);
-			url = viewService.buildUrl(Domain.TOPICS, Actions.LIST, page, topicId);
+			int page = new Pagination().calculeStartFromCount(count, postsPerPage);
+			url = this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, page, topicId);
 		}
 		else {
-			url = viewService.buildUrl(Domain.TOPICS, Actions.LIST, topicId);
+			url = this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, topicId);
 		}
 
-		viewService.redirect(url + "#" + postId);
+		this.viewService.redirect(url + "#" + postId);
 	}
 
 	/**
@@ -131,41 +136,41 @@ public class TopicActions {
 	 */
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void quote(@Parameter(key = "postId") int postId) {
-		Post post = postRepository.get(postId);
+		Post post = this.postRepository.get(postId);
 
-		propertyBag.put("post", post);
-		propertyBag.put("isQuote", true);
-		propertyBag.put("isReply", true);
-		propertyBag.put("topic", post.getTopic());
-		propertyBag.put("forum", post.getForum());
-		propertyBag.put("smilies", smilieRepository.getAllSmilies());
+		this.propertyBag.put("post", post);
+		this.propertyBag.put("isQuote", true);
+		this.propertyBag.put("isReply", true);
+		this.propertyBag.put("topic", post.getTopic());
+		this.propertyBag.put("forum", post.getForum());
+		this.propertyBag.put("smilies", this.smilieRepository.getAllSmilies());
 
-		viewService.renderView(Actions.ADD);
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void vote(@Parameter(key = "topicId") int topicId, @Parameter(key = "pollId") int pollId,
 		@Parameter(key = "optionId") int optionId) {
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 
 		if (userSession.isLogged() && optionId != 0) {
 			User user = userSession.getUser();
-			Poll poll = topicRepository.get(topicId).getPoll();
+			Poll poll = this.topicRepository.get(topicId).getPoll();
 
-			if (!pollRepository.hasUserVoted(poll, user) && poll.isOpen()) {
+			if (!this.pollRepository.hasUserVoted(poll, user) && poll.isOpen()) {
 
 				PollVoter voter = new PollVoter();
 				voter.setIp(userSession.getIp());
 				voter.setPoll(poll);
 				voter.setUser(user);
 
-				pollRepository.registerVote(voter);
+				this.pollRepository.registerVote(voter);
 
-				PollOption option = pollRepository.getOption(optionId);
+				PollOption option = this.pollRepository.getOption(optionId);
 				option.incrementVotes();
 			}
 		}
 
-		viewService.redirectToAction(Actions.LIST, topicId);
+		this.viewService.redirectToAction(Actions.LIST, topicId);
 	}
 
 	/**
@@ -174,13 +179,13 @@ public class TopicActions {
 	 */
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void replyReview(@Parameter(key = "topicId") int topicId) {
-		Topic topic = topicRepository.get(topicId);
+		Topic topic = this.topicRepository.get(topicId);
 
-		Pagination pagination = new Pagination(config, 0).forTopic(topic);
-		int start = pagination.calculeStart(pagination.getTotalPages(), config.getInt(ConfigKeys.POSTS_PER_PAGE));
+		Pagination pagination = new Pagination(this.config, 0).forTopic(topic);
+		int start = pagination.calculeStart(pagination.getTotalPages(), this.config.getInt(ConfigKeys.POSTS_PER_PAGE));
 
-		propertyBag.put("topic", topic);
-		propertyBag.put("posts", topic.getPosts(start, pagination.getRecordsPerPage()));
+		this.propertyBag.put("topic", topic);
+		this.propertyBag.put("posts", topic.getPosts(start, pagination.getRecordsPerPage()));
 	}
 
 	/**
@@ -196,7 +201,7 @@ public class TopicActions {
 		post.setHtmlEnabled(options.isHtmlEnabled());
 		post.setSmiliesEnabled(options.isSmiliesEnabled());
 
-		propertyBag.put("post", post);
+		this.propertyBag.put("post", post);
 	}
 
 	/**
@@ -205,15 +210,15 @@ public class TopicActions {
 	 */
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void reply(@Parameter(key = "topicId") int topicId) {
-		Topic topic = topicRepository.get(topicId);
+		Topic topic = this.topicRepository.get(topicId);
 
-		propertyBag.put("isReply", true);
-		propertyBag.put("post", new Post());
-		propertyBag.put("topic", topic);
-		propertyBag.put("forum", topic.getForum());
-		propertyBag.put("smilies", smilieRepository.getAllSmilies());
+		this.propertyBag.put("isReply", true);
+		this.propertyBag.put("post", new Post());
+		this.propertyBag.put("topic", topic);
+		this.propertyBag.put("forum", topic.getForum());
+		this.propertyBag.put("smilies", this.smilieRepository.getAllSmilies());
 
-		viewService.renderView(Actions.ADD);
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	/**
@@ -226,7 +231,7 @@ public class TopicActions {
 	public void replySave(@Parameter(key = "topic") Topic topic, @Parameter(key = "post") Post post,
 		@Parameter(key = "postOptions") PostFormOptions options) {
 
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 
 		post.setUserIp(userSession.getIp());
 		post.setUser(userSession.getUser());
@@ -237,19 +242,19 @@ public class TopicActions {
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
 
 		if (roleManager.isAttachmentsAlllowed(topic.getForum().getId())) {
-			attachments = attachmentService.processNewAttachments(request);
+			attachments = this.attachmentService.processNewAttachments(request);
 		}
 
-		topic = topicRepository.get(topic.getId());
+		topic = this.topicRepository.get(topic.getId());
 
 		if (topic.getForum().isModerated() && !roleManager.isModerator()) {
 			post.setModerate(true);
 		}
 
-		topicService.reply(topic, post, attachments);
+		this.topicService.reply(topic, post, attachments);
 
 		if (post.isWaitingModeration()) {
-			viewService.redirectToAction(Domain.MESSAGES, Actions.REPLY_WAITING_MODERATION, topic.getId());
+			this.viewService.redirectToAction(Domain.MESSAGES, Actions.REPLY_WAITING_MODERATION, topic.getId());
 		}
 		else {
 			this.redirecToListing(topic, post);
@@ -264,35 +269,46 @@ public class TopicActions {
 	@SecurityConstraint(value = AccessForumRule.class, displayLogin = true)
 	public void list(@Parameter(key = "topicId") int topicId, @Parameter(key = "page") int page,
 			@Parameter(key = "viewPollResults") boolean viewPollResults) {
-		Topic topic = topicRepository.get(topicId);
+		Topic topic = this.topicRepository.get(topicId);
 
 		if (topic.isWaitingModeration() ) {
-			viewService.redirectToAction(Domain.MESSAGES, Actions.TOPIC_WAITING_MODERATION,
+			this.viewService.redirectToAction(Domain.MESSAGES, Actions.TOPIC_WAITING_MODERATION,
 				topic.getForum().getId());
 			return;
 		}
 
 		topic.incrementViews();
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 		userSession.markTopicAsRead(topicId);
 
-		Pagination pagination = new Pagination(config, page).forTopic(topic);
+		Pagination pagination = new Pagination(this.config, page).forTopic(topic);
 
 		boolean canVoteOnPolls = userSession.isLogged() && userSession.getRoleManager().getCanVoteOnPolls();
 
 		if (canVoteOnPolls && topic.isPollEnabled()) {
-			canVoteOnPolls = !pollRepository.hasUserVoted(topic.getPoll(), userSession.getUser());
+			canVoteOnPolls = !this.pollRepository.hasUserVoted(topic.getPoll(), userSession.getUser());
 		}
 
-		propertyBag.put("canVoteOnPolls", canVoteOnPolls);
-		propertyBag.put("viewPollResults", viewPollResults);
-		propertyBag.put("topic", topic);
-		propertyBag.put("forum", topic.getForum());
-		propertyBag.put("pagination", pagination);
-		propertyBag.put("isModeratorOnline", sessionManager.isModeratorOnline());
-		propertyBag.put("rankings", rankingRepository.getAllRankings());
-		propertyBag.put("categories", categoryRepository.getAllCategories());
-		propertyBag.put("posts", topic.getPosts(pagination.getStart(), pagination.getRecordsPerPage()));
+		this.propertyBag.put("canVoteOnPolls", canVoteOnPolls);
+		this.propertyBag.put("viewPollResults", viewPollResults);
+		this.propertyBag.put("topic", topic);
+		this.propertyBag.put("forum", topic.getForum());
+		this.propertyBag.put("pagination", pagination);
+		this.propertyBag.put("isModeratorOnline", this.sessionManager.isModeratorOnline());
+		this.propertyBag.put("rankings", this.rankingRepository.getAllRankings());
+		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
+
+		List<Post> posts = topic.getPosts(pagination.getStart(), pagination.getRecordsPerPage());
+		if (posts.isEmpty() == false) {
+			long limitedTime = this.forumLimitedTimeRepository.getLimitedTime(posts.get(0).getForum());
+			if(limitedTime > 0) {
+				Date now = new Date();
+				for (Post post : posts) {
+					post.calculateHasEditTimeExpired(limitedTime, now);
+				}
+			}
+		}
+		this.propertyBag.put("posts", posts);
 	}
 
 	/**
@@ -307,11 +323,11 @@ public class TopicActions {
 		@Parameter(key = "pollOptions", create = true) List<PollOption> pollOptions) {
 
 		ActionUtils.definePostOptions(post, options);
-		UserSession userSession = sessionManager.getUserSession();
+		UserSession userSession = this.sessionManager.getUserSession();
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
 
 		if (userSession.getRoleManager().isAttachmentsAlllowed(topic.getForum().getId())) {
-			attachments = attachmentService.processNewAttachments(request);
+			attachments = this.attachmentService.processNewAttachments(this.request);
 		}
 
 		topic.setType(options.getTopicType());
@@ -320,7 +336,7 @@ public class TopicActions {
 		post.setUserIp(userSession.getIp());
 		topic.setFirstPost(post);
 
-		Forum forum = forumRepository.get(topic.getForum().getId());
+		Forum forum = this.forumRepository.get(topic.getForum().getId());
 
 		if (forum.isModerated() && !userSession.getRoleManager().isModerator()) {
 			topic.setPendingModeration(true);
@@ -335,10 +351,10 @@ public class TopicActions {
 		}
 
 		topicService.addTopic(topic, pollOptions, attachments);
-		propertyBag.put("topic", topic);
+		this.propertyBag.put("topic", topic);
 
 		if (topic.isWaitingModeration()) {
-			viewService.redirectToAction(Domain.MESSAGES, Actions.TOPIC_WAITING_MODERATION, topic.getForum().getId());
+			this.viewService.redirectToAction(Domain.MESSAGES, Actions.TOPIC_WAITING_MODERATION, topic.getForum().getId());
 		}
 		else {
 			this.redirecToListing(topic, post);
@@ -346,21 +362,21 @@ public class TopicActions {
 	}
 
 	public void listSmilies() {
-		propertyBag.put("smilies", smilieRepository.getAllSmilies());
+		this.propertyBag.put("smilies", this.smilieRepository.getAllSmilies());
 	}
 
 	@Viewless
 	@SecurityConstraint(value = DownloadAttachmentRule.class)
 	public void downloadAttachment(@Parameter(key = "attachmentId") int attachmentId) {
-		Attachment attachment = attachmentService.getAttachmentForDownload(attachmentId);
-		String downloadPath = attachmentService.buildDownloadPath(attachment);
+		Attachment attachment = this.attachmentService.getAttachmentForDownload(attachmentId);
+		String downloadPath = this.attachmentService.buildDownloadPath(attachment);
 
 		if (!new File(downloadPath).exists()) {
 			// TODO show a nice message instead
 			throw new ForumException("Attachment not found");
 		}
 
-		viewService.startDownload(downloadPath, attachment.getRealFilename(), attachment.getFilesize());
+		this.viewService.startDownload(downloadPath, attachment.getRealFilename(), attachment.getFilesize());
 	}
 
 	/**
@@ -369,23 +385,23 @@ public class TopicActions {
 	 */
 	@SecurityConstraint(CreateNewTopicRule.class)
 	public void add(@Parameter(key = "forumId") int forumId) {
-		Forum forum = forumRepository.get(forumId);
+		Forum forum = this.forumRepository.get(forumId);
 
-		propertyBag.put("forum", forum);
-		propertyBag.put("post", new Post());
-		propertyBag.put("isNewTopic", true);
-		propertyBag.put("smilies", smilieRepository.getAllSmilies());
+		this.propertyBag.put("forum", forum);
+		this.propertyBag.put("post", new Post());
+		this.propertyBag.put("isNewTopic", true);
+		this.propertyBag.put("smilies", this.smilieRepository.getAllSmilies());
 	}
 
 	private void redirecToListing(Topic topic, Post post) {
-		Pagination pagination = new Pagination(config, 0).forTopic(topic);
+		Pagination pagination = new Pagination(this.config, 0).forTopic(topic);
 
 		StringBuilder url = new StringBuilder(pagination.getTotalPages() > 1
-			? viewService.buildUrl(Domain.TOPICS, Actions.LIST, pagination.getTotalPages(), topic.getId())
-			: viewService.buildUrl(Domain.TOPICS, Actions.LIST, topic.getId()));
+			? this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, pagination.getTotalPages(), topic.getId())
+			: this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, topic.getId()));
 
 		url.append('#').append(post.getId());
 
-		viewService.redirect(url.toString());
+		this.viewService.redirect(url.toString());
 	}
 }

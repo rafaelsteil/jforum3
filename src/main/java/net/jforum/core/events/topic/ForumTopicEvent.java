@@ -49,7 +49,7 @@ public class ForumTopicEvent extends EmptyTopicEvent {
 		}
 
 		if (topicMatches) {
-			forum.setLastPost(repository.getLastPost(forum));
+			forum.setLastPost(this.repository.getLastPost(forum));
 		}
 	}
 }

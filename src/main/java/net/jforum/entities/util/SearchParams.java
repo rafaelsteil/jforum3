@@ -11,7 +11,11 @@
 
 package net.jforum.entities.util;
 
+import java.text.MessageFormat;
+
 import net.jforum.entities.Forum;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Arguments for a search.
@@ -24,7 +28,7 @@ import net.jforum.entities.Forum;
 public class SearchParams {
 	private final String regex = "(^| (?!\\w.*[\'\"]))";
 
-	private String query;
+	private String query, user;
 	private Forum forum = new Forum();
 	private SearchMatchType matchType = SearchMatchType.AND;
 	private SearchSort sort = SearchSort.DATE;
@@ -77,7 +81,7 @@ public class SearchParams {
 	 * @param max
 	 */
 	public void setMaxResults(int max) {
-		maxResults = max;
+		this.maxResults = max;
 	}
 
 	/**
@@ -93,11 +97,11 @@ public class SearchParams {
 	 * @return
 	 */
 	public SearchMatchType getMatchType() {
-		return matchType;
+		return this.matchType;
 	}
 
 	public String getQuery() {
-		return query;
+		return this.query;
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class SearchParams {
 	 * @return
 	 */
 	public SearchSortType getSortType() {
-		return sortType;
+		return this.sortType;
 	}
 
 	/**
@@ -113,7 +117,7 @@ public class SearchParams {
 	 * @return
 	 */
 	public SearchSort getSort() {
-		return sort;
+		return this.sort;
 	}
 
 	/**
@@ -121,7 +125,7 @@ public class SearchParams {
 	 * @return
 	 */
 	public int getMaxResults() {
-		return maxResults;
+		return this.maxResults;
 	}
 
 	/**
@@ -129,14 +133,28 @@ public class SearchParams {
 	 * @return
 	 */
 	public Forum getForum() {
-		return forum;
+		return this.forum;
 	}
 
 	/**
 	 * @return
 	 */
 	public int getStart() {
-		return start;
+		return this.start;
+	}
+
+	/**
+	 * @return the username, firstName, lastName or email to filter
+	 */
+	public String getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user the username, firstName, lastName or email to filter
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 
 	/**
@@ -162,18 +180,26 @@ public class SearchParams {
 	 * @return the query text
 	 */
 	public String buildQuery() {
-		String text = matchType == SearchMatchType.AND
-			? query.replaceAll(regex, " +")
-			: query;
+		String userQuery = StringUtils.isNotEmpty(user) ? MessageFormat.format("+(user.username:{0} user.firstName:{0} user.lastName:{0} user.email:{0})", user) : "";
 
-		String subject = query.replaceAll(regex,
-			(matchType == SearchMatchType.AND ? " +subject:" : " subject:"));
-
-		String forumQuery = "";
-		if (forum != null && forum.getId() > 0) {
-			forumQuery = "and topic.forum.id:" + forum.getId();
+		String text = "";
+		if (StringUtils.isNotEmpty(query)) {
+			text = this.matchType == SearchMatchType.AND
+				? this.query.replaceAll(this.regex, " +")
+				: this.query;
 		}
 
-		return String.format("(%s) or (%s) %s", text.trim(), subject.trim(), forumQuery).trim();
+		String subject = "";
+		if (StringUtils.isNotEmpty(query)) {
+			subject = this.query.replaceAll(this.regex,
+					(this.matchType == SearchMatchType.AND ? " +subject:" : " subject:"));
+		}
+
+		String forumQuery = "";
+		if (this.forum != null && this.forum.getId() > 0) {
+			forumQuery = "and +topic.forum.id:" + this.forum.getId();
+		}
+
+		return String.format("(%s %s %s) or (%s %s %s)", text.trim(), userQuery, forumQuery, subject.trim(), userQuery, forumQuery).trim();
 	}
 }

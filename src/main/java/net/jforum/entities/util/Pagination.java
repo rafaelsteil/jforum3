@@ -14,6 +14,7 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
+import net.jforum.entities.User;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 
@@ -35,7 +36,7 @@ public class Pagination {
 
 	public Pagination(JForumConfig config, int page) {
 		this.config = config;
-		start = page;
+		this.start = page;
 	}
 
 	/**
@@ -46,9 +47,9 @@ public class Pagination {
 	public Pagination(long totalRecords, int recordsPerPage, int page, String baseUrl, int id) {
 		this.recordsPerPage = recordsPerPage;
 		this.totalRecords = totalRecords;
-		totalPages = this.calculeTotalPages();
-		start = this.calculeStart(page, this.recordsPerPage);
-		thisPage = this.calculeThisPage(page);
+		this.totalPages = this.calculeTotalPages();
+		this.start = this.calculeStart(page, this.recordsPerPage);
+		this.thisPage = this.calculeThisPage(page);
 		this.baseUrl = baseUrl;
 		this.id = id;
 	}
@@ -59,13 +60,30 @@ public class Pagination {
 	 * @return the pagination instance
 	 */
 	public Pagination forUsers(int totalUsers) {
-		recordsPerPage = config.getInt(ConfigKeys.USERS_PER_PAGE);
-		totalRecords = totalUsers;
-		totalPages = this.calculeTotalPages();
-		thisPage = this.calculeThisPage(start);
-		start = this.calculeStart(start, recordsPerPage);
-		baseUrl = String.format("/%s/%s", Domain.USERS_ADMIN, Actions.LIST);
-		id = 0;
+		this.recordsPerPage = this.config.getInt(ConfigKeys.USERS_PER_PAGE);
+		this.totalRecords = totalUsers;
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.USERS_ADMIN, Actions.LIST);
+		this.id = 0;
+
+		return this;
+	}
+
+	/**
+	 * Create pagination for user listing
+	 * @param totalUsers the total of users
+	 * @return the pagination instance
+	 */
+	public Pagination forModerationLog(int totalRecords) {
+		this.recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		this.totalRecords = totalRecords;
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.MODERATION, Actions.SHOW_ACTIVITY_LOG);
+		this.id = 0;
 
 		return this;
 	}
@@ -76,13 +94,13 @@ public class Pagination {
 	 * @return the proper pagination instance
 	 */
 	public Pagination forSearch(int totalRecords) {
-		recordsPerPage = config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		this.recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 		this.totalRecords = totalRecords;
-		totalPages = this.calculeTotalPages();
-		thisPage = this.calculeThisPage(start);
-		start = this.calculeStart(start, recordsPerPage);
-		baseUrl = String.format("/%s/%s", Domain.SEARCH, Actions.EXECUTE);
-		id = 0;
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.SEARCH, Actions.EXECUTE);
+		this.id = 0;
 
 		return this;
 	}
@@ -93,13 +111,13 @@ public class Pagination {
 	 * @return
 	 */
 	public Pagination forPostReports(int totalRecords) {
-		recordsPerPage = config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		this.recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 		this.totalRecords = totalRecords;
-		totalPages = this.calculeTotalPages();
-		thisPage = this.calculeThisPage(start);
-		start = this.calculeStart(start, recordsPerPage);
-		baseUrl = String.format("/%s/%s", Domain.POST_REPORT, Actions.LIST_RESOLVED);
-		id = 0;
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.POST_REPORT, Actions.LIST_RESOLVED);
+		this.id = 0;
 
 		return this;
 	}
@@ -110,13 +128,13 @@ public class Pagination {
 	 * @return the proper pagination instance
 	 */
 	public Pagination forNewMessages(int totalRecords) {
-		recordsPerPage = config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		this.recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 		this.totalRecords = totalRecords;
-		totalPages = this.calculeTotalPages();
-		thisPage = this.calculeThisPage(start);
-		start = this.calculeStart(start, recordsPerPage);
-		baseUrl = String.format("/%s/%s", Domain.FORUMS, Actions.NEW_MESSAGES);
-		id = 0;
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.FORUMS, Actions.NEW_MESSAGES);
+		this.id = 0;
 
 		return this;
 	}
@@ -127,13 +145,13 @@ public class Pagination {
 	 * @return the proper pagination instance
 	 */
 	public Pagination forForum(Forum forum) {
-		recordsPerPage = config.getInt(ConfigKeys.TOPICS_PER_PAGE);
-		totalRecords = forum.getTotalTopics();
-		totalPages = this.calculeTotalPages();
-		thisPage = this.calculeThisPage(start);
-		start = this.calculeStart(start, recordsPerPage);
-		baseUrl = String.format("/%s/%s", Domain.FORUMS, Actions.SHOW);
-		id = forum.getId();
+		this.recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		this.totalRecords = forum.getTotalTopics();
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.FORUMS, Actions.SHOW);
+		this.id = forum.getId();
 
 		return this;
 	}
@@ -144,30 +162,62 @@ public class Pagination {
 	 * @return the proper pagination instance
 	 */
 	public Pagination forTopic(Topic topic) {
-		recordsPerPage = config.getInt(ConfigKeys.POSTS_PER_PAGE);
-		totalRecords = topic.getTotalPosts();
-		totalPages = this.calculeTotalPages();
-		thisPage = this.calculeThisPage(start);
-		start = this.calculeStart(start, recordsPerPage);
-		baseUrl = String.format("/%s/%s", Domain.TOPICS, Actions.LIST);
-		id = topic.getId();
+		this.recordsPerPage = this.config.getInt(ConfigKeys.POSTS_PER_PAGE);
+		this.totalRecords = topic.getTotalPosts();
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.TOPICS, Actions.LIST);
+		this.id = topic.getId();
+
+		return this;
+	}
+
+	/**
+	 * @param user the user from which the posts will be selected
+	 * @return
+	 */
+	public Pagination forUserPosts(User user) {
+		this.recordsPerPage = this.config.getInt(ConfigKeys.POSTS_PER_PAGE);
+		this.totalRecords = user.getTotalPosts();
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.USER, Actions.POSTS);
+		this.id = user.getId();
+
+		return this;
+	}
+
+	/**
+	 * @param user the user from which the topics will be selected
+	 * @return
+	 */
+	public Pagination forUserTopics(User user, int totalTopics) {
+		this.recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
+		this.totalRecords = totalTopics;
+		this.totalPages = this.calculeTotalPages();
+		this.thisPage = this.calculeThisPage(this.start);
+		this.start = this.calculeStart(this.start, this.recordsPerPage);
+		this.baseUrl = String.format("/%s/%s", Domain.USER, Actions.TOPICS);
+		this.id = user.getId();
 
 		return this;
 	}
 
 	public int getStart() {
-		return start;
+		return this.start;
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return the base url to use in the pagination links
 	 */
 	public String getBaseUrl() {
-		return baseUrl;
+		return this.baseUrl;
 	}
 
 	/**
@@ -209,14 +259,17 @@ public class Pagination {
 	}
 
 	public int calculeThisPage(int page) {
-		return Math.min(totalPages, Math.max(1, page));
+		return Math.min(this.totalPages, Math.max(1, page));
 	}
 
+	public int calculeStartFromCount(int count, int recordsPerPage) {
+		return count / recordsPerPage + (count % recordsPerPage > 0 ? 1 : 0);
+	}
 	public int calculeStart(int page, int recordsPerPage) {
 		return page <= 1 ? 0 : (page - 1) * recordsPerPage;
 	}
 
 	private int calculeTotalPages() {
-		return (int)Math.ceil((double)totalRecords / (double)recordsPerPage);
+		return (int)Math.ceil((double)this.totalRecords / (double)this.recordsPerPage);
 	}
 }

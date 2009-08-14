@@ -123,7 +123,7 @@ public class ShoutService {
 			}
 
 			//remove the html tag
-			shouter = userRepository.get(ANONYMOUS_USER_ID).getUsername();
+			shouter = this.userRepository.get(ANONYMOUS_USER_ID).getUsername();
 
 			// The name is shortened to 30 letters
 			if(shouter.length()>30) {

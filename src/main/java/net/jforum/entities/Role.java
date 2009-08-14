@@ -61,10 +61,10 @@ public class Role {
 	public Role() { }
 
 	public Role(Role role) {
-		id = role.id;
-		name = role.name;
-		group = role.group;
-		roleValues = new ArrayList<Integer>(role.roleValues);
+		this.id = role.id;
+		this.name = role.name;
+		this.group = role.group;
+		this.roleValues = new ArrayList<Integer>(role.roleValues);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class Role {
 	 * @param value
 	 */
 	public void addRoleValue(int value) {
-		roleValues.add(value);
+		this.roleValues.add(value);
 	}
 
 	/**
@@ -153,6 +153,6 @@ public class Role {
 	 */
 	@Override
 	public String toString() {
-		return String.format("%d => %s (%s)", this.getId(), this.getName(), roleValues);
+		return String.format("%d => %s (%s)", this.getId(), this.getName(), this.roleValues);
 	}
 }

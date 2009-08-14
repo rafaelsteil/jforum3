@@ -64,6 +64,6 @@ public class EmailSenderTask implements Runnable {
 			logger.trace("Running job for " + spammer);
 		}
 
-		spammer.dispatchMessages();
+		this.spammer.dispatchMessages();
 	}
 }

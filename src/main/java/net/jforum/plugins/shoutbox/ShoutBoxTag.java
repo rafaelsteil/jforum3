@@ -24,9 +24,9 @@ import net.jforum.entities.UserSession;
  *
  */
 public class ShoutBoxTag extends ImportFileTag {
-
+	
 	public static final String DEFAULT_URL = "/shoutbox/shoutbox.jsp";
-
+	
 	private Category category;
 	private ShoutBoxService shoutboxService;
 
@@ -35,11 +35,11 @@ public class ShoutBoxTag extends ImportFileTag {
 			shoutboxService = this.getBean(ShoutBoxService.class);
 		}
 	}
-
+	
 	@Override
 	public void doTag() throws JspException, IOException {
 		ShoutBox shoutBox = shoutboxService.getShoutBox(category);
-
+		
 		if(shoutBox!=null){
 			boolean showShoutBox = !shoutBox.isDisabled();
 			ServletRequest request = this.request();
@@ -48,14 +48,14 @@ public class ShoutBoxTag extends ImportFileTag {
 				if(!userSession.isLogged())//is not logged in,it will not show the shoutbox
 					showShoutBox = false;
 			}
-
-			if(showShoutBox){
+			
+			if(showShoutBox){ 
 				//put the param into context that needed by the imported file
 				request.setAttribute("CurrentShoutBox", shoutBox);
-
-				if(url == null)
+				
+				if(this.url == null)
 					this.setUrl(DEFAULT_URL);
-
+				
 				//Process the file import
 				super.doTag();
 			}
@@ -66,5 +66,5 @@ public class ShoutBoxTag extends ImportFileTag {
 		this.category = category;
 	}
 
-
+	
 }

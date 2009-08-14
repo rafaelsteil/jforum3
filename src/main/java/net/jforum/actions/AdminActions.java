@@ -54,8 +54,8 @@ public class AdminActions {
 	 * The main admin page
 	 */
 	public void main() {
-		propertyBag.put("stats", forumRepository.getForumStats());
-		propertyBag.put("sessions", sessionManager.getLoggedSessions());
-		propertyBag.put("totalLoggedUsers", sessionManager.getTotalLoggedUsers());
+		this.propertyBag.put("stats", this.forumRepository.getForumStats());
+		this.propertyBag.put("sessions", this.sessionManager.getLoggedSessions());
+		this.propertyBag.put("totalLoggedUsers", this.sessionManager.getTotalLoggedUsers());
 	}
 }

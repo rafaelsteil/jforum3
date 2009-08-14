@@ -46,7 +46,7 @@ public class RankingAdminActions {
 	}
 
 	public void list() {
-		propertyBag.put("rankings", repository.getAllRankings());
+		this.propertyBag.put("rankings", this.repository.getAllRankings());
 	}
 
 	public void add() {
@@ -54,22 +54,22 @@ public class RankingAdminActions {
 	}
 
 	public void addSave(@Parameter(key = "ranking") Ranking ranking) {
-		service.add(ranking);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.add(ranking);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void edit(@Parameter(key = "rankingId") int rankingId) {
-		propertyBag.put("ranking", repository.get(rankingId));
-		viewService.renderView(Actions.ADD);
+		this.propertyBag.put("ranking", this.repository.get(rankingId));
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	public void editSave(@Parameter(key = "ranking") Ranking ranking) {
-		service.update(ranking);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.update(ranking);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	public void delete(@Parameter(key = "rankingsId") int... rankingsId) {
-		service.delete(rankingsId);
-		viewService.redirectToAction(Actions.LIST);
+		this.service.delete(rankingsId);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

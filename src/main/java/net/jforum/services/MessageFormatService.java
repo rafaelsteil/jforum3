@@ -16,9 +16,9 @@ public class MessageFormatService {
 	public void setFormatters(PostFormatters formatters) {
 		this.formatters = formatters;
 	}
-
+	
 	//---------- Business Logic----------
-
+	
 	/**
 	 * format the text
 	 */
@@ -28,5 +28,5 @@ public class MessageFormatService {
 		}
 		return text;
 	}
-
+	
 }

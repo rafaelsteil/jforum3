@@ -45,14 +45,14 @@ import org.vraptor.webapp.DefaultComponentManager;
  * @author Bill
  */
 public class ActionExtensionManager {
-
+	
 	private static final Logger logger = Logger.getLogger(ActionExtensionManager.class);
-
+	
 	private ComponentManager componentManager;
-
+	
 	private final ParameterInfoProvider paramInfo = new ExtendedParameterInfoProvider();;
-
-	private final ConcurrentMap<String, ConcurrentMap<String, List<LogicMethod>>> extensions =
+	
+	private final ConcurrentMap<String, ConcurrentMap<String, List<LogicMethod>>> extensions = 
 		new ConcurrentHashMap<String, ConcurrentMap<String, List<LogicMethod>>>();
 
 	public ActionExtensionManager(ComponentManager componentManager) {
@@ -63,21 +63,21 @@ public class ActionExtensionManager {
 		List<LogicDefinition> definitions = new ArrayList<LogicDefinition>();
 		String componentName = logicDefinition.getComponentType().getName();
 		String preLogicMethodName = logicDefinition.getLogicMethod().getName();
-
+		
 		List<LogicMethod> extendedLogicMethods = this.getExtendedLogicMethod(componentName,preLogicMethodName);
 		DefaultLogicDefinition definition = null;
 		for(LogicMethod method : extendedLogicMethods){
 			definition = new DefaultLogicDefinition(method.getComponentType(), method);
 			definitions.add(definition);
 		}
-
+		
 		return definitions;
 	}
-
+	
 	public void setExtensions(List<String> list) {
 		if(componentManager == null)
 			throw new NullPointerException("Need Component Manager");
-
+		
 		Class<?> type;
 		for (String beanName : list) {
 			try {
@@ -92,7 +92,7 @@ public class ActionExtensionManager {
 			}
 		}//end loop
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private void register(Class<?> type) {
 		/*if(!type.isAnnotationPresent(ActionExtension.class)){
@@ -116,7 +116,7 @@ public class ActionExtensionManager {
 		//check the supperComponent exist?
 		String preComponentName = getExtendedComponentName(type); // which compoent to extend
 		Map<String,Method> methods = findExtendsMethod(type);
-
+		
 		for(String preLogicName:methods.keySet()){
 			try{
 				componentManager.getComponent(preComponentName, preLogicName);//validate component and logic
@@ -131,35 +131,35 @@ public class ActionExtensionManager {
 				methods.remove(preLogicName);
 				continue;
 			}
-
+			
 			Method extendedMethod = methods.get(preLogicName);
 			String extendedMethodName =extendedMethod.getName();
-
-			//this extend component is annotated as component,
+			
+			//this extend component is annotated as component, 
 			//Reuse the LogicMethod
-			if(thisComponentName!=null) {
+			if(thisComponentName!=null) { 
 				try {
 					ComponentType definedComponentType = componentManager.getComponent(thisComponentName, extendedMethodName);
 					LogicMethod extendedLogicMethod = definedComponentType.getLogic(extendedMethodName);
-
+					
 					this.register(preComponentName, preLogicName, extendedLogicMethod);
 				} catch (ComponentNotFoundException e) {
 					// should be find
 				} catch (LogicNotFoundException e) {
 					// should be find
 				}
-
+				
 			}
 		}
 
 		// not annotated as component
-		if(thisComponentName == null ) {
+		if(thisComponentName == null ) { 
 			ScopeType scope = ScopeType.REQUEST;
-
+			
 			//construcotr is aviable, otherwise it will not reach here
-
+			
 			Map<String, DefaultLogicMethod> actions = createLogics(methods);
-
+			
 			//Extended Component no need to support these feature
 			//List<InterceptorType> interceptors = InterceptorType.getInterceptors(type);
 			// read fields
@@ -167,20 +167,20 @@ public class ActionExtensionManager {
 			// destroy method
 			//String destroyLogicName = "destroy";
 			//List<ReadParameter> reads = findParameters(type);
-
-			DefaultComponentType componentType = new DefaultComponentType(type, type.getName(),
+			
+			DefaultComponentType componentType = new DefaultComponentType(type, type.getName(), 
 					scope, constructor, actions, null, null, null, null);
-
+			
 			for(String preLogicName : actions.keySet()){
 				DefaultLogicMethod extendedLogicMethod = actions.get(preLogicName);
 				extendedLogicMethod.setComponentType(componentType);
 				register(preComponentName, preLogicName,extendedLogicMethod);
 			}
 		}
-
+		
 
 	}
-
+	
 	private Map<String, DefaultLogicMethod> createLogics(
 			Map<String, Method> methods) {
 		Map<String, DefaultLogicMethod> actions = new HashMap<String, DefaultLogicMethod>();
@@ -214,20 +214,20 @@ public class ActionExtensionManager {
 		}
 		return methods;
 	}
-
+	
 	private boolean isNotExtendLogicMethod(Method m) {
 		return !Modifier.isPublic(m.getModifiers()) || Modifier.isStatic(m.getModifiers())
 		|| m.getDeclaringClass().equals(Object.class)
-		|| m.getName().startsWith(DefaultComponentManager.VALIDATE_METHOD_INITIALS)
+		|| m.getName().startsWith(DefaultComponentManager.VALIDATE_METHOD_INITIALS) 
 		|| ReflectionUtil.isGetter(m) || !m.isAnnotationPresent(Extends.class);
 	}
-
+	
 
 	private String getComponentName(Class<?> type) {
 		String componentName;
 
 		if (type.isAnnotationPresent(Component.class)) {
-			Component ann = (type.getAnnotation(Component.class));
+			Component ann = ((Component) type.getAnnotation(Component.class));
 			if (!ann.value().equals("")) {
 				componentName = ann.value();
 			} else {
@@ -238,11 +238,11 @@ public class ActionExtensionManager {
 		}
 		return componentName;
 	}
-
+	
 	private String getExtendedComponentName(Class<?> type){
 		String componentName;
 		if(type.isAnnotationPresent(ActionExtension.class)){
-			ActionExtension ann = (type.getAnnotation(ActionExtension.class));
+			ActionExtension ann = ((ActionExtension)type.getAnnotation(ActionExtension.class));
 			if (!ann.value().equals("")) {
 				componentName = ann.value();
 			} else {
@@ -253,9 +253,9 @@ public class ActionExtensionManager {
 		}
 		return componentName;
 	}
-
+	
 	private String getAutoName(Class<?> type){
-		String name = StringUtil.removeEnding(type.getSimpleName(),
+		String name = StringUtil.removeEnding(type.getSimpleName(), 
 				DefaultComponentManager.COMPONENT_TERMINATIONS);
 
 		if (!name.equals(type.getSimpleName())) {
@@ -264,30 +264,30 @@ public class ActionExtensionManager {
 			return type.getSimpleName();
 		}
 	}
-
+	
 	private void register(String component,String logicMethodName,LogicMethod method)  {
 		List<LogicMethod> methods = this.getExtendedLogicMethod(component, logicMethodName);
 		methods.add(method);
-
-		if (!extensions.containsKey(component)) {
-			extensions.put(component, new ConcurrentHashMap<String, List<LogicMethod>>());
+		
+		if (!this.extensions.containsKey(component)) {
+			this.extensions.put(component, new ConcurrentHashMap<String, List<LogicMethod>>());
 		}
-
-		extensions.get(component).put(logicMethodName, methods);
+		
+		this.extensions.get(component).put(logicMethodName, methods);
 	}
 
 	private List<LogicMethod> getExtendedLogicMethod(String preComponentName,
 			String preLogicMethodName) {
 		List<LogicMethod> methods;
-
-		ConcurrentMap<String, List<LogicMethod>>  _logicMethod=  extensions.get(preComponentName);
+		
+		ConcurrentMap<String, List<LogicMethod>>  _logicMethod=  this.extensions.get(preComponentName);
 		if(_logicMethod == null)
 			return new ArrayList<LogicMethod>();
-
+		
 		methods = _logicMethod.get(preLogicMethodName);
 		if(methods == null)
 			methods = new ArrayList<LogicMethod>();
-
+		
 		return methods;
 	}
 

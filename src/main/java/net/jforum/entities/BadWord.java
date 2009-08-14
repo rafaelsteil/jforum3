@@ -37,7 +37,7 @@ public class BadWord {
 	private String replacement;
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -45,7 +45,7 @@ public class BadWord {
 	}
 
 	public String getWord() {
-		return word;
+		return this.word;
 	}
 
 	public void setWord(String word) {
@@ -53,7 +53,7 @@ public class BadWord {
 	}
 
 	public String getReplacement() {
-		return replacement;
+		return this.replacement;
 	}
 
 	public void setReplacement(String replacement) {

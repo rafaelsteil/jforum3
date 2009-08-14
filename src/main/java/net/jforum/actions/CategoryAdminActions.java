@@ -54,8 +54,8 @@ public class CategoryAdminActions {
 	 * @param category
 	 */
 	public void addSave(@Parameter(key = "category") Category category) {
-		categoryService.add(category);
-		viewService.redirectToAction(Actions.LIST);
+		this.categoryService.add(category);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -63,8 +63,8 @@ public class CategoryAdminActions {
 	 * @param categoryId
 	 */
 	public void edit(@Parameter(key = "categoryId") int categoryId) {
-		propertyBag.put("category", categoryRepository.get(categoryId));
-		viewService.renderView(Actions.ADD);
+		this.propertyBag.put("category", this.categoryRepository.get(categoryId));
+		this.viewService.renderView(Actions.ADD);
 	}
 
 	/**
@@ -72,23 +72,23 @@ public class CategoryAdminActions {
 	 * @param category
 	 */
 	public void editSave(@Parameter(key = "category") Category category) {
-		categoryService.update(category);
-		viewService.redirectToAction(Actions.LIST);
+		this.categoryService.update(category);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * Removes a list of categories
 	 */
 	public void delete(@Parameter(key = "categoriesId") int... categoriesId) {
-		categoryService.delete(categoriesId);
-		viewService.redirectToAction(Actions.LIST);
+		this.categoryService.delete(categoriesId);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * List all existing categories
 	 */
 	public void list() {
-		propertyBag.put("categories", categoryRepository.getAllCategories());
+		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
 	}
 
 	/**
@@ -96,8 +96,8 @@ public class CategoryAdminActions {
 	 * @param categoryId the id of the category to change
 	 */
 	public void up(@Parameter(key = "categoryId") int categoryId) {
-		categoryService.upCategoryOrder(categoryId);
-		viewService.redirectToAction(Actions.LIST);
+		this.categoryService.upCategoryOrder(categoryId);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class CategoryAdminActions {
 	 * @param categoryId the id of the category to change
 	 */
 	public void down(@Parameter(key = "categoryId") int categoryId) {
-		categoryService.downCategoryOrder(categoryId);
-		viewService.redirectToAction(Actions.LIST);
+		this.categoryService.downCategoryOrder(categoryId);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 }

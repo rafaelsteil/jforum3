@@ -45,7 +45,7 @@ public class ForumService {
 			throw new ValidationException("This appears to be an existing forum (id > 0). Please use update() instead.");
 		}
 
-		repository.add(forum);
+		this.repository.add(forum);
 	}
 
 	/**
@@ -59,7 +59,15 @@ public class ForumService {
 			throw new ValidationException("update() expects a forum with an existing id");
 		}
 
-		repository.update(forum);
+		Forum currentForum = this.repository.get(forum.getId());
+
+		currentForum.setName(forum.getName());
+		currentForum.setDescription(forum.getDescription());
+		currentForum.setModerated(forum.isModerated());
+		currentForum.setAllowAnonymousPosts(forum.isAllowAnonymousPosts());
+		currentForum.setCategory(forum.getCategory());
+
+		this.repository.update(currentForum);
 	}
 
 	/**
@@ -69,9 +77,9 @@ public class ForumService {
 	public void delete(int... ids) {
 		if (ids != null) {
 			for (int id : ids) {
-				Forum forum = repository.get(id);
+				Forum forum = this.repository.get(id);
 
-				repository.remove(forum);
+				this.repository.remove(forum);
 			}
 		}
 	}
@@ -98,7 +106,7 @@ public class ForumService {
 	 * @param forumId the id of the category to change
 	 */
 	private void processOrdering(boolean up, int forumId) {
-		Forum toChange = repository.get(forumId);
+		Forum toChange = this.repository.get(forumId);
 		List<Forum> forums = toChange.getCategory().getForums();
 
 		int index = forums.indexOf(toChange);
@@ -111,8 +119,8 @@ public class ForumService {
 			toChange.setDisplayOrder(otherForum.getDisplayOrder());
 			otherForum.setDisplayOrder(oldOrder);
 
-			repository.update(toChange);
-			repository.update(otherForum);
+			this.repository.update(toChange);
+			this.repository.update(otherForum);
 		}
 	}
 

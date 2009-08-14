@@ -18,7 +18,7 @@ public class SpringInjector implements HInjector {
 	 * @see org.hinjector.HInjector#support(org.hibernate.SessionFactory)
 	 */
 	public SessionFactory support(SessionFactory factory) {
-		return new SpringSessionFactory(applicationContext, factory);
+		return new SpringSessionFactory(this.applicationContext, factory);
 	}
 
 }

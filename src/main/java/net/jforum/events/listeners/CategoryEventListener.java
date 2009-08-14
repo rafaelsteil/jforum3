@@ -41,7 +41,7 @@ public class CategoryEventListener extends AbstractListener<Event<Category>, Cat
 	public void updated(Category category) {
 		this.fireUpdated(category);
 	}
-
+	
 	@Before("repositoryRemove() && targetRepository() && args(category)")
 	public void beforeRemove(Category category) {
 		this.fireBeforeRemove(category);

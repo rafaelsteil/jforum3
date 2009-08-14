@@ -36,11 +36,11 @@ public class RemoteUserSSO implements SSO {
 		String remoteUser = request.getRemoteUser();
 
 		// user has since logged out
-		if (remoteUser == null && userSession.getUser().getId() != config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
+		if (remoteUser == null && userSession.getUser().getId() != this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
 			return false;
 		}
 		// user has since logged in
-		else if (remoteUser != null && userSession.getUser().getId() == config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
+		else if (remoteUser != null && userSession.getUser().getId() == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
 			return false;
 		}
 		// user has changed user

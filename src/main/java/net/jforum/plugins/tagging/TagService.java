@@ -53,7 +53,7 @@ public class TagService {
 	 * @return
 	 */
 	public List<Tag> getTag(Topic topic) {
-		return tagRepository.getTags(topic);
+		return this.tagRepository.getTags(topic);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class TagService {
 	 */
 	public int count(String name) {
 		if (StringUtils.isNotEmpty(name)) {
-			return tagRepository.count(name);
+			return this.tagRepository.count(name);
 		}
 
 		return 0;
@@ -104,7 +104,7 @@ public class TagService {
 		}
 
 		for (Tag tag : tags) {
-			tagRepository.remove(tag);
+			this.tagRepository.remove(tag);
 		}
 	}
 
@@ -118,7 +118,7 @@ public class TagService {
 		List<Topic> l = new ArrayList<Topic>();
 
 		if (tag != null) {
-			List<Topic> topics = tagRepository.getTopics(tag);
+			List<Topic> topics = this.tagRepository.getTopics(tag);
 			l = new TagSearchResult(topics, topics.size()).filter(roleManager).getResults();
 		}
 
@@ -134,7 +134,7 @@ public class TagService {
 	 */
 	@Deprecated
 	public Map<String, Integer> getHotTags(int limit, int group) {
-		Map<String, Long> hotTagsWithCount = tagRepository.getHotTags(limit);
+		Map<String, Long> hotTagsWithCount = this.tagRepository.getHotTags(limit);
 		return this.devideIntoGroup(hotTagsWithCount, group);
 
 	}
@@ -148,12 +148,12 @@ public class TagService {
 	 */
 	public Map<String, Integer> getHotTags(int limit, int group, RoleManager roleManager) {
 		List<Forum> forums = getAccessableForum(roleManager);
-		Map<String, Long> hotTagsWithCount = tagRepository.getAccessableHotTags(forums, limit);
+		Map<String, Long> hotTagsWithCount = this.tagRepository.getAccessableHotTags(forums, limit);
 		return this.devideIntoGroup(hotTagsWithCount, group);
 	}
 
 	public Map<String, Integer> getHotTags(Forum forum, int limit, int group) {
-		Map<String, Long> hotTagsWithCount = tagRepository.getHotTags(forum, limit);
+		Map<String, Long> hotTagsWithCount = this.tagRepository.getHotTags(forum, limit);
 		return this.devideIntoGroup(hotTagsWithCount, group);
 	}
 
@@ -208,7 +208,7 @@ public class TagService {
 	// TODO: it is better put this function in ForumService
 	private List<Forum> getAccessableForum(RoleManager roleManager) {
 		List<Forum> accessableForum = new ArrayList<Forum>();
-		List<Forum> allForum = forumRepository.loadAll();
+		List<Forum> allForum = this.forumRepository.loadAll();
 		for (Forum forum : allForum) {
 			if (roleManager.isForumAllowed(forum.getId())) {
 				accessableForum.add(forum);
@@ -229,6 +229,6 @@ public class TagService {
 		tag.setName(tagStr);
 		tag.setTopic(topic);
 
-		tagRepository.add(tag);
+		this.tagRepository.add(tag);
 	}
 }

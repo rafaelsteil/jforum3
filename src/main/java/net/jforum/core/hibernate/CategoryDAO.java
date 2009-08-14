@@ -57,7 +57,7 @@ public class CategoryDAO extends HibernateGenericDAO<Category> implements Catego
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Category> getAllCategories() {
-		return this.session().createCriteria(persistClass)
+		return this.session().createCriteria(this.persistClass)
 			.addOrder(Order.asc("displayOrder"))
 			.setCacheable(true)
 			.setCacheRegion("categoryDAO.getAllCategories")
@@ -66,7 +66,7 @@ public class CategoryDAO extends HibernateGenericDAO<Category> implements Catego
 	}
 
 	private int getMaxDisplayOrder() {
-		Integer displayOrder = (Integer)this.session().createCriteria(persistClass)
+		Integer displayOrder = (Integer)this.session().createCriteria(this.persistClass)
 			.setProjection(Projections.max("displayOrder"))
 			.uniqueResult();
 

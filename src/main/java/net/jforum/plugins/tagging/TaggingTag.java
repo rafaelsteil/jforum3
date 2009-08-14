@@ -34,11 +34,11 @@ public class TaggingTag extends JForumTag {
 
 	public TaggingTag() {
 		if(tagService == null) {
-			tagService = this.getBean(TagService.class);
+			this.tagService = this.getBean(TagService.class);
 		}
 
 		if(i18n ==null) {
-			i18n = this.getBean(I18n.class);
+			this.i18n = this.getBean(I18n.class);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class TaggingTag extends JForumTag {
 
 		StringBuilder sb = new StringBuilder(50);
 		try{
-			List<Tag> tags = tagService.getTag(topic);
+			List<Tag> tags = this.tagService.getTag(topic);
 
 			if(tags.size()==0) {
 				return;
@@ -87,7 +87,7 @@ public class TaggingTag extends JForumTag {
 				  .append("\">")
 				  .append(tagStr);
 				if(showCount){
-					int count = tagService.count(tagStr);
+					int count = this.tagService.count(tagStr);
 					sb.append("(")
 					  .append(count)
 					  .append("");

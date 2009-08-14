@@ -17,7 +17,7 @@ import net.jforum.repository.Repository;
 
 /**
  * @author Bill
- *
+ * 
  */
 public interface ShoutBoxRepository extends Repository<ShoutBox> {
 
@@ -30,12 +30,12 @@ public interface ShoutBoxRepository extends Repository<ShoutBox> {
 	 * @return
 	 */
 	ShoutBox getShoutBox(Category category);
-
+	
 	/**
 	 * Get all shoutboxes data from the database.
 	 *
 	 * @return all shoutboxes found
 	 */
 	public List<ShoutBox> getAllShoutBoxes();
-
+	
 }

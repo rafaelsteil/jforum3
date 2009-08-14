@@ -51,7 +51,7 @@ public class UserAdminActions {
 
 	public UserAdminActions(UserRepository repository, GroupRepository groupRepository, ViewPropertyBag propertyBag,
 			JForumConfig config, ViewService viewService, UserService userService, SessionManager sessionManager) {
-		userRepository = repository;
+		this.userRepository = repository;
 		this.groupRepository = groupRepository;
 		this.propertyBag = propertyBag;
 		this.config = config;
@@ -66,8 +66,8 @@ public class UserAdminActions {
 	 */
 	@InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void edit(@Parameter(key = "userId") int userId) {
-		propertyBag.put("user", userRepository.get(userId));
-		viewService.renderView(Domain.USER, Actions.EDIT);
+		this.propertyBag.put("user", this.userRepository.get(userId));
+		this.viewService.renderView(Domain.USER, Actions.EDIT);
 	}
 
 	/**
@@ -76,8 +76,8 @@ public class UserAdminActions {
 	 */
 	@InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void groups(@Parameter(key = "userId") int userId) {
-		propertyBag.put("user", userRepository.get(userId));
-		propertyBag.put("groups", groupRepository.getAllGroups());
+		this.propertyBag.put("user", this.userRepository.get(userId));
+		this.propertyBag.put("groups", this.groupRepository.getAllGroups());
 	}
 
 	public void lockUnlock(@Parameter(key = "userIds") int[] userIds) {
@@ -91,7 +91,7 @@ public class UserAdminActions {
 	 */
 	@InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void groupsSave(@Parameter(key = "userId") int userId, @Parameter(key = "groupIds") int... groupIds) {
-		RoleManager roleManager = sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 		boolean canSave = roleManager.isAdministrator();
 
 		if (!canSave) {
@@ -103,10 +103,10 @@ public class UserAdminActions {
 		}
 
 		if (canSave) {
-			userService.saveGroups(userId, groupIds);
+			this.userService.saveGroups(userId, groupIds);
 		}
 
-		viewService.redirectToAction(Actions.LIST);
+		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
@@ -114,10 +114,10 @@ public class UserAdminActions {
 	 * @param username the username to search
 	 */
 	public void search(@Parameter(key = "username") String username) {
-		List<User> users = userRepository.findByUserName(username);
-		propertyBag.put("users", users);
-		propertyBag.put("username", username);
-		viewService.renderView(Actions.LIST);
+		List<User> users = this.userRepository.findByUserName(username);
+		this.propertyBag.put("users", users);
+		this.propertyBag.put("username", username);
+		this.viewService.renderView(Actions.LIST);
 	}
 
 	/**
@@ -125,11 +125,11 @@ public class UserAdminActions {
 	 * @param page
 	 */
 	public void list(@Parameter(key = "page") int page) {
-		Pagination pagination = new Pagination(config, page)
-			.forUsers(userRepository.getTotalUsers());
+		Pagination pagination = new Pagination(this.config, page)
+			.forUsers(this.userRepository.getTotalUsers());
 
-		propertyBag.put("pagination", pagination);
-		propertyBag.put("users", userRepository.getAllUsers(pagination.getStart(),
+		this.propertyBag.put("pagination", pagination);
+		this.propertyBag.put("users", this.userRepository.getAllUsers(pagination.getStart(),
 			pagination.getRecordsPerPage()));
 	}
 }

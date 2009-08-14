@@ -23,8 +23,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.springframework.beans.BeanUtils;
-
 import net.jforum.entities.Topic;
 
 /**
@@ -105,13 +103,6 @@ public class Tag implements Serializable {
 	@Override
 	public String toString() {
 		return this.getName();
-	}
-
-	public Tag withName(String name) {
-		Tag result = new Tag();
-		BeanUtils.copyProperties(this, result);
-		result.setName(name);
-		return result;
 	}
 
 }

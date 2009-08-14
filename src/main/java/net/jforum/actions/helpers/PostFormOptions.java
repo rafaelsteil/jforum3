@@ -23,27 +23,27 @@ public class PostFormOptions {
 	private int topicType;
 
 	public boolean isHtmlEnabled() {
-		return !disableHtml;
+		return !this.disableHtml;
 	}
 
 	public boolean isSmiliesEnabled() {
-		return !disableSmilies;
+		return !this.disableSmilies;
 	}
 
 	public boolean isBbCodeEnabled() {
-		return !disableBbCode;
+		return !this.disableBbCode;
 	}
 
 	public boolean getAppendSignature() {
-		return appendSignature;
+		return this.appendSignature;
 	}
 
 	public boolean getNotifyReplies() {
-		return notifyReplies;
+		return this.notifyReplies;
 	}
 
 	public int getTopicType() {
-		return topicType;
+		return this.topicType;
 	}
 
 	/**
