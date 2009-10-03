@@ -10,13 +10,14 @@
  */
 package net.jforum.actions;
 
-import java.util.ArrayList;
-
 import net.jforum.actions.helpers.Actions;
+import net.jforum.actions.helpers.AttachedFile;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Forum;
+import net.jforum.entities.ModerationLog;
+import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Smilie;
 import net.jforum.entities.Topic;
@@ -29,17 +30,18 @@ import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 /**
  * @author Rafael Steil
  */
 public class PostActionsTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private PostRepository postRepository = context.mock(PostRepository.class);
+    private PostRepository postRepository = context.mock(PostRepository.class);
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private ViewService viewService = context.mock(ViewService.class);
 	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
@@ -47,8 +49,12 @@ public class PostActionsTestCase {
 	private PostService postService = context.mock(PostService.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserSession userSession = context.mock(UserSession.class);
+
 	private PostActions component = new PostActions(postRepository, propertyBag,
 		viewService, smilieRepository, postService, config, userSession, null, null);
+    private ModerationLog moderationLog = new ModerationLog();
+
+  
 
 	@Test
 	public void deleteHasMorePostsShouldRedirectToTopicListing() {
@@ -62,9 +68,6 @@ public class PostActionsTestCase {
 
 	private void deleteRedirect(final int totalPosts, final int expectedPage) {
 		final Post post = new Post(); post.setId(2); post.setTopic(new Topic() {
-			/**
-			 *
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -103,33 +106,31 @@ public class PostActionsTestCase {
 
 	@Test
 	public void editSave() {
-		final Post post = new Post(); post.setTopic(new Topic());
+		final Post post = new Post();
+        post.setTopic(new Topic());
+        post.setForum(new Forum());
 		final PostFormOptions options = new PostFormOptions();
 
 		context.checking(new Expectations() {{
 			ignoring(userSession);
-			one(postService).update(post, false, null, null);
+            one(postRepository).get(0); will(returnValue(post));
+            one(postService).update(post, false, new ArrayList<PollOption>(), new ArrayList<AttachedFile>(), moderationLog);
 			one(viewService).redirectToAction(Domain.TOPICS, Actions.LIST, post.getTopic().getId());
+
 		}});
 
-		component.editSave(post, options, null);
+		component.editSave(post, options, null, moderationLog);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void edit() {
 		final Post post = new Post() {
-			/**
-			 *
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Topic getTopic() {
 				return new Topic() {
-					/**
-					 *
-					 */
 					private static final long serialVersionUID = 1L;
 
 					@Override
@@ -159,7 +160,7 @@ public class PostActionsTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(5));
 
-			String url = null;
+			String url;
 
 			if (pageExpected > 0) {
 				url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
