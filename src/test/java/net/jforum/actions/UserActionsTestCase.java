@@ -21,10 +21,7 @@ import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
-import net.jforum.entities.Avatar;
-import net.jforum.entities.Ranking;
-import net.jforum.entities.User;
-import net.jforum.entities.UserSession;
+import net.jforum.entities.*;
 import net.jforum.entities.util.Pagination;
 import net.jforum.repository.RankingRepository;
 import net.jforum.repository.UserRepository;
@@ -63,6 +60,7 @@ public class UserActionsTestCase {
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private LostPasswordService lostPasswordService = context.mock(LostPasswordService.class);
 	private AvatarService avatarService = context.mock(AvatarService.class);
+	private User user = new User();
 	private RankingRepository rankingRepository = context.mock(RankingRepository.class);
 	private UserActions userAction = new UserActions(userRepository, propertyBag, viewService,
 		userSession, userService, sessionManager, config, lostPasswordService, avatarService, rankingRepository);
@@ -457,10 +455,19 @@ public class UserActionsTestCase {
 			one(roleManager); will(returnValue(true));
 
 			List<Ranking> rankings = new ArrayList<Ranking>();
+
 			one(rankingRepository).getAllRankings(); will(returnValue(rankings));
 			one(userRepository).get(1); will(returnValue(new User()));
 			one(propertyBag).put("user", new User());
+			one(userRepository).getTotalTopics(1); will(returnValue(0)); 
+			one(propertyBag).put("userTotalTopics", 0);
 			one(propertyBag).put("rankings", rankings);
+			one(config).getInt("anonymousUserId"); will(returnValue(0));
+			one(propertyBag).put("isAnonnimousUser", false);
+			one(userSession).getRoleManager(); will(returnValue(roleManager));
+			one(userSession).getUser(); will(returnValue(user));
+			one(roleManager).getCanEditUser(user, new ArrayList<Group>()); will(returnValue(true));
+			one(propertyBag).put("canEdit", true);
 		}});
 
 		userAction.profile(1);
