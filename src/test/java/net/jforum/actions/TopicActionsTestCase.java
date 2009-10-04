@@ -49,6 +49,7 @@ import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
+import net.jforum.plugins.post.ForumLimitedTimeRepository;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -63,6 +64,7 @@ import org.vraptor.http.VRaptorServletRequest;
  * @author Rafael Steil
  */
 public class TopicActionsTestCase {
+	
 	private Mockery context = TestCaseUtils.newMockery();
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
@@ -80,6 +82,7 @@ public class TopicActionsTestCase {
 	private PollRepository pollRepository = context.mock(PollRepository.class);
 	private AttachmentService attachmentService = context.mock(AttachmentService.class);
 	private VRaptorServletRequest request = context.mock(VRaptorServletRequest.class);
+    private ForumLimitedTimeRepository forumLimitedTimeRepository = context.mock(ForumLimitedTimeRepository.class);
 	private TopicActions topicAction;
 
 	@Test
@@ -389,7 +392,7 @@ public class TopicActionsTestCase {
 			one(topicRepository).get(1); will(returnValue(topic));
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			one(categoryRepository).getAllCategories(); will(returnValue(new ArrayList<Category>()));
-			one(topicRepository).getPosts(topic, 0, 10);
+			one(topicRepository).getPosts(topic, 0, 10); will(returnValue(new ArrayList<Post>()));
 			one(rankingRepository).getAllRankings(); will(returnValue(new ArrayList<Ranking>()));
 			one(userSession).markTopicAsRead(1);
 
@@ -570,6 +573,6 @@ public class TopicActionsTestCase {
 	public void setup() {
 		topicAction = new TopicActions(propertyBag, config, topicService, viewService,
 			forumRepository, smilieRepository, postRepository, topicRepository, categoryRepository,
-			rankingRepository, sessionManager, pollRepository, attachmentService, request);
+			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request);
 	}
 }
