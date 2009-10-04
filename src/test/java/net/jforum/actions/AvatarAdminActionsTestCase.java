@@ -76,8 +76,16 @@ public class AvatarAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(service).delete(1, 2, 3);
+        final Avatar avatar = new Avatar();
+
+        context.checking(new Expectations() {{
+
+            one(repository).get(1); will(returnValue(avatar));
+			one(repository).remove(avatar);
+            one(repository).get(2); will(returnValue(avatar));
+			one(repository).remove(avatar);
+            one(repository).get(3); will(returnValue(avatar));
+			one(repository).remove(avatar);
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
 
@@ -88,9 +96,9 @@ public class AvatarAdminActionsTestCase extends AdminTestCase {
 	@Test
 	public void listExpectOneRecord() {
 		context.checking(new Expectations() {{
-			one(repository).getAll(); will(returnValue(new ArrayList<Avatar>()));
+			one(repository).getGalleryAvatar(); will(returnValue(new ArrayList<Avatar>()));
+            one(repository).getUploadedAvatar(); will(returnValue(new ArrayList<Avatar>()));
 			one(propertyBag).put("GalleryAvatars", new ArrayList<Avatar>());
-			one(propertyBag).put("ExternalAvatars", new ArrayList<Avatar>());
 			one(propertyBag).put("UploadedAvatars", new ArrayList<Avatar>());
 		}});
 
