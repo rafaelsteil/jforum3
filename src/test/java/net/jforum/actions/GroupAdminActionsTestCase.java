@@ -54,6 +54,7 @@ public class GroupAdminActionsTestCase extends AdminTestCase {
 	public void permissions() {
 		context.checking(new Expectations() {{
 			one(repository).get(1); will(returnValue(new Group()));
+			one(roleManager).isAdministrator(); will(returnValue(true));
 			one(categoryRepository).getAllCategories(); will(returnValue(new ArrayList<Category>()));
 			one(repository).getAllGroups(); will(returnValue(new ArrayList<Group>()));
 
@@ -72,6 +73,7 @@ public class GroupAdminActionsTestCase extends AdminTestCase {
 		final PermissionOptions permissions = new PermissionOptions();
 
 		context.checking(new Expectations() {{
+			one(roleManager).isAdministrator(); will(returnValue(true));
 			one(service).savePermissions(1, permissions);
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
@@ -117,6 +119,7 @@ public class GroupAdminActionsTestCase extends AdminTestCase {
 	@Test
 	public void editExpectsAGroup() {
 		context.checking(new Expectations() {{
+			one(roleManager).isAdministrator(); will(returnValue(true));
 			one(repository).get(2); will(returnValue(new Group()));
 			one(propertyBag).put("group", new Group());
 			one(viewService).renderView(Actions.ADD);
