@@ -18,6 +18,7 @@ import net.jforum.repository.RecentTopicsRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
+import net.jforum.services.ViewService;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -31,17 +32,48 @@ public class RecentTopicsActionsTestCase {
 	private RecentTopicsRepository repository = context.mock(RecentTopicsRepository.class);
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
-	private RecentTopicsActions component = new RecentTopicsActions(repository, propertyBag, config);
+    private ViewService viewService = context.mock(ViewService.class);
+	private RecentTopicsActions component = new RecentTopicsActions(repository, propertyBag, config, viewService);
 
 	@Test
-	public void list() {
+	public void listNew() {
 		context.checking(new Expectations() {{
-			one(repository).getRecentTopics(10); will(returnValue(new ArrayList<Topic>()));
+			one(repository).getNewTopics(10); will(returnValue(new ArrayList<Topic>()));
 			one(config).getInt(ConfigKeys.RECENT_TOPICS); will(returnValue(10));
 			one(propertyBag).put("topics", new ArrayList<Topic>());
+			one(propertyBag).put("sessionTitleKey", "recentTopicsNew");
+			one(viewService).renderView("list");
 		}});
 
-		component.list();
+		component.listNew();
+		context.assertIsSatisfied();
+	}
+
+    @Test
+	public void listUpdated() {
+		context.checking(new Expectations() {{
+			one(repository).getUpdatedTopics(10); will(returnValue(new ArrayList<Topic>()));
+			one(config).getInt(ConfigKeys.RECENT_TOPICS); will(returnValue(10));
+			one(propertyBag).put("topics", new ArrayList<Topic>());
+			one(propertyBag).put("sessionTitleKey", "recentTopicsUpdated");
+			one(viewService).renderView("list");
+		}});
+
+		component.listUpdated();
+		context.assertIsSatisfied();
+	}
+
+    @Test
+	public void listHot() {
+		context.checking(new Expectations() {{
+			one(repository).getHotTopics(10); will(returnValue(new ArrayList<Topic>()));
+			one(config).getInt(ConfigKeys.RECENT_TOPICS); will(returnValue(10));
+			one(propertyBag).put("topics", new ArrayList<Topic>());
+			one(propertyBag).put("sessionTitleKey", "recentTopicsHot");
+			one(viewService).renderView("list");
+		}});
+
+		component.listHot();
 		context.assertIsSatisfied();
 	}
 }
