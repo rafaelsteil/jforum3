@@ -104,6 +104,9 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 	@Test
 	public void editExpectForumAndCategories() {
 		context.checking(new Expectations() {{
+			one(sessionManager).getUserSession(); will(returnValue(userSession));
+			one(userSession).getRoleManager(); will(returnValue(roleManager));
+			one(roleManager).getCanModerateForum(3); will(returnValue(true));
 			one(forumRepository).get(3); will(returnValue(new Forum()));
 			one(categoryRepository).getAllCategories(); will(returnValue(Arrays.asList(new Category())));
 			one(propertyBag).put("forum", new Forum());
@@ -135,7 +138,7 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCategoryAllowed(with(any(Category.class))); will(returnValue(true));
+			one(roleManager).getCanModerateForum(0); will(returnValue(true));
 			one(service).update(with(aNonNull(Forum.class)));
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
@@ -150,17 +153,20 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void editSaveNotSuperAdministratorCategoryNotAllowedShouldIgnore() {
+		final Forum forum = new Forum();
+		forum.setCategory(new Category());
+		forum.getCategory().setId(1);
+
+
 		context.checking(new Expectations() {{
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCategoryAllowed(with(any(Category.class))); will(returnValue(false));
+			one(roleManager).getCanModerateForum(0); will(returnValue(true));
+			one(service).update(forum);
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
 
-		Forum forum = new Forum();
-		forum.setCategory(new Category());
-		forum.getCategory().setId(1);
 
 		component.editSave(forum);
 		context.assertIsSatisfied();
@@ -195,7 +201,7 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCategoryAllowed(with(any(Category.class))); will(returnValue(true));
+			one(roleManager).isCategoryAllowed(1); will(returnValue(true));
 			one(propertyBag).put("forum", f);
 			one(service).add(f);
 			one(viewService).redirectToAction(Actions.LIST);
@@ -216,7 +222,9 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCategoryAllowed(with(any(Category.class))); will(returnValue(false));
+			one(roleManager).isCategoryAllowed(1); will(returnValue(true));
+			one(service).add(f);
+			one(propertyBag).put("forum", f);
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
 
@@ -227,6 +235,9 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 	@Test
 	public void up() {
 		context.checking(new Expectations() {{
+			one(sessionManager).getUserSession(); will(returnValue(userSession));
+			one(userSession).getRoleManager(); will(returnValue(roleManager));
+			one(roleManager).getCanModerateForum(1); will(returnValue(true));
 			one(service).upForumOrder(1);
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
@@ -238,6 +249,9 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 	@Test
 	public void down() {
 		context.checking(new Expectations() {{
+			one(sessionManager).getUserSession(); will(returnValue(userSession));
+			one(userSession).getRoleManager(); will(returnValue(roleManager));
+			one(roleManager).getCanModerateForum(2); will(returnValue(true));
 			one(service).downForumOrder(2);
 			one(viewService).redirectToAction(Actions.LIST);
 		}});
