@@ -51,7 +51,8 @@ public class AvatarAdminActions {
 
 	/**
 	 * Deletes avatars
-	 * @param avatarId
+     *
+	 * @param avatarId One or many avatar id's for the avatars to be deleted.
 	 */
 	public void delete(@Parameter(key = "avatarId") int... avatarId) {
 		if (avatarId != null) {
@@ -78,7 +79,9 @@ public class AvatarAdminActions {
 
 	/**
 	 * Saves a new avatar
-	 * @param smilie
+     *
+	 * @param avatar The avatar to be saved.
+     * @param image Vraptor information object carrying info about the uploaded avtatar.
 	 */
 	public void addSave(@Parameter(key = "avatar")Avatar avatar,
 		@Parameter(key = "image") UploadedFileInformation image) {
@@ -88,7 +91,9 @@ public class AvatarAdminActions {
 
 	/**
 	 * Shows the page to edit a existing avatar
-	 */
+     *
+     * @param avatarId The avatar id for the avatar to be edited.
+     */
 	public void edit(@Parameter(key = "avatarId") int avatarId) {
 		this.propertyBag.put("avatar", this.repository.get(avatarId));
 		this.viewService.renderView(Actions.ADD);
