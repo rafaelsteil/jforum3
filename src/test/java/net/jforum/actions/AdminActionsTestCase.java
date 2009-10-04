@@ -15,7 +15,8 @@ package net.jforum.actions;
  * @author Rafael Steil
  */
 public class AdminActionsTestCase extends AdminTestCase {
-	public AdminActionsTestCase() {
-		super(AdminActions.class);
-	}
+
+    public AdminActionsTestCase() {
+        super(AdminActions.class);
+    }
 }
