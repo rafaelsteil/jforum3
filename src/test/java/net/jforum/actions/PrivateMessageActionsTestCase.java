@@ -167,6 +167,7 @@ public class PrivateMessageActionsTestCase {
 	public void sendSaveExpectSuccess() {
 		context.checking(new Expectations() {{
 			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
+			one(userSession).getIp(); will(returnValue("0.0.0.0"));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
 			one(userRepository).get(1); will(returnValue(new User()));
@@ -242,10 +243,10 @@ public class PrivateMessageActionsTestCase {
 
 			allowing(userSession).getUser(); will(returnValue(currentUser));
 
-			one(propertyBag).put("pmRecipient", recipient);
+			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
+			one(viewService).renderView("sendToDenied");
 
 			ignoring(propertyBag); ignoring(smilieRepository);
-			one(viewService).renderView(Domain.TOPICS, Actions.ADD);
 		}});
 
 		action.sendTo(1);
@@ -271,8 +272,10 @@ public class PrivateMessageActionsTestCase {
 			currentUser.addGroup(g2);
 			allowing(userSession).getUser(); will(returnValue(currentUser));
 
+			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
+			one(viewService).renderView("sendToDenied");
+			
 			ignoring(propertyBag); ignoring(smilieRepository);
-			one(viewService).renderView(Domain.TOPICS, Actions.ADD);
 		}});
 
 		action.sendTo(1);
@@ -284,8 +287,7 @@ public class PrivateMessageActionsTestCase {
 		context.checking(new Expectations() {{
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
-
-			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
+			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
 
 			one(userRepository).findByUserName("an user"); will(returnValue(new ArrayList<User>()));
 			one(propertyBag).put("users", new ArrayList<User>());
@@ -301,12 +303,13 @@ public class PrivateMessageActionsTestCase {
 		context.checking(new Expectations() {{
 			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
-
-			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(false));
+			one(roleManager).getCanOnlyContactModerators(); will(returnValue(false));
 
 			User user = new User();
-			one(userSession).getUser(); will(returnValue(user));
 
+
+			one(roleManager).roleExists("interact_other_groups"); will(returnValue(false));
+			one(userSession).getUser(); will(returnValue(user));
 			one(userRepository).findByUserName("an user", user.getGroups()); will(returnValue(new ArrayList<User>()));
 			one(propertyBag).put("users", new ArrayList<User>());
 			one(propertyBag).put("username", "an user");
