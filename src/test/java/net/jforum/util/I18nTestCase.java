@@ -28,6 +28,7 @@ public class I18nTestCase {
 	public void setUp() throws Exception {
 		String configFileName = "/jforum-test.properties";
 		URL configFileUrl = this.getClass().getResource(configFileName);
+		Assert.assertNotNull("Could not load expected test file " + configFileName, configFileUrl);
 		String applicationPath = new File(configFileUrl.getFile()).getParent();
 
 		config = new JForumConfig(null, null);

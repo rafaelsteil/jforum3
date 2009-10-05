@@ -85,7 +85,8 @@ public class ForumAdminTestCase {
 	public void editSave() {
 		this.securityChecking();
 
-		final Forum forum = new Forum().withCategory(new Category());
+		final Forum forum = new Forum();
+        forum.setCategory(new Category());
 		final ForumLimitedTime forumLimitedTime = new ForumLimitedTime();
 		context.checking(new Expectations() {{
 			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));

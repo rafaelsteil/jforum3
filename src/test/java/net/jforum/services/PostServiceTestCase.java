@@ -17,7 +17,9 @@ import net.jforum.entities.Poll;
 import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
+import net.jforum.entities.ModerationLog;
 import net.jforum.repository.PostRepository;
+import net.jforum.repository.TopicRepository;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
@@ -33,7 +35,10 @@ public class PostServiceTestCase {
 	private PostRepository postRepository = context.mock(PostRepository.class);
 	private AttachmentService attachmentService = context.mock(AttachmentService.class);
 	private PollService pollService = context.mock(PollService.class);
-	private PostService service = new PostService(postRepository, attachmentService, pollService);
+    private TopicRepository topicRepository = context.mock(TopicRepository.class);
+    private ModerationLogService moderationLogService = context.mock(ModerationLogService.class);
+    private ModerationLog moderationLog = new ModerationLog();
+	private PostService service = new PostService(postRepository, attachmentService, pollService, topicRepository, moderationLogService);
 
 	@Test
 	public void newOptionsExpectChanges() {
@@ -55,7 +60,7 @@ public class PostServiceTestCase {
 		newPost.setSmiliesEnabled(true);
 		newPost.setSignatureEnabled(true);
 
-		service.update(newPost, false, null, null);
+		service.update(newPost, false, null, null, moderationLog);
 
 		context.assertIsSatisfied();
 		Assert.assertEquals(true, current.isBbCodeEnabled());
@@ -89,7 +94,7 @@ public class PostServiceTestCase {
 		Poll newPoll = new Poll(); newPoll.setLabel("new label"); newPoll.setLength(10);
 		newPost.setTopic(new Topic()); newPost.getTopic().setPoll(newPoll);
 
-		service.update(newPost, false, pollOptions, null);
+		service.update(newPost, false, pollOptions, null, moderationLog);
 
 		context.assertIsSatisfied();
 		Assert.assertEquals(10, currentPost.getTopic().getPoll().getOptions().size());
@@ -109,7 +114,7 @@ public class PostServiceTestCase {
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
 		newPost.setTopic(new Topic()); newPost.getTopic().setType(Topic.TYPE_STICKY);
-		service.update(newPost, true, null, null);
+		service.update(newPost, true, null, null, moderationLog);
 
 		context.assertIsSatisfied();
 		Assert.assertEquals(newPost.getSubject(), current.getTopic().getSubject());
@@ -129,7 +134,7 @@ public class PostServiceTestCase {
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
 		newPost.setTopic(new Topic()); newPost.getTopic().setType(Topic.TYPE_STICKY);
-		service.update(newPost, false, null, null);
+		service.update(newPost, false, null, null, moderationLog);
 
 		context.assertIsSatisfied();
 		Assert.assertEquals(newPost.getSubject(), current.getTopic().getSubject());
@@ -146,7 +151,7 @@ public class PostServiceTestCase {
 		}});
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
-		service.update(newPost, false, null, null);
+		service.update(newPost, false, null, null, moderationLog);
 
 		context.assertIsSatisfied();
 		Assert.assertEquals(newPost.getSubject(), current.getSubject());
@@ -158,36 +163,36 @@ public class PostServiceTestCase {
 	@Test(expected = IllegalStateException.class)
 	public void withoutIdExpectsException() {
 		Post p = new Post(); p.setId(0); p.setSubject("aa"); p.setText("bb");
-		service.update(p, false, null, null);
+		service.update(p, false, null, null, moderationLog);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void emptyTextExpectsException() {
 		Post p = new Post(); p.setId(1); p.setSubject("aa"); p.setText("");
-		service.update(p, false, null, null);
+		service.update(p, false, null, null, moderationLog);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void nullTextExpectsException() {
 		Post p = new Post(); p.setId(1); p.setSubject("bb"); p.setText(null);
-		service.update(p, false, null, null);
+		service.update(p, false, null, null, moderationLog);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void emptySubjectExpectsException() {
 		Post p = new Post(); p.setId(1); p.setSubject(""); p.setText("xx");
-		service.update(p, false, null, null);
+		service.update(p, false, null, null, moderationLog);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void nullSubjectExpectsException() {
 		Post p = new Post(); p.setId(1); p.setSubject(null); p.setText("ee");
-		service.update(p, false, null, null);
+		service.update(p, false, null, null, moderationLog);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void nullPostExpectException() {
-		service.update(null, false, null, null);
+		service.update(null, false, null, null, moderationLog);
 	}
 
 	private Post createCurrentPost() {

@@ -18,10 +18,13 @@ import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
+import net.jforum.entities.ModerationLog;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
+import net.jforum.repository.ModerationLogRepository;
 import net.jforum.util.TestCaseUtils;
+import net.jforum.util.JForumConfig;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -38,7 +41,11 @@ public class ModerationServiceTestCase {
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private PostRepository postRepository = context.mock(PostRepository.class);
 	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-	private ModerationService service = new ModerationService(postRepository, forumRepository, topicRepository);
+    private JForumConfig jForumConfig = context.mock(JForumConfig.class);
+    private ModerationLog moderationLog = new ModerationLog();
+    private ModerationLogRepository moderationLogRepository = context.mock(ModerationLogRepository.class);
+    private ModerationLogService moderationLogService = new ModerationLogService(jForumConfig, moderationLogRepository, topicRepository);
+	private ModerationService service = new ModerationService(postRepository, forumRepository, topicRepository, moderationLogService);
 	private States state = context.states("state");
 
 	@Test
@@ -69,7 +76,7 @@ public class ModerationServiceTestCase {
 			{ setId(6); }}));
 		}});
 
-		service.moveTopics(2, 3);
+		service.moveTopics(2, moderationLog, 3);
 		context.assertIsSatisfied();
 		Assert.assertEquals(targetForum.getLastPost(), new Post() {/**
 			 *
@@ -101,7 +108,8 @@ public class ModerationServiceTestCase {
 			one(topicRepository).get(2); will(returnValue(unlockedTopic));
 		}});
 
-		service.lockUnlock(1, 2);
+        int[] ids = {1, 2};
+		service.lockUnlock(ids, moderationLog);
 		context.assertIsSatisfied();
 		Assert.assertFalse(lockedTopic.isLocked());
 		Assert.assertTrue(unlockedTopic.isLocked());
@@ -109,7 +117,7 @@ public class ModerationServiceTestCase {
 
 	@Test
 	public void lockUnlockNullIdsShouldIgnore() {
-		service.lockUnlock(null);
+		service.lockUnlock(null, moderationLog);
 	}
 
 	@Test
@@ -120,7 +128,7 @@ public class ModerationServiceTestCase {
 			one(topicRepository).remove(topic);
 		}});
 
-		service.deleteTopics(Arrays.asList(topic));
+		service.deleteTopics(Arrays.asList(topic), moderationLog);
 		context.assertIsSatisfied();
 	}
 

@@ -17,6 +17,7 @@ import net.jforum.entities.Group;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
+import net.jforum.repository.ForumRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.util.TestCaseUtils;
 
@@ -34,7 +35,8 @@ public class GroupServiceTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
-	private GroupService service = new GroupService(repository, sessionManager, userRepository);
+    private ForumRepository forumRepository = context.mock(ForumRepository.class);
+	private GroupService service = new GroupService(repository, sessionManager, userRepository, forumRepository);
 
 	@Test
 	public void savePermissions() {
