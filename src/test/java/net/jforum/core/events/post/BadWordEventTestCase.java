@@ -40,6 +40,9 @@ public class BadWordEventTestCase {
 		}});
 
 		Post p = new Post();
+		Topic topic = new Topic();
+		topic.setSubject("title");
+		p.setTopic(topic);
 		p.setText("some content wordABCeditor more content");
 
 		event.beforeAdd(p);
