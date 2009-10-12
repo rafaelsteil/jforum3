@@ -15,16 +15,17 @@ import java.util.List;
 
 import net.jforum.actions.helpers.ApproveInfo;
 import net.jforum.entities.Forum;
+import net.jforum.entities.ModerationLog;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
-import net.jforum.entities.ModerationLog;
 import net.jforum.repository.ForumRepository;
+import net.jforum.repository.ModerationLogRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
-import net.jforum.repository.ModerationLogRepository;
-import net.jforum.util.TestCaseUtils;
+import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
+import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -41,10 +42,10 @@ public class ModerationServiceTestCase {
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private PostRepository postRepository = context.mock(PostRepository.class);
 	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-    private JForumConfig jForumConfig = context.mock(JForumConfig.class);
+    private JForumConfig config = context.mock(JForumConfig.class);
     private ModerationLog moderationLog = new ModerationLog();
     private ModerationLogRepository moderationLogRepository = context.mock(ModerationLogRepository.class);
-    private ModerationLogService moderationLogService = new ModerationLogService(jForumConfig, moderationLogRepository, topicRepository);
+    private ModerationLogService moderationLogService = new ModerationLogService(config, moderationLogRepository, topicRepository);
 	private ModerationService service = new ModerationService(postRepository, forumRepository, topicRepository, moderationLogService);
 	private States state = context.states("state");
 
@@ -57,39 +58,20 @@ public class ModerationServiceTestCase {
 		final Topic topic = new Topic(); topic.setId(3); topic.setMovedId(0); topic.setForum(oldForum);
 
 		context.checking(new Expectations() {{
+			one(config).getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED); will(returnValue(true));
 			one(forumRepository).get(2); will(returnValue(targetForum));
-			one(topicRepository).get(3); will(returnValue(topic));
-
+			allowing(topicRepository).get(3); will(returnValue(topic));
 			one(forumRepository).moveTopics(targetForum, topic.getId());
-
-			one(forumRepository).getLastPost(oldForum); will(returnValue(new Post() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(5); }}));
-			one(forumRepository).getLastPost(targetForum); will(returnValue(new Post() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(6); }}));
+			one(forumRepository).getLastPost(oldForum); will(returnValue(new Post() {{ setId(5); }}));
+			one(forumRepository).getLastPost(targetForum); will(returnValue(new Post() {{ setId(6); }}));
+			one(moderationLogRepository).add(with(any(ModerationLog.class)));
 		}});
 
 		service.moveTopics(2, moderationLog, 3);
 		context.assertIsSatisfied();
-		Assert.assertEquals(targetForum.getLastPost(), new Post() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
 
-		{ setId(6); }});
-		Assert.assertEquals(oldForum.getLastPost(), new Post() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(5); }});
+		Assert.assertEquals(targetForum.getLastPost(), new Post() {{ setId(6); }});
+		Assert.assertEquals(oldForum.getLastPost(), new Post() {{ setId(5); }});
 	}
 
 	@Test
@@ -104,6 +86,7 @@ public class ModerationServiceTestCase {
 		final Topic unlockedTopic = new Topic(); unlockedTopic.unlock();
 
 		context.checking(new Expectations() {{
+			one(config).getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED); will(returnValue(false));
 			one(topicRepository).get(1); will(returnValue(lockedTopic));
 			one(topicRepository).get(2); will(returnValue(unlockedTopic));
 		}});
@@ -125,6 +108,8 @@ public class ModerationServiceTestCase {
 		final Topic topic = new Topic(); topic.setId(1);
 
 		context.checking(new Expectations() {{
+			one(config).getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED); will(returnValue(false));
+			one(topicRepository).get(1); will(returnValue(topic));
 			one(topicRepository).remove(topic);
 		}});
 
@@ -135,12 +120,7 @@ public class ModerationServiceTestCase {
 	@Test
 	public void reject() {
 		context.checking(new Expectations() {{
-			Post post = new Post() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(1); }};
+			Post post = new Post() {{ setId(1); }};
 			one(postRepository).get(1); will(returnValue(post));
 			one(postRepository).remove(post);
 		}});
@@ -175,12 +155,7 @@ public class ModerationServiceTestCase {
 
 	@Test
 	public void approvePostInExistingTopicShouldIncrementTotalRepliesAndTotalUserPosts() {
-		Topic topic = new Topic(); topic.setPendingModeration(false); topic.setLastPost(new Post() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(2); }});
+		Topic topic = new Topic(); topic.setPendingModeration(false); topic.setLastPost(new Post() {{ setId(2); }});
 
 		final Post post = new Post(); post.setId(1); post.setModerate(true);
 		post.setTopic(topic); post.setUser(new User());
