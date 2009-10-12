@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.core.exceptions.AccessRuleException;
+import net.jforum.core.SessionManager;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostRepository;
 import net.jforum.util.TestCaseUtils;
@@ -33,7 +34,8 @@ public class ChangePostRuleTestCase {
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private PostRepository repository = context.mock(PostRepository.class);
-	private ChangePostRule rule = new ChangePostRule(repository);
+    private SessionManager sessionManager = context.mock(SessionManager.class);
+	private ChangePostRule rule = new ChangePostRule(repository, sessionManager);
 	private Map<String, String> parameterMap = new HashMap<String, String>() {/**
 		 *
 		 */

@@ -14,30 +14,28 @@ import java.util.List;
 
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
+import net.jforum.entities.ModerationLog;
 import net.jforum.services.ModerationService;
+import net.jforum.actions.helpers.ApproveInfo;
 
 /**
  * @author Rafael Steil
  */
 public class AOPTestModerationService extends ModerationService {
-	/**
-	 * @see net.jforum.services.ModerationService#deleteTopics(java.util.List)
-	 */
-	@Override
-	public void deleteTopics(List<Topic> topics) {
-	}
 
-	/**
-	 * @see net.jforum.services.ModerationService#approvePost(net.jforum.entities.Post)
-	 */
-	@Override
-	public void approvePost(Post post) {
-	}
+    @Override
+    public void deleteTopics(List<Topic> topics, ModerationLog moderationLog) {
+    }
 
-	/**
-	 * @see net.jforum.services.ModerationService#moveTopics(int, int[])
-	 */
-	@Override
-	public void moveTopics(int toForumId, int... topicIds) {
-	}
+
+    @Override
+    public void doApproval(int forumId, List<ApproveInfo> infos) {
+
+    }
+
+    @Override
+    public void moveTopics(int toForumId, ModerationLog moderationLog, int... topicIds) {
+
+    }
+
 }

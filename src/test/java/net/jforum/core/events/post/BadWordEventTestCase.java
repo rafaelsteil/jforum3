@@ -15,6 +15,7 @@ import java.util.Arrays;
 import junit.framework.Assert;
 import net.jforum.entities.BadWord;
 import net.jforum.entities.Post;
+import net.jforum.entities.Topic;
 import net.jforum.repository.BadWordRepository;
 import net.jforum.util.TestCaseUtils;
 
@@ -39,6 +40,9 @@ public class BadWordEventTestCase {
 		}});
 
 		Post p = new Post();
+		Topic topic = new Topic();
+		topic.setSubject("title");
+		p.setTopic(topic);
 		p.setText("some content wordABCeditor more content");
 
 		event.beforeAdd(p);
@@ -57,6 +61,9 @@ public class BadWordEventTestCase {
 		}});
 
 		Post p = new Post();
+		Topic topic = new Topic();
+		topic.setSubject("title");
+		p.setTopic(topic);
 		p.setText("some content of post 1. This is word1, and this is WORD2. End");
 
 		event.beforeAdd(p);

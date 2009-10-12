@@ -22,6 +22,7 @@ import net.jforum.entities.User;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
+import net.jforum.repository.UserRepository;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
@@ -40,7 +41,8 @@ public class TopicServiceTestCase {
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private PollService pollService = context.mock(PollService.class);
 	private AttachmentService attachmentService = context.mock(AttachmentService.class);
-	private TopicService topicService = new TopicService(topicRepository, postRepository, forumRepository, attachmentService, pollService);
+    private UserRepository userRepository = context.mock(UserRepository.class);
+	private TopicService topicService = new TopicService(topicRepository, postRepository, forumRepository, attachmentService, pollService, userRepository);
 
 	@Test
 	public void addTopicInvocationsShouldBeInOrder() {

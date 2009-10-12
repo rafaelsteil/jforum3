@@ -48,7 +48,7 @@ public class ShoutBoxAdminActionsTestCase extends AdminTestCase {
 	@Test
 	public void edit() {
 		context.checking(new Expectations() {{
-			one(roleManager).isCategoryAllowed(with(any(Category.class))); will(returnValue(true));
+			one(roleManager).isCategoryAllowed(1); will(returnValue(true));
 
 			ShoutBox shoutbox = new ShoutBox();
 			shoutbox.setCategory(new Category());
@@ -73,7 +73,7 @@ public class ShoutBoxAdminActionsTestCase extends AdminTestCase {
 			current.getCategory().setId(1);
 
 			one(repository).get(1); will(returnValue(current));
-			one(roleManager).isCategoryAllowed(with(any(Category.class))); will(returnValue(true));
+			one(roleManager).isCategoryAllowed(1); will(returnValue(true));
 
 			one(shoutBoxService).update(shoutBox);
 			one(viewService).redirectToAction(Actions.LIST);
