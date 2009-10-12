@@ -9,7 +9,6 @@
 	<classpathentry kind="lib" path="compile-lib/cobertura/asm-tree-2.2.1.jar"/>
 	<classpathentry kind="lib" path="compile-lib/cobertura/cobertura.jar"/>
 	<classpathentry kind="lib" path="compile-lib/cobertura/jakarta-oro-2.0.8.jar"/>
-	<classpathentry kind="lib" path="compile-lib/cobertura/log4j-1.2.9.jar"/>
 	<classpathentry kind="lib" path="compile-lib/dumbster1.6.jar"/>
 	<classpathentry kind="lib" path="compile-lib/el-api.jar"/>
 	<classpathentry kind="lib" path="compile-lib/hamcrest-library-1.1.jar"/>
