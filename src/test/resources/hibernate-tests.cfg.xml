@@ -33,6 +33,7 @@
 		<mapping class="net.jforum.entities.Smilie" />
 		<mapping class="net.jforum.entities.Post" />
 		<mapping class="net.jforum.entities.Topic" />
+		<mapping class="net.jforum.entities.Theme" />
 		<mapping class="net.jforum.entities.UserSession" />
 		<mapping class="net.jforum.entities.Config"/>
 		<mapping class="net.jforum.entities.Role"/>

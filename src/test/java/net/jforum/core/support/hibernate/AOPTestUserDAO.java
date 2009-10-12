@@ -15,6 +15,8 @@ import java.util.List;
 import net.jforum.core.hibernate.HibernateGenericDAO;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
+import net.jforum.entities.Post;
+import net.jforum.entities.Topic;
 import net.jforum.repository.UserRepository;
 
 import org.hibernate.SessionFactory;
@@ -63,7 +65,14 @@ public class AOPTestUserDAO extends HibernateGenericDAO<User> implements UserRep
 		return 0;
 	}
 
-	/**
+    /**
+     * @see net.jforum.repository.UserRepository#getTotalTopics(int)
+     */
+    public int getTotalTopics(int userId) {
+        return 0;
+    }
+
+    /**
 	 * @see net.jforum.repository.UserRepository#getTotalUsers()
 	 */
 	public int getTotalUsers() {
@@ -148,7 +157,21 @@ public class AOPTestUserDAO extends HibernateGenericDAO<User> implements UserRep
 		return null;
 	}
 
-	/**
+    /**
+     * @see net.jforum.repository.UserRepository#getPosts(net.jforum.entities.User, int, int)
+     */
+    public List<Post> getPosts(User user, int start, int recordsPerPage) {
+        return null;
+    }
+
+    /**
+     * @see net.jforum.repository.UserRepository#getTopics(net.jforum.entities.User, int, int)  
+     */
+    public List<Topic> getTopics(User user, int start, int recordsPerPage) {
+        return null;
+    }
+
+    /**
 	 * @see net.jforum.repository.UserRepository#changeAllowAvatarState(boolean, net.jforum.entities.Group)
 	 */
 	public void changeAllowAvatarState(boolean allowAvatar, Group group) {

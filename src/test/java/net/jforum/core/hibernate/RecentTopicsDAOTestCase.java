@@ -25,9 +25,18 @@ public class RecentTopicsDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@Test
 	public void expectZeroResultsShouldReturnEmptyList() {
 		RecentTopicsDAO dao = this.newDao();
-		List<Topic> list = dao.getRecentTopics(10);
+		List<Topic> list = dao.getNewTopics(10);
+		Assert.assertEquals(0, list.size());
+
+		dao = this.newDao();
+		list = dao.getUpdatedTopics(10);
+		Assert.assertEquals(0, list.size());
+
+		dao = this.newDao();
+		list = dao.getHotTopics(10);
 		Assert.assertEquals(0, list.size());
 	}
+
 
 	@Test
 	public void postsInModerationExpectOneResult() {
@@ -35,7 +44,7 @@ public class RecentTopicsDAOTestCase extends AbstractDAOTestCase<Topic> {
 		this.loadDump("/recenttopics/moderation.sql");
 
 		RecentTopicsDAO dao = this.newDao();
-		List<Topic> list = dao.getRecentTopics(10);
+		List<Topic> list = dao.getNewTopics(10);
 
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals(6, list.get(0).getId());
@@ -46,7 +55,7 @@ public class RecentTopicsDAOTestCase extends AbstractDAOTestCase<Topic> {
 		this.loadDump("/recenttopics/dump.sql");
 
 		RecentTopicsDAO dao = this.newDao();
-		List<Topic> list = dao.getRecentTopics(10);
+		List<Topic> list = dao.getNewTopics(10);
 		Assert.assertEquals(8, list.size());
 
 		Assert.assertEquals(8, list.get(0).getId());
