@@ -44,16 +44,19 @@ public class JForumConfig extends PropertiesConfiguration {
 		try {
 			loadProps();
 
-			hibernateTask.execute(new HibernateRunnable() {
-				public void run() {
-					try {
-						loadDatabaseProperties();
+			//in test environment, hibernateTask could be null 
+			if(hibernateTask != null){
+				hibernateTask.execute(new HibernateRunnable() {
+					public void run() {
+						try {
+							loadDatabaseProperties();
+						}
+						catch (Exception e) {
+							throw new ForumException(e);
+						}
 					}
-					catch (Exception e) {
-						throw new ForumException(e);
-					}
-				}
-			});
+				});
+			}
 		}
 		catch (Exception e) {
 			throw new ForumException(e);
