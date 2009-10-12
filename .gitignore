@@ -1,3 +1,5 @@
 target/
 *.class
 webapp/WEB-INF/classes/
+cobertura.ser
+tmp/
