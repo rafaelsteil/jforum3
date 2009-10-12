@@ -71,7 +71,7 @@ public class UserActionsTestCase {
 			User user = new User();
 			one(userRepository).get(1); will(returnValue(user));
 			one(rankingRepository).getAllRankings(); will(returnValue(new ArrayList<Ranking>()));
-			one(avatarService).getGalleryAvatar(); will(returnValue(new ArrayList<Avatar>()));
+			one(avatarService).getAvatarGallery(); will(returnValue(new ArrayList<Avatar>()));
 			one(propertyBag).put("user", user);
 			one(propertyBag).put("rankings", new ArrayList<Ranking>());
 			one(propertyBag).put("avatars", new ArrayList<Avatar>());

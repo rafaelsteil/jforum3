@@ -43,25 +43,29 @@ public class AvatarServiceTestCase {
 	}
 
 	@Test(expected = ValidationException.class)
-	public void add0IdExpectException() {
-		Avatar s = new Avatar();
-		s.setId(1);
-		service.add(s,null);
+	public void addWithIdExpectException() {
+		Avatar avatar = new Avatar();
+		avatar.setId(1);
+
+		context.checking(new Expectations() {{
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY); will(returnValue(true));
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_UPLOAD); will(returnValue(true));
+		}});
+
+		service.add(avatar);
 	}
 
 	@Test(expected = ValidationException.class)
-	public void addNone0IdExpectException() {
-		Avatar s = new Avatar();
-		s.setId(0);
-		service.update(s, null);
-	}
+	public void updateWithoutIdExpectException() {
+		Avatar avatar = new Avatar();
+		avatar.setId(0);
 
-	@Test(expected = ValidationException.class)
-	public void addProperSizeExpectException() {
-		Avatar s = new Avatar();
-		s.setHeight(2000);
-		s.setWidth(1509);
-		service.add(s);
+		context.checking(new Expectations() {{
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY); will(returnValue(true));
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_UPLOAD); will(returnValue(true));
+		}});
+
+		service.update(avatar, null);
 	}
 
 	@Test
@@ -78,6 +82,13 @@ public class AvatarServiceTestCase {
 		context.checking(new Expectations() {{
 			one(config).getApplicationPath(); will(returnValue(tempDir));
 			one(config).getValue(ConfigKeys.AVATAR_GALLERY_DIR); will(returnValue(""));
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY); will(returnValue(true));
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_UPLOAD); will(returnValue(true));
+			one(config).getLong(ConfigKeys.AVATAR_MAX_SIZE); will(returnValue(10000l));
+			one(config).getInt(ConfigKeys.AVATAR_MAX_WIDTH); will(returnValue(800));
+			one(config).getInt(ConfigKeys.AVATAR_MAX_HEIGHT); will(returnValue(600));
+			one(config).getInt(ConfigKeys.AVATAR_MIN_WIDTH); will(returnValue(1));
+			one(config).getInt(ConfigKeys.AVATAR_MIN_HEIGHT); will(returnValue(1));
 			one(repository).add(avatar);
 		}});
 
@@ -111,11 +122,17 @@ public class AvatarServiceTestCase {
 			one(repository).get(1); will(returnValue(currentAvatar));
 			atLeast(1).of(config).getApplicationPath(); will(returnValue(currentFile.getParent()));
 			atLeast(1).of(config).getValue(ConfigKeys.AVATAR_GALLERY_DIR); will(returnValue(""));
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY); will(returnValue(true));
+			one(config).getBoolean(ConfigKeys.AVATAR_ALLOW_UPLOAD); will(returnValue(true));
+			one(config).getLong(ConfigKeys.AVATAR_MAX_SIZE); will(returnValue(10000l));
+			one(config).getInt(ConfigKeys.AVATAR_MAX_WIDTH); will(returnValue(800));
+			one(config).getInt(ConfigKeys.AVATAR_MAX_HEIGHT); will(returnValue(600));
+			one(config).getInt(ConfigKeys.AVATAR_MIN_WIDTH); will(returnValue(1));
+			one(config).getInt(ConfigKeys.AVATAR_MIN_HEIGHT); will(returnValue(1));
 			one(repository).update(currentAvatar);
 		}});
 
-		File newFile = File.createTempFile("jforum", "tests");
-		newFile.deleteOnExit();
+		File newFile = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
 
 		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(newFile,
 			newFile.getAbsolutePath(), newFile.getName());
@@ -151,7 +168,7 @@ public class AvatarServiceTestCase {
 			String applicationPath = new File(this.getClass().getResource("").getFile()).getParent();
 
 			atLeast(1).of(config).getApplicationPath(); will(returnValue(applicationPath));
-			atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR); will(returnValue(""));
+			atLeast(1).of(config).getValue(ConfigKeys.AVATAR_GALLERY_DIR); will(returnValue(""));
 
 			one(repository).get(1); will(returnValue(s1));
 			one(repository).remove(s1);

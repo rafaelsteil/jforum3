@@ -185,7 +185,7 @@ public class UserActions {
 		User userToEdit = this.userRepository.get(userId);
 		this.propertyBag.put("user", userToEdit);
 		this.propertyBag.put("rankings", this.rankingRepository.getAllRankings());
-		this.propertyBag.put("avatars", this.avatarService.getGalleryAvatar());
+		this.propertyBag.put("avatars", this.avatarService.getAvatarGallery());
 	}
 
 	/**

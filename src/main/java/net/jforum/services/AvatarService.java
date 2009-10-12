@@ -41,7 +41,7 @@ public class AvatarService {
 		this.repository = repository;
 	}
 
-	public List<Avatar> getGalleryAvatar() {
+	public List<Avatar> getAvatarGallery() {
 		boolean allowGallery = this.config.getBoolean(ConfigKeys.AVATAR_ALLOW_GALLERY);
 
 		if (allowGallery) {
@@ -69,7 +69,6 @@ public class AvatarService {
 			throw new ValidationException("Cannot add an existing (id > 0) avatar");
 		}
 
-		// Upload the image to avatar dir and get the upload img info
 		String imgName = this.processImageUpload(avatar, uploadedFile);
 
 		if (imgName != null) {
@@ -89,10 +88,7 @@ public class AvatarService {
 			throw new ValidationException("Cannot add an existing (id > 0) avatar");
 		}
 
-		// Check width & height whether is in the allowed range
 		this.checkImageSize(avatar);
-
-		// imageUtil.
 		this.repository.add(avatar);
 	}
 
@@ -114,7 +110,6 @@ public class AvatarService {
 
 		// upload the img and get the upload img info
 		String imageDiskName = this.processImageUpload(avatar, uploadedFile);
-
 
 		if (imageDiskName != null) {
 			this.deleteImage(current);
@@ -209,19 +204,15 @@ public class AvatarService {
 	 * @return file name
 	 */
 	private String processImageUpload(Avatar avatar, UploadedFileInformation uploadedFile) {
-
-		// save the image to avatar dir
 		File file = this.saveImage(avatar, uploadedFile);
 
-		if (file == null) {// no image upload
+		if (file == null) {
 			return null;
 		}
 
 		avatar.setFileName(file.getName());
 
 		try {
-			// file size check, TODO, reduce the size if possible
-			// Get the number of bytes in the file
 			long size = file.length();
 			long maxSize = this.config.getLong(ConfigKeys.AVATAR_MAX_SIZE);
 
@@ -229,7 +220,6 @@ public class AvatarService {
 				throw new ValidationException("File size too big");
 			}
 
-			// read image information
 			ImageInfo ii = new ImageInfo();
 
 			try {
@@ -250,17 +240,9 @@ public class AvatarService {
 			this.checkImageSize(avatar);
 		}
 		catch (ValidationException e) {
-			// del image if image is not allowed
 			file.delete();
 			throw e;
 		}
-
-		// fix the image size if the width or height is not allowed
-		/*
-		 * boolean changed = fixImageSize(avatar); if(changed){ //need change the image, scale the image String imgName = file.getAbsolutePath(); int
-		 * type = ImageUtils.IMAGE_UNKNOWN; if(ImageInfo.FORMAT_PNG == ii.getFormat()){ // if it is PNG type = ImageUtils.IMAGE_PNG; }
-		 * ImageUtils.resizeImage(imgName, type, avatar.getWidth(), avatar.getHeight()); }
-		 */
 
 		return file.getName();
 	}
@@ -296,13 +278,6 @@ public class AvatarService {
 	 *
 	 * @param avatar
 	 */
-	/*
-	 * private boolean fixImageSize(Avatar avatar){ boolean changed = false; //fix the image size\ int maxWidth =
-	 * this.config.getInt(ConfigKeys.AVATAR_MAX_WIDTH); int maxHeight = this.config.getInt(ConfigKeys.AVATAR_MAX_HEIGHT); int minWidth =
-	 * this.config.getInt(ConfigKeys.AVATAR_MIN_WIDTH); int minHeight = this.config.getInt(ConfigKeys.AVATAR_MIN_HEIGHT); int height =
-	 * avatar.getHeight(); int width = avatar.getWidth(); //if(width/height) return changed; }
-	 */
-
 	private void checkImageSize(Avatar avatar) {
 		int maxWidth = this.config.getInt(ConfigKeys.AVATAR_MAX_WIDTH);
 		int maxHeight = this.config.getInt(ConfigKeys.AVATAR_MAX_HEIGHT);
@@ -325,7 +300,8 @@ public class AvatarService {
 		}
 		else {
 			String imageName = avatar.getFileName();
-			String imageFilePath = String.format("%s/%s/%s", this.config.getApplicationPath(), this.config.getValue(avatarConfigKey), imageName);
+			String imageFilePath = String.format("%s/%s/%s", this.config.getApplicationPath(),
+				this.config.getValue(avatarConfigKey), imageName);
 
 			return new File(imageFilePath);
 		}
