@@ -80,7 +80,7 @@ public class TopicServiceTestCase {
 			one(t).setLastPost(post); inSequence(sequence);
 
 			one(t).isWaitingModeration(); will(returnValue(true));
-			
+
 			one(pollService).associatePoll(t, Collections.<PollOption>emptyList());
 			one(attachmentService).insertAttachments(Collections.<AttachedFile>emptyList(), post);
 		}});
@@ -136,23 +136,9 @@ public class TopicServiceTestCase {
 	public void replyModeratedPostShouldNotUpdateSomeProperties() {
 		final Topic topic = this.newTopic();
 		int currentTotalReplies = topic.getTotalReplies();
-		topic.setLastPost(new Post() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(2); }});
-		Forum forum = new Forum() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); setLastPost(new Post() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(5); }}); }};
+		topic.setLastPost(new Post() {{ setId(2); }});
+		Forum forum = new Forum() {{ setId(1);
+		setLastPost(new Post() {{ setId(5); }}); }};
 
 		context.checking(new Expectations() {{
 			one(topicRepository).get(topic.getId()); will(returnValue(topic));
@@ -177,12 +163,7 @@ public class TopicServiceTestCase {
 	public void addModeratedTopicShouldNotUpdateForumLastPost() {
 		final Topic topic = this.newTopic();
 		topic.setPendingModeration(true);
-		final Forum forum = new Forum() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }};
+		final Forum forum = new Forum() {{ setId(1); }};
 
 		context.checking(new Expectations() {{
 			ignoring(topicRepository);
@@ -281,17 +262,13 @@ public class TopicServiceTestCase {
 	public void addNewTopicShouldSaveFirstPostAndAllRelatedObjecUpdates() {
 		final Topic topic = this.newTopic();
 
-		final Forum forum = new Forum() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }};
+		final Forum forum = new Forum() {{ setId(1); }};
 
 		context.checking(new Expectations() {{
 			one(forumRepository).get(1); will(returnValue(forum));
 			one(topicRepository).add(topic);
 			one(postRepository).add(topic.getFirstPost());
+			one(userRepository).getTotalPosts(topic.getUser()); will(returnValue(1));
 			ignoring(pollService);
 			ignoring(attachmentService);
 		}});
@@ -317,12 +294,7 @@ public class TopicServiceTestCase {
 
 		topic.setSubject("topic 1");
 		topic.getForum().setId(1);
-		topic.setUser(new User() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		topic.setUser(new User() {{ setId(1); }});
 		topic.setFirstPost(new Post());
 		topic.getFirstPost().setSubject("123");
 		topic.getFirstPost().setText("some message");
