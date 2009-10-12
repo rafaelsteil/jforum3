@@ -207,10 +207,10 @@ public class ForumDAO extends HibernateGenericDAO<Forum> implements ForumReposit
 	}
 
 	/**
-	 * @see net.jforum.repository.ForumRepository#loadAll()
+	 * @see net.jforum.repository.ForumRepository#findAll()
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Forum> loadAll() {
+	public List<Forum> findAll() {
 		return this.session().createQuery("select new Forum(forum.id) from Forum as forum)").list();
 	}
 

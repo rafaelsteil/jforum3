@@ -87,8 +87,8 @@ public interface ForumRepository extends Repository<Forum> {
 	public void moveTopics(Forum toForum, int... topicIds);
 
 	/**
-	 * Load all the forum
+	 * Returns all registered forums
 	 * @return
 	 */
-	public List<Forum> loadAll();
+	public List<Forum> findAll();
 }

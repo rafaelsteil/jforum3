@@ -208,7 +208,7 @@ public class TagService {
 	// TODO: it is better put this function in ForumService
 	private List<Forum> getAccessableForum(RoleManager roleManager) {
 		List<Forum> accessableForum = new ArrayList<Forum>();
-		List<Forum> allForum = this.forumRepository.loadAll();
+		List<Forum> allForum = this.forumRepository.findAll();
 		for (Forum forum : allForum) {
 			if (roleManager.isForumAllowed(forum.getId())) {
 				accessableForum.add(forum);

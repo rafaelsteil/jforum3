@@ -13,11 +13,11 @@ package net.jforum.services;
 import java.util.Arrays;
 import java.util.List;
 
+import net.jforum.entities.ModerationLog;
 import net.jforum.entities.Poll;
 import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
-import net.jforum.entities.ModerationLog;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
 import net.jforum.util.TestCaseUtils;
@@ -52,17 +52,24 @@ public class PostServiceTestCase {
 		context.checking(new Expectations() {{
 			ignoring(attachmentService); ignoring(pollService);
 			one(postRepository).get(1); will(returnValue(current));
+			one(postRepository).update(current);
+			one(topicRepository).update(current.getTopic());
+			ignoring(moderationLogService);
 		}});
 
-		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
+		Post newPost = new Post();
+		newPost.setId(1);
+		newPost.setText("new text");
+		newPost.setSubject("new subject");
 		newPost.setBbCodeEnabled(true);
 		newPost.setHtmlEnabled(true);
 		newPost.setSmiliesEnabled(true);
 		newPost.setSignatureEnabled(true);
+		newPost.setTopic(new Topic());
 
 		service.update(newPost, false, null, null, moderationLog);
-
 		context.assertIsSatisfied();
+
 		Assert.assertEquals(true, current.isBbCodeEnabled());
 		Assert.assertEquals(true, current.isHtmlEnabled());
 		Assert.assertEquals(true, current.isSmiliesEnabled());
@@ -72,12 +79,7 @@ public class PostServiceTestCase {
 	@Test
 	public void changePoll() {
 		final Post currentPost = this.createCurrentPost();
-		currentPost.getTopic().setPoll(new Poll() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		currentPost.getTopic().setPoll(new Poll() {{ setId(1); }});
 		currentPost.getTopic().getFirstPost().setId(1);
 
 		PollOption pollOption = new PollOption(); pollOption.setText("A");
@@ -87,17 +89,26 @@ public class PostServiceTestCase {
 			ignoring(attachmentService);
 			one(pollService).processChanges(currentPost.getTopic().getPoll(), pollOptions);
 			one(postRepository).get(1); will(returnValue(currentPost));
+			one(postRepository).update(currentPost);
+			one(topicRepository).update(currentPost.getTopic());
+			ignoring(moderationLogService);
 		}});
 
-		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
+		Post newPost = new Post();
+		newPost.setId(1);
+		newPost.setText("new text");
+		newPost.setSubject("new subject");
 
-		Poll newPoll = new Poll(); newPoll.setLabel("new label"); newPoll.setLength(10);
-		newPost.setTopic(new Topic()); newPost.getTopic().setPoll(newPoll);
+		Poll newPoll = new Poll();
+		newPoll.setLabel("new label");
+		newPoll.setLength(10);
+		newPost.setTopic(new Topic());
+		newPost.getTopic().setPoll(newPoll);
 
 		service.update(newPost, false, pollOptions, null, moderationLog);
 
 		context.assertIsSatisfied();
-		Assert.assertEquals(10, currentPost.getTopic().getPoll().getOptions().size());
+		Assert.assertEquals(10, currentPost.getTopic().getPoll().getLength());
 		Assert.assertEquals("new label", currentPost.getTopic().getPoll().getLabel());
 	}
 
@@ -110,6 +121,9 @@ public class PostServiceTestCase {
 		context.checking(new Expectations() {{
 			ignoring(attachmentService); ignoring(pollService);
 			one(postRepository).get(1); will(returnValue(current));
+			one(postRepository).update(current);
+			one(topicRepository).update(current.getTopic());
+			ignoring(moderationLogService);
 		}});
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
@@ -130,6 +144,9 @@ public class PostServiceTestCase {
 		context.checking(new Expectations() {{
 			ignoring(attachmentService); ignoring(pollService);
 			one(postRepository).get(1); will(returnValue(current));
+			one(postRepository).update(current);
+			one(topicRepository).update(current.getTopic());
+			ignoring(moderationLogService);
 		}});
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
@@ -148,6 +165,9 @@ public class PostServiceTestCase {
 		context.checking(new Expectations() {{
 			ignoring(attachmentService); ignoring(pollService);
 			one(postRepository).get(1); will(returnValue(current));
+			one(postRepository).update(current);
+			one(topicRepository).update(current.getTopic());
+			ignoring(moderationLogService);
 		}});
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
