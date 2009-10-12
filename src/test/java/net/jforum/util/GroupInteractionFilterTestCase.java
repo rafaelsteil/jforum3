@@ -11,6 +11,7 @@
 package net.jforum.util;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Group;
@@ -51,7 +52,7 @@ public class GroupInteractionFilterTestCase {
 			one(propertyBag).get("onlineUsers"); will(returnValue(Arrays.asList(us1, us2, us3)));
 
 			one(propertyBag).put("totalLoggedUsers", 2);
-			one(propertyBag).put("onlineUsers", Arrays.asList(us1, us2));
+			one(propertyBag).put("onlineUsers", new HashSet<UserSession>(Arrays.asList(us1, us2)));
 		}});
 
 		GroupInteractionFilter filter = new GroupInteractionFilter();
