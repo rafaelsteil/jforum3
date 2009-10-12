@@ -19,8 +19,8 @@ import junit.framework.Assert;
 import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
-import net.jforum.util.TestCaseUtils;
 import net.jforum.repository.UserRepository;
+import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -65,52 +65,19 @@ public class EditUserRuleTestCase {
 			one(request).getParameter("userId"); will(returnValue("1"));
 			one(userSession).isLogged(); will(returnValue(true));
 
-			User user = new User(); user.setId(9);
-			one(userSession).getUser(); will(returnValue(user));
+			User currentUser = new User(); currentUser.setId(9);
+			one(userSession).getUser(); will(returnValue(currentUser));
+
+			User user1 = new User(); user1.setId(1);
+			one(userRepository).get(1); will(returnValue(user1));
 
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAdministrator(); will(returnValue(true));
+			one(roleManager).getCanEditUser(user1, currentUser.getGroups()); will(returnValue(true));
 		}});
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
-	}
+		boolean shouldProceed = rule.shouldProceed(userSession, request);
 
-	@Test
-	public void loggedDifferentUserIdIsCoAdministratorExpectSuccess() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("userId"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
-
-			User user = new User(); user.setId(9);
-			one(userSession).getUser(); will(returnValue(user));
-
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(true));
-		}});
-
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void loggedDifferentUserIdNotAdministratorNotCoAdministratorShouldDeny() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("userId"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
-
-			User user = new User(); user.setId(9);
-			one(userSession).getUser(); will(returnValue(user));
-
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(false));
-		}});
-
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
+		Assert.assertTrue(shouldProceed);
 		context.assertIsSatisfied();
 	}
 
@@ -122,7 +89,9 @@ public class EditUserRuleTestCase {
 			one(userSession).isLogged(); will(returnValue(false));
 		}});
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
+		boolean shouldProceed = rule.shouldProceed(userSession, request);
+
+		Assert.assertFalse(shouldProceed);
 		context.assertIsSatisfied();
 	}
 
@@ -147,6 +116,7 @@ public class EditUserRuleTestCase {
 			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
 			one(request).getParameter("user.id"); will(returnValue("1"));
 			ignoring(userSession); ignoring(roleManager);
+			allowing(userRepository).get(1); will(returnValue(new User()));
 		}});
 
 		rule.shouldProceed(userSession, request);
@@ -159,6 +129,7 @@ public class EditUserRuleTestCase {
 			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
 			one(request).getParameter("userId"); will(returnValue("1"));
 			ignoring(userSession); ignoring(roleManager);
+			allowing(userRepository).get(1); will(returnValue(new User()));
 		}});
 
 		rule.shouldProceed(userSession, request);

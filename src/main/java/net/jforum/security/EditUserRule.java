@@ -25,10 +25,10 @@ import net.jforum.repository.UserRepository;
  * @author Rafael Steil
  */
 public class EditUserRule implements AccessRule {
-	private final UserRepository repository;
+	private final UserRepository userRepository;
 
 	public EditUserRule(UserRepository repository) {
-		this.repository = repository;
+		this.userRepository = repository;
 	}
 
 	/**
@@ -41,14 +41,20 @@ public class EditUserRule implements AccessRule {
 	 */
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		int userId = this.findUserId(request);
-
 		boolean logged = userSession.isLogged();
-		if(logged && userSession.getUser().getId() == userId) {
+
+		if (!logged) {
+			return false;
+		}
+
+		User currentUser = userSession.getUser();
+
+		if (currentUser.getId() == userId) {
 			return true;
 		}
 
-		User user = repository.get(userId);
-		return logged && userSession.getRoleManager().getCanEditUser(user, userSession.getUser().getGroups());
+		User user = userRepository.get(userId);
+		return userSession.getRoleManager().getCanEditUser(user, currentUser.getGroups());
 	}
 
 	private int findUserId(HttpServletRequest request) {

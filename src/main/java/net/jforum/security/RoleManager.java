@@ -37,10 +37,12 @@ public class RoleManager {
 	 * This will replace any existing group that may exist already
 	 * @param groups the groups to add
 	 */
+	@SuppressWarnings("unchecked")
 	public void setGroups(List<Group> groups) {
 		this.roles = new HashMap<String, Role>();
 
-		List<String> shouldIntersectValues = Arrays.asList(new String[] {SecurityConstants.FORUM_READ_ONLY, SecurityConstants.FORUM_REPLY_ONLY});
+		List<String> shouldIntersectValues = Arrays.asList(new String[] {SecurityConstants.FORUM_READ_ONLY,
+			SecurityConstants.FORUM_REPLY_ONLY});
 
 		if (groups != null) {
 			for (Group group : groups) {
@@ -283,7 +285,7 @@ public class RoleManager {
 		// working with int... versus Integer...
 		// versus int[] and Integer[] in some other classes,
 		// and that .toArray() does not work with int itself,
-		// we do the copy by hand there. Maybe a FIXME
+		// we do the copy by hand there.
 		int[] data = new int[role.getRoleValues().size()];
 		int counter = 0;
 		for (int value : role.getRoleValues()) {
@@ -349,16 +351,18 @@ public class RoleManager {
 	}
 
 	public boolean getCanEditUser(User userToEdit, List<Group> groups) {
-		if(isAdministrator()) {
+		if (isAdministrator()) {
 			return true;
 		}
+
 		for (Group group : groups) {
 			for (Group group2 : userToEdit.getGroups()) {
-				if(group.equals(group2)) {
+				if (group.equals(group2)) {
 					return true;
 				}
 			}
 		}
+
 		return false;
 	}
 }
