@@ -57,40 +57,6 @@
 		<filter-class>net.jforum.core.support.hibernate.OpenSessionInViewFilter</filter-class>
 	</filter>
 	
-	<!-- 
-	<filter>
-		<filter-name>JForumCasLogoutFilter</filter-name>
-		<filter-class>com.redwahoo.forum.LogoutFilter</filter-class>
-	</filter>
-	
-	<filter>
-		<filter-name>CAS Filter</filter-name>
-		<filter-class>edu.yale.its.tp.cas.client.filter.CASFilter</filter-class>
-			<init-param>
-				<param-name>edu.yale.its.tp.cas.client.filter.loginUrl</param-name>
-				<param-value>https://www.govdex.gov.au/cas/login</param-value>
-			</init-param>
-			<init-param>
-				<param-name>edu.yale.its.tp.cas.client.filter.validateUrl</param-name>
-				<param-value>https://www.govdex.gov.au/cas/serviceValidate</param-value>
-			</init-param>
-			<init-param>
-				<param-name>edu.yale.its.tp.cas.client.filter.serverName</param-name>
-				<param-value>192.168.0.21:8080</param-value>
-			</init-param>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>CAS Filter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping> 
-	
-	<filter-mapping>
-		<filter-name>JForumCasLogoutFilter</filter-name>
-		<url-pattern>/user/logout.page</url-pattern>
-	</filter-mapping>
-	-->
-	
 	<filter-mapping>
 		<filter-name>hibernateSessionViewFilter</filter-name>
 	  	<url-pattern>*.page</url-pattern> 
