@@ -32,6 +32,4 @@
 	
 	<!-- Plugins -->
 	<bean id="net.jforum.plugins.tagging.TagService" class="net.jforum.plugins.tagging.TagService" autowire="constructor"/>
-	<bean id="net.jforum.plugins.shoutbox.ShoutBoxService" class="net.jforum.plugins.shoutbox.ShoutBoxService" autowire="constructor"/>
-	<bean id="net.jforum.plugins.shoutbox.ShoutService" class="net.jforum.plugins.shoutbox.ShoutService" autowire="constructor"/>
 </beans>

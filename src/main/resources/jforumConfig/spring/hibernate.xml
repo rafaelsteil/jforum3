@@ -72,11 +72,7 @@
 				<value>net.jforum.entities.PollVoter</value>
 				<value>net.jforum.entities.Attachment</value>
 				<value>net.jforum.entities.ModerationLog</value>
-				
-				<!-- Plugins -->
 				<value>net.jforum.plugins.tagging.Tag</value>
-				<value>net.jforum.plugins.shoutbox.ShoutBox</value>
-				<value>net.jforum.plugins.shoutbox.Shout</value>
 				<value>net.jforum.plugins.post.ForumLimitedTime</value>
 			</list>
 		</property>
