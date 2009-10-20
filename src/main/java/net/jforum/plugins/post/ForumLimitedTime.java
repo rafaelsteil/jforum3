@@ -31,9 +31,6 @@ import net.jforum.entities.Forum;
 @Entity
 @Table(name = "jforum_forums_limited_time")
 public class ForumLimitedTime implements Serializable {
-
-	private static final long serialVersionUID = 1762021375734643889L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_limited_time_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")

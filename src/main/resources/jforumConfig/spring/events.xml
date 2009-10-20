@@ -45,7 +45,6 @@
 		<property name="events">
 			<list>
 				<bean class="net.jforum.core.events.category.NewCategoryGroupPermissionsEvent" autowire="constructor"/>
-				<bean class="net.jforum.plugins.shoutbox.ShoutBoxEvent" autowire="constructor"/>
 			</list>
 		</property>
 	</bean>

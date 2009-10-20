@@ -35,15 +35,13 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "jforum_avatar")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Avatar implements Serializable {
-	private static final long serialVersionUID = -6771539622889141674L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_avatar_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")
 	@Column(name = "id")
 	private int id;
 
-	@Column(name = "file_name")
+	@Column(name = "filename")
 	private String fileName;
 
 	@Column(name = "avatar_type", updatable = false)

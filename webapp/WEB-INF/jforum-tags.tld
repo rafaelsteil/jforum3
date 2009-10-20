@@ -151,38 +151,6 @@
 	</attribute>
 </tag>
 
-<!-- Plugin ShoutBox -->
-<tag>
-	<name>shoutbox</name>
-	<tag-class>net.jforum.plugins.shoutbox.ShoutBoxTag</tag-class>
-	<body-content>empty</body-content>
-	
-	<attribute>
-		<name>category</name>
-		<required>true</required>
-		<rtexprvalue>true</rtexprvalue>
-	</attribute>
-	
-	<attribute>	
-        <description>
-			The URL of the shoutbox page.
-        </description>
-        <name>url</name>
-        <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
-	</attribute>
-	
-    <attribute>
-        <description>
-Character encoding of the content at the input
-resource.
-        </description>
-        <name>charEncoding</name>
-        <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
-    </attribute>	
-</tag>
-
 <!-- Plugin Tagging -->
 <tag>
 	<name>tagging</name>

@@ -1,5 +1,36 @@
 delete from jforum_sessions;
 
+# Avatar
+create table jforum_avatar (
+	id int not null primary key auto_increment,
+	filename varchar(255),
+	avatar_type varchar(10),
+	width int default 0,
+	height int default 0
+);
+
+# Post Report
+create table jforum_post_report (
+	report_id int not null primary key auto_increment,
+	post_id int not null,
+	report_date datetime,
+	report_description text,
+	user_id int,
+	report_status varchar(15)
+);
+
+# Forums Limited Time
+create table jforum_forums_limited_time (
+	id int not null primary key auto_increment,
+	forum_id int not null,
+	limited_time bigint
+);
+
+# Polls
+alter table jforum_vote_voters add voter_id int not null primary key auto_increment;
+alter table jforum_vote_results drop vote_option_id;
+alter table jforum_vote_results add vote_option_id int not null primary key auto_increment;
+
 # Users
 alter table jforum_users change user_active user_active tinyint(1) default 1;
 alter table jforum_users drop user_session_page;
@@ -13,10 +44,9 @@ alter table jforum_users change user_timezone user_timezone varchar(10);
 alter table jforum_users change user_style user_style int default 0;
 alter table jforum_users change user_lang user_lang varchar(10);
 alter table jforum_users change user_dateformat user_dateformat varchar(20);
---alter table jforum_users change user_avatar_type user_avatar_type tinyint(1) default 0;
---TODO:copy data to new table
 alter table jforum_users drop column user_avatar_type;
 alter table jforum_users change rank_id rank_id int;
+alter table jforum_users add avatar_id int default null;
 alter table jforum_users change deleted deleted tinyint(1) default 0;
 alter table jforum_users add user_total_privmsgs int default 0;
 update jforum_users set user_active = 1 where user_active is null;
@@ -38,6 +68,7 @@ alter table jforum_topics change topic_time topic_date datetime;
 alter table jforum_topics change topic_last_post_id topic_last_post_id int default 0;
 alter table jforum_topics change topic_moved_id topic_moved_id int default 0;
 alter table jforum_topics change moderated need_moderate tinyint(1) default 0;
+alter table jforum_topics add has_attachment tinyint(1) default 0;
 
 # Topics Watch
 alter table jforum_topics_watch add topics_watch_id int not null primary key auto_increment;
@@ -47,7 +78,7 @@ alter table jforum_topics_watch add constraint topic_id unique(topic_id, user_id
 alter table jforum_posts change post_time post_date datetime;
 alter table jforum_posts change poster_ip poster_ip varchar(50);
 
-alter table jforum_posts add post_text;
+alter table jforum_posts add post_text text not null;
 alter table jforum_posts add post_subject varchar(255);
 
 update jforum_posts p set p.post_subject = (select pt.post_subject from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
@@ -56,6 +87,23 @@ update jforum_posts p set p.post_text = (select pt.post_text from jforum_posts_t
 update jforum_posts set post_edit_count = 0 where post_edit_count is null;
 	
 drop table jforum_posts_text;
+
+# Attachments
+alter table jforum_attach drop privmsgs_id;
+alter table jforum_attach add download_count int default 0;
+alter table jforum_attach add physical_filename varchar(255);
+alter table jforum_attach add real_filename varchar(255);
+alter table jforum_attach add mimetype varchar(25);
+alter table jforum_attach add upload_date datetime;
+alter table jforum_attach add filesize bigint;
+alter table jforum_attach add thumb tinyint(1) default 0;
+alter table jforum_attach add file_extension varchar(6);
+
+update jforum_posts p set p.post_subject = (select pt.post_subject from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
+update jforum_posts p set p.post_text = (select pt.post_text from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
+
+drop table jforum_attach_desc;
+
 
 # Sessions
 alter table jforum_sessions drop session_page;

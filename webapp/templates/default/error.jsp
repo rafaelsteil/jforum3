@@ -28,8 +28,6 @@ END ERROR STACK TRACE
 			<table cellspacing="0" cellpadding="0" width="100%" border="0">
 				<tr>
 					<td width="100%" align="center" valign="middle">
-						<img src="<jforum:templateResource item="/images/logo.jpg"/>" vspace="1" border="0" alt="[Logo]" />
-						<br>
 						<span class="maintitle">Ooops - An error has ocurred</span>
 					</td>
 				</tr>

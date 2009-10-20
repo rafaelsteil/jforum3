@@ -139,7 +139,6 @@
 							<c:when test="${canPostReply}">
 								<td width="8%" align="left" valign="bottom" nowrap="nowrap">
 									<a href="<jforum:url address='/topics/reply/${topic.id}'/>" rel="nofollow" class="icon_reply nav"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
-									<a href="<jforum:url address='/tag/reply/${topic.id}'/>" rel="nofollow" class="icon_reply nav"><img src=<jforum:templateResource item='/tag/images/tag_topic.gif'/> /></a>
 								</td>
 							</c:when>
 						</c:choose>
@@ -203,9 +202,9 @@
 
 				<!-- POST LISTING --> 
 				<c:forEach items="${posts}" var="post" varStatus="info">
-					<c:set var="canEditCurrentMessage" value="${roleManager.administrator 
+					<c:set var="canEditCurrentMessage" value="${userSession.logged && (roleManager.administrator 
 						|| (roleManager.moderator && roleManager.isForumAllowed$1[topic.forum.id] && roleManager.canEditPosts)
-						|| (!topic.locked && post.user.id == userSession.user.id)}"/>
+						|| (!topic.locked && post.user.id == userSession.user.id))}"/>
 				
 					<c:choose>
 						<c:when test="${info.count % 2 == 0}">
@@ -259,10 +258,6 @@
 								<%@ include file="show_attachments_inc.jsp" %>
 							</c:if>
 							
-							<c:if test="${topic.firstPost.id == post.id}">
-								<jforum:tagging topic="${topic}"/>
-							</c:if>
-
 							<c:if test="${post.editCount > 0 && not empty post.editDate}">
 								<c:choose>
 									<c:when test="${post.editCount == 1}">
@@ -440,12 +435,6 @@
 </table>
 
 <a name="quick"></a>
-
-<c:set var="shoutEnabled"><jforum:settings key="shoutbox.enabled"/></c:set>
-
-<c:if test="${shoutEnabled}">
-	<jforum:shoutbox category="${topic.forum.category}" />
-</c:if>
 
 <%@ include file="../highlighter.jsp" %>
 

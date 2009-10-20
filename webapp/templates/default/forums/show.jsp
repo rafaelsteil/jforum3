@@ -189,8 +189,6 @@
 				</tr>
 			</table>
 			
-			<jforum:taggingCloud forum="${forum}"/>
-
 			<c:if test="${roleManager.moderator}">
 				</form>
 			</c:if>	
@@ -263,11 +261,5 @@
 		</td>
 	</tr>
 </table>
-
-<c:set var="shoutEnabled"><jforum:settings key="shoutbox.enabled"/></c:set>
-
-<c:if test="${shoutEnabled}">
-	<jforum:shoutbox category="${forum.category}" />
-</c:if>
 
 <c:import url="../footer.jsp"/>

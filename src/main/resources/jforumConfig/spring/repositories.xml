@@ -35,7 +35,5 @@
 	
 	<!-- Plugins -->
 	<bean id="net.jforum.plugins.tagging.TagRepository" class="net.jforum.plugins.tagging.TagDAO" autowire="constructor"/>
-	<bean id="net.jforum.plugins.shoutbox.ShoutBoxRepository" class="net.jforum.plugins.shoutbox.ShoutBoxDAO" autowire="constructor"/>
-	<bean id="net.jforum.plugins.shoutbox.ShoutRepository" class="net.jforum.plugins.shoutbox.ShoutDAO" autowire="constructor"/>
 	<bean id="net.jforum.plugins.post.ForumLimitedTimeRepository" class="net.jforum.plugins.post.ForumLimitedTimeDAO" autowire="constructor"/>
 </beans>

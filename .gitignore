@@ -3,3 +3,4 @@ target/
 webapp/WEB-INF/classes/
 cobertura.ser
 tmp/
+work/

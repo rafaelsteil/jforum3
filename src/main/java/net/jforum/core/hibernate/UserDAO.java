@@ -154,7 +154,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 		return (User)this.session().createCriteria(this.persistClass)
 			.addOrder(Order.desc("registrationDate"))
 			.setMaxResults(1)
-			.setCacheable(false)
+			.setCacheable(true)
 			.setCacheRegion("userDAO.getLastRegisteredUser")
 			.setComment("userDAO.getLastRegisteredUser")
 			.list().get(0);

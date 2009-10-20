@@ -30,10 +30,6 @@
 		<td>
 			<table cellspacing="0" cellpadding="0" width="100%" border="0" style="display: ;">
 				<tr>
-					<td>
-						<a href="${homepageLink}" id="forumLogo"><img src="<c:url value='/images/transp.gif'/>"></a>
-					</td>
-					 
 					<td width="100%" align="center" valign="middle">
 						<span class="maintitle"><jforum:settings key='forum.page.title'/></span>
 						<table cellspacing="0" cellpadding="2" border="0">
@@ -43,7 +39,7 @@
 									<a id="search" href="<jforum:url address="/search/filters"/>"><strong><jforum:i18n key="ForumBase.search"/></strong></a> &nbsp;
 
 									<img src="<jforum:templateResource item='/images/icon_mini_recentTopics.gif'/>" alt="[Recent Topics]" />
-									<a id="latest" href="<jforum:url address='/recentTopics/list'/>"><jforum:i18n key="ForumBase.recentTopics"/></a> &nbsp;
+									<a id="latest" href="<jforum:url address='/recentTopics/listNew'/>"><jforum:i18n key="ForumBase.recentTopicsNew"/></a> &nbsp;
 										
 									<c:if test="${userSession.roleManager.userListingEnabled}">
 										<img src="<jforum:templateResource item='/images/icon_mini_members.gif'/>" alt="[Members]" />&nbsp;

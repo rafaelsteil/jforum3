@@ -107,15 +107,12 @@
 				<!-- END OF FORUM LISTING -->
 			</table>
 
-			<jforum:taggingCloud/>
-
 			<table cellspacing="0" cellpadding="2" width="100%" align="center" border="0">
 				<tr>
 					<td align="left"><span class="gensmall"><a class="gensmall" href="">&nbsp;</a></span><span class="gensmall">&nbsp;</span></td>
 				</tr>
 			</table>
 		
-			<!--
 			<table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 				<tr>
 					<td class="cathead" colspan="2" height="28"><span class="cattitle"><jforum:i18n key="ForumListing.whoIsOnline"/></span></td>
@@ -169,7 +166,6 @@
 					</td>
 				</tr>
 			</table>
-			-->
 			
 			<br/>
         

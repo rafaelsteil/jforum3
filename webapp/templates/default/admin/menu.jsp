@@ -36,10 +36,6 @@
 				</c:if>
 
 				<tr>
-					<td class="row1"><a id="categories" class="genmed" href="<jforum:url address='/adminShoutBox/list'/>" target="main"><jforum:i18n key="Admin.ShoutBoxes"/></a></td>
-				</tr>
-				
-				<tr>
 					<td class="row1"><a id="forums" class="genmed" href="<jforum:url address='/adminForums/list'/>" target="main"><jforum:i18n key="Admin.forums"/></a></td>
 				</tr>
 				

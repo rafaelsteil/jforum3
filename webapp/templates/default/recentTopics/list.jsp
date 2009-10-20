@@ -15,7 +15,7 @@
 						<td valign="bottom" align="left">
 							<a class="nav" href="<jforum:url address='/forums/list'/>"><jforum:i18n key='ForumListing.forumIndex'/></a>
 							&raquo;
-							<a id="latest3" class="nav" href="<jforum:url address='/recentTopics/list'/>"><jforum:i18n key='ForumBase.recentTopics'/></a>
+							<a id="latest3" class="nav" href="<jforum:url address='/recentTopics/list'/>"><jforum:i18n key='ForumBase.recentTopicsNew'/></a>
 							<c:set var="rssEnabled"><jforum:settings key="rss.enabled"/></c:set>
 							<c:if test="${rssEnabled}">
 								&nbsp;<a href="<jforum:url address='/rss/recentTopics'/>"><img src="<jforum:templateResource item='/images/xml_button.gif'/>" border="0" align="middle" alt="[XML]" /></a>
