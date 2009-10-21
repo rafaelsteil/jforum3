@@ -1,6 +1,10 @@
 target/
 *.class
 webapp/WEB-INF/classes/
+webapp/WEB-INF/lib/
 cobertura.ser
 tmp/
 work/
+.idea
+out
+*.iml
