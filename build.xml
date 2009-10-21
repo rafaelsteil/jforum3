@@ -17,7 +17,7 @@
 	<property name="cobertura.libs.dir" value="${custom.libs}/cobertura"/>
 	<property name="instrumentation.dir" value="target/tests"/>
 	<property name="build.dir" location="webapp" />
-	<property name="project.libs" location="webapp/WEB-INF/lib" />
+	<property name="project.libs" location="lib" />
 	<property name="src.dir" value="src/main/java" />
 	<property name="resources.dir" value="src/main/resources"/>
 	<property name="tests.dir" value="src/test/java" />
