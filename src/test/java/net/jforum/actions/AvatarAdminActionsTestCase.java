@@ -11,11 +11,8 @@
 package net.jforum.actions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
-import net.jforum.core.support.vraptor.MultipartRequestInterceptor;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Avatar;
 import net.jforum.repository.AvatarRepository;
@@ -25,10 +22,7 @@ import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
 import org.vraptor.interceptor.UploadedFileInformation;
 
 public class AvatarAdminActionsTestCase extends AdminTestCase {
@@ -41,14 +35,6 @@ public class AvatarAdminActionsTestCase extends AdminTestCase {
 
 	public AvatarAdminActionsTestCase() {
 		super(SmilieAdminActions.class);
-	}
-
-	@Test
-	public void shouldBeInterceptedByMultipartRequestInterceptor() throws Exception {
-		Assert.assertTrue(avatarAction.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = avatarAction.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(MultipartRequestInterceptor.class));
 	}
 
 	@Test

@@ -42,7 +42,7 @@ import org.vraptor.url.LogicLocator;
  * @author Rafael Steil
  */
 public class DefaultLogicLocator implements LogicLocator {
-	private static final Logger logger = Logger.getLogger(MultipartRequestInterceptor.class);
+	private static final Logger logger = Logger.getLogger(DefaultLogicLocator.class);
 	private final File temporaryDirectory;
 	private ComponentManager manager;
 	private JForumConfig config;

@@ -22,7 +22,6 @@ import net.jforum.actions.interceptors.ExtensibleInterceptor;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.MultipartRequestInterceptor;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
@@ -33,6 +32,7 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.entities.util.Pagination;
+import net.jforum.plugins.post.ForumLimitedTimeRepository;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PollRepository;
@@ -49,7 +49,6 @@ import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
-import net.jforum.plugins.post.ForumLimitedTimeRepository;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -64,7 +63,7 @@ import org.vraptor.http.VRaptorServletRequest;
  * @author Rafael Steil
  */
 public class TopicActionsTestCase {
-	
+
 	private Mockery context = TestCaseUtils.newMockery();
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
@@ -128,14 +127,6 @@ public class TopicActionsTestCase {
 		InterceptedBy annotation = topicAction.getClass().getAnnotation(InterceptedBy.class);
 		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
 		Assert.assertTrue(interceptors.contains(MethodSecurityInterceptor.class));
-	}
-
-	@Test
-	public void shouldBeInterceptedByMultipartRequestInterceptor() throws Exception {
-		Assert.assertTrue(topicAction.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = topicAction.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(MultipartRequestInterceptor.class));
 	}
 
 	@Test

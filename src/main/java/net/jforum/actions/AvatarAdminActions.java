@@ -14,7 +14,6 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.MultipartRequestInterceptor;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Avatar;
 import net.jforum.repository.AvatarRepository;
@@ -31,7 +30,7 @@ import org.vraptor.interceptor.UploadedFileInformation;
  * @author Bill
  */
 @Component(Domain.AVATAR_ADMIN)
-@InterceptedBy({MultipartRequestInterceptor.class,ActionSecurityInterceptor.class})
+@InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class AvatarAdminActions {
 
@@ -40,9 +39,7 @@ public class AvatarAdminActions {
 	private ViewPropertyBag propertyBag;
 	private AvatarRepository repository;
 
-	public AvatarAdminActions(ViewPropertyBag propertyBag,
-			AvatarRepository repository, AvatarService service,
-			ViewService viewService) {
+	public AvatarAdminActions(ViewPropertyBag propertyBag, AvatarRepository repository, AvatarService service, ViewService viewService) {
 		this.propertyBag = propertyBag;
 		this.repository = repository;
 		this.service = service;
@@ -51,7 +48,7 @@ public class AvatarAdminActions {
 
 	/**
 	 * Deletes avatars
-     *
+	 *
 	 * @param avatarId One or many avatar id's for the avatars to be deleted.
 	 */
 	public void delete(@Parameter(key = "avatarId") int... avatarId) {
@@ -79,28 +76,26 @@ public class AvatarAdminActions {
 
 	/**
 	 * Saves a new avatar
-     *
+	 *
 	 * @param avatar The avatar to be saved.
-     * @param image Vraptor information object carrying info about the uploaded avtatar.
+	 * @param image Vraptor information object carrying info about the uploaded avtatar.
 	 */
-	public void addSave(@Parameter(key = "avatar")Avatar avatar,
-		@Parameter(key = "image") UploadedFileInformation image) {
+	public void addSave(@Parameter(key = "avatar") Avatar avatar, @Parameter(key = "image") UploadedFileInformation image) {
 		this.service.add(avatar, image);
 		this.viewService.redirectToAction(Actions.LIST);
 	}
 
 	/**
 	 * Shows the page to edit a existing avatar
-     *
-     * @param avatarId The avatar id for the avatar to be edited.
-     */
+	 *
+	 * @param avatarId The avatar id for the avatar to be edited.
+	 */
 	public void edit(@Parameter(key = "avatarId") int avatarId) {
 		this.propertyBag.put("avatar", this.repository.get(avatarId));
 		this.viewService.renderView(Actions.ADD);
 	}
 
-	public void editSave(@Parameter(key = "avatar") Avatar avatar,
-		@Parameter(key = "image") UploadedFileInformation image) {
+	public void editSave(@Parameter(key = "avatar") Avatar avatar, @Parameter(key = "image") UploadedFileInformation image) {
 		this.service.update(avatar, image);
 		this.viewService.redirectToAction(Actions.LIST);
 	}

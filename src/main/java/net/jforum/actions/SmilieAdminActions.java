@@ -14,7 +14,6 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.MultipartRequestInterceptor;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Smilie;
 import net.jforum.repository.SmilieRepository;
@@ -31,7 +30,7 @@ import org.vraptor.interceptor.UploadedFileInformation;
  * @author Rafael Steil
  */
 @Component(Domain.SMILIES_ADMIN)
-@InterceptedBy( { MultipartRequestInterceptor.class, ActionSecurityInterceptor.class })
+@InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class SmilieAdminActions {
 	private SmilieRepository repository;
