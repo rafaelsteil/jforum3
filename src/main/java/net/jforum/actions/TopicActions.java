@@ -26,7 +26,6 @@ import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ForumException;
-import net.jforum.core.support.vraptor.MultipartRequestInterceptor;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Attachment;
 import net.jforum.entities.Forum;
@@ -67,7 +66,7 @@ import org.vraptor.http.VRaptorServletRequest;
  * @author Rafael Steil
  */
 @Component(Domain.TOPICS)
-@InterceptedBy( { MultipartRequestInterceptor.class, MethodSecurityInterceptor.class, ExtensibleInterceptor.class })
+@InterceptedBy( { MethodSecurityInterceptor.class, ExtensibleInterceptor.class })
 public class TopicActions {
 	private ViewPropertyBag propertyBag;
 	private ForumRepository forumRepository;

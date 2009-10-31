@@ -73,6 +73,7 @@ create index forums_category on jforum_forums(category_id);
 alter table jforum_topics change topic_title topic_subject varchar(110) not null;
 alter table jforum_topics change topic_time topic_date datetime;
 alter table jforum_topics change topic_last_post_id topic_last_post_id int default 0;
+alter table jforum_topics change topic_first_post_id topic_first_post_id int default 0;
 alter table jforum_topics change topic_moved_id topic_moved_id int default 0;
 alter table jforum_topics change moderated need_moderate tinyint(1) default 0;
 alter table jforum_topics add has_attachment tinyint(1) default 0;

@@ -41,14 +41,8 @@ public class MultipartRequestInterceptor implements Interceptor {
 
 		VRaptorServletRequest servletRequest = flow.getLogicRequest().getRequest();
 
-		LOG.debug("Trying to parse multipart request.");
-
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory(4096 * 16, this.temporaryDirectory);
-
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Using repository [" + factory.getRepository() + "]");
-		}
 
 		// Create a new file upload handler
 		ServletFileUpload upload = new ServletFileUpload(factory);
@@ -79,9 +73,7 @@ public class MultipartRequestInterceptor implements Interceptor {
 			else {
 				if (!item.getName().trim().equals("")) {
 					try {
-						File file = File.createTempFile("raptor.", ".upload");
-						file.deleteOnExit();
-
+						File file = File.createTempFile("vraptor.", ".upload");
 						item.write(file);
 
 						UploadedFileInformation fileInformation = new BasicUploadedFileInformation(
@@ -96,7 +88,7 @@ public class MultipartRequestInterceptor implements Interceptor {
 					}
 				}
 				else {
-					LOG.info("A file field was empy: " + item.getFieldName());
+					LOG.debug("A file field was empy: " + item.getFieldName());
 				}
 			}
 		}

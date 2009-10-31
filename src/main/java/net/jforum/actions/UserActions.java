@@ -140,7 +140,7 @@ public class UserActions {
 
 	/**
 	 * Called from {@link #login(String)}, to validate the user credentials
-	 * 
+	 *
 	 * @param username the username
 	 * @param password the password
 	 * @param autoLogin autoLogin
@@ -284,7 +284,7 @@ public class UserActions {
 			this.propertyBag.put("user", userToEdit);
 			this.propertyBag.put("userTotalTopics", this.userRepository.getTotalTopics(userId));
 			this.propertyBag.put("rankings", this.rankingRepository.getAllRankings());
-			this.propertyBag.put("isAnonnimousUser", userId == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)); // FIXME Fix mispelling 'isAnonnimousUser'
+			this.propertyBag.put("isAnonymousUser", userId == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
 
 			boolean canEdit = userSession.getRoleManager().getCanEditUser(userToEdit, userSession.getUser().getGroups());
 			this.propertyBag.put("canEdit", canEdit);

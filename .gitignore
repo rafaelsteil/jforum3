@@ -8,3 +8,4 @@ work/
 .idea
 out
 *.iml
+.settings/

@@ -101,7 +101,9 @@ function smiliePopup() {
 	</c:when>
 </c:choose>
 
-<form action="<jforum:url address='/jforum'/>?module=${saveModule}&action=${saveAction}" method="post" enctype="multipart/form-data" name="post" id="post" onSubmit="return validatePostForm(this)">
+<form action="<jforum:url address='/jforum'/>" method="post" enctype="multipart/form-data" name="post" id="post" onSubmit="return validatePostForm(this)">
+<input type="hidden" name="module" value="${saveModule}">
+<input type="hidden" name="action" value="${saveAction}">
 
 <c:if test="${!isPrivateMessage}">
 	<input type="hidden" name="topic.forum.id" value="${forum.id}" />
