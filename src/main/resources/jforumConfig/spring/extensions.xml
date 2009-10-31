@@ -11,10 +11,12 @@
 	<bean id="net.jforum.extensions.ActionExtensionManager" class="net.jforum.extensions.ActionExtensionManager" scope="prototype">
 		<property name="extensions">
 			<list>
-				<value>net.jforum.actions.extensions.TopicWatchExtension</value>	
+				<value>net.jforum.actions.extensions.TopicWatchExtension</value>
+				<!--
+				<value>net.jforum.plugins.post.ForumAdminExtension</value>
 				<value>net.jforum.plugins.tagging.TopicExtension</value>
 				<value>net.jforum.plugins.tagging.PostExtensioin</value>
-				<value>net.jforum.plugins.post.ForumAdminExtension</value>
+				-->
 			</list>
 		</property>	
 	</bean>

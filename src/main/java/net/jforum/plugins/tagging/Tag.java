@@ -31,8 +31,6 @@ import net.jforum.entities.Topic;
 @Entity
 @Table(name = "jforum_topics_tag")
 public class Tag implements Serializable {
-	private static final long serialVersionUID = 4209304350121641277L;
-
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_topics_tag_seq")
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence")

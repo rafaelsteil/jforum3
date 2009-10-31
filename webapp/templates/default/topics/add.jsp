@@ -284,16 +284,6 @@ function smiliePopup() {
 						</div> 
 					</td>
 				</tr>
-				
-				<c:if test="${!isPrivateMessage && !isReply && (!isEdit || (post.topic.firstPost.id == post.id))}">
-					<tr>
-						<td class="row1 gen" align="right"><strong><jforum:i18n key='Tag.tag'/></strong></td>
-						<td class="row1 gensmall">
-							<input type="text" tabindex="200" value="${tags}" name="tags" id="tags" size="45"/>
-							<em class="helpline"><jforum:i18n key='Tag.intro'/></em>
-						</td>
-					</tr> 
-				</c:if>
 
 				<!-- Options -->
 				<tr>

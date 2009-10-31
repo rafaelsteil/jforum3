@@ -26,58 +26,56 @@ import org.vraptor.annotations.Parameter;
 
 /**
  * @author Bill
- *
  */
 @ActionExtension(Domain.POSTS)
-public class PostExtensioin {
-
+public class PostExtension {
 	private ViewPropertyBag propertyBag;
 	private TagService tagService;
 	private PostRepository postRepository;
-	
-	public PostExtensioin(PostRepository postRepository,
-			ViewPropertyBag propertyBag, TagService tagService) {
+
+	public PostExtension(PostRepository postRepository, ViewPropertyBag propertyBag, TagService tagService) {
 		this.postRepository = postRepository;
 		this.propertyBag = propertyBag;
 		this.tagService = tagService;
 	}
 
 	@Extends(Actions.EDIT)
-	public void edit(){
-		//boolean isEdit =(boolean) propertyBag.get("isEdit");
+	public void edit() {
 		Post post = (Post) propertyBag.get("post");
-		
-		if(post == null)
+
+		if (post == null) {
 			return;
-		
+		}
+
 		Topic topic = post.getTopic();
-		if(post.equals(topic.getFirstPost())){
+		if (post.equals(topic.getFirstPost())) {
 			propertyBag.put("tags", tagService.getTagString(topic));
 		}
 	}
-	
+
 	@Extends(Actions.EDITSAVE)
-	public void editSave(@Parameter(key = "post") Post post,@Parameter(key = "tags") String tagString){
+	public void editSave(@Parameter(key = "post") Post post, @Parameter(key = "tags") String tagString) {
 		post = this.postRepository.get(post.getId());
-		
-		if(post == null)
-			return ;
-		
+
+		if (post == null) {
+			return;
+		}
+
 		Topic topic = post.getTopic();
-		if(post.equals(topic.getFirstPost())){
+		if (post.equals(topic.getFirstPost())) {
 			List<Tag> tags = tagService.getTag(topic);
-			if(tagService.getTagString(topic).equals(tagString.trim()))
-				return ; //no changed
-			
-			//changed. remove all the old tags
+
+			if (tagService.getTagString(topic).equals(tagString.trim())) {
+				return;
+			}
+
+			// changed. remove all the old tags
 			this.tagService.remove(tags);
-			
-			//add the new tag if not empty
-			if(StringUtils.isNotEmpty(tagString)){
+
+			// add the new tag if not empty
+			if (StringUtils.isNotEmpty(tagString)) {
 				this.tagService.addTag(tagString, topic);
 			}
 		}
-		
 	}
-	
 }

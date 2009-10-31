@@ -26,6 +26,13 @@ create table jforum_forums_limited_time (
 	limited_time bigint
 );
 
+# Tags
+create table jforum_topics_tag (
+	tag_id int not null primary key auto_increment,
+	topic_id int not null,
+	tag_name varchar(100) not null
+);
+
 # Polls
 alter table jforum_vote_voters add voter_id int not null primary key auto_increment;
 alter table jforum_vote_results drop vote_option_id;
@@ -69,6 +76,7 @@ alter table jforum_topics change topic_last_post_id topic_last_post_id int defau
 alter table jforum_topics change topic_moved_id topic_moved_id int default 0;
 alter table jforum_topics change moderated need_moderate tinyint(1) default 0;
 alter table jforum_topics add has_attachment tinyint(1) default 0;
+update jforum_topics set topic_vote_id = null where topic_vote_id = 0;
 
 # Topics Watch
 alter table jforum_topics_watch add topics_watch_id int not null primary key auto_increment;
@@ -81,11 +89,12 @@ alter table jforum_posts change poster_ip poster_ip varchar(50);
 alter table jforum_posts add post_text text not null;
 alter table jforum_posts add post_subject varchar(255);
 
-update jforum_posts p set p.post_subject = (select pt.post_subject from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
-update jforum_posts p set p.post_text = (select pt.post_text from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
-
-update jforum_posts set post_edit_count = 0 where post_edit_count is null;
+create temporary table posts_text_tmp as select post_id, post_subject, post_text from jforum_posts_text;
 	
+update jforum_posts p, posts_text_tmp t set p.post_subject = t.post_subject, p.post_text = t.post_text where p.post_id = t.post_id;
+update jforum_posts set post_edit_count = 0 where post_edit_count is null;
+
+drop table post_text_tmp;	
 drop table jforum_posts_text;
 
 # Attachments
@@ -93,17 +102,23 @@ alter table jforum_attach drop privmsgs_id;
 alter table jforum_attach add download_count int default 0;
 alter table jforum_attach add physical_filename varchar(255);
 alter table jforum_attach add real_filename varchar(255);
-alter table jforum_attach add mimetype varchar(25);
+alter table jforum_attach add description varchar(255);
+alter table jforum_attach add mimetype varchar(50);
 alter table jforum_attach add upload_date datetime;
 alter table jforum_attach add filesize bigint;
 alter table jforum_attach add thumb tinyint(1) default 0;
 alter table jforum_attach add file_extension varchar(6);
 
-update jforum_posts p set p.post_subject = (select pt.post_subject from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
-update jforum_posts p set p.post_text = (select pt.post_text from jforum_posts_text pt where pt.post_id = p.post_id) where p.post_id = p.post_id;
+create temporary table attach_desc_tmp as select * from jforum_attach_desc;
 
+update jforum_attach a, attach_desc_tmp t set a.download_count = t.download_count, 
+	a.physical_filename = t.physical_filename, a.real_filename = t.real_filename, 
+	a.description = t.description, a.mimetype = t.mimetype, a.upload_date = t.upload_time, 
+	a.filesize = t.filesize, a.thumb = t.thumb
+	where a.attach_id = t.attach_id;
+
+drop table attach_desc_tmp
 drop table jforum_attach_desc;
-
 
 # Sessions
 alter table jforum_sessions drop session_page;
