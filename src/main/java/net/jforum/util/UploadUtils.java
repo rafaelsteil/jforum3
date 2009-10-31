@@ -92,9 +92,15 @@ public class UploadUtils {
 
 				inputStream.close();
 				fileInputStream.close();
+
+				this.deleteTempFile();
 			}
 			catch (Exception e) {
 			}
 		}
+	}
+
+	private void deleteTempFile() {
+		this.uploadedFile.getFile().delete();
 	}
 }
