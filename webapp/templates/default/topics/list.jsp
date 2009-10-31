@@ -65,7 +65,7 @@
 				'<jforum:i18n key="PostReport.cancel"/>': function() { $(this).dialog("close"); }
 			},
 			width: 400,
-			height: navigator.userAgent.indexOf("MSIE") > -1 ? 320 : 250,
+			height: navigator.userAgent.indexOf("MSIE") > -1 ? 330 : 270,
 			open: function() {
 				$("#reportAbuse").html(reportAbuseContents);
 			},

@@ -12,6 +12,8 @@ package net.jforum.actions;
 
 import java.util.List;
 
+import net.jforum.actions.helpers.Actions;
+import net.jforum.actions.helpers.Domain;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Topic;
 import net.jforum.repository.RecentTopicsRepository;
@@ -24,16 +26,14 @@ import org.vraptor.annotations.Component;
 /**
  * @author Rafael Steil
  */
-@Component("recentTopics")
+@Component(Domain.RECENT_TOPICS)
 public class RecentTopicsActions {
-	private RecentTopicsRepository repository;
-	private ViewPropertyBag propertyBag;
-	private JForumConfig config;
+	private final RecentTopicsRepository repository;
+	private final ViewPropertyBag propertyBag;
+	private final JForumConfig config;
 	private final ViewService viewService;
 
-	public RecentTopicsActions(RecentTopicsRepository repository,
-		ViewPropertyBag propertyBag,
-		JForumConfig config, ViewService viewService) {
+	public RecentTopicsActions(RecentTopicsRepository repository, ViewPropertyBag propertyBag, JForumConfig config, ViewService viewService) {
 		this.repository = repository;
 		this.propertyBag = propertyBag;
 		this.config = config;
@@ -43,17 +43,19 @@ public class RecentTopicsActions {
 	public void listNew() {
 		list(this.repository.getNewTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsNew");
 	}
+
 	public void listUpdated() {
 		list(this.repository.getUpdatedTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsUpdated");
 	}
+
 	public void listHot() {
 		list(this.repository.getHotTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsHot");
 	}
 
 	private void list(List<Topic> topics, String key) {
 		this.propertyBag.put("topics", topics);
-		this.propertyBag.put("sessionTitleKey", key);
+		this.propertyBag.put("recentTopicsSectionKey", key);
 
-		viewService.renderView("list");
+		viewService.renderView(Actions.LIST);
 	}
 }

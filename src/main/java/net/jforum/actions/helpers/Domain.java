@@ -37,8 +37,9 @@ public class Domain{
 	public static final String RSS = "rss";
 	public static final String POST_REPORT = "postReport";
 	public static final String CONFIG_ADMIN = "adminConfig";
-		public static final String SHOUTBOX_ADMIN = "adminShoutBox";
+	public static final String SHOUTBOX_ADMIN = "adminShoutBox";
 	public static final String THEMES_ADMIN = "adminThemes";
+	public static final String RECENT_TOPICS = "recentTopics";
 
 	private Domain() {}
 }

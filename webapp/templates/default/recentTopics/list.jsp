@@ -1,7 +1,9 @@
 <%@taglib prefix="jforum" uri="http://www.jforum.net/tags"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<c:import url="../header.jsp"/>
+<c:set var="sectionTitle"><jforum:i18n key='ForumBase.${recentTopicsSectionKey}'/></c:set>
+<c:set var="pageTitle">${sectionTitle}</c:set>
+<%@ include file="../header.jsp" %>
 
 <link rel="alternate" type="application/rss+xml" title="RSS" href="<jforum:url address='/rss/recentTopics'/>" />
 
@@ -15,7 +17,7 @@
 						<td valign="bottom" align="left">
 							<a class="nav" href="<jforum:url address='/forums/list'/>"><jforum:i18n key='ForumListing.forumIndex'/></a>
 							&raquo;
-							<a id="latest3" class="nav" href="<jforum:url address='/recentTopics/list'/>"><jforum:i18n key='ForumBase.recentTopicsNew'/></a>
+							<a id="latest3" class="nav" href="<jforum:url address='/recentTopics/${action}'/>">${sectionTitle}</a>
 							<c:set var="rssEnabled"><jforum:settings key="rss.enabled"/></c:set>
 							<c:if test="${rssEnabled}">
 								&nbsp;<a href="<jforum:url address='/rss/recentTopics'/>"><img src="<jforum:templateResource item='/images/xml_button.gif'/>" border="0" align="middle" alt="[XML]" /></a>

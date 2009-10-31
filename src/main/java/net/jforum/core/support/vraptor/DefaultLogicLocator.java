@@ -114,6 +114,9 @@ public class DefaultLogicLocator implements LogicLocator {
 				throw new ForumException("Could not find an url mapping for " + sb + ". Have you configured it at urlPattern.properties?");
 			}
 
+			request.setAttribute("module", urlModel[componentIndex]);
+			request.setAttribute("action", urlModel[logicIndex]);
+
 			if (url.getSize() >= urlModel.length - baseLen) {
 				for (int i = 0; i < url.getSize(); i++) {
 					request.setParameter(url.getVars()[i], urlModel[i + baseLen]);

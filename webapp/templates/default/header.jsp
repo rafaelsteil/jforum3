@@ -64,7 +64,7 @@
 											<a id="privatemessages" href="<jforum:url address='/pm/inbox'/>"><img src="<jforum:templateResource item='/images/icon_mini_message.gif'/>" border="0" alt="[Message]" />
 												<c:set var="totalPrivateMessages" value="${userSession.user.totalUnreadPrivateMessages}"/>
 												<c:if test="${totalPrivateMessages > 0}">
-													<span style="color: #FF0000; font-weight: bold;"><jforum:i18n key="ForumBase.newPm"/>: (${totalPrivateMessages})</span>
+													<strong><jforum:i18n key="ForumBase.newPm"/>: (${totalPrivateMessages})</strong>
 												</c:if>
 												
 												<c:if test="${totalPrivateMessages == 0}">

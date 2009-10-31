@@ -38,7 +38,7 @@ public class PostReportCounterOperation implements RequestOperation {
 		int total = 0;
 		UserSession userSession = this.sessionManager.getUserSession();
 
-		if (userSession.isLogged() && userSession.getRoleManager().isModerator()) {
+		if (userSession != null && userSession.isLogged() && userSession.getRoleManager().isModerator()) {
 			total = this.repository.countPendingReports(userSession.getRoleManager().getRoleValues(SecurityConstants.FORUM));
 		}
 
