@@ -1,5 +1,6 @@
 <%@taglib prefix="jforum" uri="http://www.jforum.net/tags"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <html>
 <head>
@@ -27,20 +28,20 @@
 		<td class="row1"><b>${stats.posts}</b></td>
 		<td class="row1" nowrap="nowrap"><jforum:i18n key="Admin.welcome.postsPerDay"/></td>
 	
-		<td class="row2"><b>${stats.postsPerDay}</b></td>
+		<td class="row2"><b><fmt:formatNumber type="number" maxFractionDigits="2" value="${stats.postsPerDay}"/></b></td>
 	  </tr>
 	  <tr>
 		<td class="row2" nowrap="nowrap"><jforum:i18n key="Admin.welcome.numTopics"/></td>
 		<td class="row2"><b>${stats.topics}</b></td>
 		<td class="row2" nowrap="nowrap"><jforum:i18n key="Admin.welcome.topicsPerDay"/></td>
-		<td class="row2"><b>${stats.topicsPerDay}</b></td>
+		<td class="row2"><b><fmt:formatNumber type="number" maxFractionDigits="2" value="${stats.topicsPerDay}"/></b></td>
 	
 	  </tr>
 	  <tr>
 		<td class="row1" nowrap="nowrap"><jforum:i18n key="Admin.welcome.numUsers"/></td>
 		<td class="row1"><b>${stats.users}</b></td>
 		<td class="row1" nowrap="nowrap"><jforum:i18n key="Admin.welcome.usersPerDay"/></td>
-		<td class="row1"><b>${stats.usersPerDay}</b></td>
+		<td class="row1"><b><fmt:formatNumber type="number" maxFractionDigits="2" value="${stats.usersPerDay}"/></b></td>
 	  </tr>
 	</table>
 </c:if>

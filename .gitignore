@@ -10,3 +10,4 @@ out
 *.iml
 .settings/
 webapp/upload/
+src/main/resources/jforumConfig/jforum-custom.properties
