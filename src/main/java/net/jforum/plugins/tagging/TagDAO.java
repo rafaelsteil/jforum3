@@ -58,7 +58,7 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 	/**
 	 * get the Hot tags and its count
 	 * order by the tag name
-	 * @deprecated 
+	 * @deprecated
 	 */
 	@Deprecated
 	@SuppressWarnings("unchecked")
@@ -67,7 +67,7 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 		  .setMaxResults(limit)
 		  .setComment("tagDAO.getHotTags(int)")
 		  .list();
-		
+
 		return this.transferListMap(_list);
 	}
 
@@ -84,7 +84,7 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 			  .list();
 			return this.transferListMap(_list);
 		}
-		
+
 		return new LinkedHashMap<String,Long>();
 	}
 
@@ -95,7 +95,7 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 	public Map<String, Long> getHotTags(Forum forum, int limit) {
 		/*int count = forum.getTotalTopics();
 		List<Topic> topics = forum.getTopics(0, count);*/
-		
+
 		//just need the id of these topics, no need load all the propertise
 		List<Topic> topics = this.session().createQuery("select new Topic(topic.id) from Topic as topic where topic.forum = :forum")
 							.setParameter("forum", forum).list();
@@ -107,9 +107,10 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Long> getAccessableHotTags(List<Forum> forums, int limit) {
-		if(forums == null || forums.size() == 0)
+		if(forums == null || forums.size() == 0) {
 			return new LinkedHashMap<String,Long>();
-		
+		}
+
 		List<Topic> topics = this.session().createQuery("select new Topic(topic.id) from Topic as topic where topic.forum in (:forums)")
 		.setParameterList("forums", forums).list();
 		return this.getHotTags(topics, limit);
@@ -132,12 +133,12 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 					  .setComment("tagDAO.update(String)")
 					  .executeUpdate();
 	}
-	
+
 	public int count(String name) {
-		return  (Integer) this.session().createQuery("select count(*) as c from Tag where name=:name")
+		return  ((Number)this.session().createQuery("select count(*) as c from Tag where name=:name")
 			  .setString("name", name)
 			  .setComment("tagDAO.count(String)")
-			  .uniqueResult();
+			  .uniqueResult()).intValue();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -151,7 +152,7 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 	private Query getAllTagQuery (){
 		return this.session().createQuery("select distinct(name) from Tag order by name");
 	}
-	
+
 	private Map<String,Long> transferListMap(List<Object[]> maps){
 		Map<String,Long>  result = new LinkedHashMap<String,Long> ();
 		for(Object[] item : maps){
@@ -159,7 +160,7 @@ public class TagDAO extends HibernateGenericDAO<Tag> implements TagRepository {
 			Long count = (Long)item[1];
 			result.put(name, count);
 		}
-		
+
 		return result;
 	}
 

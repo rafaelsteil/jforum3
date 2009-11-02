@@ -47,7 +47,7 @@ public class TopicWatchServiceTestCase {
 		final User user = new User(); user.setId(2);
 
 		context.checking(new Expectations() {{
-			one(repository).getSubscription(topic, user); will(returnValue(false));
+			one(repository).getSubscription(topic, user); will(returnValue(null));
 			one(repository).add(with(aNonNull(TopicWatch.class)));
 		}});
 
@@ -61,7 +61,7 @@ public class TopicWatchServiceTestCase {
 		final User user = new User(); user.setId(2);
 
 		context.checking(new Expectations() {{
-			one(repository).getSubscription(topic, user); will(returnValue(true));
+			one(repository).getSubscription(topic, user); will(returnValue(new TopicWatch()));
 		}});
 
 		service.watch(topic, user);

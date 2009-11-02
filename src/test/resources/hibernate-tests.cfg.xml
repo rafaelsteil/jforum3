@@ -46,5 +46,7 @@
 		<mapping class="net.jforum.entities.Poll" />
 		<mapping class="net.jforum.entities.PollOption" />
 		<mapping class="net.jforum.entities.Attachment" />
+		<mapping class="net.jforum.plugins.post.ForumLimitedTime" />
+		<mapping class="net.jforum.plugins.tagging.Tag" />
 	</session-factory>
 </hibernate-configuration>

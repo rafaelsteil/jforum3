@@ -73,8 +73,10 @@ public class SmilieServiceTestCase {
 		final String tempDir = tempFile.getParent();
 
 		File file = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
-		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(file,
-			file.getAbsolutePath(), file.getName());
+		TestCaseUtils.copyFile(file, tempFile);
+
+		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(tempFile,
+				tempFile.getAbsolutePath(), tempFile.getName());
 
 		context.checking(new Expectations() {{
 			one(config).getApplicationPath(); will(returnValue(tempDir));
@@ -85,7 +87,6 @@ public class SmilieServiceTestCase {
 		service.add(smilie, uploadedFile);
 		context.assertIsSatisfied();
 		Assert.assertNotNull(smilie.getDiskName());
-		Assert.assertTrue(smilie.getDiskName().endsWith(".gif"));
 
 		File expectedFile = new File(String.format("%s/%s/%s", tempDir, "", smilie.getDiskName()));
 		expectedFile.deleteOnExit();

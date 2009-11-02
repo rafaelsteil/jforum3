@@ -64,10 +64,6 @@ public class ActionExtensionManagerTestCase {
 
 		manager.setExtensions(Arrays.asList(FooExtension.class.getName()));
 
-		/*manager.findAndExecute("foo", "fooOne", request);
-		manager.findAndExecute("foo", "fooTwo", request);
-		manager.findAndExecute("foo", "fooThree", request);*/
-
 		Assert.assertTrue(oneExecuted);
 		Assert.assertTrue(twoExecuted);
 		Assert.assertTrue(threeExecuted);

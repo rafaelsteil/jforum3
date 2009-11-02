@@ -17,13 +17,9 @@ import net.jforum.util.JDBCLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * @author Rafael Steil
- */
 public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimitedTime> {
-
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void getFourmLimitedTime() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/posteditlimited/dump.sql");
@@ -38,8 +34,8 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		Assert.assertEquals(4, fourmLimitedTime.getId());
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void getFourmLimitedTimeReturnNullIfNotFound() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/posteditlimited/dump.sql");
@@ -53,8 +49,8 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		Assert.assertNull(fourmLimitedTime);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void getLimitedTime() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/posteditlimited/dump.sql");
@@ -68,8 +64,8 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		Assert.assertEquals(125, limitedTime);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void getLimitedTimeReturn0IfNotFound() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/posteditlimited/dump.sql");
@@ -86,5 +82,4 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 	private ForumLimitedTimeDAO newFourmLimitedTimeDAO() {
 		return new ForumLimitedTimeDAO(sessionFactory);
 	}
-
 }

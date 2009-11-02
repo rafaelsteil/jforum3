@@ -47,6 +47,7 @@ public class DefaultLoginAuthenticatorTestCase {
 		context.checking(new Expectations() {{
 			User user = new User();
 			user.setDeleted(false);
+			user.setActive(false);
 			user.setActivationKey("some key");
 
 			one(repository).validateLogin("user", "passwd"); will(returnValue(user));

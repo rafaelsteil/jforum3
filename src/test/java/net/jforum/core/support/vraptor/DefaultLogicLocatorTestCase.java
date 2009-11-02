@@ -74,6 +74,8 @@ public class DefaultLogicLocatorTestCase {
 			one(config).getUrlPattern("posts.list.1"); will(returnValue(new UrlPattern("topicId")));
 			exactly(1).of(request).setParameter("topicId", "50");
 			one(componentManager).getComponent("posts", "list"); will(returnValue(componentType));
+			one(request).setAttribute("module", "posts");
+			one(request).setAttribute("action", "list");
 			one(componentType).getLogic("list"); will(returnValue(logicMethod));
 		}});
 
@@ -106,6 +108,8 @@ public class DefaultLogicLocatorTestCase {
 			one(componentManager).getComponent("forums", "show"); will(returnValue(componentType));
 			one(componentType).getLogic("show"); will(returnValue(logicMethod));
 			one(config).getUrlPattern("forums.show.1"); will(returnValue(new UrlPattern("forumId")));
+			one(request).setAttribute("module", "forums");
+			one(request).setAttribute("action", "show");
 			exactly(1).of(request).setParameter("forumId", "3");
 		}});
 
@@ -124,6 +128,8 @@ public class DefaultLogicLocatorTestCase {
 			one(componentManager).getComponent("categories", "list"); will(returnValue(componentType));
 			one(componentType).getLogic("list"); will(returnValue(logicMethod));
 			one(config).getUrlPattern("categories.list.0"); will(returnValue(new UrlPattern("")));
+			one(request).setAttribute("module", "categories");
+			one(request).setAttribute("action", "list");
 		}});
 
 		LogicLocator logicLocator = new DefaultLogicLocator(componentManager);
@@ -143,6 +149,8 @@ public class DefaultLogicLocatorTestCase {
 			one(config).getUrlPattern("categories.list.2"); will(returnValue(new UrlPattern("start, categoryId")));
 			exactly(1).of(request).setParameter("start", "15");
 			exactly(1).of(request).setParameter("categoryId", "1234");
+			one(request).setAttribute("module", "categories");
+			one(request).setAttribute("action", "list");
 		}});
 
 		LogicLocator logicLocator = new DefaultLogicLocator(componentManager);
@@ -189,6 +197,7 @@ public class DefaultLogicLocatorTestCase {
 			one(servletContext).getAttribute(ConfigKeys.SPRING_CONTEXT); will(returnValue(springContext));
 			one(springContext).getBean(JForumConfig.class.getName()); will(returnValue(config));
 			one(config).getValue(ConfigKeys.SERVLET_EXTENSION); will(returnValue(".page"));
+			allowing(request).getMethod(); will(returnValue("GET"));
 		}});
 	}
 }

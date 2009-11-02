@@ -24,18 +24,13 @@ import org.junit.Test;
 
 /**
  * @author Bill
- *
  */
 public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
-
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTagByTopic() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/tagdao/dump.sql");
-		this.commit();
-		this.beginTransaction();
-
 
 		TopicDAO topicDAO = this.newTopicDao();
 		TagDAO tagdao = this.newDao();
@@ -44,7 +39,6 @@ public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
 
 		Tag tag1 = tagdao.get(1);
 		Tag tag3 = tagdao.get(3);
-		this.commit();
 
 		List<Tag> tags = tagdao.getTags(topic);
 		Assert.assertEquals(2, tags.size());
@@ -52,26 +46,23 @@ public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
 		Assert.assertTrue(tags.contains(tag3));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void getAll(){
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/tagdao/dump.sql");
-		this.commit();
-		this.beginTransaction();
 
 		TagDAO tagdao = this.newDao();
 		List<String> tags = tagdao.getAll();
-		this.commit();
 
 		Assert.assertEquals(3, tags.size());
 		Assert.assertTrue(tags.contains("IT"));
 		Assert.assertTrue(tags.contains("Indonesia"));
-		Assert.assertTrue(tags.contains("Jakarat"));
+		Assert.assertTrue(tags.contains("Jakarta"));
 	}
 
-	@SuppressWarnings({ "deprecation" })
 	@Test
+	@SuppressWarnings("deprecation")
 	public void getHotTags(){
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/tagdao/dump.sql");
@@ -91,11 +82,13 @@ public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
 		this.commit();
 
 		Assert.assertEquals(3, tags.size());
-		Assert.assertTrue(tags.keySet().contains("Indonesia"));
-		Assert.assertTrue(tags.keySet().contains("Indonesia"));
-		Assert.assertTrue(tags.keySet().contains("Jakarta"));
+
+		Assert.assertTrue(tags.containsKey("IT"));
+		Assert.assertTrue(tags.containsKey("Jakarta"));
+		Assert.assertTrue(tags.containsKey("Indonesia"));
+
 		Assert.assertTrue(tags.get("Indonesia").equals(1l));
-		Assert.assertTrue(tags.get("Indonesia").equals(2l));
+		Assert.assertTrue(tags.get("IT").equals(2l));
 		Assert.assertTrue(tags.get("Jakarta").equals(1l));
 	}
 
@@ -118,8 +111,8 @@ public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
 		Assert.assertFalse(tags.contains("IT"));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void updateTagName(){
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/tagdao/dump.sql");
@@ -135,11 +128,11 @@ public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
 		this.commit();
 
 		Assert.assertFalse(tags.contains("IT"));
-		Assert.assertFalse(tags.contains("Information Technology"));
+		Assert.assertTrue(tags.contains("Information Technology"));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
+	@SuppressWarnings("deprecation")
 	public void countTag(){
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/tagdao/dump.sql");
@@ -153,8 +146,8 @@ public class TagDAOTestCase extends AbstractDAOTestCase<Tag> {
 		Assert.assertEquals(3, count);
 	}
 
-	@SuppressWarnings({ "deprecation", "serial" })
 	@Test
+	@SuppressWarnings({ "deprecation", "serial" })
 	public void getTopicOfTagName(){
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/tagdao/dump.sql");

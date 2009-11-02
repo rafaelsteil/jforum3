@@ -74,9 +74,11 @@ public class TagServiceTestCase {
 		final Topic topic = new Topic();
 		topic.setId(1);
 		context.checking(new Expectations() {{
-            // FIXME Reintroduce tests
-			//one(repository).add(new Tag().withName("IT"));
-			//one(repository).add(new Tag().withName("Jakarta"));
+			Tag it = new Tag(); it.setName("IT");
+			Tag jakarta = new Tag(); jakarta.setName("Jakarta");
+
+			one(repository).add(it);
+			one(repository).add(jakarta);
 		}});
 		service.addTag(tag,topic);
 		context.assertIsSatisfied();

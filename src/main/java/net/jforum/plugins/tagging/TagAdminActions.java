@@ -17,6 +17,7 @@ import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.security.AdministrationRule;
 import net.jforum.services.ViewService;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.vraptor.annotations.Component;
 import org.vraptor.annotations.InterceptedBy;
 import org.vraptor.annotations.Parameter;
@@ -32,18 +33,20 @@ public class TagAdminActions {
 	private ViewService viewService;
 	private ViewPropertyBag propertyBag;
 	private TagRepository repository;
-	
+
 	public TagAdminActions(ViewPropertyBag propertyBag,
 			ViewService viewService,TagRepository repository) {
 		this.propertyBag = propertyBag;
 		this.repository = repository;
 		this.viewService = viewService;
 	}
-	
+
 	public void delete(@Parameter(key = "tags") String... tags) {
-		if (tags != null) {
+		if (!ArrayUtils.isEmpty(tags)) {
 			for (String tag : tags) {
-				this.repository.remove(tag);
+				if (tag != null) {
+					this.repository.remove(tag);
+				}
 			}
 		}
 

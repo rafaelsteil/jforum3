@@ -76,8 +76,10 @@ public class AvatarServiceTestCase {
 		final String tempDir = tempFile.getParent();
 
 		File file = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
-		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(file,
-			file.getAbsolutePath(), file.getName());
+		TestCaseUtils.copyFile(file, tempFile);
+
+		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(tempFile,
+				tempFile.getAbsolutePath(), tempFile.getName());
 
 		context.checking(new Expectations() {{
 			one(config).getApplicationPath(); will(returnValue(tempDir));
@@ -95,7 +97,6 @@ public class AvatarServiceTestCase {
 		service.add(avatar, uploadedFile);
 		context.assertIsSatisfied();
 		Assert.assertNotNull(avatar.getFileName());
-		Assert.assertTrue(avatar.getFileName().endsWith(".gif"));
 
 		File expectedFile = new File(String.format("%s/%s/%s", tempDir, "", avatar.getFileName()));
 		expectedFile.deleteOnExit();
@@ -132,7 +133,9 @@ public class AvatarServiceTestCase {
 			one(repository).update(currentAvatar);
 		}});
 
-		File newFile = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
+		File originalFile = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
+		File newFile = File.createTempFile("jforum", "tests");
+		TestCaseUtils.copyFile(originalFile, newFile);
 
 		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(newFile,
 			newFile.getAbsolutePath(), newFile.getName());

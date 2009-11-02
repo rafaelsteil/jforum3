@@ -11,6 +11,9 @@
 package net.jforum.util;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -47,8 +50,9 @@ public class TestCaseUtils {
 	 * @return
 	 */
 	public static String getApplicationRoot() {
-		String filePath = TestCaseUtils.class.getResource("/").getFile();
-		return filePath.substring(0, filePath.length() - "/target/tests/".length());
+		String filePath = TestCaseUtils.class.getResource(".").getFile();
+		int index = filePath.indexOf("/target/tests");
+		return filePath.substring(0, index);
 	}
 
 	/**
@@ -130,6 +134,26 @@ public class TestCaseUtils {
 				reader.close();
 			}
 			catch (Exception e) {}
+		}
+	}
+
+	public static void copyFile(File in, File out) {
+		try {
+			FileInputStream fis = new FileInputStream(in);
+			FileOutputStream fos = new FileOutputStream(out);
+
+			byte[] buf = new byte[1024];
+			int i = 0;
+
+			while ((i = fis.read(buf)) != -1) {
+				fos.write(buf, 0, i);
+			}
+
+			fis.close();
+			fos.close();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 }
