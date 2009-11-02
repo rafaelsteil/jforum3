@@ -14,11 +14,12 @@ import java.util.ArrayList;
 
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Topic;
+import net.jforum.entities.UserSession;
 import net.jforum.repository.RecentTopicsRepository;
+import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
-import net.jforum.services.ViewService;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -33,15 +34,17 @@ public class RecentTopicsActionsTestCase {
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
     private ViewService viewService = context.mock(ViewService.class);
-	private RecentTopicsActions component = new RecentTopicsActions(repository, propertyBag, config, viewService);
+    private UserSession userSession = context.mock(UserSession.class);
+	private RecentTopicsActions component = new RecentTopicsActions(repository, propertyBag, config, viewService, userSession);
 
 	@Test
 	public void listNew() {
 		context.checking(new Expectations() {{
+			one(userSession).getRoleManager(); will(returnValue(null));
 			one(repository).getNewTopics(10); will(returnValue(new ArrayList<Topic>()));
 			one(config).getInt(ConfigKeys.RECENT_TOPICS); will(returnValue(10));
 			one(propertyBag).put("topics", new ArrayList<Topic>());
-			one(propertyBag).put("sessionTitleKey", "recentTopicsNew");
+			one(propertyBag).put("recentTopicsSectionKey", "recentTopicsNew");
 			one(viewService).renderView("list");
 		}});
 
@@ -52,10 +55,11 @@ public class RecentTopicsActionsTestCase {
     @Test
 	public void listUpdated() {
 		context.checking(new Expectations() {{
+			one(userSession).getRoleManager(); will(returnValue(null));
 			one(repository).getUpdatedTopics(10); will(returnValue(new ArrayList<Topic>()));
 			one(config).getInt(ConfigKeys.RECENT_TOPICS); will(returnValue(10));
 			one(propertyBag).put("topics", new ArrayList<Topic>());
-			one(propertyBag).put("sessionTitleKey", "recentTopicsUpdated");
+			one(propertyBag).put("recentTopicsSectionKey", "recentTopicsUpdated");
 			one(viewService).renderView("list");
 		}});
 
@@ -66,10 +70,11 @@ public class RecentTopicsActionsTestCase {
     @Test
 	public void listHot() {
 		context.checking(new Expectations() {{
+			one(userSession).getRoleManager(); will(returnValue(null));
 			one(repository).getHotTopics(10); will(returnValue(new ArrayList<Topic>()));
 			one(config).getInt(ConfigKeys.RECENT_TOPICS); will(returnValue(10));
 			one(propertyBag).put("topics", new ArrayList<Topic>());
-			one(propertyBag).put("sessionTitleKey", "recentTopicsHot");
+			one(propertyBag).put("recentTopicsSectionKey", "recentTopicsHot");
 			one(viewService).renderView("list");
 		}});
 
