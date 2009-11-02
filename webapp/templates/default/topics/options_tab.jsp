@@ -29,9 +29,9 @@
 			<td><label for="attach_sig"><jforum:i18n key='PostForm.appendSignature'/></label></td>
 		</tr>
 
-		<c:if test="${not empty forum}">
+		<c:if test="${not empty forum && !isEdit}">
 			<tr>
-				<td><input type="checkbox" id="notify" name="postOptions.notifyReplies" value="true" ${repliesChecked} /> </td>
+				<td><input type="checkbox" id="notify" name="postOptions.notifyReplies" value="true" <c:if test="${userSession.user.notifyReply}">checked</c:if> /> </td>
 				<td><label for="notify"><jforum:i18n key='PostForm.notifyReplies'/></label></td>
 			</tr>
 		</c:if>

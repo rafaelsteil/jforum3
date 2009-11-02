@@ -37,7 +37,7 @@ public interface TopicWatchRepository extends Repository<TopicWatch> {
 	 * @param user the user
 	 * @return true if the user is watching the topic
 	 */
-	public boolean isUserSubscribed(Topic topic, User user);
+	public TopicWatch getSubscription(Topic topic, User user);
 
 	/**
 	 * Clear all subscriptions of some topic

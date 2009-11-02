@@ -21,6 +21,7 @@ import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Topic;
+import net.jforum.entities.TopicWatch;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.extensions.ActionExtension;
@@ -67,7 +68,7 @@ public class TopicWatchExtensionTestCase {
 
 		context.checking(new Expectations() {{
 			Topic t = new Topic(); t.setId(1);
-			one(service).isUserSubscribed(t, new User()); will(returnValue(true));
+			one(service).getSubscription(t, new User()); will(returnValue(new TopicWatch()));
 			one(propertyBag).put("isUserWatchingTopic", true);
 		}});
 
@@ -80,7 +81,11 @@ public class TopicWatchExtensionTestCase {
 			UserSession us = context.mock(UserSession.class);
 			one(sessionManager).getUserSession(); will(returnValue(us));
 			Topic t = new Topic(); t.setId(1);
-			one(propertyBag).get("topic"); will(returnValue(t));
+
+			if (isLogged) {
+				one(propertyBag).get("topic"); will(returnValue(t));
+			}
+
 			one(us).isLogged(); will(returnValue(isLogged));
 			allowing(us).getUser(); will(returnValue(new User()));
 		}});

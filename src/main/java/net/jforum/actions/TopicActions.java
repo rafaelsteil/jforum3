@@ -300,7 +300,8 @@ public class TopicActions {
 		List<Post> posts = topic.getPosts(pagination.getStart(), pagination.getRecordsPerPage());
 		if (posts.isEmpty() == false) {
 			long limitedTime = this.forumLimitedTimeRepository.getLimitedTime(posts.get(0).getForum());
-			if(limitedTime > 0) {
+
+			if (limitedTime > 0) {
 				Date now = new Date();
 				for (Post post : posts) {
 					post.calculateHasEditTimeExpired(limitedTime, now);

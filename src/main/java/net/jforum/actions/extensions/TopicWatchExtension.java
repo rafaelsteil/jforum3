@@ -18,6 +18,7 @@ import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Topic;
+import net.jforum.entities.TopicWatch;
 import net.jforum.entities.UserSession;
 import net.jforum.extensions.ActionExtension;
 import net.jforum.extensions.Extends;
@@ -37,10 +38,10 @@ import org.vraptor.annotations.Parameter;
 @ActionExtension(Domain.TOPICS)
 @InterceptedBy(MethodSecurityInterceptor.class)
 public class TopicWatchExtension {
-	private ViewPropertyBag propertyBag;
-	private SessionManager sessionManager;
-	private ViewService viewService;
-	private TopicWatchService watchService;
+	private final ViewPropertyBag propertyBag;
+	private final SessionManager sessionManager;
+	private final ViewService viewService;
+	private final TopicWatchService watchService;
 
 	public TopicWatchExtension(ViewPropertyBag propertyBag, SessionManager sessionManager,
 		ViewService viewService, TopicWatchService watchService) {
@@ -52,12 +53,20 @@ public class TopicWatchExtension {
 
 	@Extends(Actions.LIST)
 	public void afterList() {
+		boolean isWatching = false;
 		UserSession userSession = this.sessionManager.getUserSession();
-		Topic topic = (Topic)this.propertyBag.get("topic");
 
-		this.propertyBag.put("isUserWatchingTopic", userSession.isLogged()
-			? this.watchService.isUserSubscribed(topic, userSession.getUser())
-			: false);
+		if (userSession.isLogged()) {
+			Topic topic = (Topic)this.propertyBag.get("topic");
+			TopicWatch subscription = this.watchService.getSubscription(topic, userSession.getUser());
+			isWatching = subscription != null;
+
+			if (!subscription.isRead()) {
+				subscription.markAsRead();
+			}
+		}
+
+		this.propertyBag.put("isUserWatchingTopic", isWatching);
 	}
 
 	/**
@@ -66,7 +75,8 @@ public class TopicWatchExtension {
 	 */
 	@SecurityConstraint(value = AuthenticatedRule.class, displayLogin = true)
 	public void watch(@Parameter(key = "page") int page, @Parameter(key = "topicId") int topicId) {
-		Topic topic = new Topic(); topic.setId(topicId);
+		Topic topic = new Topic();
+		topic.setId(topicId);
 
 		UserSession userSession = this.sessionManager.getUserSession();
 

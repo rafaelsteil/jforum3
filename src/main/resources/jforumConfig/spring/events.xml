@@ -13,7 +13,6 @@
 			<list>
 				<bean class="net.jforum.core.events.topic.ForumTopicEvent" autowire="constructor"/>
 				<bean class="net.jforum.core.events.topic.TopicWatchTopicEvent" autowire="constructor"/>
-				<bean class="net.jforum.plugins.tagging.TagTopicEvent" autowire="constructor"/>
 			</list>
 		</property>
 	</bean>

@@ -28,6 +28,14 @@
         overflowToDisk    - Sets whether elements can overflow to disk when the in-memory cache
                             has reached the maxInMemory limit.
 	-->
+
+    <!-- Default Cache configuration -->
+	<defaultCache
+		maxElementsInMemory="20000"
+		eternal="false"
+		timeToIdleSeconds="1200"
+		timeToLiveSeconds="3600"
+		overflowToDisk="true"/>
 	
 	<!-- Category -->
 	<cache name="net.jforum.entities.Category"
@@ -142,13 +150,5 @@
 		timeToIdleSeconds="3601"
 		timeToLiveSeconds="18001"
 		eternal="true"
-		overflowToDisk="true"/>
-
-    <!--Default Cache configuration. These will applied to caches programmatically created through the CacheManager -->
-	<defaultCache
-		maxElementsInMemory="2000"
-		eternal="false"
-		timeToIdleSeconds="1200"
-		timeToLiveSeconds="3600"
 		overflowToDisk="true"/>
 </ehcache>

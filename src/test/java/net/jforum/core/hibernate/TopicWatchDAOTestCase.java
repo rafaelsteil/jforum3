@@ -62,7 +62,7 @@ public class TopicWatchDAOTestCase extends AbstractDAOTestCase<TopicWatch> {
 
 		dao.removeSubscription(topic);
 
-		Assert.assertFalse(dao.isUserSubscribed(topic, user));
+		Assert.assertNull(dao.getSubscription(topic, user));
 	}
 
 	@Test
@@ -77,10 +77,10 @@ public class TopicWatchDAOTestCase extends AbstractDAOTestCase<TopicWatch> {
 
 		dao.removeSubscription(topic, user);
 
-		Assert.assertFalse(dao.isUserSubscribed(topic, user));
+		Assert.assertNull(dao.getSubscription(topic, user));
 
 		user.setId(2);
-		Assert.assertTrue(dao.isUserSubscribed(topic, user));
+		Assert.assertNotNull(dao.getSubscription(topic, user));
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class TopicWatchDAOTestCase extends AbstractDAOTestCase<TopicWatch> {
 		Topic topic = new Topic(); topic.setId(1);
 		User user = new User(); user.setId(1);
 
-		Assert.assertFalse(dao.isUserSubscribed(topic, user));
+		Assert.assertNull(dao.getSubscription(topic, user));
 	}
 
 	@Test
@@ -102,7 +102,7 @@ public class TopicWatchDAOTestCase extends AbstractDAOTestCase<TopicWatch> {
 		Topic topic = new Topic(); topic.setId(1);
 		User user = new User(); user.setId(1);
 
-		Assert.assertTrue(dao.isUserSubscribed(topic, user));
+		Assert.assertNotNull(dao.getSubscription(topic, user));
 	}
 
 	@Test

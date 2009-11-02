@@ -26,11 +26,9 @@ public class TopicWatchService {
 		this.repository = repository;
 	}
 
-	/**
-	 * @see {@link TopicWatchRepository#isUserSubscribed(Topic, User))
-	 */
-	public boolean isUserSubscribed(Topic topic, User user) {
-		return this.repository.isUserSubscribed(topic, user);
+
+	public TopicWatch getSubscription(Topic topic, User user) {
+		return this.repository.getSubscription(topic, user);
 	}
 
 	/**
@@ -39,10 +37,11 @@ public class TopicWatchService {
 	 * @param user the user who wants to watch
 	 */
 	public void watch(Topic topic, User user) {
-		boolean isUserSubscribed = this.repository.isUserSubscribed(topic, user);
+		TopicWatch watch = this.repository.getSubscription(topic, user);
 
-		if (!isUserSubscribed) {
-			TopicWatch watch = new TopicWatch();
+		if (watch == null) {
+			watch = new TopicWatch();
+			watch.markAsRead();
 			watch.setTopic(topic);
 			watch.setUser(user);
 
