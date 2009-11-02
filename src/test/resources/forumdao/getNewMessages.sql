@@ -10,12 +10,12 @@ INSERT INTO jforum_topics (topic_id, forum_id, topic_subject, user_id, topic_dat
 INSERT INTO jforum_topics (topic_id, forum_id, topic_subject, user_id, topic_date, TOPIC_STATUS, TOPIC_REPLIES, TOPIC_VIEWS, TOPIC_TYPE, TOPIC_VOTE_ID, need_moderate, topic_moved_id,has_attachment) VALUES (5, 2, 't2.1', 1, CURRENT_TIMESTAMP, 0, 0, 0, 0, null, 0, 0,false)
 INSERT INTO jforum_topics (topic_id, forum_id, topic_subject, user_id, topic_date, TOPIC_STATUS, TOPIC_REPLIES, TOPIC_VIEWS, TOPIC_TYPE, TOPIC_VOTE_ID, need_moderate, topic_moved_id,has_attachment) VALUES (6, 1, 't1.5', 1, CURRENT_TIMESTAMP, 0, 0, 0, 0, null, 0, 0,false)
 
-INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (1, 1, 1, '2008-06-11 14:50:32', 0, 0, 0, 0, 0, 0, 0)
-INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (2, 2, 1, '2008-06-11 14:51:33', 0, 0, 0, 0, 0, 0, 0)
-INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (3, 3, 1, '2008-06-11 14:52:34', 0, 0, 0, 0, 0, 0, 0)
-INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (4, 4, 1, '2008-06-11 14:53:35', 0, 0, 0, 0, 0, 0, 0)
-INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (5, 5, 1, '2008-06-11 14:52:19', 0, 0, 0, 0, 0, 0, 0)
-INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (6, 6, 1, '2008-06-11 09:49:11', 0, 0, 0, 0, 0, 0, 0) 
+INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (1, 1, 1, '2008-06-11 14:51:32', 0, 0, 0, 0, 0, 0, 0)
+INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (2, 2, 1, '2008-06-11 14:52:33', 0, 0, 0, 0, 0, 0, 0)
+INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (3, 3, 1, '2008-06-11 14:53:34', 0, 0, 0, 0, 0, 0, 0)
+INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (4, 4, 1, '2008-06-11 14:54:35', 0, 0, 0, 0, 0, 0, 0)
+INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (5, 5, 1, '2008-06-11 14:59:19', 0, 0, 0, 0, 0, 0, 0)
+INSERT INTO jforum_posts (post_id, topic_id, user_id, post_date, need_moderate, enable_bbcode, post_edit_count, attach, enable_html, enable_sig, enable_smilies) VALUES (6, 6, 1, '2008-06-10 09:49:11', 0, 0, 0, 0, 0, 0, 0) 
 
 UPDATE jforum_topics SET topic_last_post_id = 1 WHERE topic_id = 1
 UPDATE jforum_topics SET topic_last_post_id = 2 WHERE topic_id = 2

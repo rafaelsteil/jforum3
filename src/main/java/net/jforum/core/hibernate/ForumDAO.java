@@ -143,7 +143,6 @@ public class ForumDAO extends HibernateGenericDAO<Forum> implements ForumReposit
 			.setProjection(Projections.rowCount())
 			.add(Restrictions.eq("pendingModeration", false))
 			.add(Restrictions.eq("forum", forum))
-			.add(Restrictions.eq("movedId", 0))
 			.setCacheable(true)
 			.setCacheRegion("forumDAO.getTotalTopics#" + forum.getId())
 			.setComment("forumDAO.getTotalTopics")

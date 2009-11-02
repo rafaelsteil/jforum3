@@ -41,7 +41,11 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 
 		ForumDAO dao = this.newForumDao();
 		Forum toForum = dao.get(2);
-		dao.moveTopics(toForum, new int[] { 1 });
+
+		Assert.assertEquals(1, dao.getTotalTopics(toForum));
+		Assert.assertEquals(1, dao.getTotalPosts(toForum));
+
+		dao.moveTopics(toForum, 1);
 
 		Assert.assertEquals(2, dao.getTotalTopics(toForum));
 		Assert.assertEquals(2, dao.getTotalPosts(toForum));
@@ -53,15 +57,13 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/forumdao/getNewMessages.sql");
 
-		Calendar c = Calendar.getInstance();
-		c.set(2008, 5, 11, 14, 50);
+		Calendar from = Calendar.getInstance();
+		from.set(2008, 5, 11, 14, 50);
 
 		ForumDAO dao = this.newForumDao();
-		PaginatedResult<Topic> messages = dao.getNewMessages(c.getTime(), 0, 3);
+		PaginatedResult<Topic> messages = dao.getNewMessages(from.getTime(), 0, 3);
 
 		Assert.assertEquals(3, messages.getResults().size());
-
-		// FIXME this sometimes returns 4 (which is wrong), and sometimes 5 (which is correct). Find why
 		Assert.assertEquals(5, messages.getTotalRecords());
 	}
 
