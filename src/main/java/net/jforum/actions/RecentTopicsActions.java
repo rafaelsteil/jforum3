@@ -14,9 +14,11 @@ import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
+import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Topic;
 import net.jforum.repository.RecentTopicsRepository;
+import net.jforum.security.TopicFilter;
 import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
@@ -32,30 +34,35 @@ public class RecentTopicsActions {
 	private final ViewPropertyBag propertyBag;
 	private final JForumConfig config;
 	private final ViewService viewService;
+	private final SessionManager sessionManager;
 
-	public RecentTopicsActions(RecentTopicsRepository repository, ViewPropertyBag propertyBag, JForumConfig config, ViewService viewService) {
+	public RecentTopicsActions(RecentTopicsRepository repository, ViewPropertyBag propertyBag, JForumConfig config,
+			ViewService viewService, SessionManager sessionManager) {
 		this.repository = repository;
 		this.propertyBag = propertyBag;
 		this.config = config;
 		this.viewService = viewService;
+		this.sessionManager = sessionManager;
 	}
 
 	public void listNew() {
-		list(this.repository.getNewTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsNew");
+		this.list(this.repository.getNewTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsNew");
 	}
 
 	public void listUpdated() {
-		list(this.repository.getUpdatedTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsUpdated");
+		this.list(this.repository.getUpdatedTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsUpdated");
 	}
 
 	public void listHot() {
-		list(this.repository.getHotTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsHot");
+		this.list(this.repository.getHotTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsHot");
 	}
 
 	private void list(List<Topic> topics, String key) {
-		this.propertyBag.put("topics", topics);
+		TopicFilter filter = new TopicFilter();
+
+		this.propertyBag.put("topics", filter.filter(topics, this.sessionManager.getUserSession().getRoleManager()));
 		this.propertyBag.put("recentTopicsSectionKey", key);
 
-		viewService.renderView(Actions.LIST);
+		this.viewService.renderView(Actions.LIST);
 	}
 }
