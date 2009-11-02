@@ -42,6 +42,7 @@ public class RecentTopicsDAO extends HibernateGenericDAO<Topic> implements Recen
 			.list();
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Topic> getUpdatedTopics(int count) {
 		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("pendingModeration", false))
@@ -54,6 +55,7 @@ public class RecentTopicsDAO extends HibernateGenericDAO<Topic> implements Recen
 			.list();
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Topic> getHotTopics(int count) {
 		return this.session().createCriteria(this.persistClass)
 			.add(Restrictions.eq("pendingModeration", false))

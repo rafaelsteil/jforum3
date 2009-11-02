@@ -25,7 +25,6 @@ public class DisplayCategoriesTag extends JForumTag {
 	private List<Category> categories;
 	private RoleManager roleManager;
 	private String var;
-	private boolean isModerator;
 
 	/**
 	 * @see javax.servlet.jsp.tagext.SimpleTagSupport#doTag()
@@ -50,9 +49,5 @@ public class DisplayCategoriesTag extends JForumTag {
 
 	public void setItems(List<Category> categories) {
 		this.categories = categories;
-	}
-
-	public void setModerator(boolean isModerator) {
-		this.isModerator = isModerator;
 	}
 }

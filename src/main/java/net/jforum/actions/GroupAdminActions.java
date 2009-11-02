@@ -11,7 +11,6 @@
 package net.jforum.actions;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;

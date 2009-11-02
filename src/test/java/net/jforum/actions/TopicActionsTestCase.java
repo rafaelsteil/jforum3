@@ -62,6 +62,7 @@ import org.vraptor.http.VRaptorServletRequest;
 /**
  * @author Rafael Steil
  */
+@SuppressWarnings("unchecked")
 public class TopicActionsTestCase {
 
 	private Mockery context = TestCaseUtils.newMockery();

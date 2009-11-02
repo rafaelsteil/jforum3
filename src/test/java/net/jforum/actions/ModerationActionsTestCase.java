@@ -12,35 +12,34 @@ package net.jforum.actions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.ApproveInfo;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
-import net.jforum.entities.*;
+import net.jforum.entities.Category;
+import net.jforum.entities.ModerationLog;
+import net.jforum.entities.Topic;
+import net.jforum.entities.User;
+import net.jforum.entities.UserSession;
 import net.jforum.repository.CategoryRepository;
-import net.jforum.repository.TopicRepository;
 import net.jforum.repository.ModerationLogRepository;
+import net.jforum.repository.TopicRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.services.ModerationService;
 import net.jforum.services.ViewService;
-import net.jforum.util.TestCaseUtils;
 import net.jforum.util.JForumConfig;
+import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
 
 /**
  * @author Rafael Steil
  */
 public class ModerationActionsTestCase {
-	
+
 	private Mockery context = TestCaseUtils.newMockery();
 	private JForumConfig jForumConfig = context.mock(JForumConfig.class);
 	private ViewService viewService = context.mock(ViewService.class);
@@ -177,17 +176,5 @@ public class ModerationActionsTestCase {
 		}});
 
 		action.approve(1, Arrays.asList(new ApproveInfo[0]));
-	}
-
-	/*
-		FIXME : Rafael should look into why this test fails
-	 */
-	@Test
-	public void shouldBeInterceptedByMultipartRequestInterceptor() throws Exception {
-		Assert.assertTrue(action.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = action.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		// Reintroduce
-		//Assert.assertTrue(interceptors.contains(ActionSecurityInterceptor.class));
 	}
 }

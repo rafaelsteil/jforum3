@@ -12,11 +12,10 @@ package net.jforum.core.support.hibernate;
 
 import java.util.List;
 
-import net.jforum.entities.Post;
-import net.jforum.entities.Topic;
-import net.jforum.entities.ModerationLog;
-import net.jforum.services.ModerationService;
 import net.jforum.actions.helpers.ApproveInfo;
+import net.jforum.entities.ModerationLog;
+import net.jforum.entities.Topic;
+import net.jforum.services.ModerationService;
 
 /**
  * @author Rafael Steil
@@ -37,5 +36,4 @@ public class AOPTestModerationService extends ModerationService {
     public void moveTopics(int toForumId, ModerationLog moderationLog, int... topicIds) {
 
     }
-
 }

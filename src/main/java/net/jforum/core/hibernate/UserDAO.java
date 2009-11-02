@@ -200,6 +200,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 			.uniqueResult();
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Post> getPosts(User user, int start, int recordsPerPage) {
 		return this.session().createCriteria(Post.class)
 				.add(Restrictions.eq("user", user))
@@ -210,6 +211,7 @@ public class UserDAO extends HibernateGenericDAO<User> implements UserRepository
 				.list();
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Topic> getTopics(User user, int start, int recordsPerPage) {
 		return this.session().createCriteria(Topic.class)
 			.add(Restrictions.eq("user", user))
