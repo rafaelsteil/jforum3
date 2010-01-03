@@ -65,6 +65,16 @@ public class Group implements Serializable {
 
 		return false;
 	}
+	
+	public boolean roleExists(String name, int value) {
+		for (Role role : this.roles) {
+			if (role.getName().equals(name)) {
+				return role.getRoleValues().contains(value);
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Add a new security role to this group

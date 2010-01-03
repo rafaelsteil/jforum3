@@ -101,7 +101,7 @@
 					<th class="thcornerl" nowrap="nowrap" align="center" colspan="2" height="25">&nbsp;<jforum:i18n key="ForumIndex.topics"/>&nbsp;</th>
 					<th class="thtop" nowrap="nowrap" align="center" width="50">&nbsp;<jforum:i18n key="ForumIndex.answers"/>&nbsp;</th>
 					<th class="thtop" nowrap="nowrap" align="center" width="100">&nbsp;<jforum:i18n key="ForumIndex.author"/>&nbsp;</th>
-					<th class="thtop" nowrap="nowrap" align="center" width="50">&nbsp;<jforum:i18n key="ForumIndex.views"/>&nbsp;</th>
+					<!--<th class="thtop" nowrap="nowrap" align="center" width="50">&nbsp;<jforum:i18n key="ForumIndex.views"/>&nbsp;</th>-->
 					<th class="thcornerr" nowrap="nowrap" align="center">&nbsp;<jforum:i18n key="ForumIndex.lastMessage"/>&nbsp;</th>
 	
 					<c:if test="${roleManager.moderator}">
@@ -152,7 +152,7 @@
 							<span class="name"><a href="<jforum:url address='/user/profile/${topic.user.id}'/>">${fn:escapeXml(topic.user.username)}</a></span>
 						</td>
 
-						<td class="${row2}" valign="middle"  align="center"><span class="postdetails">${topic.totalViews}</span></td>
+						<!--<td class="${row2}" valign="middle"  align="center"><span class="postdetails">${topic.totalViews}</span></td>-->
 						<td class="${row3}" valign="middle"  nowrap="nowrap" align="center">
 							<span class="postdetails">${topic.lastPost.date}<br />
 							<a href="<jforum:url address='/user/profile/${topic.lastPost.user.id}'/>">${fn:escapeXml(topic.lastPost.user.username)}</a>

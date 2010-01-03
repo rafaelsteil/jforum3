@@ -17,10 +17,8 @@ import java.util.List;
 import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ValidationException;
-import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
-import net.jforum.repository.ForumRepository;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.RoleManager;
@@ -35,13 +33,11 @@ public class GroupService {
 	private GroupRepository repository;
 	private SessionManager sessionManager;
 	private UserRepository userRepository;
-	private ForumRepository forumRepository;
 
-	public GroupService(GroupRepository repository, SessionManager sessionManager, UserRepository userRepository, ForumRepository forumRepository) {
+	public GroupService(GroupRepository repository, SessionManager sessionManager, UserRepository userRepository) {
 		this.repository = repository;
 		this.sessionManager = sessionManager;
 		this.userRepository = userRepository;
-		this.forumRepository = forumRepository;
 	}
 
 	/**
@@ -52,13 +48,13 @@ public class GroupService {
 
 	/**
 	 * Save the permissions for this group
-	 * @param group
-	 * @param permissions
 	 */
 	public void savePermissions(int groupId, PermissionOptions permissions) {
 		Group group = this.repository.get(groupId);
+
 		RoleManager currentRoles = new RoleManager();
 		currentRoles.setGroups(Arrays.asList(group));
+
 		group.getRoles().clear();
 
 		boolean isAdministrator = currentRoles.isAdministrator();
@@ -95,29 +91,8 @@ public class GroupService {
 		this.registerRole(group, SecurityConstants.TOPIC_MOVE, permissions.getCanMoveTopics());
 		this.registerRole(group, SecurityConstants.MODERATE_REPLIES, permissions.getModeratedReplies());
 
-		List<Forum> forums = this.forumRepository.findAll();
-		List<Integer> notAllowedForums = new ArrayList<Integer>();
-
-		for (Forum forum : forums) {
-			notAllowedForums.add(forum.getId());
-		}
-
-		notAllowedForums.removeAll(permissions.getAllowedForums());
-		permissions.getReplyOnly().addAll(notAllowedForums);
-		permissions.getReadOnlyForums().addAll(notAllowedForums);
-
-		List<Integer> replyOnly = permissions.getReplyOnly();
-
-		// this ternary server to whitelist replyonly forums at RoleManager
-		this.registerRole(group, SecurityConstants.FORUM_REPLY_ONLY, replyOnly.isEmpty()
-			? Arrays.asList(new Integer[] {new Integer(0)})
-			: replyOnly);
-
-		// this ternary server to whitelist readonly forums at RoleManager
-		List<Integer> readOnlyForums = permissions.getReadOnlyForums();
-		this.registerRole(group, SecurityConstants.FORUM_READ_ONLY, readOnlyForums.isEmpty()
-			? Arrays.asList(new Integer[] {new Integer(0)})
-			: readOnlyForums);
+		this.registerRole(group, SecurityConstants.FORUM_REPLY_ONLY, permissions.getReplyOnly());
+		this.registerRole(group, SecurityConstants.FORUM_READ_ONLY, permissions.getReadOnlyForums());
 
 		this.registerRole(group, SecurityConstants.POLL_VOTE, permissions.getAllowPollVote());
 		this.registerRole(group, SecurityConstants.PRIVATE_MESSAGE, permissions.isPrivateMessageAllowed());

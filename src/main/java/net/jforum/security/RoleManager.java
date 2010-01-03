@@ -10,6 +10,7 @@
  */
 package net.jforum.security;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import net.jforum.entities.Group;
 import net.jforum.entities.Role;
 import net.jforum.entities.User;
 import net.jforum.util.SecurityConstants;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Provide access to all roles from a set of groups.
@@ -37,12 +37,8 @@ public class RoleManager {
 	 * This will replace any existing group that may exist already
 	 * @param groups the groups to add
 	 */
-	@SuppressWarnings("unchecked")
 	public void setGroups(List<Group> groups) {
 		this.roles = new HashMap<String, Role>();
-
-		List<String> shouldIntersectValues = Arrays.asList(new String[] {SecurityConstants.FORUM_READ_ONLY,
-			SecurityConstants.FORUM_REPLY_ONLY});
 
 		if (groups != null) {
 			for (Group group : groups) {
@@ -55,13 +51,31 @@ public class RoleManager {
 						this.roles.put(role.getName(), new Role(role));
 					}
 					else {
-						// this always works because when saving permissions we add an 0 id forum
-						// if no readonly/replyonly forum is added
-						if(shouldIntersectValues.contains(role.getName())) {
+						// Handle the very special case of read only and reply only
+						if (role.getName().equals(SecurityConstants.FORUM_READ_ONLY)
+								|| role.getName().equals(SecurityConstants.FORUM_REPLY_ONLY)) {
 							existingRole.getRoleValues().retainAll(role.getRoleValues());
-						} else {
+						}
+						else {
 							existingRole.getRoleValues().addAll(role.getRoleValues());
 						}
+					}
+				}
+			}
+
+			this.readReplyOnlySecondPass(SecurityConstants.FORUM_READ_ONLY, groups);
+			this.readReplyOnlySecondPass(SecurityConstants.FORUM_REPLY_ONLY, groups);
+		}
+	}
+
+	private void readReplyOnlySecondPass(String roleName, List<Group> groups) {
+		Role role = this.roles.get(roleName);
+
+		if (role != null) {
+			for (int forumId : new ArrayList<Integer>(role.getRoleValues())) {
+				for (Group g : groups) {
+					if (g.roleExists(SecurityConstants.FORUM, forumId) && !g.roleExists(roleName, forumId)) {
+						role.getRoleValues().remove((Object)forumId);
 					}
 				}
 			}

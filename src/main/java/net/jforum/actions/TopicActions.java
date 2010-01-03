@@ -276,7 +276,8 @@ public class TopicActions {
 			return;
 		}
 
-		topic.incrementViews();
+		// FIXME resolve cache issues
+		//topic.incrementViews();
 		UserSession userSession = this.sessionManager.getUserSession();
 		userSession.markTopicAsRead(topicId);
 

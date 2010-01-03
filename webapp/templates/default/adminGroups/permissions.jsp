@@ -8,7 +8,7 @@ div.scroll {
 }
 </style>
 
-<script type="text/javascript" src="<jforum:templateResource item='/js/shiftClick.js'/>"></script>
+<script type="text/javascript" src="<jforum:templateResource item='/js/shiftClick.js?3'/>"></script>
 
 <c:set var="isAdministrator" value="${userSession.roleManager.administrator}"/>
 
@@ -39,6 +39,7 @@ div.scroll {
 		<!-- ***************** -->
 		<!-- Co administration -->
 		<!-- ***************** -->
+		<!-- 
 		<tr>
 			<td class="row3 gen" colspan="3"><b><jforum:i18n key="Permissions.coAdministration"/></b></td>
 		</tr>
@@ -68,6 +69,7 @@ div.scroll {
 				</div>
 			</td>
 		</tr>
+		-->
 	</c:if>
 		
 	<!-- ********** -->

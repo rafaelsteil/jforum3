@@ -10,15 +10,11 @@
  */
 package net.jforum.services;
 
-import java.util.ArrayList;
-
 import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ValidationException;
-import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
 import net.jforum.entities.UserSession;
-import net.jforum.repository.ForumRepository;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.RoleManager;
@@ -38,8 +34,7 @@ public class GroupServiceTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
-    private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private GroupService service = new GroupService(repository, sessionManager, userRepository, forumRepository);
+	private GroupService service = new GroupService(repository, sessionManager, userRepository);
 
 	@Test
 	public void savePermissions() {
@@ -53,7 +48,6 @@ public class GroupServiceTestCase {
 			one(sessionManager).computeAllOnlineModerators();
 			one(repository).get(1); will(returnValue(new Group()));
 			one(repository).update(group);
-			one(forumRepository).findAll(); will(returnValue(new ArrayList<Forum>()));
 		}});
 
 		service.savePermissions(1, new PermissionOptions());

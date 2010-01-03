@@ -15,6 +15,7 @@ import java.util.List;
 
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
+import net.jforum.util.SecurityConstants;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,6 +24,74 @@ import org.junit.Test;
  * @author Rafael Steil
  */
 public class RoleManagerTestCase {
+	@Test
+	public void readOnlyGroupACantAccessForumGroupBIsReadOnlyShoudlNotBeAbleToCreateTopics() {
+		Group g1 = new Group();
+		g1.addRole(this.newRole(SecurityConstants.FORUM_READ_ONLY, Arrays.asList(1)));
+		g1.addRole(this.newRole(SecurityConstants.FORUM_REPLY_ONLY, Arrays.asList(5)));
+		g1.addRole(this.newRole(SecurityConstants.FORUM, Arrays.asList(1)));
+		g1.addRole(this.newRole(SecurityConstants.FORUM, Arrays.asList(5)));
+
+		Group g2 = new Group();
+		g2.addRole(this.newRole("some role"));
+
+		RoleManager manager = new RoleManager();
+		manager.setGroups(Arrays.asList(g1, g2));
+
+		Assert.assertTrue(manager.isForumAllowed(1));
+		Assert.assertTrue(manager.isForumReadOnly(1));
+		Assert.assertTrue(manager.isForumReplyOnly(5));
+	}
+
+	@Test
+	public void readReplyOnlyShouldRetainOnlyCommonValues() {
+		Group g1 = new Group();
+		g1.addRole(this.newRole(SecurityConstants.FORUM_READ_ONLY, Arrays.asList(1, 2, 3)));
+		g1.addRole(this.newRole(SecurityConstants.FORUM_REPLY_ONLY, Arrays.asList(7)));
+
+		Group g2 = new Group();
+		g2.addRole(this.newRole(SecurityConstants.FORUM_READ_ONLY, Arrays.asList(2, 3)));
+		g2.addRole(this.newRole(SecurityConstants.FORUM_REPLY_ONLY, Arrays.asList(7, 9)));
+
+		Group g3 = new Group();
+		g3.addRole(this.newRole(SecurityConstants.FORUM_READ_ONLY, Arrays.asList(3)));
+		g3.addRole(this.newRole(SecurityConstants.FORUM_REPLY_ONLY, Arrays.asList(9, 13, 14)));
+
+		RoleManager manager = new RoleManager();
+		manager.setGroups(Arrays.asList(g1, g2, g3));
+
+		Assert.assertFalse(manager.isForumReadOnly(1));
+		Assert.assertFalse(manager.isForumReadOnly(2));
+		Assert.assertTrue(manager.isForumReadOnly(3));
+
+		Assert.assertFalse(manager.isForumReplyOnly(7));
+		Assert.assertFalse(manager.isForumReplyOnly(9));
+		Assert.assertFalse(manager.isForumReplyOnly(13));
+		Assert.assertFalse(manager.isForumReplyOnly(14));
+	}
+
+	@Test
+	public void readReplyOnlyShouldAllowEverything() {
+		Group g1 = new Group();
+		g1.addRole(this.newRole(SecurityConstants.FORUM, Arrays.asList(1, 2, 3, 7)));
+		g1.addRole(this.newRole(SecurityConstants.FORUM_READ_ONLY, Arrays.asList(1, 2, 3)));
+		g1.addRole(this.newRole(SecurityConstants.FORUM_REPLY_ONLY, Arrays.asList(7)));
+
+		Group g2 = new Group();
+		g2.addRole(this.newRole(SecurityConstants.FORUM, Arrays.asList(1, 2, 3, 7)));
+		g2.addRole(this.newRole("some role"));
+
+		RoleManager manager = new RoleManager();
+		manager.setGroups(Arrays.asList(g1, g2));
+
+		Assert.assertFalse(manager.isForumReadOnly(1));
+		Assert.assertFalse(manager.isForumReadOnly(2));
+		Assert.assertFalse(manager.isForumReadOnly(3));
+		Assert.assertFalse(manager.isForumReadOnly(7));
+		Assert.assertFalse(manager.isForumReplyOnly(7));
+		Assert.assertTrue(manager.roleExists("some role"));
+	}
+
 	@Test
 	public void singleRoleExists() {
 		Group g = new Group(); g.addRole(this.newRole("role1"));

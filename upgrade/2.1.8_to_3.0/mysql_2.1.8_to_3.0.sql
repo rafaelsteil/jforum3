@@ -1,6 +1,7 @@
 delete from jforum_sessions;
 
 # Avatar
+drop table if exists jforum_avatar;
 create table jforum_avatar (
 	id int not null primary key auto_increment,
 	filename varchar(255),
@@ -10,6 +11,7 @@ create table jforum_avatar (
 );
 
 # Post Report
+drop table if exists jforum_post_report;
 create table jforum_post_report (
 	report_id int not null primary key auto_increment,
 	post_id int not null,
@@ -20,6 +22,7 @@ create table jforum_post_report (
 );
 
 # Forums Limited Time
+drop table if exists jforum_forums_limited_time;
 create table jforum_forums_limited_time (
 	id int not null primary key auto_increment,
 	forum_id int not null,
@@ -27,6 +30,7 @@ create table jforum_forums_limited_time (
 );
 
 # Tags
+drop table if exists jforum_topics_tag;
 create table jforum_topics_tag (
 	tag_id int not null primary key auto_increment,
 	topic_id int not null,
@@ -80,8 +84,12 @@ alter table jforum_topics add has_attachment tinyint(1) default 0;
 update jforum_topics set topic_vote_id = null where topic_vote_id = 0;
 
 # Topics Watch
+create temporary table tmp_twatch select distinct topic_id, user_id, is_read from jforum_topics_watch;
+delete from jforum_topics_watch;
 alter table jforum_topics_watch add topics_watch_id int not null primary key auto_increment;
+insert into jforum_topics_watch (topic_id, user_id, is_read) select topic_id, user_id, is_read from tmp_twatch;
 alter table jforum_topics_watch add constraint topic_id unique(topic_id, user_id);
+drop table tmp_twatch;
 
 # Posts
 alter table jforum_posts change post_time post_date datetime;
@@ -95,7 +103,7 @@ create temporary table posts_text_tmp as select post_id, post_subject, post_text
 update jforum_posts p, posts_text_tmp t set p.post_subject = t.post_subject, p.post_text = t.post_text where p.post_id = t.post_id;
 update jforum_posts set post_edit_count = 0 where post_edit_count is null;
 
-drop table post_text_tmp;	
+drop table posts_text_tmp;	
 drop table jforum_posts_text;
 
 # Attachments
@@ -118,7 +126,6 @@ update jforum_attach a, attach_desc_tmp t set a.download_count = t.download_coun
 	a.filesize = t.filesize, a.thumb = t.thumb
 	where a.attach_id = t.attach_id;
 
-drop table attach_desc_tmp
 drop table jforum_attach_desc;
 
 # Sessions
@@ -144,8 +151,8 @@ alter table jforum_groups drop parent_id;
 
 # Privmsgs
 alter table jforum_privmsgs change privmsgs_ip privmsgs_ip varchar(50);
-alter table jforum_privmsgs add privmsgs_text text not null;
-update jforum_privmsgs p set p.privmsgs_text = (select pt.privmsgs_text from jforum_privmsgs_text pt where pt.privmsgs_id = p.privmsgs_id);
+alter table jforum_privmsgs add privmsgs_text text;
+update jforum_privmsgs p set p.privmsgs_text = (select pt.privmsgs_text from jforum_privmsgs_text pt where pt.privmsgs_id = p.privmsgs_id and pt.privmsgs_text is not null);
 drop table jforum_privmsgs_text;
 
 # Roles
