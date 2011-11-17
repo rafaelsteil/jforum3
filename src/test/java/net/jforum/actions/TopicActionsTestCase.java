@@ -63,7 +63,7 @@ import org.vraptor.http.VRaptorServletRequest;
  * @author Rafael Steil
  */
 @SuppressWarnings("unchecked")
-public class TopicActionsTestCase {
+public class TopicActionsTestCase { 
 
 	private Mockery context = TestCaseUtils.newMockery();
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
