@@ -18,70 +18,70 @@ import net.jforum.entities.Post;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostRepository;
 import net.jforum.security.RoleManager;
-import net.jforum.services.ViewService;
+import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-
-import org.vraptor.Interceptor;
-import org.vraptor.LogicException;
-import org.vraptor.LogicFlow;
-import org.vraptor.LogicRequest;
-import org.vraptor.view.ViewException;
+import br.com.caelum.vraptor.InterceptionException;
+import br.com.caelum.vraptor.Intercepts;
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.core.InterceptorStack;
+import br.com.caelum.vraptor.interceptor.Interceptor;
+import br.com.caelum.vraptor.resource.ResourceMethod;
 
 /**
- * @author Bill
+ * Apply minimum time constraints between each posting, to avoid spamming
  */
+@Intercepts
 public class PostEditInterceptor implements Interceptor {
 	private final ForumLimitedTimeRepository repository;
 	private final PostRepository postRepository;
 	private final JForumConfig config;
 	private final SessionManager sessionManager;
-	private final ViewService viewService;
+	private final HttpServletRequest request;
+	private final Result result;
 
 	public PostEditInterceptor(PostRepository postRepository, ForumLimitedTimeRepository repository,
-			JForumConfig config, SessionManager sessionManager, ViewService viewService) {
+			JForumConfig config, SessionManager sessionManager, HttpServletRequest request, Result result) {
 		this.postRepository = postRepository;
 		this.repository = repository;
 		this.config = config;
 		this.sessionManager = sessionManager;
-		this.viewService = viewService;
+		this.request = request;
+		this.result = result;
 	}
 
-	/**
-	 * @see org.vraptor.Interceptor#intercept(org.vraptor.LogicFlow)
-	 */
-	public void intercept(LogicFlow flow) throws LogicException, ViewException {
-		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
+	@Override
+	public boolean accepts(ResourceMethod method) {
+		return this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
+	}
 
-		if (isEnabled) {
-			UserSession userSession = this.sessionManager.getUserSession();
-			RoleManager roleManager = userSession.getRoleManager();
+	@Override
+	public void intercept(InterceptorStack stack, ResourceMethod method, Object resourceInstance) throws InterceptionException {
+		UserSession userSession = this.sessionManager.getUserSession();
+		RoleManager roleManager = userSession.getRoleManager();
 
-			if (!roleManager.isAdministrator() && !roleManager.isModerator() && !roleManager.getCanEditPosts()) {
-				LogicRequest logicRequest = flow.getLogicRequest();
+		if (!roleManager.isAdministrator() && !roleManager.isModerator() && !roleManager.getCanEditPosts()) {
+			int postId = Integer.parseInt(request.getParameter("postId"));
 
-				HttpServletRequest request = logicRequest.getRequest();
-				int postId = Integer.parseInt(request.getParameter("postId"));
+			Post post = this.postRepository.get(postId);
+			Forum forum = post.getForum();
 
-				Post post = this.postRepository.get(postId);
-				Forum forum = post.getForum();
+			long time = this.repository.getLimitedTime(forum);
 
-				long time = this.repository.getLimitedTime(forum);
+			if (time > 0) {
+				long duration = (System.currentTimeMillis() - post.getDate().getTime()) / 1000;
 
-				if (time > 0) {
-					long duration = (System.currentTimeMillis() - post.getDate().getTime()) / 1000;
-
-					if (duration > time) {
-						this.viewService.renderView("postTimeLimited", "limited");
-						return;
-					}
+				if (duration > time) {
+					// TODO: Decide to where redirect the user
+					throw new RuntimeException("duration > time");
 				}
-				if(roleManager.getPostOnlyWithModeratorOnline() && !sessionManager.isModeratorOnline()) {
-					this.viewService.renderView("canOnlyPostWithModeratorOnline", "moderatorOnline");
-					return;
-				}
+			}
+
+			if (roleManager.getPostOnlyWithModeratorOnline() && !sessionManager.isModeratorOnline()) {
+				// TODO
+				throw new RuntimeException("Posting is only allowed when moderators are online");
 			}
 		}
 
-		flow.execute();
+		stack.next(method, resourceInstance);
 	}
 }

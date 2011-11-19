@@ -17,6 +17,7 @@ import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.UserRepository;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * Check if the user can edit his profile
@@ -24,6 +25,7 @@ import net.jforum.repository.UserRepository;
  * if the current user can edit a specific profile
  * @author Rafael Steil
  */
+@Component
 public class EditUserRule implements AccessRule {
 	private final UserRepository userRepository;
 
@@ -39,6 +41,7 @@ public class EditUserRule implements AccessRule {
 	 * </ul>
 	 * It is expected that the parameter <i>userId</i> or <i>user.id</i> exists in the request
 	 */
+	@Override
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		int userId = this.findUserId(request);
 		boolean logged = userSession.isLogged();

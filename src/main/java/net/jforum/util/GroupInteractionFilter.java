@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.jforum.actions.ForumActions;
+import net.jforum.controllers.ForumController;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
@@ -31,7 +31,7 @@ public class GroupInteractionFilter {
 	 * 
 	 * @param propertyBag
 	 *            the property bag for the "show" method of the
-	 *            {@link ForumActions} action
+	 *            {@link ForumController} action
 	 * @param userSession
 	 *            the user session of the current logged user
 	 */

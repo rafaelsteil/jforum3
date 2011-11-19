@@ -33,10 +33,10 @@ public class TagAdminActionsTestCase extends AdminTestCase {
 	private ViewService viewService = context.mock(ViewService.class);
 	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private TagRepository repository = context.mock(TagRepository.class);
-	private TagAdminActions action = new TagAdminActions(propertyBag,viewService,repository);
+	private TagAdminController action = new TagAdminController(propertyBag,viewService,repository);
 
 	public TagAdminActionsTestCase() {
-		super(TagAdminActions.class);
+		super(TagAdminController.class);
 	}
 
 	@Test

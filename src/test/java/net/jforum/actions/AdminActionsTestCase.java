@@ -10,6 +10,8 @@
  */
 package net.jforum.actions;
 
+import net.jforum.controllers.AdminController;
+
 
 /**
  * @author Rafael Steil
@@ -17,6 +19,6 @@ package net.jforum.actions;
 public class AdminActionsTestCase extends AdminTestCase {
 
     public AdminActionsTestCase() {
-        super(AdminActions.class);
+        super(AdminController.class);
     }
 }

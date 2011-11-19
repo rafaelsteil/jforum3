@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
+import net.jforum.controllers.BadWordAdminController;
 import net.jforum.entities.BadWord;
 import net.jforum.repository.BadWordRepository;
 import net.jforum.util.TestCaseUtils;
@@ -29,14 +30,14 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class BadWordAdminActionsTestCase extends AdminTestCase {
 	public BadWordAdminActionsTestCase() {
-		super(BadWordAdminActions.class);
+		super(BadWordAdminController.class);
 	}
 
 	private Mockery context = TestCaseUtils.newMockery();
 	private BadWordRepository repository = context
 			.mock(BadWordRepository.class);
 	private MockResult mockResult = new MockResult();
-	private BadWordAdminActions action = new BadWordAdminActions(mockResult,
+	private BadWordAdminController action = new BadWordAdminController(mockResult,
 			repository);
 
 	@Test

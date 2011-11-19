@@ -12,6 +12,7 @@ package net.jforum.actions;
 
 import java.util.ArrayList;
 
+import net.jforum.controllers.SmilieAdminController;
 import net.jforum.entities.Smilie;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.services.SmilieService;
@@ -32,11 +33,11 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 	private SmilieRepository repository = context.mock(SmilieRepository.class);
 	private SmilieService service = context.mock(SmilieService.class);
 	private MockResult mockResult = new MockResult();
-	private SmilieAdminActions smilieAction = new SmilieAdminActions(service,
+	private SmilieAdminController smilieAction = new SmilieAdminController(service,
 			repository, mockResult);
 
 	public SmilieAdminActionsTestCase() {
-		super(SmilieAdminActions.class);
+		super(SmilieAdminController.class);
 	}
 
 	@Test
@@ -46,7 +47,7 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 				one(repository).get(1);
 				will(returnValue(new Smilie()));
 				one(mockResult).include("smilie", new Smilie());
-				one(mockResult).forwardTo(SmilieAdminActions.class).add();
+				one(mockResult).forwardTo(SmilieAdminController.class).add();
 			}
 		});
 
@@ -60,7 +61,7 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 			{
 				one(service).update(with(aNonNull(Smilie.class)),
 						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(SmilieAdminActions.class).list();
+				one(mockResult).redirectTo(SmilieAdminController.class).list();
 			}
 		});
 
@@ -73,7 +74,7 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).delete(1, 2, 3);
-				one(mockResult).redirectTo(SmilieAdminActions.class).list();
+				one(mockResult).redirectTo(SmilieAdminController.class).list();
 			}
 		});
 
@@ -101,7 +102,7 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 			{
 				one(service).add(with(aNonNull(Smilie.class)),
 						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(SmilieAdminActions.class).list();
+				one(mockResult).redirectTo(SmilieAdminController.class).list();
 			}
 		});
 

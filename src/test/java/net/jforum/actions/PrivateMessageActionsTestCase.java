@@ -20,6 +20,8 @@ import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
 import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
+import net.jforum.controllers.PrivateMessageController;
+import net.jforum.controllers.TopicController;
 import net.jforum.core.Role;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
@@ -66,7 +68,7 @@ public class PrivateMessageActionsTestCase {
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private MockResult mockResult = new MockResult();
-	private PrivateMessageActions action = new PrivateMessageActions(repository,
+	private PrivateMessageController action = new PrivateMessageController(repository,
 		smilieRepository, userRepository, service, sessionManager, mockResult);
 
 	@Test
@@ -217,7 +219,7 @@ public class PrivateMessageActionsTestCase {
 			ignoring(mockResult); ignoring(smilieRepository);
 			
 			//TODO pass zero?
-			one(mockResult).forwardTo(TopicActions.class).add(0);
+			one(mockResult).forwardTo(TopicController.class).add(0);
 		}});
 
 		action.sendTo(1);
@@ -346,7 +348,7 @@ public class PrivateMessageActionsTestCase {
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 			
 			//TODO pass zero?
-			one(mockResult).forwardTo(TopicActions.class).add(0);
+			one(mockResult).forwardTo(TopicController.class).add(0);
 		}});
 
 		action.send();

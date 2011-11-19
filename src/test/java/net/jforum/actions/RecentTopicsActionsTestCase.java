@@ -12,6 +12,7 @@ package net.jforum.actions;
 
 import java.util.ArrayList;
 
+import net.jforum.controllers.RecentTopicsController;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.RecentTopicsRepository;
@@ -35,7 +36,7 @@ public class RecentTopicsActionsTestCase {
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private MockResult mockResult = new MockResult();
-	private RecentTopicsActions component = new RecentTopicsActions(repository,
+	private RecentTopicsController component = new RecentTopicsController(repository,
 			config, userSession, mockResult);
 
 	@Test

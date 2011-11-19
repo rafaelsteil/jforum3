@@ -13,6 +13,7 @@ package net.jforum.actions;
 import java.util.ArrayList;
 
 import net.jforum.actions.helpers.Actions;
+import net.jforum.controllers.CategoryAdminController;
 import net.jforum.entities.Category;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.services.CategoryService;
@@ -30,14 +31,14 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class CategoryAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private CategoryAdminActions component;
+	private CategoryAdminController component;
 	private final CategoryRepository repository = context
 			.mock(CategoryRepository.class);
 	private final CategoryService service = context.mock(CategoryService.class);
 	private MockResult mockResult = new MockResult();
 
 	public CategoryAdminActionsTestCase() {
-		super(CategoryAdminActions.class);
+		super(CategoryAdminController.class);
 	}
 
 	@Test
@@ -104,7 +105,7 @@ public class CategoryAdminActionsTestCase extends AdminTestCase {
 	}
 
 	/**
-	 * Test method for {@link net.jforum.actions.CategoryAdminActions#list()}.
+	 * Test method for {@link net.jforum.controllers.CategoryAdminController#list()}.
 	 */
 	@Test
 	public void list() {
@@ -123,7 +124,7 @@ public class CategoryAdminActionsTestCase extends AdminTestCase {
 
 	/**
 	 * Test method for
-	 * {@link net.jforum.actions.CategoryAdminActions#up(java.lang.Integer)}.
+	 * {@link net.jforum.controllers.CategoryAdminController#up(java.lang.Integer)}.
 	 */
 	@Test
 	public void up() {
@@ -140,7 +141,7 @@ public class CategoryAdminActionsTestCase extends AdminTestCase {
 
 	/**
 	 * Test method for
-	 * {@link net.jforum.actions.CategoryAdminActions#down(java.lang.Integer)}.
+	 * {@link net.jforum.controllers.CategoryAdminController#down(java.lang.Integer)}.
 	 */
 	@Test
 	public void down() {
@@ -157,6 +158,6 @@ public class CategoryAdminActionsTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		component = new CategoryAdminActions(repository, service, mockResult);
+		component = new CategoryAdminController(repository, service, mockResult);
 	}
 }

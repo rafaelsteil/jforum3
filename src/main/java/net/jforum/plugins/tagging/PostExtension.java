@@ -14,7 +14,6 @@ import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.extensions.ActionExtension;
@@ -22,39 +21,39 @@ import net.jforum.extensions.Extends;
 import net.jforum.repository.PostRepository;
 
 import org.apache.commons.lang.StringUtils;
-import org.vraptor.annotations.Parameter;
+
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Bill
  */
 @ActionExtension(Domain.POSTS)
 public class PostExtension {
-	private ViewPropertyBag propertyBag;
 	private TagService tagService;
 	private PostRepository postRepository;
+	private final Result result;
 
-	public PostExtension(PostRepository postRepository, ViewPropertyBag propertyBag, TagService tagService) {
+	public PostExtension(PostRepository postRepository, TagService tagService, Result result) {
 		this.postRepository = postRepository;
-		this.propertyBag = propertyBag;
 		this.tagService = tagService;
+		this.result = result;
 	}
 
 	@Extends(Actions.EDIT)
 	public void edit() {
-		Post post = (Post) propertyBag.get("post");
+		Post post = (Post) result.included().get("post");
 
-		if (post == null) {
-			return;
-		}
+		if (post != null) {
+			Topic topic = post.getTopic();
 
-		Topic topic = post.getTopic();
-		if (post.equals(topic.getFirstPost())) {
-			propertyBag.put("tags", tagService.getTagString(topic));
+			if (post.equals(topic.getFirstPost())) {
+				result.include("tags", tagService.getTagString(topic));
+			}
 		}
 	}
 
 	@Extends(Actions.EDITSAVE)
-	public void editSave(@Parameter(key = "post") Post post, @Parameter(key = "tags") String tagString) {
+	public void editSave(Post post, String tagString) {
 		post = this.postRepository.get(post.getId());
 
 		if (post == null) {

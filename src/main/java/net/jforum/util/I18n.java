@@ -17,11 +17,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.jforum.core.exceptions.ForumException;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  * @author James Yong
  */
+@Component
 public class I18n {
 	private Map<String, Properties> messages = new HashMap<String, Properties>();
 	private Properties localeNames = new Properties();
@@ -75,7 +77,7 @@ public class I18n {
 	 * @param args Object
 	 * @return String
 	 */
-	public String getFormattedMessage(String key, Object[] args) {
+	public String getFormattedMessage(String key, Object... args) {
 		return this.getFormattedMessage(key, this.defaultLocaleName, args);
 	}
 

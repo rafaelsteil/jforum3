@@ -11,6 +11,7 @@
 package net.jforum.actions;
 
 import net.jforum.actions.helpers.Actions;
+import net.jforum.controllers.RSSController;
 import net.jforum.entities.UserSession;
 import net.jforum.security.RoleManager;
 import net.jforum.services.RSSService;
@@ -35,7 +36,7 @@ public class RSSActionsTestCase {
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private MockResult mockResult = new MockResult();
-	private RSSActions action = new RSSActions(mockResult, rssService,
+	private RSSController action = new RSSController(mockResult, rssService,
 			userSession, config);
 
 	@Test

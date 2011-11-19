@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
+import net.jforum.controllers.MessageController;
 import net.jforum.util.I18n;
 import net.jforum.util.TestCaseUtils;
 
@@ -31,7 +32,7 @@ public class MessageActionsTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private I18n i18n = context.mock(I18n.class);
 	private MockResult mockResult = new MockResult();
-	private MessageActions action = new MessageActions(i18n, mockResult);
+	private MessageController action = new MessageController(i18n, mockResult);
 
 	@Test
 	public void replyWaitingModeration() {

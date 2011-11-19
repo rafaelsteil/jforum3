@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 import net.jforum.actions.helpers.Actions;
+import net.jforum.controllers.SearchController;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
@@ -48,7 +49,7 @@ public class SearchActionsTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private MockResult mockResult = new MockResult();
-	private SearchActions action = new SearchActions(categoryRepository,
+	private SearchController action = new SearchController(categoryRepository,
 			config, searchRepository, userSession, mockResult);
 
 	@Test

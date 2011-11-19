@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
+import net.jforum.controllers.ForumController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
@@ -64,7 +65,7 @@ public class ForumActionsTestCase {
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private GroupInteractionFilter groupInteractionFilter = context
 			.mock(GroupInteractionFilter.class);
-	private ForumActions forumAction;
+	private ForumController forumAction;
 	private MockResult mockResult = new MockResult();
 
 	@Test
@@ -210,7 +211,7 @@ public class ForumActionsTestCase {
 
 	@Before
 	public void setup() {
-		forumAction = new ForumActions(categoryRepository, sessionManager,
+		forumAction = new ForumController(categoryRepository, sessionManager,
 				forumRepository, userRepository, mostUsersEverOnlineService,
 				config, groupInteractionFilter, mockResult);
 	}

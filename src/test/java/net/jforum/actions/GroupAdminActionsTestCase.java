@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.PermissionOptions;
+import net.jforum.controllers.GroupAdminController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Group;
@@ -36,7 +37,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class GroupAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private GroupAdminActions component;
+	private GroupAdminController component;
 	private GroupRepository repository = context.mock(GroupRepository.class);
 	private GroupService service = context.mock(GroupService.class);
 	private CategoryRepository categoryRepository = context
@@ -47,7 +48,7 @@ public class GroupAdminActionsTestCase extends AdminTestCase {
 	private MockResult mockResult = new MockResult();
 
 	public GroupAdminActionsTestCase() {
-		super(GroupAdminActions.class);
+		super(GroupAdminController.class);
 	}
 
 	@Test
@@ -267,7 +268,7 @@ public class GroupAdminActionsTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		component = new GroupAdminActions(service, repository, sessionManager,
+		component = new GroupAdminController(service, repository, sessionManager,
 				categoryRepository, mockResult);
 
 		context.checking(new Expectations() {

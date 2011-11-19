@@ -13,6 +13,7 @@ package net.jforum.actions;
 import java.util.Arrays;
 
 import net.jforum.actions.helpers.Actions;
+import net.jforum.controllers.ForumAdminController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
@@ -35,7 +36,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class ForumAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private ForumAdminActions component;
+	private ForumAdminController component;
 	private CategoryRepository categoryRepository = context
 			.mock(CategoryRepository.class);
 	private ForumService service = context.mock(ForumService.class);
@@ -47,7 +48,7 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 	private MockResult mockResult = new MockResult();
 
 	public ForumAdminActionsTestCase() {
-		super(ForumAdminActions.class);
+		super(ForumAdminController.class);
 	}
 
 	@Test
@@ -329,7 +330,7 @@ public class ForumAdminActionsTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		component = new ForumAdminActions(service, forumRepository,
+		component = new ForumAdminController(service, forumRepository,
 				categoryRepository, sessionManager, mockResult);
 	}
 }

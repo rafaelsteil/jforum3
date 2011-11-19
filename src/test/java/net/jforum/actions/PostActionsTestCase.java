@@ -16,6 +16,9 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.AttachedFile;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
+import net.jforum.controllers.ForumController;
+import net.jforum.controllers.PostController;
+import net.jforum.controllers.TopicController;
 import net.jforum.entities.Forum;
 import net.jforum.entities.ModerationLog;
 import net.jforum.entities.PollOption;
@@ -52,7 +55,7 @@ public class PostActionsTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private MockResult mockResult = new MockResult();
 
-	private PostActions component = new PostActions(postRepository,
+	private PostController component = new PostController(postRepository,
 			smilieRepository, postService, config, userSession, null, null,
 			mockResult);
 	private ModerationLog moderationLog = new ModerationLog();
@@ -110,7 +113,7 @@ public class PostActionsTestCase {
 															// event dispatch
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumActions.class).show(
+				one(mockResult).redirectTo(ForumController.class).show(
 						post.getTopic().getForum().getId(), 0);
 			}
 		});
@@ -136,7 +139,7 @@ public class PostActionsTestCase {
 						new ArrayList<AttachedFile>(), moderationLog);
 
 				// TODO pass zero and true?
-				one(mockResult).redirectTo(TopicActions.class).list(
+				one(mockResult).redirectTo(TopicController.class).list(
 						post.getTopic().getId(), 0, true);
 
 			}
@@ -177,7 +180,7 @@ public class PostActionsTestCase {
 				one(mockResult).include("smilies", new ArrayList<Smilie>());
 
 				// TODO pass zero?
-				one(mockResult).forwardTo(TopicActions.class).add(0);
+				one(mockResult).forwardTo(TopicController.class).add(0);
 			}
 		});
 

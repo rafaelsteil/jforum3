@@ -12,6 +12,8 @@ package net.jforum.actions;
 
 import java.util.ArrayList;
 
+import net.jforum.controllers.UserController;
+import net.jforum.controllers.UserAdminController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
@@ -38,7 +40,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 public class UserAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private UserRepository repository = context.mock(UserRepository.class);
-	private UserAdminActions component;
+	private UserAdminController component;
 	private GroupRepository groupRepository = context
 			.mock(GroupRepository.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
@@ -49,7 +51,7 @@ public class UserAdminActionsTestCase extends AdminTestCase {
 	private MockResult mockResult = new MockResult();
 
 	public UserAdminActionsTestCase() {
-		super(UserAdminActions.class);
+		super(UserAdminController.class);
 	}
 
 	@Test
@@ -66,7 +68,7 @@ public class UserAdminActionsTestCase extends AdminTestCase {
 				one(userService).saveGroups(1, 1, 2);
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(UserAdminActions.class).list(0);
+				one(mockResult).redirectTo(UserAdminController.class).list(0);
 			}
 		});
 
@@ -92,7 +94,7 @@ public class UserAdminActionsTestCase extends AdminTestCase {
 				one(userService).saveGroups(1, 1, 2);
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(UserAdminActions.class).list(0);
+				one(mockResult).redirectTo(UserAdminController.class).list(0);
 			}
 		});
 
@@ -114,7 +116,7 @@ public class UserAdminActionsTestCase extends AdminTestCase {
 				will(returnValue(false));
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(UserAdminActions.class).list(0);
+				one(mockResult).redirectTo(UserAdminController.class).list(0);
 			}
 		});
 
@@ -152,7 +154,7 @@ public class UserAdminActionsTestCase extends AdminTestCase {
 				one(mockResult).include("user", user);
 
 				// TODO pass zero?
-				one(mockResult).forwardTo(UserActions.class).edit(0);
+				one(mockResult).forwardTo(UserController.class).edit(0);
 			}
 		});
 
@@ -182,7 +184,7 @@ public class UserAdminActionsTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		component = new UserAdminActions(repository, groupRepository, config,
+		component = new UserAdminController(repository, groupRepository, config,
 				userService, sessionManager, mockResult);
 	}
 }

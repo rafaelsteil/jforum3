@@ -43,14 +43,10 @@
 package net.jforum.util;
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import net.jforum.core.exceptions.ForumException;
-
-import org.vraptor.interceptor.UploadedFileInformation;
-
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
@@ -91,15 +87,9 @@ public class UploadUtils {
 				outputStream.close();
 
 				inputStream.close();
-
-				this.deleteTempFile();
 			}
 			catch (Exception e) {
 			}
 		}
-	}
-
-	private void deleteTempFile() {
-		this.uploadedFile.getFile().delete();
 	}
 }

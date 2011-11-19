@@ -16,8 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import br.com.caelum.vraptor.Result;
-
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.exceptions.ForumException;
@@ -33,10 +31,12 @@ import yarfraw.core.datamodel.FeedFormat;
 import yarfraw.core.datamodel.ItemEntry;
 import yarfraw.core.datamodel.YarfrawException;
 import yarfraw.io.FeedWriter;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class RSSService {
 	private JForumConfig config;
 	private RSSRepository rssRepository;
@@ -55,7 +55,7 @@ public class RSSService {
 	 * @param forumId the forum id
 	 * @return the rss contents
 	 */
-	public String forForum(int forumId, Result result) {
+	public String forForum(int forumId) {
 		Forum forum = this.forumRepository.get(forumId);
 
 		List<Topic> topics = this.rssRepository.getForumTopics(forum,
@@ -63,11 +63,11 @@ public class RSSService {
 
 		ChannelFeed feed = new ChannelFeed()
 			.setTitle(this.i18n.getFormattedMessage("RSS.ForumTopics.title", this.i18n.params(forum.getName())))
-			.addLink(this.buildForumLink(result, forum))
+			.addLink(this.buildForumLink(forum))
 			.setDescriptionOrSubtitle(forum.getDescription());
 
 		for (Topic topic : topics) {
-			String topicLink = this.buildTopicLink(result, topic);
+			String topicLink = this.buildTopicLink(topic);
 
 			feed.addItem(new ItemEntry()
 				.addLink(topicLink)
@@ -103,8 +103,8 @@ public class RSSService {
 	 * @param forum the forum
 	 * @return the forum link
 	 */
-	private String buildForumLink(ViewService viewService, Forum forum) {
-		return new StringBuilder().append(viewService.getForumLink())
+	private String buildForumLink(Forum forum) {
+		return new StringBuilder().append(this.config.getString(ConfigKeys.FORUM_LINK))
 			.append(Domain.FORUMS).append('/').append(Actions.SHOW)
 			.append('/').append(forum.getId()).append(this.config.getValue(ConfigKeys.SERVLET_EXTENSION))
 			.toString();
@@ -115,8 +115,8 @@ public class RSSService {
 	 * @param topic the topic
 	 * @return the link
 	 */
-	private String buildTopicLink(ViewService viewService, Topic topic) {
-		return new StringBuilder().append(viewService.getForumLink())
+	private String buildTopicLink(Topic topic) {
+		return new StringBuilder().append(this.config.getString(ConfigKeys.FORUM_LINK))
 			.append(Domain.TOPICS).append('/').append(Actions.PRE_LIST)
 			.append('/').append(topic.getId()).append('/').append(topic.getLastPost().getId())
 			.append(this.config.getValue(ConfigKeys.SERVLET_EXTENSION))

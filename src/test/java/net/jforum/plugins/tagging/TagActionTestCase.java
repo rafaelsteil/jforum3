@@ -47,7 +47,7 @@ public class TagActionTestCase {
 	private TagService tagService = context.mock(TagService.class);
 	private TopicRepository topicRepository = context.mock(TopicRepository.class);
 	private UserSession userSession = context.mock(UserSession.class);
-	private TagAction tagAction;
+	private TagController tagAction;
 
 	@Test
 	public void find(){
@@ -122,6 +122,6 @@ public class TagActionTestCase {
 
 	@Before
 	public void setup() {
-		tagAction = new TagAction(propertyBag, tagService, topicRepository, viewService, userSession);
+		tagAction = new TagController(propertyBag, tagService, topicRepository, viewService, userSession);
 	}
 }

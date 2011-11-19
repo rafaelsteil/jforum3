@@ -18,6 +18,7 @@ import java.util.List;
 import junit.framework.Assert;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
+import net.jforum.controllers.PostReportController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
@@ -58,7 +59,7 @@ public class PostReportActionsTestCase {
 	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
 	private JForumConfig config = mockery.mock(JForumConfig.class);
 	private MockResult mockResult = new MockResult();
-	private PostReportActions action = new PostReportActions(repository, sessionManager, config, mockResult);
+	private PostReportController action = new PostReportController(repository, sessionManager, config, mockResult);
 
 	@Test
 	public void listResolved() {
@@ -134,7 +135,7 @@ public class PostReportActionsTestCase {
 
 			one(repository).get(1); will(returnValue(report));
 
-			one(mockResult).redirectTo(PostReportActions.class).list();
+			one(mockResult).redirectTo(PostReportController.class).list();
 		}});
 
 		action.delete(1);
@@ -155,7 +156,7 @@ public class PostReportActionsTestCase {
 
 			one(repository).get(1); will(returnValue(report));
 			one(repository).remove(report);
-			one(mockResult).redirectTo(PostReportActions.class).list();
+			one(mockResult).redirectTo(PostReportController.class).list();
 		}});
 
 		action.delete(1);

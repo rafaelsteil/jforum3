@@ -22,6 +22,8 @@ import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
 import net.jforum.actions.interceptors.ExtensibleInterceptor;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
+import net.jforum.controllers.MessageController;
+import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
@@ -86,7 +88,7 @@ public class TopicActionsTestCase {
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
     private ForumLimitedTimeRepository forumLimitedTimeRepository = context.mock(ForumLimitedTimeRepository.class);
     private MockResult mockResult = new MockResult();
-	private TopicActions topicAction;
+	private TopicController topicAction;
 
 	@Test
 	public void replyReview() {
@@ -110,7 +112,7 @@ public class TopicActionsTestCase {
 
 		context.checking(new Expectations() {{
 			one(topicRepository).get(1); will(returnValue(topic));
-			one(mockResult).redirectTo(MessageActions.class).topicWaitingModeration(2);
+			one(mockResult).redirectTo(MessageController.class).topicWaitingModeration(2);
 		}});
 
 		topicAction.list(1, 0, false);
@@ -479,7 +481,7 @@ public class TopicActionsTestCase {
 			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
 			one(roleManager).isModerator(); will(returnValue(false));
 			ignoring(userSession); ignoring(topicService);
-			one(mockResult).redirectTo(MessageActions.class).replyWaitingModeration(2);
+			one(mockResult).redirectTo(MessageController.class).replyWaitingModeration(2);
 		}});
 
 		Post post = new Post(); post.setModerate(false);
@@ -497,7 +499,7 @@ public class TopicActionsTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			ignoring(userSession); ignoring(topicService);
 			one(topicRepository).get(1); will(returnValue(topic));
-			one(mockResult).redirectTo(MessageActions.class).replyWaitingModeration(1);
+			one(mockResult).redirectTo(MessageController.class).replyWaitingModeration(1);
 		}});
 
 		Post post = new Post(); post.setModerate(true);
@@ -530,7 +532,7 @@ public class TopicActionsTestCase {
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 			
 			//TODO pass zero?
-			one(mockResult).redirectTo(TopicActions.class).add(0);
+			one(mockResult).redirectTo(TopicController.class).add(0);
 		}});
 
 		topicAction.reply(1);
@@ -560,7 +562,7 @@ public class TopicActionsTestCase {
 			one(mockResult).include("forum", post.getForum());
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 			//TODO pass zero?
-			one(mockResult).redirectTo(TopicActions.class).add(0);
+			one(mockResult).redirectTo(TopicController.class).add(0);
 		}});
 
 		topicAction.quote(1);
@@ -569,7 +571,7 @@ public class TopicActionsTestCase {
 
 	@Before
 	public void setup() {
-		topicAction = new TopicActions(mockResult, config, topicService,
+		topicAction = new TopicController(mockResult, config, topicService,
 			forumRepository, smilieRepository, postRepository, topicRepository, categoryRepository,
 			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request);
 	}

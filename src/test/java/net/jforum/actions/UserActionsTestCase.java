@@ -18,6 +18,9 @@ import java.util.List;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
+import net.jforum.controllers.ForumController;
+import net.jforum.controllers.MessageController;
+import net.jforum.controllers.UserController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.support.vraptor.ViewPropertyBag;
@@ -68,7 +71,7 @@ public class UserActionsTestCase {
 	private User user = new User();
 	private RankingRepository rankingRepository = context.mock(RankingRepository.class);
 	private MockResult mockResult = new MockResult();
-	private UserActions userAction = new UserActions(userRepository, userSession, userService, sessionManager, 
+	private UserController userAction = new UserController(userRepository, userSession, userService, sessionManager, 
 			config, lostPasswordService, avatarService, rankingRepository, mockResult);
 
 	@Test
@@ -98,7 +101,7 @@ public class UserActionsTestCase {
 			one(roleManager).isCoAdministrator(); will(returnValue(false));
 			one(userService).update(user, false);
 			one(config).getValue(ConfigKeys.AUTHENTICATION_TYPE);
-			one(mockResult).redirectTo(UserActions.class).edit(user.getId());
+			one(mockResult).redirectTo(UserController.class).edit(user.getId());
 		}});
 
 		userAction.editSave(user,null, null, null);
@@ -284,7 +287,7 @@ public class UserActionsTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
-			one(mockResult).redirectTo(ForumActions.class).list();
+			one(mockResult).redirectTo(ForumController.class).list();
 		}});
 
 		userAction.logout();
@@ -320,7 +323,7 @@ public class UserActionsTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_ID); will(returnValue("z"));
 			one(userSession).addCookie("z", Integer.toString(user.getId()));
 			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(ForumActions.class).list();
+			one(mockResult).redirectTo(ForumController.class).list();
 		}});
 
 		userAction.authenticateUser("user", "passwd", true, null);
@@ -341,7 +344,7 @@ public class UserActionsTestCase {
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
 			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(ForumActions.class).list();
+			one(mockResult).redirectTo(ForumController.class).list();
 		}});
 
 		userAction.authenticateUser("user", "passwd", false, null);
@@ -364,7 +367,7 @@ public class UserActionsTestCase {
 	public void registrationCompletedWithAnonymousUserExpectRedirect() {
 		context.checking(new Expectations() {{
 			one(userSession).isLogged(); will(returnValue(false));
-			one(mockResult).redirectTo(UserActions.class).insert();
+			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
 		userAction.registrationCompleted();
@@ -389,7 +392,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(1));
 			one(mockResult).include("error", "User.usernameTooBig");
-			one(mockResult).redirectTo(UserActions.class).insert();
+			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername("username1"); }});
@@ -402,7 +405,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(mockResult).include("error", "User.usernameInvalidChars");
-			one(mockResult).redirectTo(UserActions.class).insert();
+			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername("<username"); }});
@@ -415,7 +418,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(mockResult).include("error", "User.usernameInvalidChars");
-			one(mockResult).redirectTo(UserActions.class).insert();
+			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername(">username"); }});
@@ -429,7 +432,7 @@ public class UserActionsTestCase {
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(userRepository).isUsernameAvailable("username", null); will(returnValue(false));
 			one(mockResult).include("error", "User.usernameNotAvailable");
-			one(mockResult).redirectTo(UserActions.class).insert();
+			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername("username"); }});
@@ -446,7 +449,7 @@ public class UserActionsTestCase {
 			one(userRepository).isUsernameAvailable("username", null); will(returnValue(true));
 			one(userSession).becomeLogged();
 			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(UserActions.class).registrationCompleted();
+			one(mockResult).redirectTo(UserController.class).registrationCompleted();
 		}});
 
 		userAction.insertSave(new User() {{ setId(1); setUsername("username"); }});
@@ -485,7 +488,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager); will(returnValue(false));
-			one(mockResult).redirectTo(MessageActions.class).accessDenied();
+			one(mockResult).redirectTo(MessageController.class).accessDenied();
 		}});
 
 		userAction.profile(1);

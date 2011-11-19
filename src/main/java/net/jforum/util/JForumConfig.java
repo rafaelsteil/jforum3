@@ -10,15 +10,12 @@
  */
 package net.jforum.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Map.Entry;
 
 import net.jforum.core.UrlPattern;
 import net.jforum.core.exceptions.ForumException;
@@ -29,10 +26,15 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  * @author Jose Donizetti Brito Junior
  */
+@Component
+@ApplicationScoped
 public class JForumConfig extends PropertiesConfiguration {
 	private Map<String, UrlPattern> urlPatterns = new HashMap<String, UrlPattern>();
 	private ConfigRepository configRepository;
@@ -44,9 +46,10 @@ public class JForumConfig extends PropertiesConfiguration {
 		try {
 			loadProps();
 
-			//in test environment, hibernateTask could be null 
+			//in test environment, hibernateTask could be null
 			if(hibernateTask != null){
 				hibernateTask.execute(new HibernateRunnable() {
+					@Override
 					public void run() {
 						try {
 							loadDatabaseProperties();
@@ -61,8 +64,6 @@ public class JForumConfig extends PropertiesConfiguration {
 		catch (Exception e) {
 			throw new ForumException(e);
 		}
-
-		this.loadUrlPatterns();
 	}
 
 	public JForumConfig() {
@@ -131,32 +132,5 @@ public class JForumConfig extends PropertiesConfiguration {
 	 */
 	public String getValue(String key) {
 		return this.getString(key);
-	}
-
-	/**
-	 * Load the urlPatterns
-	 */
-	private void loadUrlPatterns() {
-		FileInputStream fis = null;
-
-		try {
-			Properties p = new Properties();
-			p.load(this.getClass().getResourceAsStream("/jforumConfig/urlPattern.properties"));
-
-			for (Entry<Object, Object> entry : p.entrySet()) {
-				String name = (String)entry.getKey();
-				String value = (String)entry.getValue();
-
-				this.urlPatterns.put(name, new UrlPattern(value));
-			}
-		}
-		catch (IOException e) {
-			throw new ForumException(e);
-		}
-		finally {
-			if (fis != null) {
-				try { fis.close(); } catch (Exception e) {}
-			}
-		}
 	}
 }

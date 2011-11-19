@@ -15,7 +15,6 @@ import net.jforum.repository.Repository;
 
 /**
  * @author Bill
- *
  */
 public interface ForumLimitedTimeRepository extends Repository<ForumLimitedTime> {
 

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.jforum.actions.helpers.ApproveInfo;
+import net.jforum.controllers.ForumController;
+import net.jforum.controllers.ModerationController;
 import net.jforum.entities.Category;
 import net.jforum.entities.ModerationLog;
 import net.jforum.entities.Topic;
@@ -52,7 +54,7 @@ public class ModerationActionsTestCase {
 			.mock(ModerationLogRepository.class);
 	private User user = new User();
 	private MockResult mockResult = new MockResult();
-	private ModerationActions action = new ModerationActions(mockResult,
+	private ModerationController action = new ModerationController(mockResult,
 			roleManager, service, categoryRepository, topicRepository,
 			jForumConfig, moderationLogRepository, userSession);
 
@@ -169,7 +171,7 @@ public class ModerationActionsTestCase {
 						Arrays.asList(new Topic(), new Topic()), moderationLog);
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumActions.class).show(1, 0);
+				one(mockResult).redirectTo(ForumController.class).show(1, 0);
 			}
 		});
 
@@ -184,7 +186,7 @@ public class ModerationActionsTestCase {
 				one(roleManager).getCanDeletePosts();
 				will(returnValue(false));
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumActions.class).show(1, 0);
+				one(mockResult).redirectTo(ForumController.class).show(1, 0);
 			}
 		});
 
@@ -200,7 +202,7 @@ public class ModerationActionsTestCase {
 				will(returnValue(true));
 				one(service).doApproval(1, Arrays.asList(new ApproveInfo[0]));
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumActions.class).show(1, 0);
+				one(mockResult).redirectTo(ForumController.class).show(1, 0);
 			}
 		});
 
@@ -214,7 +216,7 @@ public class ModerationActionsTestCase {
 				one(roleManager).getCanApproveMessages();
 				will(returnValue(false));
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumActions.class).show(1, 0);
+				one(mockResult).redirectTo(ForumController.class).show(1, 0);
 			}
 		});
 

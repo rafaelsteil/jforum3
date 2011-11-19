@@ -10,9 +10,9 @@
  */
 package net.jforum.actions.extensions;
 
-import net.jforum.actions.TopicActions;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
+import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Topic;
@@ -27,7 +27,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 
 /**
- * Topic watch extension for {@link TopicActions}
+ * Topic watch extension for {@link TopicController}
  * 
  * @author Rafael Steil
  */

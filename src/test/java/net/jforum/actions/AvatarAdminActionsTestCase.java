@@ -13,6 +13,8 @@ package net.jforum.actions;
 import java.util.ArrayList;
 
 import net.jforum.actions.helpers.Actions;
+import net.jforum.controllers.AvatarAdminController;
+import net.jforum.controllers.SmilieAdminController;
 import net.jforum.entities.Avatar;
 import net.jforum.repository.AvatarRepository;
 import net.jforum.services.AvatarService;
@@ -30,11 +32,11 @@ public class AvatarAdminActionsTestCase extends AdminTestCase {
 	private AvatarRepository repository = context.mock(AvatarRepository.class);
 	private AvatarService service = context.mock(AvatarService.class);
 	private MockResult mockResult = new MockResult();
-	private AvatarAdminActions avatarAction = new AvatarAdminActions(
+	private AvatarAdminController avatarAction = new AvatarAdminController(
 			mockResult, repository, service);
 
 	public AvatarAdminActionsTestCase() {
-		super(SmilieAdminActions.class);
+		super(SmilieAdminController.class);
 	}
 
 	@Test
