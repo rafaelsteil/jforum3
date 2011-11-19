@@ -8,7 +8,7 @@ This README describes how to build the project.
 Why we use ANT?
 ---------------
 
-We decided to use ANT because we needed...
+We decided to use ANT because we needed....
 
 
 Steps to build
