@@ -14,15 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.BadWord;
 import net.jforum.repository.BadWordRepository;
-import net.jforum.services.ViewService;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
+
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
@@ -33,16 +33,19 @@ public class BadWordAdminActionsTestCase extends AdminTestCase {
 	}
 
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewService viewService = context.mock(ViewService.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
-	private BadWordRepository repository = context.mock(BadWordRepository.class);
-	private BadWordAdminActions action = new BadWordAdminActions(viewService, propertyBag, repository);
+	private BadWordRepository repository = context
+			.mock(BadWordRepository.class);
+	private MockResult mockResult = new MockResult();
+	private BadWordAdminActions action = new BadWordAdminActions(mockResult,
+			repository);
 
 	@Test
 	public void deleteUsingNullShouldIgnore() {
-		context.checking(new Expectations() {{
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(mockResult).redirectTo(Actions.LIST);
+			}
+		});
 
 		action.delete(null);
 		context.assertIsSatisfied();
@@ -50,18 +53,22 @@ public class BadWordAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			BadWord w1 = new BadWord();
-			BadWord w2 = new BadWord();
+		context.checking(new Expectations() {
+			{
+				BadWord w1 = new BadWord();
+				BadWord w2 = new BadWord();
 
-			one(repository).get(1); will(returnValue(w1));
-			one(repository).get(2); will(returnValue(w2));
+				one(repository).get(1);
+				will(returnValue(w1));
+				one(repository).get(2);
+				will(returnValue(w2));
 
-			one(repository).remove(w1);
-			one(repository).remove(w2);
+				one(repository).remove(w1);
+				one(repository).remove(w2);
 
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+				one(mockResult).redirectTo(Actions.LIST);
+			}
+		});
 
 		action.delete(1, 2);
 		context.assertIsSatisfied();
@@ -69,11 +76,14 @@ public class BadWordAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void list() {
-		context.checking(new Expectations() {{
-			List<BadWord> list = new ArrayList<BadWord>();
-			one(repository).getAll(); will(returnValue(list));
-			one(propertyBag).put("words", list);
-		}});
+		context.checking(new Expectations() {
+			{
+				List<BadWord> list = new ArrayList<BadWord>();
+				one(repository).getAll();
+				will(returnValue(list));
+				one(mockResult).include("words", list);
+			}
+		});
 
 		action.list();
 		context.assertIsSatisfied();
@@ -83,10 +93,12 @@ public class BadWordAdminActionsTestCase extends AdminTestCase {
 	public void addSave() {
 		final BadWord word = new BadWord();
 
-		context.checking(new Expectations() {{
-			one(repository).add(word);
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).add(word);
+				one(mockResult).redirectTo(Actions.LIST);
+			}
+		});
 
 		action.addSave(word);
 		context.assertIsSatisfied();
@@ -96,11 +108,14 @@ public class BadWordAdminActionsTestCase extends AdminTestCase {
 	public void edit() {
 		final BadWord word = new BadWord();
 
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(word));
-			one(propertyBag).put("word", word);
-			one(viewService).renderView(Actions.ADD);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).get(1);
+				will(returnValue(word));
+				one(mockResult).include("word", word);
+				one(mockResult).forwardTo(Actions.ADD);
+			}
+		});
 
 		action.edit(1);
 		context.assertIsSatisfied();
@@ -110,10 +125,12 @@ public class BadWordAdminActionsTestCase extends AdminTestCase {
 	public void editSave() {
 		final BadWord word = new BadWord();
 
-		context.checking(new Expectations() {{
-			one(repository).update(word);
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).update(word);
+				one(mockResult).redirectTo(Actions.LIST);
+			}
+		});
 
 		action.editSave(word);
 		context.assertIsSatisfied();

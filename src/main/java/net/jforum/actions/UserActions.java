@@ -15,11 +15,8 @@ import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ExternalUserManagementInterceptor;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Avatar;
 import net.jforum.entities.AvatarType;
 import net.jforum.entities.Post;
@@ -35,28 +32,25 @@ import net.jforum.security.RoleManager;
 import net.jforum.services.AvatarService;
 import net.jforum.services.LostPasswordService;
 import net.jforum.services.UserService;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
 
 import org.apache.commons.lang.StringUtils;
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
-import org.vraptor.interceptor.MultipartRequestInterceptor;
-import org.vraptor.interceptor.UploadedFileInformation;
-import org.vraptor.plugin.interceptor.MethodInterceptorInterceptor;
+
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.USER)
-@InterceptedBy( {MethodInterceptorInterceptor.class,MultipartRequestInterceptor.class, MethodSecurityInterceptor.class })
+@Resource
+@Path(Domain.USER)
+//@InterceptedBy( {MethodInterceptorInterceptor.class,MultipartRequestInterceptor.class, MethodSecurityInterceptor.class })
 public class UserActions {
 	private UserRepository userRepository;
-	private ViewPropertyBag propertyBag;
-	private ViewService viewService;
 	private UserService userService;
 	private UserSession userSession;
 	private SessionManager sessionManager;
@@ -64,14 +58,12 @@ public class UserActions {
 	private JForumConfig config;
 	private AvatarService avatarService;
 	private RankingRepository rankingRepository;
-
-	public UserActions(UserRepository userRepository, ViewPropertyBag propertyBag,
-		ViewService viewService, UserSession userSession, UserService userService,
+	private final Result result;
+	
+	public UserActions(UserRepository userRepository, UserSession userSession, UserService userService,
 		SessionManager sessionFacade, JForumConfig config, LostPasswordService lostPasswordService,
-		AvatarService avatarService, RankingRepository rankingRepository) {
+		AvatarService avatarService, RankingRepository rankingRepository, Result result) {
 		this.userRepository = userRepository;
-		this.propertyBag = propertyBag;
-		this.viewService = viewService;
 		this.userService = userService;
 		this.sessionManager = sessionFacade;
 		this.userSession = userSession;
@@ -79,33 +71,34 @@ public class UserActions {
 		this.lostPasswordService = lostPasswordService;
 		this.avatarService = avatarService;
 		this.rankingRepository = rankingRepository;
+		this.result = result;
 	}
 
 	/**
 	 * Shows the page with all registered users
 	 * @param page the pagination first record to start showing
 	 */
-	public void list(@Parameter(key = "page") int page) {
+	public void list(int page) {
 		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
 		if (!roleManager.isUserListingEnabled()) {
-			this.propertyBag.put("users", new ArrayList<User>());
+			this.result.include("users", new ArrayList<User>());
 		}
 		else {
 			Pagination pagination = new Pagination(this.config, page)
 				.forUsers(this.userRepository.getTotalUsers());
 
 			if (roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
-				this.propertyBag.put("users", this.userRepository.getAllUsers(pagination.getStart(),
+				this.result.include("users", this.userRepository.getAllUsers(pagination.getStart(),
 					pagination.getRecordsPerPage()));
 			}
 			else {
 				User currentUser = this.sessionManager.getUserSession().getUser();
-				this.propertyBag.put("users", this.userRepository.getAllUsers(pagination.getStart(),
+				this.result.include("users", this.userRepository.getAllUsers(pagination.getStart(),
 					pagination.getRecordsPerPage(), currentUser.getGroups()));
 			}
 
-			this.propertyBag.put("pagination", pagination);
+			this.result.include("pagination", pagination);
 		}
 	}
 
@@ -122,19 +115,19 @@ public class UserActions {
 		this.sessionManager.add(us);
 		this.removeAutoLoginCookies(us);
 
-		this.viewService.redirectToAction(Domain.FORUMS, Actions.LIST);
+		this.result.redirectTo(ForumActions.class).list();
 	}
 
 	/**
 	 * Shows the form to log in
 	 */
-	public void login(@Parameter(key = "returnPath") String returnPath) {
+	public void login(String returnPath) {
 		if (StringUtils.isEmpty(returnPath) && !this.config.getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER)) {
 			returnPath = this.viewService.getReferer();
 		}
 
 		if (!StringUtils.isEmpty(returnPath)) {
-			this.propertyBag.put("returnPath", returnPath);
+			this.result.include("returnPath", returnPath);
 		}
 	}
 
@@ -145,14 +138,14 @@ public class UserActions {
 	 * @param password the password
 	 * @param autoLogin autoLogin
 	 */
-	public void authenticateUser(@Parameter(key = "username") String username,
-		@Parameter(key = "password") String password, @Parameter(key = "autoLogin") boolean autoLogin,
-		@Parameter(key = "returnPath") String returnPath) {
+	public void authenticateUser(String username,
+		String password, boolean autoLogin,
+		String returnPath) {
 		User user = this.userService.validateLogin(username, password);
 
 		if (user == null) {
-			this.propertyBag.put("invalidLogin", true);
-			this.viewService.renderView(Actions.LOGIN);
+			this.result.include("invalidLogin", true);
+			this.result.forwardTo(Actions.LOGIN);
 		}
 		else {
 			this.userSession.setUser(user);
@@ -168,10 +161,10 @@ public class UserActions {
 			this.sessionManager.add(this.userSession);
 
 			if (!StringUtils.isEmpty(returnPath)) {
-				this.viewService.redirect(returnPath);
+				this.result.redirectTo(returnPath);
 			}
 			else {
-				this.viewService.redirectToAction(Domain.FORUMS, Actions.LIST);
+				this.result.redirectTo(ForumActions.class).list();
 			}
 		}
 	}
@@ -181,11 +174,11 @@ public class UserActions {
 	 * @param userId the user id
 	 */
 	@SecurityConstraint(EditUserRule.class)
-	public void edit(@Parameter(key = "userId") int userId) {
+	public void edit(int userId) {
 		User userToEdit = this.userRepository.get(userId);
-		this.propertyBag.put("user", userToEdit);
-		this.propertyBag.put("rankings", this.rankingRepository.getAllRankings());
-		this.propertyBag.put("avatars", this.avatarService.getAvatarGallery());
+		this.result.include("user", userToEdit);
+		this.result.include("rankings", this.rankingRepository.getAllRankings());
+		this.result.include("avatars", this.avatarService.getAvatarGallery());
 	}
 
 	/**
@@ -193,8 +186,8 @@ public class UserActions {
 	 * @param user the user to update
 	 */
 	@SecurityConstraint(EditUserRule.class)
-	public void editSave(@Parameter(key = "user") User user, @Parameter(key = "avatarId") Integer avatarId,
-			@Parameter(key = "uploadfile") UploadedFileInformation image, @Parameter(key = "rankingId") Integer rankingId) {
+	public void editSave(User user, Integer avatarId,
+			UploadedFile image, Integer rankingId) {
 
 		Avatar avatar = null;
 
@@ -227,13 +220,13 @@ public class UserActions {
 		canChangeUserName = canChangeUserName && !isSSOAuthentication;
 
 		this.userService.update(user, canChangeUserName);
-		this.viewService.redirectToAction(Actions.EDIT, user.getId());
+		this.result.redirectTo(this).edit(user.getId());
 	}
 
 	/**
 	 * Shows the page to create a new user
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
+	//@InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void insert() {
 
 	}
@@ -242,52 +235,52 @@ public class UserActions {
 	 * Adds a new user
 	 * @param user the user to add
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
-	public void insertSave(@Parameter(key = "user") User user) {
+	//@InterceptedBy(ExternalUserManagementInterceptor.class)
+	public void insertSave(User user) {
 		boolean error = false;
 
 		if (!error && user.getUsername().length() > this.config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)) {
-			this.propertyBag.put("error", "User.usernameTooBig");
+			this.result.include("error", "User.usernameTooBig");
 			error = true;
 		}
 
 		if (!error && user.getUsername().indexOf('<') > -1 || user.getUsername().indexOf('>') > -1) {
-			this.propertyBag.put("error", "User.usernameInvalidChars");
+			this.result.include("error", "User.usernameInvalidChars");
 			error = true;
 		}
 
 		if (!error && !this.userRepository.isUsernameAvailable(user.getUsername(), user.getEmail())) {
-			this.propertyBag.put("error", "User.usernameNotAvailable");
+			this.result.include("error", "User.usernameNotAvailable");
 			error = true;
 		}
 
 		if (error) {
-			this.viewService.renderView(Actions.INSERT);
+			this.result.forwardTo(this).insert();
 			return;
 		}
 
 		this.userService.add(user);
 		this.registerUserInSession(user);
-		this.viewService.redirectToAction(Actions.REGISTRATION_COMPLETED);
+		this.result.redirectTo(this).registrationCompleted();
 	}
 
 	/**
 	 * Shows the profile of some user
 	 * @param userId the user to show
 	 */
-	public void profile(@Parameter(key = "userId") int userId) {
+	public void profile(int userId) {
 		if (!this.userSession.getRoleManager().getCanViewProfile()) {
-			this.viewService.accessDenied();
+			this.result.redirectTo(MessageActions.class).accessDenied();
 		}
 		else {
 			User userToEdit = this.userRepository.get(userId);
-			this.propertyBag.put("user", userToEdit);
-			this.propertyBag.put("userTotalTopics", this.userRepository.getTotalTopics(userId));
-			this.propertyBag.put("rankings", this.rankingRepository.getAllRankings());
-			this.propertyBag.put("isAnonymousUser", userId == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
+			this.result.include("user", userToEdit);
+			this.result.include("userTotalTopics", this.userRepository.getTotalTopics(userId));
+			this.result.include("rankings", this.rankingRepository.getAllRankings());
+			this.result.include("isAnonymousUser", userId == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
 
 			boolean canEdit = userSession.getRoleManager().getCanEditUser(userToEdit, userSession.getUser().getGroups());
-			this.propertyBag.put("canEdit", canEdit);
+			this.result.include("canEdit", canEdit);
 		}
 	}
 
@@ -296,10 +289,10 @@ public class UserActions {
 	 */
 	public void registrationCompleted() {
 		if (!this.userSession.isLogged()) {
-			this.viewService.redirectToAction(Actions.INSERT);
+			this.result.redirectTo(this).insert();
 		}
 		else {
-			this.propertyBag.put("user", this.userSession.getUser());
+			this.result.include("user", this.userSession.getUser());
 		}
 	}
 
@@ -307,19 +300,19 @@ public class UserActions {
 
 	}
 
-	public void lostPasswordSend(@Parameter(key = "username") String username,
-		@Parameter(key = "email") String email) {
+	public void lostPasswordSend(String username,
+		String email) {
 
 		boolean success = this.lostPasswordService.send(username, email);
-		this.propertyBag.put("success", success);
+		this.result.include("success", success);
 	}
 
 	/**
 	 * Shows the page asking the user a new password
 	 * @param hash the validation hash
 	 */
-	public void recoverPassword(@Parameter(key = "hash") String hash) {
-		this.propertyBag.put("hash", hash);
+	public void recoverPassword(String hash) {
+		this.result.include("hash", hash);
 	}
 
 	/**
@@ -328,17 +321,17 @@ public class UserActions {
 	 * @param username the username associated with the hash
 	 * @param newPassword the new password to set
 	 */
-	public void recoverPasswordValidate(@Parameter(key = "hash") String hash,
-		@Parameter(key = "username") String username, @Parameter(key = "newPassword") String newPassword) {
+	public void recoverPasswordValidate(String hash,
+		String username, String newPassword) {
 		User user = this.userRepository.validateLostPasswordHash(username, hash);
 
 		if (user == null) {
-			this.propertyBag.put("error", true);
-			this.propertyBag.put("message", "PasswordRecovery.invalidData");
+			this.result.include("error", true);
+			this.result.include("message", "PasswordRecovery.invalidData");
 		}
 		else {
 			user.setPassword(newPassword);
-			this.propertyBag.put("message", "PasswordRecovery.ok");
+			this.result.include("message", "PasswordRecovery.ok");
 		}
 	}
 
@@ -346,32 +339,32 @@ public class UserActions {
 	 * Lists all the posts made by an user
 	 * @param userId the user id
 	 */
-	public void posts(@Parameter(key = "userId") int userId, @Parameter(key = "page") int page) {
+	public void posts(int userId, int page) {
 		User user = userRepository.get(userId);
 
 		Pagination pagination = new Pagination(this.config, page).forUserPosts(user);
 
 		List<Post> posts = userRepository.getPosts(user, pagination.getStart(), pagination.getRecordsPerPage());
 
-		this.propertyBag.put("pagination", pagination);
-		this.propertyBag.put("posts", posts);
-		this.propertyBag.put("user", user);
+		this.result.include("pagination", pagination);
+		this.result.include("posts", posts);
+		this.result.include("user", user);
 	}
 
 	/**
 	 * Lists all the topics made by an user
 	 * @param userId the user id
 	 */
-	public void topics(@Parameter(key = "userId") int userId, @Parameter(key = "page") int page) {
+	public void topics(int userId, int page) {
 		User user = userRepository.get(userId);
 
 		Pagination pagination = new Pagination(this.config, page).forUserTopics(user, userRepository.getTotalTopics(userId));
 
 		List<Topic> topics = userRepository.getTopics(user, pagination.getStart(), pagination.getRecordsPerPage());
 
-		this.propertyBag.put("pagination", pagination);
-		this.propertyBag.put("topics", topics);
-		this.propertyBag.put("user", user);
+		this.result.include("pagination", pagination);
+		this.result.include("topics", topics);
+		this.result.include("user", user);
 	}
 
 	private void registerUserInSession(User user) {

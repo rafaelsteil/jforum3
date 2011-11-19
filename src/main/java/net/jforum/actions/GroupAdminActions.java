@@ -12,164 +12,178 @@ package net.jforum.actions;
 
 import java.util.Arrays;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PermissionOptions;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
-import net.jforum.actions.interceptors.ExternalUserManagementInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Group;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.GroupRepository;
 import net.jforum.security.AdministrationRule;
 import net.jforum.security.RoleManager;
 import net.jforum.services.GroupService;
-import net.jforum.services.ViewService;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
-import org.vraptor.plugin.interceptor.MethodInterceptorInterceptor;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.GROUPS_ADMIN)
-@InterceptedBy({MethodInterceptorInterceptor.class,ActionSecurityInterceptor.class})
+@Resource
+@Path(Domain.GROUPS_ADMIN)
+// @InterceptedBy({MethodInterceptorInterceptor.class,ActionSecurityInterceptor.class})
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class GroupAdminActions {
 	private GroupRepository groupRepository;
 	private CategoryRepository categoryRepository;
 	private GroupService service;
-	private ViewPropertyBag propertyBag;
-	private ViewService viewService;
 	private SessionManager sessionManager;
+	private final Result result;
 
-	public GroupAdminActions(GroupService service, GroupRepository repository, SessionManager sessionManager,
-		ViewPropertyBag propertyBag, ViewService viewService, CategoryRepository categoryRepository) {
+	public GroupAdminActions(GroupService service, GroupRepository repository,
+			SessionManager sessionManager,
+			CategoryRepository categoryRepository, Result result) {
 		this.service = service;
 		this.groupRepository = repository;
-		this.viewService = viewService;
-		this.propertyBag = propertyBag;
 		this.categoryRepository = categoryRepository;
 		this.sessionManager = sessionManager;
+		this.result = result;
 	}
 
 	/**
 	 * Shows the page to set permissions for a specific group
-	 * @param groupId the group id
+	 * 
+	 * @param groupId
+	 *            the group id
 	 */
-	public void permissions(@Parameter(key = "groupId") int groupId) {
+	public void permissions(int groupId) {
 		Group group = this.groupRepository.get(groupId);
 
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
-		if (!roleManager.isAdministrator() && !roleManager.isGroupManager(groupId)) {
-			this.viewService.redirectToAction(Actions.LIST);
-		}
-		else {
-			this.propertyBag.put("group", group);
-			this.propertyBag.put("groups", this.groupRepository.getAllGroups());
-			this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
-			this.propertyBag.put("permissions", this.convertRolesToPermissionOptions(group));
+		if (!roleManager.isAdministrator()
+				&& !roleManager.isGroupManager(groupId)) {
+			this.result.redirectTo(this).list();
+		} else {
+			this.result.include("group", group);
+			this.result.include("groups", this.groupRepository.getAllGroups());
+			this.result.include("categories",
+					this.categoryRepository.getAllCategories());
+			this.result.include("permissions",
+					this.convertRolesToPermissionOptions(group));
 		}
 	}
 
 	/**
 	 * Save the permissions for this group
-	 * @param groupId the id of the group to save
-	 * @param permissions the set of permissions of this group
+	 * 
+	 * @param groupId
+	 *            the id of the group to save
+	 * @param permissions
+	 *            the set of permissions of this group
 	 */
-	public void permissionsSave(@Parameter(key = "groupId") int groupId, @Parameter(key = "permission") PermissionOptions permissions) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
-		if (roleManager.isAdministrator() || roleManager.isGroupManager(groupId)) {
+	public void permissionsSave(int groupId, PermissionOptions permissions) {
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
+		if (roleManager.isAdministrator()
+				|| roleManager.isGroupManager(groupId)) {
 			this.service.savePermissions(groupId, permissions);
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	/**
 	 * List all existing groups
 	 */
 	public void list() {
-		this.propertyBag.put("groups", this.groupRepository.getAllGroups());
+		this.result.include("groups", this.groupRepository.getAllGroups());
 	}
 
 	/**
 	 * Shows the page to add a new group
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
+	// @InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void add() {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
 		if (!roleManager.isAdministrator()) {
-			this.viewService.redirectToAction(Actions.LIST);
+			this.result.redirectTo(this).list();
 		}
 	}
 
 	/**
 	 * Delete one or more groups
-	 * @param groupId the id of the groups to delete
+	 * 
+	 * @param groupId
+	 *            the id of the groups to delete
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
-	public void delete(@Parameter(key = "groupId") int... groupId) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+	// @InterceptedBy(ExternalUserManagementInterceptor.class)
+	public void delete(int... groupId) {
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
 		if (roleManager.isAdministrator()) {
 			this.service.delete(groupId);
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	/**
 	 * Shows the page to edit a group
+	 * 
 	 * @param groupId
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
-	public void edit(@Parameter(key = "groupId") int groupId) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+	// @InterceptedBy(ExternalUserManagementInterceptor.class)
+	public void edit(int groupId) {
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
-		if (!roleManager.isAdministrator() && !roleManager.isGroupManager(groupId)) {
-			this.viewService.redirectToAction(Actions.LIST);
-		}
-		else {
-			this.propertyBag.put("group", this.groupRepository.get(groupId));
-			this.viewService.renderView(Actions.ADD);
+		if (!roleManager.isAdministrator()
+				&& !roleManager.isGroupManager(groupId)) {
+			this.result.redirectTo(this).list();
+		} else {
+			this.result.include("group", this.groupRepository.get(groupId));
+			this.result.forwardTo(this).add();
 		}
 	}
 
 	/**
 	 * Saves the new information of an existing group
+	 * 
 	 * @param group
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
-	public void editSave(@Parameter(key = "group") Group group) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+	// @InterceptedBy(ExternalUserManagementInterceptor.class)
+	public void editSave(Group group) {
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
-		if (roleManager.isAdministrator() || roleManager.isGroupManager(group.getId())) {
+		if (roleManager.isAdministrator()
+				|| roleManager.isGroupManager(group.getId())) {
 			this.service.update(group);
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	/**
 	 * Save a new grop
+	 * 
 	 * @param group
 	 */
-	@InterceptedBy(ExternalUserManagementInterceptor.class)
-	public void addSave(@Parameter(key = "group") Group group) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+	// @InterceptedBy(ExternalUserManagementInterceptor.class)
+	public void addSave(Group group) {
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
 		if (roleManager.isAdministrator()) {
 			this.service.add(group);
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	private PermissionOptions convertRolesToPermissionOptions(Group group) {

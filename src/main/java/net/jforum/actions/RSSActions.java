@@ -12,31 +12,28 @@ package net.jforum.actions;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.UserSession;
 import net.jforum.services.RSSService;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.Parameter;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.RSS)
+@Resource
+@Path(Domain.RSS)
 public class RSSActions {
-	private ViewPropertyBag propertyBag;
-	private ViewService viewService;
 	private RSSService rssService;
 	private UserSession userSession;
 	private JForumConfig config;
+	private final Result result;
 
-	public RSSActions(ViewPropertyBag propertyBag, ViewService viewService,
-		RSSService rssService, UserSession userSession, JForumConfig config) {
-		this.viewService = viewService;
-		this.propertyBag = propertyBag;
+	public RSSActions(Result result, RSSService rssService,
+			UserSession userSession, JForumConfig config) {
+		this.result = result;
 		this.rssService = rssService;
 		this.userSession = userSession;
 		this.config = config;
@@ -44,16 +41,19 @@ public class RSSActions {
 
 	/**
 	 * Display the latest topics from a specific forum
-	 * @param forumId the id of the forum to show
+	 * 
+	 * @param forumId
+	 *            the id of the forum to show
 	 */
-	public void forumTopics(@Parameter(key = "forumId") int forumId) {
-		if (!this.isRSSEnabled() || !this.userSession.getRoleManager().isForumAllowed(forumId)) {
-			this.viewService.renderView(Actions.ACCESS_DENIED);
-		}
-		else {
-			String contents = this.rssService.forForum(forumId, this.viewService);
-			this.propertyBag.put("contents", contents);
-			this.viewService.renderView(Actions.RSS);
+	public void forumTopics(int forumId) {
+		if (!this.isRSSEnabled()
+				|| !this.userSession.getRoleManager().isForumAllowed(forumId)) {
+			this.result.forwardTo(MessageActions.class).accessDenied();
+		} else {
+			String contents = this.rssService.forForum(forumId,
+					this.viewService);
+			this.result.include("contents", contents);
+			this.result.forwardTo(Actions.RSS);
 		}
 	}
 

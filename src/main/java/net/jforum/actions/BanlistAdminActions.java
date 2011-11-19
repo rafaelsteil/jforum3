@@ -11,32 +11,30 @@
 package net.jforum.actions;
 
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.repository.BanlistRepository;
 import net.jforum.security.AdministrationRule;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.BANNING_ADMIN)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.BANNING_ADMIN)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class BanlistAdminActions {
 	private BanlistRepository repository;
-	private ViewPropertyBag propertyBag;
+	private final Result result;
 
-	public BanlistAdminActions(BanlistRepository repository,
-			ViewPropertyBag propertyBag) {
+	public BanlistAdminActions(BanlistRepository repository, Result result) {
 		this.repository = repository;
-		this.propertyBag = propertyBag;
+		this.result = result;
 	}
 
 	public void list() {
-		this.propertyBag.put("banlist", this.repository.getAllBanlists());
+		this.result.include("banlist", this.repository.getAllBanlists());
 	}
 }

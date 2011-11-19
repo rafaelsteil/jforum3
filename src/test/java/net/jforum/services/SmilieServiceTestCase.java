@@ -11,6 +11,7 @@
 package net.jforum.services;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import net.jforum.core.exceptions.ValidationException;
@@ -24,8 +25,9 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
-import org.vraptor.interceptor.BasicUploadedFileInformation;
-import org.vraptor.interceptor.UploadedFileInformation;
+
+import br.com.caelum.vraptor.interceptor.multipart.DefaultUploadedFile;
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
  * @author Rafael Steil
@@ -43,52 +45,64 @@ public class SmilieServiceTestCase {
 
 	@Test(expected = ValidationException.class)
 	public void addUsingEmptyCodeExpectException() {
-		Smilie s = new Smilie(); s.setCode("");
+		Smilie s = new Smilie();
+		s.setCode("");
 		service.add(s, null);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void addUsingNullCodeExpectException() {
-		Smilie s = new Smilie(); s.setCode(null);
+		Smilie s = new Smilie();
+		s.setCode(null);
 		service.add(s, null);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void addUsingIdBiggerThanZeroExpectException() {
-		Smilie s = new Smilie(); s.setCode("x"); s.setId(1);
+		Smilie s = new Smilie();
+		s.setCode("x");
+		s.setId(1);
 		service.add(s, null);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void addUsingNullImageExpectsException() {
-		Smilie s = new Smilie(); s.setCode(":)");
+		Smilie s = new Smilie();
+		s.setCode(":)");
 		service.add(s, null);
 	}
 
 	@Test
 	public void addExpectSuccess() throws IOException {
-		final Smilie smilie = new Smilie(); smilie.setCode(":)");
+		final Smilie smilie = new Smilie();
+		smilie.setCode(":)");
 		File tempFile = File.createTempFile("jforum", "tests");
 		tempFile.deleteOnExit();
 		final String tempDir = tempFile.getParent();
 
-		File file = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
+		File file = new File(this.getClass().getResource("/smilies/smilie.gif")
+				.getFile());
 		TestCaseUtils.copyFile(file, tempFile);
 
-		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(tempFile,
-				tempFile.getAbsolutePath(), tempFile.getName());
+		UploadedFile uploadedFile = new DefaultUploadedFile(
+				new FileInputStream(file), file.getAbsolutePath(), "");
 
-		context.checking(new Expectations() {{
-			one(config).getApplicationPath(); will(returnValue(tempDir));
-			one(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR); will(returnValue(""));
-			one(repository).add(smilie);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(config).getApplicationPath();
+				will(returnValue(tempDir));
+				one(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR);
+				will(returnValue(""));
+				one(repository).add(smilie);
+			}
+		});
 
 		service.add(smilie, uploadedFile);
 		context.assertIsSatisfied();
 		Assert.assertNotNull(smilie.getDiskName());
 
-		File expectedFile = new File(String.format("%s/%s/%s", tempDir, "", smilie.getDiskName()));
+		File expectedFile = new File(String.format("%s/%s/%s", tempDir, "",
+				smilie.getDiskName()));
 		expectedFile.deleteOnExit();
 
 		Assert.assertTrue(expectedFile.exists());
@@ -101,19 +115,25 @@ public class SmilieServiceTestCase {
 
 	@Test(expected = ValidationException.class)
 	public void updateUsingEmptyCodeExpectException() {
-		Smilie s = new Smilie(); s.setCode(""); s.setId(1);
+		Smilie s = new Smilie();
+		s.setCode("");
+		s.setId(1);
 		service.update(s, null);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void updateUsingNullCodeExpectException() {
-		Smilie s = new Smilie(); s.setCode(null); s.setId(1);
+		Smilie s = new Smilie();
+		s.setCode(null);
+		s.setId(1);
 		service.update(s, null);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void updateUsingIdZeroExpectException() {
-		Smilie s = new Smilie(); s.setCode("x"); s.setId(0);
+		Smilie s = new Smilie();
+		s.setCode("x");
+		s.setId(0);
 		service.update(s, null);
 	}
 
@@ -122,25 +142,34 @@ public class SmilieServiceTestCase {
 		final File currentFile = File.createTempFile("jforum", "tests");
 		currentFile.deleteOnExit();
 
-		final Smilie currentSmilie = new Smilie(); currentSmilie.setId(1); currentSmilie.setCode(":)");
+		final Smilie currentSmilie = new Smilie();
+		currentSmilie.setId(1);
+		currentSmilie.setCode(":)");
 		currentSmilie.setDiskName(currentFile.getName());
 
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(currentSmilie));
-			atLeast(1).of(config).getApplicationPath(); will(returnValue(currentFile.getParent()));
-			atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR); will(returnValue(""));
-			one(repository).update(currentSmilie);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).get(1);
+				will(returnValue(currentSmilie));
+				atLeast(1).of(config).getApplicationPath();
+				will(returnValue(currentFile.getParent()));
+				atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR);
+				will(returnValue(""));
+				one(repository).update(currentSmilie);
+			}
+		});
 
 		File newFile = File.createTempFile("jforum", "tests");
 		newFile.deleteOnExit();
 
-		UploadedFileInformation uploadedFile = new BasicUploadedFileInformation(newFile,
-			newFile.getAbsolutePath(), newFile.getName());
+		UploadedFile uploadedFile = new DefaultUploadedFile(
+				new FileInputStream(newFile), newFile.getAbsolutePath(), "");
 
 		String oldDiskName = currentSmilie.getDiskName();
 
-		Smilie newSmilie = new Smilie(); newSmilie.setId(1); newSmilie.setCode(":D");
+		Smilie newSmilie = new Smilie();
+		newSmilie.setId(1);
+		newSmilie.setCode(":D");
 		service.update(newSmilie, uploadedFile);
 		context.assertIsSatisfied();
 
@@ -148,19 +177,27 @@ public class SmilieServiceTestCase {
 		Assert.assertFalse(currentFile.exists());
 		Assert.assertFalse(currentSmilie.getDiskName().equals(oldDiskName));
 
-		new File(String.format("%s/%s", currentFile.getParent(), currentSmilie.getDiskName())).delete();
+		new File(String.format("%s/%s", currentFile.getParent(),
+				currentSmilie.getDiskName())).delete();
 	}
 
 	@Test
 	public void updateOnlyCodeExpectsSuccess() {
-		final Smilie currentSmilie = new Smilie(); currentSmilie.setCode(":)"); currentSmilie.setId(1);
+		final Smilie currentSmilie = new Smilie();
+		currentSmilie.setCode(":)");
+		currentSmilie.setId(1);
 
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(currentSmilie));
-			one(repository).update(currentSmilie);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).get(1);
+				will(returnValue(currentSmilie));
+				one(repository).update(currentSmilie);
+			}
+		});
 
-		Smilie newSmilie = new Smilie(); newSmilie.setId(1); newSmilie.setCode(":D");
+		Smilie newSmilie = new Smilie();
+		newSmilie.setId(1);
+		newSmilie.setCode(":D");
 		service.update(newSmilie, null);
 		context.assertIsSatisfied();
 		Assert.assertEquals(newSmilie.getCode(), currentSmilie.getCode());
@@ -168,31 +205,44 @@ public class SmilieServiceTestCase {
 
 	@Test
 	public void deleteUsingNullShouldIgnore() {
-		context.checking(new Expectations() {{ }});
+		context.checking(new Expectations() {
+			{
+			}
+		});
 		service.delete(null);
 	}
 
 	@Test
 	public void deleteExpectSuccess() {
-		context.checking(new Expectations() {{
-			Smilie s1 = new Smilie(); s1.setId(1); s1.setDiskName(Long.toString(System.currentTimeMillis()));
-			Smilie s2 = new Smilie(); s2.setId(2); s2.setDiskName(Long.toString(System.currentTimeMillis()));
+		context.checking(new Expectations() {
+			{
+				Smilie s1 = new Smilie();
+				s1.setId(1);
+				s1.setDiskName(Long.toString(System.currentTimeMillis()));
+				Smilie s2 = new Smilie();
+				s2.setId(2);
+				s2.setDiskName(Long.toString(System.currentTimeMillis()));
 
-			String applicationPath = new File(this.getClass().getResource("").getFile()).getParent();
+				String applicationPath = new File(this.getClass()
+						.getResource("").getFile()).getParent();
 
-			atLeast(1).of(config).getApplicationPath(); will(returnValue(applicationPath));
-			atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR); will(returnValue(""));
+				atLeast(1).of(config).getApplicationPath();
+				will(returnValue(applicationPath));
+				atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR);
+				will(returnValue(""));
 
-			one(repository).get(1); will(returnValue(s1));
-			one(repository).remove(s1);
+				one(repository).get(1);
+				will(returnValue(s1));
+				one(repository).remove(s1);
 
-			one(repository).get(2); will(returnValue(s2));
-			one(repository).remove(s2);
+				one(repository).get(2);
+				will(returnValue(s2));
+				one(repository).remove(s2);
 
-		}});
+			}
+		});
 
 		service.delete(1, 2);
 		context.assertIsSatisfied();
 	}
 }
-

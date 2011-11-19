@@ -33,7 +33,8 @@ import net.jforum.util.UploadUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.vraptor.interceptor.UploadedFileInformation;
+
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
  * @author Rafael Steil
@@ -72,7 +73,7 @@ public class AttachmentService {
 		long totalSize = 0;
 
 		for (int i = 0; i < total; i++) {
-			UploadedFileInformation fileInfo = (UploadedFileInformation)request.getAttribute("attachment_" + i);
+			UploadedFile fileInfo = (UploadedFile) request.getAttribute("attachment_" + i);
 
 			if (fileInfo == null) {
 				continue;

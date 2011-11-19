@@ -11,11 +11,9 @@
 package net.jforum.actions;
 
 import net.jforum.actions.helpers.Actions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.UserSession;
 import net.jforum.security.RoleManager;
 import net.jforum.services.RSSService;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
@@ -25,28 +23,35 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class RSSActionsTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private RSSService rssService = context.mock(RSSService.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private RSSActions action = new RSSActions(propertyBag, viewService, rssService, userSession, config);
+	private MockResult mockResult = new MockResult();
+	private RSSActions action = new RSSActions(mockResult, rssService,
+			userSession, config);
 
 	@Test
 	public void forumTopicsExpectSuccess() {
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.RSS_ENABLED); will(returnValue(true));
-			one(roleManager).isForumAllowed(1); will(returnValue(true));
-			one(rssService).forForum(1, viewService); will(returnValue("contents"));
-			one(propertyBag).put("contents", "contents");
-			one(viewService).renderView(Actions.RSS);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(config).getBoolean(ConfigKeys.RSS_ENABLED);
+				will(returnValue(true));
+				one(roleManager).isForumAllowed(1);
+				will(returnValue(true));
+				one(rssService).forForum(1, mockResult);
+				will(returnValue("contents"));
+				one(mockResult).include("contents", "contents");
+				one(mockResult).forwardTo(Actions.RSS);
+			}
+		});
 
 		action.forumTopics(1);
 		context.assertIsSatisfied();
@@ -54,11 +59,15 @@ public class RSSActionsTestCase {
 
 	@Test
 	public void forumTopicsUserDoesNotHaveRightsShouldDeny() {
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.RSS_ENABLED); will(returnValue(true));
-			one(roleManager).isForumAllowed(1); will(returnValue(false));
-			one(viewService).renderView(Actions.ACCESS_DENIED);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(config).getBoolean(ConfigKeys.RSS_ENABLED);
+				will(returnValue(true));
+				one(roleManager).isForumAllowed(1);
+				will(returnValue(false));
+				one(mockResult).forwardTo(Actions.ACCESS_DENIED);
+			}
+		});
 
 		action.forumTopics(1);
 		context.assertIsSatisfied();
@@ -66,10 +75,13 @@ public class RSSActionsTestCase {
 
 	@Test
 	public void forumTopicsRSSDisabledShouldDeny() {
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.RSS_ENABLED); will(returnValue(false));
-			one(viewService).renderView(Actions.ACCESS_DENIED);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(config).getBoolean(ConfigKeys.RSS_ENABLED);
+				will(returnValue(false));
+				one(mockResult).forwardTo(Actions.ACCESS_DENIED);
+			}
+		});
 
 		action.forumTopics(1);
 		context.assertIsSatisfied();
@@ -77,8 +89,11 @@ public class RSSActionsTestCase {
 
 	@Before
 	public void setup() {
-		context.checking(new Expectations() {{
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-		}});
+		context.checking(new Expectations() {
+			{
+				allowing(userSession).getRoleManager();
+				will(returnValue(roleManager));
+			}
+		});
 	}
 }

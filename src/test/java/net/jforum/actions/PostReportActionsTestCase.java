@@ -45,19 +45,20 @@ import org.junit.Test;
 import org.vraptor.Interceptor;
 import org.vraptor.annotations.InterceptedBy;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class PostReportActionsTestCase {
 	private Mockery mockery = TestCaseUtils.newMockery();
 	private SessionManager sessionManager = mockery.mock(SessionManager.class);
-	private ViewPropertyBag propertyBag = mockery.mock(ViewPropertyBag.class);
-	private ViewService viewService = mockery.mock(ViewService.class);
 	private UserSession userSession = mockery.mock(UserSession.class);
 	private RoleManager roleManager = mockery.mock(RoleManager.class);
 	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
 	private JForumConfig config = mockery.mock(JForumConfig.class);
-	private PostReportActions action = new PostReportActions(repository, sessionManager, propertyBag, viewService, config);
+	private MockResult mockResult = new MockResult();
+	private PostReportActions action = new PostReportActions(repository, sessionManager, config, mockResult);
 
 	@Test
 	public void listResolved() {
@@ -66,8 +67,8 @@ public class PostReportActionsTestCase {
 			allowing(config).getInt(ConfigKeys.TOPICS_PER_PAGE); will(returnValue(10));
 			one(repository).getPaginated(0, 10, PostReportStatus.RESOLVED, new int[] {});
 				will(returnValue(new PaginatedResult<PostReport>(new ArrayList<PostReport>(), 10)));
-			one(propertyBag).put("pagination", new Pagination(0, 0, 0, "", 0));
-			one(propertyBag).put("reports", new ArrayList<PostReport>());
+			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
+			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
 		action.listResolved(0);
@@ -133,7 +134,7 @@ public class PostReportActionsTestCase {
 
 			one(repository).get(1); will(returnValue(report));
 
-			one(viewService).redirectToAction(Actions.LIST);
+			one(mockResult).redirectTo(PostReportActions.class).list();
 		}});
 
 		action.delete(1);
@@ -154,7 +155,7 @@ public class PostReportActionsTestCase {
 
 			one(repository).get(1); will(returnValue(report));
 			one(repository).remove(report);
-			one(viewService).redirectToAction(Actions.LIST);
+			one(mockResult).redirectTo(PostReportActions.class).list();
 		}});
 
 		action.delete(1);
@@ -170,7 +171,7 @@ public class PostReportActionsTestCase {
 			one(roleManager).isCoAdministrator(); will(returnValue(false));
 			one(roleManager).getRoleValues(SecurityConstants.FORUM); will(returnValue(forumIds));
 			one(repository).getAll(PostReportStatus.UNRESOLVED, forumIds); will(returnValue(new ArrayList<PostReport>()));
-			one(propertyBag).put("reports", new ArrayList<PostReport>());
+			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
 		action.list();
@@ -180,7 +181,7 @@ public class PostReportActionsTestCase {
 	@Test
 	public void listNullStatusDefaultShouldBeUnresolved() {
 		mockery.checking(new Expectations() {{
-			ignoring(sessionManager); ignoring(roleManager); ignoring(propertyBag);
+			ignoring(sessionManager); ignoring(roleManager); ignoring(mockResult);
 			one(repository).getAll(PostReportStatus.UNRESOLVED, new int[] {});
 		}});
 
@@ -193,7 +194,7 @@ public class PostReportActionsTestCase {
 		mockery.checking(new Expectations() {{
 			one(roleManager).isAdministrator(); will(returnValue(true));
 			one(repository).getAll(PostReportStatus.UNRESOLVED, null); will(returnValue(new ArrayList<PostReport>()));
-			one(propertyBag).put("reports", new ArrayList<PostReport>());
+			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
 		action.list();
@@ -206,7 +207,7 @@ public class PostReportActionsTestCase {
 			one(roleManager).isAdministrator(); will(returnValue(false));
 			one(roleManager).isCoAdministrator(); will(returnValue(true));
 			one(repository).getAll(PostReportStatus.UNRESOLVED, null); will(returnValue(new ArrayList<PostReport>()));
-			one(propertyBag).put("reports", new ArrayList<PostReport>());
+			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
 		action.list();

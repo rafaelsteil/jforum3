@@ -154,7 +154,7 @@
 			</fileset>
 			<report styledir="${build.style}" format="frames" todir="${artifacts.dir}/junit" />
 		</junitreport>
-		<fail if="failed-test" message="Testes unitarios com problema!" />
+		<fail if="failed-test" message="Unit test with problems!" />
 	</target>
 
 	<target name="cobertura-report">

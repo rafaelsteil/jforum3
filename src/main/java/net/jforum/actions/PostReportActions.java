@@ -12,12 +12,9 @@ package net.jforum.actions;
 
 import java.util.Date;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Post;
 import net.jforum.entities.PostReport;
 import net.jforum.entities.PostReportStatus;
@@ -27,60 +24,61 @@ import net.jforum.entities.util.Pagination;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.security.ModerationRule;
 import net.jforum.security.RoleManager;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
 
 import org.hibernate.ObjectNotFoundException;
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
+
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.POST_REPORT)
-@InterceptedBy(MethodSecurityInterceptor.class)
+@Resource
+@Path(Domain.POST_REPORT)
+// @InterceptedBy(MethodSecurityInterceptor.class)
 public class PostReportActions {
 	private final PostReportRepository repository;
 	private final SessionManager sessionManager;
-	private final ViewPropertyBag propertyBag;
-	private final ViewService viewService;
 	private final JForumConfig config;
+	private final Result result;
 
-	public PostReportActions(PostReportRepository repository, SessionManager sessionManager,
-		ViewPropertyBag propertyBag, ViewService viewService, JForumConfig config) {
+	public PostReportActions(PostReportRepository repository,
+			SessionManager sessionManager, JForumConfig config, Result result) {
 		this.repository = repository;
 		this.sessionManager = sessionManager;
-		this.propertyBag = propertyBag;
-		this.viewService = viewService;
 		this.config = config;
+		this.result = result;
 	}
 
 	@SecurityConstraint(ModerationRule.class)
 	public void list() {
 		int[] forumIds = this.getForumIdsToFilter();
-		this.propertyBag.put("reports", this.repository.getAll(PostReportStatus.UNRESOLVED, forumIds));
+		this.result.include("reports",
+				this.repository.getAll(PostReportStatus.UNRESOLVED, forumIds));
 	}
 
 	@SecurityConstraint(ModerationRule.class)
-	public void listResolved(@Parameter(key = "page") int page) {
+	public void listResolved(int page) {
 		int[] forumIds = this.getForumIdsToFilter();
 		int recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 
 		PaginatedResult<PostReport> reports = this.repository.getPaginated(
-			new Pagination().calculeStart(page, recordsPerPage), recordsPerPage,
-			PostReportStatus.RESOLVED, forumIds);
+				new Pagination().calculeStart(page, recordsPerPage),
+				recordsPerPage, PostReportStatus.RESOLVED, forumIds);
 
-		Pagination pagination = new Pagination(this.config, page).forPostReports(reports.getTotalRecords());
+		Pagination pagination = new Pagination(this.config, page)
+				.forPostReports(reports.getTotalRecords());
 
-		this.propertyBag.put("pagination", pagination);
-		this.propertyBag.put("reports", reports.getResults());
+		this.result.include("pagination", pagination);
+		this.result.include("reports", reports.getResults());
 	}
 
 	@SecurityConstraint(ModerationRule.class)
-	public void resolve(@Parameter(key = "reportId") int reportId) {
+	public void resolve(int reportId) {
 		PostReport report = this.repository.get(reportId);
 
 		if (this.canManipulateReport(report)) {
@@ -88,21 +86,21 @@ public class PostReportActions {
 			this.repository.update(report);
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	@SecurityConstraint(ModerationRule.class)
-	public void delete(@Parameter(key = "reportId") int reportId) {
+	public void delete(int reportId) {
 		PostReport report = this.repository.get(reportId);
 
 		if (this.canManipulateReport(report)) {
 			this.repository.remove(report);
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
-	public void report(@Parameter(key = "postId") int postId, @Parameter(key = "description") String description) {
+	public void report(int postId, String description) {
 		UserSession userSession = this.sessionManager.getUserSession();
 
 		if (userSession.isLogged()) {
@@ -111,7 +109,8 @@ public class PostReportActions {
 			report.setUser(userSession.getUser());
 			report.setDescription(description);
 
-			Post post = new Post(); post.setId(postId);
+			Post post = new Post();
+			post.setId(postId);
 			report.setPost(post);
 
 			this.repository.add(report);
@@ -119,16 +118,17 @@ public class PostReportActions {
 	}
 
 	private boolean canManipulateReport(PostReport report) {
-		int[] forumIds = this.sessionManager.getUserSession().getRoleManager().getRoleValues(SecurityConstants.FORUM);
+		int[] forumIds = this.sessionManager.getUserSession().getRoleManager()
+				.getRoleValues(SecurityConstants.FORUM);
 
 		for (int forumId : forumIds) {
-			// Make sure the user is removing a report from a forum he can moderate
+			// Make sure the user is removing a report from a forum he can
+			// moderate
 			try {
 				if (forumId == report.getPost().getForum().getId()) {
 					return true;
 				}
-			}
-			catch (ObjectNotFoundException e) {
+			} catch (ObjectNotFoundException e) {
 				return true;
 			}
 		}
@@ -138,7 +138,8 @@ public class PostReportActions {
 
 	private int[] getForumIdsToFilter() {
 		int[] forumIds = null;
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.sessionManager.getUserSession()
+				.getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isCoAdministrator()) {
 			forumIds = roleManager.getRoleValues(SecurityConstants.FORUM);

@@ -51,13 +51,15 @@ import net.jforum.core.exceptions.ForumException;
 
 import org.vraptor.interceptor.UploadedFileInformation;
 
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
+
 /**
  * @author Rafael Steil
  */
 public class UploadUtils {
-	private UploadedFileInformation uploadedFile;
+	private UploadedFile uploadedFile;
 
-	public UploadUtils(UploadedFileInformation uploadedFile) {
+	public UploadUtils(UploadedFile uploadedFile) {
 		this.uploadedFile = uploadedFile;
 	}
 
@@ -69,11 +71,9 @@ public class UploadUtils {
 	public void saveUploadedFile(String filename) {
 		BufferedInputStream inputStream = null;
 		FileOutputStream outputStream = null;
-		FileInputStream fileInputStream = null;
 
 		try {
-			fileInputStream = new FileInputStream(this.uploadedFile.getFile());
-			inputStream = new BufferedInputStream(fileInputStream);
+			inputStream = new BufferedInputStream(this.uploadedFile.getFile());
 			outputStream = new FileOutputStream(filename);
 
 			int c;
@@ -91,7 +91,6 @@ public class UploadUtils {
 				outputStream.close();
 
 				inputStream.close();
-				fileInputStream.close();
 
 				this.deleteTempFile();
 			}
