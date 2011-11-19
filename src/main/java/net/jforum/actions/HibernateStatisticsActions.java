@@ -11,42 +11,40 @@
 package net.jforum.actions;
 
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.security.AdministrationRule;
-import net.jforum.services.ViewService;
 
 import org.hibernate.SessionFactory;
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
+
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.HIBERNATE)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.HIBERNATE)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class HibernateStatisticsActions {
 	private SessionFactory sessionFactory;
-	private ViewPropertyBag propertyBag;
-	private ViewService viewService;
+	private final Result result;
 
-	public HibernateStatisticsActions(SessionFactory sessionFactory, ViewPropertyBag propertyBag,
-		ViewService viewService) {
+	public HibernateStatisticsActions(SessionFactory sessionFactory,
+			Result result) {
 		this.sessionFactory = sessionFactory;
-		this.propertyBag = propertyBag;
-		this.viewService = viewService;
+		this.result = result;
 	}
 
 	public void list() {
-		boolean statsEnabled = this.sessionFactory.getStatistics().isStatisticsEnabled();
+		boolean statsEnabled = this.sessionFactory.getStatistics()
+				.isStatisticsEnabled();
 
 		if (!statsEnabled) {
-			this.viewService.renderView("statsDisabled");
-		}
-		else {
-			this.propertyBag.put("stats", this.sessionFactory.getStatistics());
+			this.result.forwardTo("statsDisabled");
+		} else {
+			this.result.include("stats", this.sessionFactory.getStatistics());
 		}
 	}
 }

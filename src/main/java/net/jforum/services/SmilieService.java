@@ -21,7 +21,8 @@ import net.jforum.util.MD5;
 import net.jforum.util.UploadUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.vraptor.interceptor.UploadedFileInformation;
+
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
  * @author Rafael Steil
@@ -37,19 +38,22 @@ public class SmilieService {
 
 	/**
 	 * Adds a new smilie
+	 * 
 	 * @param smilie
 	 */
-	public void add(Smilie smilie, UploadedFileInformation uploadedFile) {
+	public void add(Smilie smilie, UploadedFile uploadedFile) {
 		this.applyCommonConstraints(smilie);
 
 		if (smilie.getId() > 0) {
-			throw new ValidationException("Cannot add an existing (id > 0) smilie");
+			throw new ValidationException(
+					"Cannot add an existing (id > 0) smilie");
 		}
 
 		String imageDiskName = this.saveImage(uploadedFile);
 
 		if (imageDiskName == null) {
-			throw new NullPointerException("Could not find the smile file to save");
+			throw new NullPointerException(
+					"Could not find the smile file to save");
 		}
 
 		smilie.setDiskName(imageDiskName);
@@ -59,14 +63,16 @@ public class SmilieService {
 
 	/**
 	 * Updates a existing smilie
+	 * 
 	 * @param smilie
 	 * @param file
 	 */
-	public void update(Smilie smilie, UploadedFileInformation uploadedFile) {
+	public void update(Smilie smilie, UploadedFile uploadedFile) {
 		this.applyCommonConstraints(smilie);
 
 		if (smilie.getId() == 0) {
-			throw new ValidationException("update() expects a smilie with an existing id");
+			throw new ValidationException(
+					"update() expects a smilie with an existing id");
 		}
 
 		String imageDiskName = this.saveImage(uploadedFile);
@@ -84,6 +90,7 @@ public class SmilieService {
 
 	/**
 	 * Delete smilies
+	 * 
 	 * @param smiliesId
 	 */
 	public void delete(int... smiliesId) {
@@ -98,25 +105,28 @@ public class SmilieService {
 	}
 
 	private void deleteImage(Smilie smilie) {
-		String filename = String.format("%s/%s/%s", this.config.getApplicationPath(),
-			this.config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
-			smilie.getDiskName());
+		String filename = String.format("%s/%s/%s",
+				this.config.getApplicationPath(),
+				this.config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
+				smilie.getDiskName());
 
 		new File(filename).delete();
 	}
 
-	private String saveImage(UploadedFileInformation uploadedFile) {
+	private String saveImage(UploadedFile uploadedFile) {
 		if (uploadedFile != null) {
 			UploadUtils upload = new UploadUtils(uploadedFile);
 
-			String imageName = String.format("%s.%s",
-				MD5.hash(uploadedFile.getCompleteFileName() + System.currentTimeMillis()),
-				upload.getExtension());
+			String imageName = String.format(
+					"%s.%s",
+					MD5.hash(uploadedFile.getFileName()
+							+ System.currentTimeMillis()),
+					upload.getExtension());
 
 			upload.saveUploadedFile(String.format("%s/%s/%s",
-				this.config.getApplicationPath(),
-				this.config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
-				imageName));
+					this.config.getApplicationPath(),
+					this.config.getValue(ConfigKeys.SMILIE_IMAGE_DIR),
+					imageName));
 
 			return imageName;
 		}

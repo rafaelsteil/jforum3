@@ -12,7 +12,6 @@ package net.jforum.actions;
 
 import java.util.ArrayList;
 
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Banlist;
 import net.jforum.repository.BanlistRepository;
 import net.jforum.util.TestCaseUtils;
@@ -22,14 +21,17 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class BanlistAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private BanlistAdminActions component;
-	private BanlistRepository repository = context.mock(BanlistRepository.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
+	private BanlistRepository repository = context
+			.mock(BanlistRepository.class);
+	private MockResult mockResult = new MockResult();
 
 	public BanlistAdminActionsTestCase() {
 		super(BanlistAdminActions.class);
@@ -37,10 +39,13 @@ public class BanlistAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void listExpectOneRecord() {
-		context.checking(new Expectations() {{
-			one(repository).getAllBanlists(); will(returnValue(new ArrayList<Banlist>()));
-			one(propertyBag).put("banlist", new ArrayList<Banlist>());
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).getAllBanlists();
+				will(returnValue(new ArrayList<Banlist>()));
+				one(mockResult).include("banlist", new ArrayList<Banlist>());
+			}
+		});
 
 		component.list();
 		context.assertIsSatisfied();
@@ -48,6 +53,6 @@ public class BanlistAdminActionsTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		component = new BanlistAdminActions(repository, propertyBag);
+		component = new BanlistAdminActions(repository, mockResult);
 	}
 }

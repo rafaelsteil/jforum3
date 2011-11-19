@@ -11,37 +11,38 @@
 package net.jforum.actions;
 
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.repository.ForumRepository;
 import net.jforum.security.AdministrationRule;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.ADMIN)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.ADMIN)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class AdminActions {
 	private final SessionManager sessionManager;
-	private final ViewPropertyBag propertyBag;
 	private final ForumRepository forumRepository;
+	private final Result result;
 
-	public AdminActions(SessionManager sessionManager,ViewPropertyBag propertyBag, ForumRepository forumRepository) {
+	public AdminActions(SessionManager sessionManager,
+			ForumRepository forumRepository, Result result) {
 		this.sessionManager = sessionManager;
-		this.propertyBag = propertyBag;
 		this.forumRepository = forumRepository;
+		this.result = result;
 	}
 
 	/**
 	 * Shows the main administration page (for logged users)
 	 */
-	public void index() { }
+	public void index() {
+	}
 
 	/**
 	 * The left navigation menu
@@ -54,8 +55,10 @@ public class AdminActions {
 	 * The main admin page
 	 */
 	public void main() {
-		this.propertyBag.put("stats", this.forumRepository.getForumStats());
-		this.propertyBag.put("sessions", this.sessionManager.getLoggedSessions());
-		this.propertyBag.put("totalLoggedUsers", this.sessionManager.getTotalLoggedUsers());
+		this.result.include("stats", this.forumRepository.getForumStats());
+		this.result
+				.include("sessions", this.sessionManager.getLoggedSessions());
+		this.result.include("totalLoggedUsers",
+				this.sessionManager.getTotalLoggedUsers());
 	}
 }

@@ -39,23 +39,24 @@ import org.vraptor.Interceptor;
 import org.vraptor.annotations.Component;
 import org.vraptor.annotations.InterceptedBy;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class TopicWatchExtensionTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private TopicWatchService service = context.mock(TopicWatchService.class);
-	private TopicWatchExtension extension = new TopicWatchExtension(propertyBag, sessionManager, viewService, service);
+	private MockResult mockResult = new MockResult();
+	private TopicWatchExtension extension = new TopicWatchExtension(sessionManager, service, mockResult);
 
 	@Test
 	public void afterListNogLoggedWatchingShouldBeFalse() {
 		this.afterListExpectations(false);
 
 		context.checking(new Expectations() {{
-			one(propertyBag).put("isUserWatchingTopic", false);
+			one(mockResult).include("isUserWatchingTopic", false);
 		}});
 
 		extension.afterList();
@@ -69,7 +70,7 @@ public class TopicWatchExtensionTestCase {
 		context.checking(new Expectations() {{
 			Topic t = new Topic(); t.setId(1);
 			one(service).getSubscription(t, new User()); will(returnValue(new TopicWatch()));
-			one(propertyBag).put("isUserWatchingTopic", true);
+			one(mockResult).include("isUserWatchingTopic", true);
 		}});
 
 		extension.afterList();
@@ -83,7 +84,7 @@ public class TopicWatchExtensionTestCase {
 			Topic t = new Topic(); t.setId(1);
 
 			if (isLogged) {
-				one(propertyBag).get("topic"); will(returnValue(t));
+				one(mockResult).included().get("topic"); will(returnValue(t));
 			}
 
 			one(us).isLogged(); will(returnValue(isLogged));

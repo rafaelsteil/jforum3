@@ -13,10 +13,8 @@ package net.jforum.actions;
 import java.util.Date;
 
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
@@ -32,31 +30,31 @@ import net.jforum.util.ConfigKeys;
 import net.jforum.util.GroupInteractionFilter;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.FORUMS)
-@InterceptedBy(MethodSecurityInterceptor.class)
+@Resource
+@Path(Domain.FORUMS)
+//@InterceptedBy(MethodSecurityInterceptor.class)
 public class ForumActions {
 	private CategoryRepository categoryRepository;
 	private ForumRepository forumRepository;
 	private UserRepository userRepository;
 	private SessionManager sessionManager;
-	private ViewPropertyBag propertyBag;
 	private MostUsersEverOnlineService mostUsersEverOnlineService;
 	private JForumConfig config;
 	private GroupInteractionFilter groupInteractionFilter;
+	private final Result result;
 
-	public ForumActions(ViewPropertyBag propertyBag, CategoryRepository categoryRepository,
+	public ForumActions(CategoryRepository categoryRepository,
 		SessionManager sessionManager, ForumRepository forumRepository,
 		UserRepository userRepository, MostUsersEverOnlineService mostUsersEverOnlineService,
-		JForumConfig config, GroupInteractionFilter groupInteractionFilter) {
-		this.propertyBag = propertyBag;
+		JForumConfig config, GroupInteractionFilter groupInteractionFilter,
+		Result result) {
 		this.categoryRepository = categoryRepository;
 		this.sessionManager = sessionManager;
 		this.forumRepository = forumRepository;
@@ -64,13 +62,14 @@ public class ForumActions {
 		this.mostUsersEverOnlineService = mostUsersEverOnlineService;
 		this.config = config;
 		this.groupInteractionFilter = groupInteractionFilter;
+		this.result = result;
 	}
 
 	/**
 	 * Show the new messages since the last time the user did something in the forum
 	 */
 	@SecurityConstraint(value = AuthenticatedRule.class, displayLogin = true)
-	public void newMessages(@Parameter(key = "page") int page) {
+	public void newMessages(int page) {
 		UserSession userSession = this.sessionManager.getUserSession();
 		int recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 
@@ -79,25 +78,25 @@ public class ForumActions {
 
 		Pagination pagination = new Pagination(this.config, page).forNewMessages(newMessages.getTotalRecords());
 
-		this.propertyBag.put("pagination", pagination);
-		this.propertyBag.put("results", newMessages.getResults());
-		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
+		this.result.include("pagination", pagination);
+		this.result.include("results", newMessages.getResults());
+		this.result.include("categories", this.categoryRepository.getAllCategories());
 	}
 
 	/**
 	 * Show topics from a forum
 	 */
 	@SecurityConstraint(value = AccessForumRule.class, displayLogin = true)
-	public void show(@Parameter(key = "forumId") int forumId, @Parameter(key = "page") int page) {
+	public void show(int forumId, int page) {
 		Forum forum = this.forumRepository.get(forumId);
 
 		Pagination pagination = new Pagination(this.config, page).forForum(forum);
 
-		this.propertyBag.put("forum", forum);
-		this.propertyBag.put("pagination", pagination);
-		this.propertyBag.put("isModeratorOnline", this.sessionManager.isModeratorOnline());
-		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
-		this.propertyBag.put("topics", forum.getTopics(pagination.getStart(),
+		this.result.include("forum", forum);
+		this.result.include("pagination", pagination);
+		this.result.include("isModeratorOnline", this.sessionManager.isModeratorOnline());
+		this.result.include("categories", this.categoryRepository.getAllCategories());
+		this.result.include("topics", forum.getTopics(pagination.getStart(),
 			pagination.getRecordsPerPage()));
 	}
 
@@ -105,21 +104,21 @@ public class ForumActions {
 	 * Listing of all forums
 	 */
 	public void list() {
-		this.propertyBag.put("categories", this.categoryRepository.getAllCategories());
-		this.propertyBag.put("onlineUsers", this.sessionManager.getLoggedSessions());
-		this.propertyBag.put("totalRegisteredUsers", this.userRepository.getTotalUsers());
-		this.propertyBag.put("totalMessages", this.forumRepository.getTotalMessages());
-		this.propertyBag.put("totalLoggedUsers", this.sessionManager.getTotalLoggedUsers());
-		this.propertyBag.put("totalAnonymousUsers", this.sessionManager.getTotalAnonymousUsers());
-		this.propertyBag.put("lastRegisteredUser", this.userRepository.getLastRegisteredUser());
-		this.propertyBag.put("postsPerPage", this.config.getInt(ConfigKeys.POSTS_PER_PAGE));
-		this.propertyBag.put("mostUsersEverOnline", mostUsersEverOnlineService
+		this.result.include("categories", this.categoryRepository.getAllCategories());
+		this.result.include("onlineUsers", this.sessionManager.getLoggedSessions());
+		this.result.include("totalRegisteredUsers", this.userRepository.getTotalUsers());
+		this.result.include("totalMessages", this.forumRepository.getTotalMessages());
+		this.result.include("totalLoggedUsers", this.sessionManager.getTotalLoggedUsers());
+		this.result.include("totalAnonymousUsers", this.sessionManager.getTotalAnonymousUsers());
+		this.result.include("lastRegisteredUser", this.userRepository.getLastRegisteredUser());
+		this.result.include("postsPerPage", this.config.getInt(ConfigKeys.POSTS_PER_PAGE));
+		this.result.include("mostUsersEverOnline", mostUsersEverOnlineService
 			.getMostRecentData(this.sessionManager.getTotalUsers()));
 
 		UserSession userSession = this.sessionManager.getUserSession();
 
 		if (userSession.isLogged() && !userSession.getRoleManager().roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
-			this.groupInteractionFilter.filterForumListing(propertyBag, userSession);
+			this.groupInteractionFilter.filterForumListing(this.result, userSession);
 		}
 	}
 }

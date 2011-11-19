@@ -12,18 +12,17 @@ package net.jforum.actions;
 
 import java.util.ArrayList;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Smilie;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.services.SmilieService;
-import net.jforum.services.ViewService;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
-import org.vraptor.interceptor.UploadedFileInformation;
+
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
@@ -31,10 +30,10 @@ import org.vraptor.interceptor.UploadedFileInformation;
 public class SmilieAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private SmilieRepository repository = context.mock(SmilieRepository.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private SmilieService service = context.mock(SmilieService.class);
-	private SmilieAdminActions smilieAction = new SmilieAdminActions(service, repository, propertyBag, viewService);
+	private MockResult mockResult = new MockResult();
+	private SmilieAdminActions smilieAction = new SmilieAdminActions(service,
+			repository, mockResult);
 
 	public SmilieAdminActionsTestCase() {
 		super(SmilieAdminActions.class);
@@ -42,11 +41,14 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void edit() {
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(new Smilie()));
-			one(propertyBag).put("smilie", new Smilie());
-			one(viewService).renderView(Actions.ADD);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).get(1);
+				will(returnValue(new Smilie()));
+				one(mockResult).include("smilie", new Smilie());
+				one(mockResult).forwardTo(SmilieAdminActions.class).add();
+			}
+		});
 
 		smilieAction.edit(1);
 		context.assertIsSatisfied();
@@ -54,10 +56,13 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void editSave() {
-		context.checking(new Expectations() {{
-			one(service).update(with(aNonNull(Smilie.class)), with(aNull(UploadedFileInformation.class)));
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(service).update(with(aNonNull(Smilie.class)),
+						with(aNull(UploadedFile.class)));
+				one(mockResult).redirectTo(SmilieAdminActions.class).list();
+			}
+		});
 
 		smilieAction.editSave(new Smilie(), null);
 		context.assertIsSatisfied();
@@ -65,10 +70,12 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(service).delete(1, 2, 3);
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(service).delete(1, 2, 3);
+				one(mockResult).redirectTo(SmilieAdminActions.class).list();
+			}
+		});
 
 		smilieAction.delete(1, 2, 3);
 		context.assertIsSatisfied();
@@ -76,10 +83,13 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void listExpectOneRecord() {
-		context.checking(new Expectations() {{
-			one(repository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).getAllSmilies();
+				will(returnValue(new ArrayList<Smilie>()));
+				one(mockResult).include("smilies", new ArrayList<Smilie>());
+			}
+		});
 
 		smilieAction.list();
 		context.assertIsSatisfied();
@@ -87,10 +97,13 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void addSave() {
-		context.checking(new Expectations() {{
-			one(service).add(with(aNonNull(Smilie.class)), with(aNull(UploadedFileInformation.class)));
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(service).add(with(aNonNull(Smilie.class)),
+						with(aNull(UploadedFile.class)));
+				one(mockResult).redirectTo(SmilieAdminActions.class).list();
+			}
+		});
 
 		smilieAction.addSave(new Smilie(), null);
 		context.assertIsSatisfied();

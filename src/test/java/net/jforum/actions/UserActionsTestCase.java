@@ -49,14 +49,15 @@ import org.vraptor.annotations.InterceptedBy;
 import org.vraptor.interceptor.MultipartRequestInterceptor;
 import org.vraptor.interceptor.UploadedFileInformation;
 
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class UserActionsTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private UserRepository userRepository = context.mock(UserRepository.class);
-	private ViewService viewService = context.mock(ViewService.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private UserService userService = context.mock(UserService.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
@@ -66,8 +67,9 @@ public class UserActionsTestCase {
 	private AvatarService avatarService = context.mock(AvatarService.class);
 	private User user = new User();
 	private RankingRepository rankingRepository = context.mock(RankingRepository.class);
-	private UserActions userAction = new UserActions(userRepository, propertyBag, viewService,
-		userSession, userService, sessionManager, config, lostPasswordService, avatarService, rankingRepository);
+	private MockResult mockResult = new MockResult();
+	private UserActions userAction = new UserActions(userRepository, userSession, userService, sessionManager, 
+			config, lostPasswordService, avatarService, rankingRepository, mockResult);
 
 	@Test
 	public void edit() {
@@ -76,9 +78,9 @@ public class UserActionsTestCase {
 			one(userRepository).get(1); will(returnValue(user));
 			one(rankingRepository).getAllRankings(); will(returnValue(new ArrayList<Ranking>()));
 			one(avatarService).getAvatarGallery(); will(returnValue(new ArrayList<Avatar>()));
-			one(propertyBag).put("user", user);
-			one(propertyBag).put("rankings", new ArrayList<Ranking>());
-			one(propertyBag).put("avatars", new ArrayList<Avatar>());
+			one(mockResult).include("user", user);
+			one(mockResult).include("rankings", new ArrayList<Ranking>());
+			one(mockResult).include("avatars", new ArrayList<Avatar>());
 		}});
 
 		userAction.edit(1);
@@ -96,7 +98,7 @@ public class UserActionsTestCase {
 			one(roleManager).isCoAdministrator(); will(returnValue(false));
 			one(userService).update(user, false);
 			one(config).getValue(ConfigKeys.AUTHENTICATION_TYPE);
-			one(viewService).redirectToAction(Actions.EDIT, user.getId());
+			one(mockResult).redirectTo(UserActions.class).edit(user.getId());
 		}});
 
 		userAction.editSave(user,null, null, null);
@@ -106,7 +108,7 @@ public class UserActionsTestCase {
 	@Test
 	public void recoverPassword() {
 		context.checking(new Expectations() {{
-			one(propertyBag).put("hash", "123");
+			one(mockResult).include("hash", "123");
 		}});
 
 		userAction.recoverPassword("123");
@@ -117,8 +119,8 @@ public class UserActionsTestCase {
 	public void recoverPasswordValidateUsingBadDataExpectFail() {
 		context.checking(new Expectations() {{
 			one(userRepository).validateLostPasswordHash("user", "hash"); will(returnValue(null));
-			one(propertyBag).put("error", true);
-			one(propertyBag).put("message", "PasswordRecovery.invalidData");
+			one(mockResult).include("error", true);
+			one(mockResult).include("message", "PasswordRecovery.invalidData");
 		}});
 
 		userAction.recoverPasswordValidate("hash", "user", "123");
@@ -129,7 +131,7 @@ public class UserActionsTestCase {
 	public void recoverPasswordValidateUsingGoodDataExpectSuccess() {
 		context.checking(new Expectations() {{
 			one(userRepository).validateLostPasswordHash("user", "hash"); will(returnValue(new User()));
-			one(propertyBag).put("message", "PasswordRecovery.ok");
+			one(mockResult).include("message", "PasswordRecovery.ok");
 		}});
 
 		userAction.recoverPasswordValidate("hash", "user", "123");
@@ -140,7 +142,7 @@ public class UserActionsTestCase {
 	public void lostPasswordSend() {
 		context.checking(new Expectations() {{
 			one(lostPasswordService).send("username", "email"); will(returnValue(true));
-			one(propertyBag).put("success", true);
+			one(mockResult).include("success", true);
 		}});
 
 		userAction.lostPasswordSend("username", "email");
@@ -152,7 +154,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(false));
 			one(viewService).getReferer(); will(returnValue("some referer"));
-			one(propertyBag).put("returnPath", "some referer");
+			one(mockResult).include("returnPath", "some referer");
 		}});
 
 		userAction.login(null);
@@ -162,7 +164,7 @@ public class UserActionsTestCase {
 	@Test
 	public void loginWithReturnPath() {
 		context.checking(new Expectations() {{
-			one(propertyBag).put("returnPath", "some return path");
+			one(mockResult).include("returnPath", "some return path");
 		}});
 
 		userAction.login("some return path");
@@ -190,7 +192,7 @@ public class UserActionsTestCase {
 	@Test
 	public void editSaveShouldHaveEditUserRule() throws Exception {
 		Method method = userAction.getClass().getMethod("editSave", User.class, Integer.class,
-			UploadedFileInformation.class, Integer.class);
+			UploadedFile.class, Integer.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(EditUserRule.class, method.getAnnotation(SecurityConstraint.class).value());
@@ -218,7 +220,7 @@ public class UserActionsTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isUserListingEnabled(); will(returnValue(false));
-			one(propertyBag).put("users", new ArrayList<User>());
+			one(mockResult).include("users", new ArrayList<User>());
 		}});
 
 		userAction.list(0);
@@ -237,8 +239,8 @@ public class UserActionsTestCase {
 			one(userRepository).getTotalUsers(); will(returnValue(100));
 			one(config).getInt(ConfigKeys.USERS_PER_PAGE); will(returnValue(10));
 			one(userRepository).getAllUsers(0, 10); will(returnValue(new ArrayList<User>()));
-			one(propertyBag).put("users", new ArrayList<User>());
-			one(propertyBag).put("pagination", new Pagination(0, 0, 0, "", 0));
+			one(mockResult).include("users", new ArrayList<User>());
+			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
 		}});
 
 		userAction.list(0);
@@ -260,8 +262,8 @@ public class UserActionsTestCase {
 			one(userRepository).getTotalUsers(); will(returnValue(100));
 			one(config).getInt(ConfigKeys.USERS_PER_PAGE); will(returnValue(10));
 			one(userRepository).getAllUsers(0, 10, user.getGroups()); will(returnValue(new ArrayList<User>()));
-			one(propertyBag).put("users", new ArrayList<User>());
-			one(propertyBag).put("pagination", new Pagination(0, 0, 0, "", 0));
+			one(mockResult).include("users", new ArrayList<User>());
+			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
 		}});
 
 		userAction.list(0);
@@ -282,7 +284,7 @@ public class UserActionsTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
-			one(viewService).redirectToAction(Domain.FORUMS, Actions.LIST);
+			one(mockResult).redirectTo(ForumActions.class).list();
 		}});
 
 		userAction.logout();
@@ -293,8 +295,8 @@ public class UserActionsTestCase {
 	public void authenticateUserUsingInvalidCredentialsExpectsInvalidLogin() {
 		context.checking(new Expectations() {{
 			one(userService).validateLogin("user", "passwd"); will(returnValue(null));
-			one(propertyBag).put("invalidLogin", true);
-			one(viewService).renderView(Actions.LOGIN);
+			one(mockResult).include("invalidLogin", true);
+			one(mockResult).forwardTo(Actions.LOGIN);
 		}});
 
 		userAction.authenticateUser("user", "passwd", false, null);
@@ -318,7 +320,7 @@ public class UserActionsTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_ID); will(returnValue("z"));
 			one(userSession).addCookie("z", Integer.toString(user.getId()));
 			one(sessionManager).add(userSession);
-			one(viewService).redirectToAction(Domain.FORUMS, Actions.LIST);
+			one(mockResult).redirectTo(ForumActions.class).list();
 		}});
 
 		userAction.authenticateUser("user", "passwd", true, null);
@@ -339,7 +341,7 @@ public class UserActionsTestCase {
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
 			one(sessionManager).add(userSession);
-			one(viewService).redirectToAction(Domain.FORUMS, Actions.LIST);
+			one(mockResult).redirectTo(ForumActions.class).list();
 		}});
 
 		userAction.authenticateUser("user", "passwd", false, null);
@@ -351,7 +353,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(userService).validateLogin("user1", "pass1"); will(returnValue(new User()));
 			ignoring(userSession); ignoring(config); ignoring(sessionManager);
-			one(viewService).redirect("return path");
+			one(mockResult).redirectTo("return path");
 		}});
 
 		userAction.authenticateUser("user1", "pass1", false, "return path");
@@ -362,7 +364,7 @@ public class UserActionsTestCase {
 	public void registrationCompletedWithAnonymousUserExpectRedirect() {
 		context.checking(new Expectations() {{
 			one(userSession).isLogged(); will(returnValue(false));
-			one(viewService).redirectToAction(Actions.INSERT);
+			one(mockResult).redirectTo(UserActions.class).insert();
 		}});
 
 		userAction.registrationCompleted();
@@ -374,7 +376,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(userSession).isLogged(); will(returnValue(true));
 			one(userSession).getUser(); will(returnValue(new User()));
-			one(propertyBag).put("user", new User());
+			one(mockResult).include("user", new User());
 		}});
 
 		userAction.registrationCompleted();
@@ -386,8 +388,8 @@ public class UserActionsTestCase {
 	public void insertSaveUsernameTooBig() {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(1));
-			one(propertyBag).put("error", "User.usernameTooBig");
-			one(viewService).renderView(Actions.INSERT);
+			one(mockResult).include("error", "User.usernameTooBig");
+			one(mockResult).redirectTo(UserActions.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername("username1"); }});
@@ -399,8 +401,8 @@ public class UserActionsTestCase {
 	public void insertSaveUsernameContainsInvalidChars() {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
-			one(propertyBag).put("error", "User.usernameInvalidChars");
-			one(viewService).renderView(Actions.INSERT);
+			one(mockResult).include("error", "User.usernameInvalidChars");
+			one(mockResult).redirectTo(UserActions.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername("<username"); }});
@@ -412,8 +414,8 @@ public class UserActionsTestCase {
 	public void insertSaveUsernameContainsInvalidChars2() {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
-			one(propertyBag).put("error", "User.usernameInvalidChars");
-			one(viewService).renderView(Actions.INSERT);
+			one(mockResult).include("error", "User.usernameInvalidChars");
+			one(mockResult).redirectTo(UserActions.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername(">username"); }});
@@ -426,8 +428,8 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(userRepository).isUsernameAvailable("username", null); will(returnValue(false));
-			one(propertyBag).put("error", "User.usernameNotAvailable");
-			one(viewService).renderView(Actions.INSERT);
+			one(mockResult).include("error", "User.usernameNotAvailable");
+			one(mockResult).redirectTo(UserActions.class).insert();
 		}});
 
 		userAction.insertSave(new User() {{ setUsername("username"); }});
@@ -444,7 +446,7 @@ public class UserActionsTestCase {
 			one(userRepository).isUsernameAvailable("username", null); will(returnValue(true));
 			one(userSession).becomeLogged();
 			one(sessionManager).add(userSession);
-			one(viewService).redirectToAction(Actions.REGISTRATION_COMPLETED);
+			one(mockResult).redirectTo(UserActions.class).registrationCompleted();
 		}});
 
 		userAction.insertSave(new User() {{ setId(1); setUsername("username"); }});
@@ -462,16 +464,16 @@ public class UserActionsTestCase {
 
 			one(rankingRepository).getAllRankings(); will(returnValue(rankings));
 			one(userRepository).get(1); will(returnValue(new User()));
-			one(propertyBag).put("user", new User());
+			one(mockResult).include("user", new User());
 			one(userRepository).getTotalTopics(1); will(returnValue(0));
-			one(propertyBag).put("userTotalTopics", 0);
-			one(propertyBag).put("rankings", rankings);
+			one(mockResult).include("userTotalTopics", 0);
+			one(mockResult).include("rankings", rankings);
 			one(config).getInt("anonymousUserId"); will(returnValue(0));
-			one(propertyBag).put("isAnonymousUser", false);
+			one(mockResult).include("isAnonymousUser", false);
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(userSession).getUser(); will(returnValue(user));
 			one(roleManager).getCanEditUser(user, new ArrayList<Group>()); will(returnValue(true));
-			one(propertyBag).put("canEdit", true);
+			one(mockResult).include("canEdit", true);
 		}});
 
 		userAction.profile(1);
@@ -483,7 +485,7 @@ public class UserActionsTestCase {
 		context.checking(new Expectations() {{
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager); will(returnValue(false));
-			one(viewService).accessDenied();
+			one(mockResult).redirectTo(MessageActions.class).accessDenied();
 		}});
 
 		userAction.profile(1);
