@@ -16,23 +16,29 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.jforum.actions.ForumActions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
 public class GroupInteractionFilter {
 	/**
-	 * Filter the property bag for forums/show, based on group interaction settings
-	 * @param propertyBag the property bag for the "show" method of the {@link ForumActions} action
-	 * @param userSession the user session of the current logged user
+	 * Filter the property bag for forums/show, based on group interaction
+	 * settings
+	 * 
+	 * @param propertyBag
+	 *            the property bag for the "show" method of the
+	 *            {@link ForumActions} action
+	 * @param userSession
+	 *            the user session of the current logged user
 	 */
-	public void filterForumListing(ViewPropertyBag propertyBag, UserSession userSession) {
+	public void filterForumListing(Result result, UserSession userSession) {
 		@SuppressWarnings("unchecked")
-		Collection<UserSession> sessions = (Collection<UserSession>)propertyBag.get("onlineUsers");
+		Collection<UserSession> sessions = (Collection<UserSession>) result
+				.included().get("onlineUsers");
 
 		if (sessions == null) {
 			sessions = new ArrayList<UserSession>();
@@ -51,7 +57,7 @@ public class GroupInteractionFilter {
 			}
 		}
 
-		propertyBag.put("totalLoggedUsers", newSessions.size());
-		propertyBag.put("onlineUsers", newSessions);
+		result.include("totalLoggedUsers", newSessions.size());
+		result.include("onlineUsers", newSessions);
 	}
 }

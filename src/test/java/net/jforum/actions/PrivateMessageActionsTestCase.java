@@ -51,30 +51,31 @@ import org.vraptor.Interceptor;
 import org.vraptor.annotations.InterceptedBy;
 import org.vraptor.interceptor.MultipartRequestInterceptor;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class PrivateMessageActionsTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private UserSession userSession = context.mock(UserSession.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private PrivateMessageRepository repository = context.mock(PrivateMessageRepository.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
 	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
 	private PrivateMessageService service = context.mock(PrivateMessageService.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private PrivateMessageActions action = new PrivateMessageActions(repository, viewService,
-		propertyBag, smilieRepository, userRepository, service, sessionManager);
+	private MockResult mockResult = new MockResult();
+	private PrivateMessageActions action = new PrivateMessageActions(repository,
+		smilieRepository, userRepository, service, sessionManager, mockResult);
 
 	@Test
 	public void review() {
 		context.checking(new Expectations() {{
 			PrivateMessage pm = new PrivateMessage(); pm.setId(1);
 			one(repository).get(1); will(returnValue(pm));
-			one(propertyBag).put("pm", pm);
-			one(propertyBag).put("post", pm.asPost());
+			one(mockResult).include("pm", pm);
+			one(mockResult).include("post", pm.asPost());
 		}});
 
 		action.review(1);
@@ -87,7 +88,7 @@ public class PrivateMessageActionsTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getUser(); will(returnValue(new User()));
 			one(service).delete(new User(), 1, 2, 3);
-			one(viewService).redirectToAction(Actions.INBOX);
+			one(mockResult).redirectTo(Actions.INBOX);
 		}});
 
 		action.delete(1, 2, 3);
@@ -112,8 +113,8 @@ public class PrivateMessageActionsTestCase {
 			{ setId(3); }});
 
 			one(repository).get(1); will(returnValue(pm));
-			one(propertyBag).put("pm", pm);
-			one(propertyBag).put("post", new Post());
+			one(mockResult).include("pm", pm);
+			one(mockResult).include("post", new Post());
 		}});
 
 		action.read(1);
@@ -140,7 +141,7 @@ public class PrivateMessageActionsTestCase {
 		context.checking(new Expectations() {{
 
 			one(repository).get(1); will(returnValue(pm));
-			ignoring(propertyBag);
+			ignoring(mockResult);
 		}});
 
 		action.read(1);
@@ -154,9 +155,9 @@ public class PrivateMessageActionsTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getUser(); will(returnValue(new User()));
 			one(repository).getFromSentBox(new User()); will(returnValue(new ArrayList<PrivateMessage>()));
-			one(propertyBag).put("privateMessages", new ArrayList<PrivateMessage>());
-			one(propertyBag).put("sentbox", true);
-			one(viewService).renderView(Actions.MESSAGES);
+			one(mockResult).include("privateMessages", new ArrayList<PrivateMessage>());
+			one(mockResult).include("sentbox", true);
+			one(mockResult).forwardTo(Actions.MESSAGES);
 		}});
 
 		action.sent();
@@ -173,7 +174,7 @@ public class PrivateMessageActionsTestCase {
 			one(userRepository).get(1); will(returnValue(new User()));
 			one(userSession).getUser(); will(returnValue(new User()));
 			one(service).send(with(aNonNull(PrivateMessage.class)));
-			one(viewService).redirectToAction(Actions.INBOX);
+			one(mockResult).redirectTo(Actions.INBOX);
 		}});
 
 		action.sendSave(new Post(), new PostFormOptions(), null, 1);
@@ -211,10 +212,12 @@ public class PrivateMessageActionsTestCase {
 			one(userSession).getUser(); will(returnValue(new User()));
 
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
-			one(propertyBag).put("pmRecipient", recipient);
+			one(mockResult).include("pmRecipient", recipient);
 
-			ignoring(propertyBag); ignoring(smilieRepository);
-			one(viewService).renderView(Domain.TOPICS, Actions.ADD);
+			ignoring(mockResult); ignoring(smilieRepository);
+			
+			//TODO pass zero?
+			one(mockResult).forwardTo(TopicActions.class).add(0);
 		}});
 
 		action.sendTo(1);
@@ -244,9 +247,9 @@ public class PrivateMessageActionsTestCase {
 			allowing(userSession).getUser(); will(returnValue(currentUser));
 
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
-			one(viewService).renderView("sendToDenied");
+			one(mockResult).forwardTo("sendToDenied");
 
-			ignoring(propertyBag); ignoring(smilieRepository);
+			ignoring(mockResult); ignoring(smilieRepository);
 		}});
 
 		action.sendTo(1);
@@ -273,9 +276,9 @@ public class PrivateMessageActionsTestCase {
 			allowing(userSession).getUser(); will(returnValue(currentUser));
 
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
-			one(viewService).renderView("sendToDenied");
+			one(mockResult).forwardTo("sendToDenied");
 			
-			ignoring(propertyBag); ignoring(smilieRepository);
+			ignoring(mockResult); ignoring(smilieRepository);
 		}});
 
 		action.sendTo(1);
@@ -290,8 +293,8 @@ public class PrivateMessageActionsTestCase {
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
 
 			one(userRepository).findByUserName("an user"); will(returnValue(new ArrayList<User>()));
-			one(propertyBag).put("users", new ArrayList<User>());
-			one(propertyBag).put("username", "an user");
+			one(mockResult).include("users", new ArrayList<User>());
+			one(mockResult).include("username", "an user");
 		}});
 
 		action.findUser("an user");
@@ -311,8 +314,8 @@ public class PrivateMessageActionsTestCase {
 			one(roleManager).roleExists("interact_other_groups"); will(returnValue(false));
 			one(userSession).getUser(); will(returnValue(user));
 			one(userRepository).findByUserName("an user", user.getGroups()); will(returnValue(new ArrayList<User>()));
-			one(propertyBag).put("users", new ArrayList<User>());
-			one(propertyBag).put("username", "an user");
+			one(mockResult).include("users", new ArrayList<User>());
+			one(mockResult).include("username", "an user");
 		}});
 
 		action.findUser("an user");
@@ -322,7 +325,7 @@ public class PrivateMessageActionsTestCase {
 	@Test
 	public void findUserWithoutUsername() {
 		context.checking(new Expectations() {{
-			one(propertyBag).put("username", null);
+			one(mockResult).include("username", null);
 		}});
 
 		action.findUser(null);
@@ -336,12 +339,14 @@ public class PrivateMessageActionsTestCase {
 			User user = new User(); user.setId(1);
 			one(userSession).getUser(); will(returnValue(user));
 			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(propertyBag).put("post", new Post());
-			one(propertyBag).put("isPrivateMessage", true);
-			one(propertyBag).put("attachmentsEnabled", false);
-			one(propertyBag).put("user", user);
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
-			one(viewService).renderView(Domain.TOPICS, Actions.ADD);
+			one(mockResult).include("post", new Post());
+			one(mockResult).include("isPrivateMessage", true);
+			one(mockResult).include("attachmentsEnabled", false);
+			one(mockResult).include("user", user);
+			one(mockResult).include("smilies", new ArrayList<Smilie>());
+			
+			//TODO pass zero?
+			one(mockResult).forwardTo(TopicActions.class).add(0);
 		}});
 
 		action.send();
@@ -355,9 +360,9 @@ public class PrivateMessageActionsTestCase {
 			User user = new User(); user.setId(1);
 			one(userSession).getUser(); will(returnValue(user));
 			one(repository).getFromInbox(user); will(returnValue(new ArrayList<PrivateMessage>()));
-			one(propertyBag).put("inbox", true);
-			one(propertyBag).put("privateMessages", new ArrayList<PrivateMessage>());
-			one(viewService).renderView(Actions.MESSAGES);
+			one(mockResult).include("inbox", true);
+			one(mockResult).include("privateMessages", new ArrayList<PrivateMessage>());
+			one(mockResult).forwardTo(Actions.MESSAGES);
 		}});
 	}
 

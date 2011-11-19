@@ -10,11 +10,12 @@
  */
 package net.jforum.actions;
 
+import java.util.ArrayList;
+
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.AttachedFile;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Forum;
 import net.jforum.entities.ModerationLog;
 import net.jforum.entities.PollOption;
@@ -26,35 +27,35 @@ import net.jforum.repository.PostRepository;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.repository.TopicRepository;
 import net.jforum.services.PostService;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
+
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
 public class PostActionsTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-    private PostRepository postRepository = context.mock(PostRepository.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
-	private ViewService viewService = context.mock(ViewService.class);
-	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
+	private PostRepository postRepository = context.mock(PostRepository.class);
+	private SmilieRepository smilieRepository = context
+			.mock(SmilieRepository.class);
+	private TopicRepository topicRepository = context
+			.mock(TopicRepository.class);
 	private PostService postService = context.mock(PostService.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserSession userSession = context.mock(UserSession.class);
+	private MockResult mockResult = new MockResult();
 
-	private PostActions component = new PostActions(postRepository, propertyBag,
-		viewService, smilieRepository, postService, config, userSession, null, null);
-    private ModerationLog moderationLog = new ModerationLog();
-
-  
+	private PostActions component = new PostActions(postRepository,
+			smilieRepository, postService, config, userSession, null, null,
+			mockResult);
+	private ModerationLog moderationLog = new ModerationLog();
 
 	@Test
 	public void deleteHasMorePostsShouldRedirectToTopicListing() {
@@ -67,7 +68,9 @@ public class PostActionsTestCase {
 	}
 
 	private void deleteRedirect(final int totalPosts, final int expectedPage) {
-		final Post post = new Post(); post.setId(2); post.setTopic(new Topic() {
+		final Post post = new Post();
+		post.setId(2);
+		post.setTopic(new Topic() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -77,10 +80,13 @@ public class PostActionsTestCase {
 		});
 		post.getTopic().setId(7);
 
-		context.checking(new Expectations() {{
-			one(postRepository).get(2); will(returnValue(post));
-			one(postService).delete(post);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(postRepository).get(2);
+				will(returnValue(post));
+				one(postService).delete(post);
+			}
+		});
 
 		this.redirectToPage(post.getTopic(), expectedPage);
 
@@ -90,15 +96,24 @@ public class PostActionsTestCase {
 
 	@Test
 	public void deleteLastMessageShouldRedirectToForum() {
-		final Post post = new Post(); post.setId(2); post.setTopic(new Topic(topicRepository));
+		final Post post = new Post();
+		post.setId(2);
+		post.setTopic(new Topic(topicRepository));
 		post.getTopic().getForum().setId(3);
 
-		context.checking(new Expectations() {{
-			one(postRepository).get(2); will(returnValue(post));
-			one(postService).delete(post);
-			post.getTopic().decrementTotalReplies(); // we simulate the event dispatch
-			one(viewService).redirectToAction(Domain.FORUMS, Actions.SHOW, post.getTopic().getForum().getId());
-		}});
+		context.checking(new Expectations() {
+			{
+				one(postRepository).get(2);
+				will(returnValue(post));
+				one(postService).delete(post);
+				post.getTopic().decrementTotalReplies(); // we simulate the
+															// event dispatch
+
+				// TODO pass zero?
+				one(mockResult).redirectTo(ForumActions.class).show(
+						post.getTopic().getForum().getId(), 0);
+			}
+		});
 
 		component.delete(2);
 		context.assertIsSatisfied();
@@ -107,17 +122,25 @@ public class PostActionsTestCase {
 	@Test
 	public void editSave() {
 		final Post post = new Post();
-        post.setTopic(new Topic());
-        post.setForum(new Forum());
+		post.setTopic(new Topic());
+		post.setForum(new Forum());
 		final PostFormOptions options = new PostFormOptions();
 
-		context.checking(new Expectations() {{
-			ignoring(userSession);
-            one(postRepository).get(0); will(returnValue(post));
-            one(postService).update(post, false, new ArrayList<PollOption>(), new ArrayList<AttachedFile>(), moderationLog);
-			one(viewService).redirectToAction(Domain.TOPICS, Actions.LIST, post.getTopic().getId());
+		context.checking(new Expectations() {
+			{
+				ignoring(userSession);
+				one(postRepository).get(0);
+				will(returnValue(post));
+				one(postService).update(post, false,
+						new ArrayList<PollOption>(),
+						new ArrayList<AttachedFile>(), moderationLog);
 
-		}});
+				// TODO pass zero and true?
+				one(mockResult).redirectTo(TopicActions.class).list(
+						post.getTopic().getId(), 0, true);
+
+			}
+		});
 
 		component.editSave(post, options, null, moderationLog);
 		context.assertIsSatisfied();
@@ -141,37 +164,51 @@ public class PostActionsTestCase {
 			}
 		};
 
-		context.checking(new Expectations() {{
-			one(postRepository).get(1); will(returnValue(post));
-			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(propertyBag).put("post", post);
-			one(propertyBag).put("isEdit", true);
-			one(propertyBag).put("topic", new Topic());
-			one(propertyBag).put("forum", new Forum());
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
-			one(viewService).renderView(Domain.TOPICS, Actions.ADD);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(postRepository).get(1);
+				will(returnValue(post));
+				one(smilieRepository).getAllSmilies();
+				will(returnValue(new ArrayList<Smilie>()));
+				one(mockResult).include("post", post);
+				one(mockResult).include("isEdit", true);
+				one(mockResult).include("topic", new Topic());
+				one(mockResult).include("forum", new Forum());
+				one(mockResult).include("smilies", new ArrayList<Smilie>());
+
+				// TODO pass zero?
+				one(mockResult).forwardTo(TopicActions.class).add(0);
+			}
+		});
 
 		component.edit(1);
 		context.assertIsSatisfied();
 	}
 
 	private void redirectToPage(final Topic topic, final int pageExpected) {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(5));
+		context.checking(new Expectations() {
+			{
+				one(config).getInt(ConfigKeys.POSTS_PER_PAGE);
+				will(returnValue(5));
 
-			String url;
+				String url;
 
-			if (pageExpected > 0) {
-				url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
-				one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, pageExpected, topic.getId()); will(returnValue(url));
+				if (pageExpected > 0) {
+					url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS,
+							Actions.LIST, pageExpected, topic.getId());
+					one(viewService).buildUrl(Domain.TOPICS, Actions.LIST,
+							pageExpected, topic.getId());
+					will(returnValue(url));
+				} else {
+					url = String.format("/%s/%s/%s.page", Domain.TOPICS,
+							Actions.LIST, topic.getId());
+					one(viewService).buildUrl(Domain.TOPICS, Actions.LIST,
+							topic.getId());
+					will(returnValue(url));
+				}
+
+				one(mockResult).redirectTo(url);
 			}
-			else  {
-				url = String.format("/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, topic.getId());
-				one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, topic.getId()); will(returnValue(url));
-			}
-
-			one(viewService).redirect(url);
-		}});
+		});
 	}
 }

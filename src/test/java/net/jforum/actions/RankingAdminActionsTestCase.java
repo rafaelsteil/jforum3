@@ -12,12 +12,9 @@ package net.jforum.actions;
 
 import java.util.Arrays;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Ranking;
 import net.jforum.repository.RankingRepository;
 import net.jforum.services.RankingService;
-import net.jforum.services.ViewService;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
@@ -25,16 +22,18 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class RankingAdminActionsTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private RankingAdminActions component;
-	private RankingRepository repository = context.mock(RankingRepository.class);
-	private ViewService viewService = context.mock(ViewService.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
+	private RankingRepository repository = context
+			.mock(RankingRepository.class);
 	private RankingService service = context.mock(RankingService.class);
+	private MockResult mockResult = new MockResult();
 
 	public RankingAdminActionsTestCase() {
 		super(RankingAdminActions.class);
@@ -42,16 +41,21 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void add() {
-		context.checking(new Expectations() {{}});
+		context.checking(new Expectations() {
+			{
+			}
+		});
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void addSave() {
-		context.checking(new Expectations() {{
-			one(service).add(with(aNonNull(Ranking.class)));
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(service).add(with(aNonNull(Ranking.class)));
+				one(mockResult).redirectTo(RankingAdminActions.class).list();
+			}
+		});
 
 		component.addSave(new Ranking());
 		context.assertIsSatisfied();
@@ -59,11 +63,14 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void edit() {
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(new Ranking()));
-			one(propertyBag).put("ranking", new Ranking());
-			one(viewService).renderView(Actions.ADD);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).get(1);
+				will(returnValue(new Ranking()));
+				one(mockResult).include("ranking", new Ranking());
+				one(mockResult).redirectTo(RankingAdminActions.class).add();
+			}
+		});
 
 		component.edit(1);
 		context.assertIsSatisfied();
@@ -71,10 +78,12 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void editSave() {
-		context.checking(new Expectations() {{
-			one(service).update(with(aNonNull(Ranking.class)));
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(service).update(with(aNonNull(Ranking.class)));
+				one(mockResult).redirectTo(RankingAdminActions.class).list();
+			}
+		});
 
 		component.editSave(new Ranking());
 		context.assertIsSatisfied();
@@ -82,10 +91,12 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(service).delete(1, 2, 3, 4);
-			one(viewService).redirectToAction(Actions.LIST);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(service).delete(1, 2, 3, 4);
+				one(mockResult).redirectTo(RankingAdminActions.class).list();
+			}
+		});
 
 		component.delete(1, 2, 3, 4);
 		context.assertIsSatisfied();
@@ -93,10 +104,14 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void listExpectOneRecord() {
-		context.checking(new Expectations() {{
-			one(repository).getAllRankings(); will(returnValue(Arrays.asList(new Ranking())));
-			one(propertyBag).put("rankings", Arrays.asList(new Ranking()));
-		}});
+		context.checking(new Expectations() {
+			{
+				one(repository).getAllRankings();
+				will(returnValue(Arrays.asList(new Ranking())));
+				one(mockResult).include("rankings",
+						Arrays.asList(new Ranking()));
+			}
+		});
 
 		component.list();
 		context.assertIsSatisfied();
@@ -104,6 +119,6 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		component = new RankingAdminActions(repository, propertyBag, viewService, service);
+		component = new RankingAdminActions(repository, service, mockResult);
 	}
 }

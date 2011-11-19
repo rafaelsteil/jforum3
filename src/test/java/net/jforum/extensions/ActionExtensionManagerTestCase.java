@@ -24,7 +24,6 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
-import org.vraptor.annotations.Parameter;
 import org.vraptor.component.ComponentManager;
 import org.vraptor.component.DefaultComponentContainer;
 
@@ -96,7 +95,7 @@ public class ActionExtensionManagerTestCase {
 	@ActionExtension(Domain.USER)
 	public static class FooExtension {
 		@Extends("list")
-		public void one(@Parameter(key = "start") int start ) {
+		public void one(int start ) {
 			System.out.println(start);
 			oneExecuted = true;
 		}

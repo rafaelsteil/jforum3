@@ -11,8 +11,6 @@
 package net.jforum.util;
 
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate3.SessionHolder;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * @author Rafael Steil

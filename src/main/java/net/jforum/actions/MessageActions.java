@@ -12,56 +12,62 @@ package net.jforum.actions;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
-import net.jforum.services.ViewService;
 import net.jforum.util.I18n;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.Parameter;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * Just display some messages
+ * 
  * @author Rafael Steil
  */
-@Component(Domain.MESSAGES)
+@Resource
+@Path(Domain.MESSAGES)
 public class MessageActions {
-	private ViewPropertyBag propertyBag;
-	private ViewService viewService;
 	private I18n i18n;
+	private final Result result;
 
-	public MessageActions(ViewPropertyBag propertyBag, ViewService viewService, I18n i18n) {
-		this.propertyBag = propertyBag;
-		this.viewService = viewService;
+	public MessageActions(I18n i18n, Result result) {
 		this.i18n = i18n;
+		this.result = result;
 	}
 
 	/**
 	 * Displays an "access is denied" message
 	 */
 	public void accessDenied() {
-		this.propertyBag.put("message", this.i18n.getMessage("Message.accessDenied"));
-		this.viewService.renderView(Actions.MESSAGE);
+		this.result.include("message",
+				this.i18n.getMessage("Message.accessDenied"));
+		// this.viewService.renderView(Actions.MESSAGE);
+		this.result.forwardTo(Actions.MESSAGE);
 	}
 
 	/**
-	 * Displays a "waiting moderation" message for newly created topics in moderated forums
+	 * Displays a "waiting moderation" message for newly created topics in
+	 * moderated forums
+	 * 
 	 * @param forumId
 	 */
-	public void topicWaitingModeration(@Parameter(key = "forumId") int forumId) {
-		this.propertyBag.put("message", this.i18n.getFormattedMessage("PostShow.waitingModeration",
-			this.i18n.params(this.viewService.buildUrl(Domain.FORUMS, Actions.SHOW, forumId))));
+	public void topicWaitingModeration(int forumId) {
+		this.result.include("message", this.i18n.getFormattedMessage(
+				"PostShow.waitingModeration", this.i18n.params(this.viewService
+						.buildUrl(Domain.FORUMS, Actions.SHOW, forumId))));
 
-		this.viewService.renderView(Actions.MESSAGE);
+		this.result.forwardTo(Actions.MESSAGE);
 	}
 
 	/**
-	 * Displays a "waiting moderation" message for replies in topics of moderated forums
+	 * Displays a "waiting moderation" message for replies in topics of
+	 * moderated forums
+	 * 
 	 * @param forumId
 	 */
-	public void replyWaitingModeration(@Parameter(key = "topicId") int topicId) {
-		this.propertyBag.put("message", this.i18n.getFormattedMessage("PostShow.waitingModeration",
-				this.i18n.params(this.viewService.buildUrl(Domain.TOPICS, Actions.LIST, topicId))));
+	public void replyWaitingModeration(int topicId) {
+		this.result.include("message", this.i18n.getFormattedMessage(
+				"PostShow.waitingModeration", this.i18n.params(this.viewService
+						.buildUrl(Domain.TOPICS, Actions.LIST, topicId))));
 
-		this.viewService.renderView(Actions.MESSAGE);
+		this.result.forwardTo(Actions.MESSAGE);
 	}
 }

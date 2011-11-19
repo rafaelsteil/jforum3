@@ -10,47 +10,41 @@
  */
 package net.jforum.actions;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Smilie;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.security.AdministrationRule;
 import net.jforum.services.SmilieService;
-import net.jforum.services.ViewService;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
-import org.vraptor.interceptor.UploadedFileInformation;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.SMILIES_ADMIN)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.SMILIES_ADMIN)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class SmilieAdminActions {
 	private SmilieRepository repository;
 	private SmilieService service;
-	private ViewPropertyBag propertyBag;
-	private ViewService viewService;
+	private final Result result;
 
-	public SmilieAdminActions(SmilieService service, SmilieRepository repository,
-		ViewPropertyBag propertyBag, ViewService viewService) {
+	public SmilieAdminActions(SmilieService service,
+			SmilieRepository repository, Result result) {
 		this.service = service;
 		this.repository = repository;
-		this.propertyBag = propertyBag;
-		this.viewService = viewService;
+		this.result = result;
 	}
 
 	/**
 	 * List all smilies
 	 */
 	public void list() {
-		this.propertyBag.put("smilies", this.repository.getAllSmilies());
+		this.result.include("smilies", this.repository.getAllSmilies());
 	}
 
 	/**
@@ -62,34 +56,34 @@ public class SmilieAdminActions {
 
 	/**
 	 * Saves a new smilie
+	 * 
 	 * @param smilie
 	 */
-	public void addSave(@Parameter(key = "smilie") Smilie smilie,
-		@Parameter(key = "image") UploadedFileInformation image) {
+	public void addSave(Smilie smilie, UploadedFile image) {
 		this.service.add(smilie, image);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	/**
 	 * Shows the page to edit a existing smilie
 	 */
-	public void edit(@Parameter(key = "smilieId") int smilieId) {
-		this.propertyBag.put("smilie", this.repository.get(smilieId));
-		this.viewService.renderView(Actions.ADD);
+	public void edit(int smilieId) {
+		this.result.include("smilie", this.repository.get(smilieId));
+		this.result.forwardTo(this).add();
 	}
 
-	public void editSave(@Parameter(key = "smilie") Smilie smilie,
-		@Parameter(key = "image") UploadedFileInformation image) {
+	public void editSave(Smilie smilie, UploadedFile image) {
 		this.service.update(smilie, image);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	/**
 	 * Deletes smilies
+	 * 
 	 * @param smiliesId
 	 */
-	public void delete(@Parameter(key = "smiliesId") int... smiliesId) {
+	public void delete(int... smiliesId) {
 		this.service.delete(smiliesId);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 }

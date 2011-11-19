@@ -10,66 +10,60 @@
  */
 package net.jforum.actions;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Ranking;
 import net.jforum.repository.RankingRepository;
 import net.jforum.security.AdministrationRule;
 import net.jforum.services.RankingService;
-import net.jforum.services.ViewService;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.RANKINGS_ADMIN)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.RANKINGS_ADMIN)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class RankingAdminActions {
 	private RankingRepository repository;
 	private RankingService service;
-	private ViewService viewService;
-	private ViewPropertyBag propertyBag;
+	private final Result result;
 
-	public RankingAdminActions(RankingRepository repository, ViewPropertyBag propertyBag,
-		ViewService viewService, RankingService service) {
+	public RankingAdminActions(RankingRepository repository,
+			RankingService service, Result result) {
 		this.repository = repository;
-		this.viewService = viewService;
-		this.propertyBag = propertyBag;
 		this.service = service;
+		this.result = result;
 	}
 
 	public void list() {
-		this.propertyBag.put("rankings", this.repository.getAllRankings());
+		this.result.include("rankings", this.repository.getAllRankings());
 	}
 
 	public void add() {
 
 	}
 
-	public void addSave(@Parameter(key = "ranking") Ranking ranking) {
+	public void addSave(Ranking ranking) {
 		this.service.add(ranking);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
-	public void edit(@Parameter(key = "rankingId") int rankingId) {
-		this.propertyBag.put("ranking", this.repository.get(rankingId));
-		this.viewService.renderView(Actions.ADD);
+	public void edit(int rankingId) {
+		this.result.include("ranking", this.repository.get(rankingId));
+		this.result.forwardTo(this).add();
 	}
 
-	public void editSave(@Parameter(key = "ranking") Ranking ranking) {
+	public void editSave(Ranking ranking) {
 		this.service.update(ranking);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
-	public void delete(@Parameter(key = "rankingsId") int... rankingsId) {
+	public void delete(int... rankingsId) {
 		this.service.delete(rankingsId);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 }

@@ -26,8 +26,7 @@ import net.jforum.util.ImageInfo;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.MD5;
 import net.jforum.util.UploadUtils;
-
-import org.vraptor.interceptor.UploadedFileInformation;
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
  * @author Bill
@@ -57,7 +56,7 @@ public class AvatarService {
 	 * @param avatar
 	 * @param image
 	 */
-	public void add(Avatar avatar, UploadedFileInformation uploadedFile) {
+	public void add(Avatar avatar, UploadedFile uploadedFile) {
 		if (uploadedFile == null) {
 			this.add(avatar);
 			return;
@@ -98,7 +97,7 @@ public class AvatarService {
 	 * @param avatar
 	 * @param image
 	 */
-	public void update(Avatar avatar, UploadedFileInformation uploadedFile) {
+	public void update(Avatar avatar, UploadedFile uploadedFile) {
 		this.isAllowed(avatar);
 
 		if (avatar.getId() == 0) {
@@ -203,7 +202,7 @@ public class AvatarService {
 	 * @param uploadedFile
 	 * @return file name
 	 */
-	private String processImageUpload(Avatar avatar, UploadedFileInformation uploadedFile) {
+	private String processImageUpload(Avatar avatar, UploadedFile uploadedFile) {
 		File file = this.saveImage(avatar, uploadedFile);
 
 		if (file == null) {
@@ -254,13 +253,13 @@ public class AvatarService {
 	 * @param uploadedFile
 	 * @return
 	 */
-	private File saveImage(Avatar avatar, UploadedFileInformation uploadedFile) {
+	private File saveImage(Avatar avatar, UploadedFile uploadedFile) {
 		String configKey = getAvatarPathConfigKey(avatar);
 
 		if (configKey != null && uploadedFile != null) {
 			UploadUtils upload = new UploadUtils(uploadedFile);
 
-			String imageName = String.format("%s.%s", MD5.hash(uploadedFile.getCompleteFileName() + System.currentTimeMillis()),
+			String imageName = String.format("%s.%s", MD5.hash(uploadedFile.getFileName() + System.currentTimeMillis()),
 				upload.getExtension());
 
 			String filePath = String.format("%s/%s/%s", this.config.getApplicationPath(), this.config.getValue(configKey), imageName);

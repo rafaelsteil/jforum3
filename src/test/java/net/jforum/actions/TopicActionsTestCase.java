@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
@@ -59,17 +61,17 @@ import org.vraptor.Interceptor;
 import org.vraptor.annotations.InterceptedBy;
 import org.vraptor.http.VRaptorServletRequest;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 @SuppressWarnings("unchecked")
-public class TopicActionsTestCase {
+public class TopicActionsTestCase { 
 
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private TopicService topicService = context.mock(TopicService.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
@@ -81,8 +83,9 @@ public class TopicActionsTestCase {
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private PollRepository pollRepository = context.mock(PollRepository.class);
 	private AttachmentService attachmentService = context.mock(AttachmentService.class);
-	private VRaptorServletRequest request = context.mock(VRaptorServletRequest.class);
+	private HttpServletRequest request = context.mock(HttpServletRequest.class);
     private ForumLimitedTimeRepository forumLimitedTimeRepository = context.mock(ForumLimitedTimeRepository.class);
+    private MockResult mockResult = new MockResult();
 	private TopicActions topicAction;
 
 	@Test
@@ -93,8 +96,8 @@ public class TopicActionsTestCase {
 			allowing(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			one(topicRepository).getPosts(t, 0, 10); will(returnValue(new ArrayList<Post>()));
 			allowing(topicRepository).getTotalPosts(t); will(returnValue(5));
-			one(propertyBag).put("topic", t);
-			one(propertyBag).put("posts", new ArrayList<Post>());
+			one(mockResult).include("topic", t);
+			one(mockResult).include("posts", new ArrayList<Post>());
 		}});
 
 		topicAction.replyReview(1);
@@ -107,7 +110,7 @@ public class TopicActionsTestCase {
 
 		context.checking(new Expectations() {{
 			one(topicRepository).get(1); will(returnValue(topic));
-			one(viewService).redirectToAction(Domain.MESSAGES, Actions.TOPIC_WAITING_MODERATION, 2);
+			one(mockResult).redirectTo(MessageActions.class).topicWaitingModeration(2);
 		}});
 
 		topicAction.list(1, 0, false);
@@ -174,7 +177,7 @@ public class TopicActionsTestCase {
 		context.checking(new Expectations() {{
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(forumRepository).get(topic.getForum().getId()); will(returnValue(topic.getForum()));
-			one(propertyBag).put("topic", topic);
+			one(mockResult).include("topic", topic);
 		}});
 
 		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
@@ -218,7 +221,7 @@ public class TopicActionsTestCase {
 
 			String url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
 			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, pageExpected, topic.getId()); will(returnValue(url));
-			one(viewService).redirect(url + "#0");
+			one(mockResult).redirectTo(url + "#0");
 		}});
 	}
 
@@ -226,11 +229,11 @@ public class TopicActionsTestCase {
 	public void add() {
 		context.checking(new Expectations() {{
 			one(forumRepository).get(1); will(returnValue(new Forum()));
-			one(propertyBag).put("forum", new Forum());
-			one(propertyBag).put("post", new Post());
-			one(propertyBag).put("isNewTopic", true);
+			one(mockResult).include("forum", new Forum());
+			one(mockResult).include("post", new Post());
+			one(mockResult).include("isNewTopic", true);
 			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
+			one(mockResult).include("smilies", new ArrayList<Smilie>());
 		}});
 
 		topicAction.add(1);
@@ -241,7 +244,7 @@ public class TopicActionsTestCase {
 	public void listSmilie() {
 		context.checking(new Expectations() {{
 			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
+			one(mockResult).include("smilies", new ArrayList<Smilie>());
 		}});
 
 		topicAction.listSmilies();
@@ -265,9 +268,9 @@ public class TopicActionsTestCase {
 			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
 			one(roleManager).getCanCreateStickyAnnouncementTopics(); will(returnValue(false));
 			one(roleManager).getCanCreatePolls(); will(returnValue(false));
-			ignoring(userSession); ignoring(topicService); ignoring(viewService);
+			ignoring(userSession); ignoring(topicService); ignoring(mockResult);
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(propertyBag).put("topic", topic);
+			one(mockResult).include("topic", topic);
 		}});
 
 		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
@@ -295,7 +298,7 @@ public class TopicActionsTestCase {
 			ignoring(roleManager).getCanCreateStickyAnnouncementTopics();
 			ignoring(userSession); ignoring(topicService); ignoring(viewService);
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(propertyBag).put("topic", topic);
+			one(mockResult).include("topic", topic);
 		}});
 
 		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
@@ -321,8 +324,8 @@ public class TopicActionsTestCase {
 			one(roleManager).isModerator(); will(returnValue(false));
 			one(roleManager).getCanCreatePolls(); will(returnValue(false));
 			ignoring(roleManager).getCanCreateStickyAnnouncementTopics();
-			ignoring(userSession); ignoring(topicService); ignoring(viewService);
-			one(propertyBag).put("topic", topic);
+			ignoring(userSession); ignoring(topicService); ignoring(mockResult);
+			one(mockResult).include("topic", topic);
 		}});
 
 		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
@@ -352,8 +355,8 @@ public class TopicActionsTestCase {
 			ignoring(roleManager);
 			String url = "/topics/list/0.page";
 			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 0); will(returnValue(url));
-			one(viewService).redirect(url + "#0");
-			one(propertyBag).put("topic", topic);
+			one(mockResult).redirectTo(url + "#0");
+			one(mockResult).include("topic", topic);
 		}});
 
 		topicAction.addSave(topic, post, new PostFormOptions(), null);
@@ -389,15 +392,15 @@ public class TopicActionsTestCase {
 			one(userSession).markTopicAsRead(1);
 
 			one(sessionManager).isModeratorOnline(); will(returnValue(true));
-			one(propertyBag).put("isModeratorOnline", true);
-			one(propertyBag).put("topic", topic);
-			one(propertyBag).put("forum", topic.getForum());
-			one(propertyBag).put("pagination", new Pagination(0, 0, 0, "", 0));
-			one(propertyBag).put("categories", new ArrayList<Category>());
-			one(propertyBag).put("posts", new ArrayList<Post>());
-			one(propertyBag).put("rankings", new ArrayList<Ranking>());
-			one(propertyBag).put("canVoteOnPolls", false);
-			one(propertyBag).put("viewPollResults", false);
+			one(mockResult).include("isModeratorOnline", true);
+			one(mockResult).include("topic", topic);
+			one(mockResult).include("forum", topic.getForum());
+			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
+			one(mockResult).include("categories", new ArrayList<Category>());
+			one(mockResult).include("posts", new ArrayList<Post>());
+			one(mockResult).include("rankings", new ArrayList<Ranking>());
+			one(mockResult).include("canVoteOnPolls", false);
+			one(mockResult).include("viewPollResults", false);
 		}});
 
 		topicAction.list(1, 0, false);
@@ -426,7 +429,7 @@ public class TopicActionsTestCase {
 
 			String url = "/topics/list/1.page";
 			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 1); will(returnValue(url));
-			one(viewService).redirect(url + "#0");
+			one(mockResult).redirectTo(url + "#0");
 		}});
 
 		Post post = new Post();
@@ -454,7 +457,7 @@ public class TopicActionsTestCase {
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			String url = "/topics/list/2.page";
 			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 2); will(returnValue(url));
-			one(viewService).redirect(url + "#0");
+			one(mockResult).redirectTo(url + "#0");
 		}});
 
 		Post post = new Post(); post.setModerate(false);
@@ -476,7 +479,7 @@ public class TopicActionsTestCase {
 			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
 			one(roleManager).isModerator(); will(returnValue(false));
 			ignoring(userSession); ignoring(topicService);
-			one(viewService).redirectToAction(Domain.MESSAGES, Actions.REPLY_WAITING_MODERATION, 2);
+			one(mockResult).redirectTo(MessageActions.class).replyWaitingModeration(2);
 		}});
 
 		Post post = new Post(); post.setModerate(false);
@@ -494,7 +497,7 @@ public class TopicActionsTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			ignoring(userSession); ignoring(topicService);
 			one(topicRepository).get(1); will(returnValue(topic));
-			one(viewService).redirectToAction(Domain.MESSAGES, Actions.REPLY_WAITING_MODERATION, 1);
+			one(mockResult).redirectTo(MessageActions.class).replyWaitingModeration(1);
 		}});
 
 		Post post = new Post(); post.setModerate(true);
@@ -520,12 +523,14 @@ public class TopicActionsTestCase {
 
 			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
 
-			one(propertyBag).put("isReply", true);
-			one(propertyBag).put("post", new Post());
-			one(propertyBag).put("topic", new Topic());
-			one(propertyBag).put("forum", new Forum());
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
-			one(viewService).renderView(Actions.ADD);
+			one(mockResult).include("isReply", true);
+			one(mockResult).include("post", new Post());
+			one(mockResult).include("topic", new Topic());
+			one(mockResult).include("forum", new Forum());
+			one(mockResult).include("smilies", new ArrayList<Smilie>());
+			
+			//TODO pass zero?
+			one(mockResult).redirectTo(TopicActions.class).add(0);
 		}});
 
 		topicAction.reply(1);
@@ -548,13 +553,14 @@ public class TopicActionsTestCase {
 
 			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
 
-			one(propertyBag).put("post", post);
-			one(propertyBag).put("isQuote", true);
-			one(propertyBag).put("isReply", true);
-			one(propertyBag).put("topic", post.getTopic());
-			one(propertyBag).put("forum", post.getForum());
-			one(propertyBag).put("smilies", new ArrayList<Smilie>());
-			one(viewService).renderView(Actions.ADD);
+			one(mockResult).include("post", post);
+			one(mockResult).include("isQuote", true);
+			one(mockResult).include("isReply", true);
+			one(mockResult).include("topic", post.getTopic());
+			one(mockResult).include("forum", post.getForum());
+			one(mockResult).include("smilies", new ArrayList<Smilie>());
+			//TODO pass zero?
+			one(mockResult).redirectTo(TopicActions.class).add(0);
 		}});
 
 		topicAction.quote(1);
@@ -563,7 +569,7 @@ public class TopicActionsTestCase {
 
 	@Before
 	public void setup() {
-		topicAction = new TopicActions(propertyBag, config, topicService, viewService,
+		topicAction = new TopicActions(mockResult, config, topicService,
 			forumRepository, smilieRepository, postRepository, topicRepository, categoryRepository,
 			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request);
 	}

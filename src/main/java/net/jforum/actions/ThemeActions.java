@@ -10,62 +10,56 @@
  */
 package net.jforum.actions;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Theme;
 import net.jforum.repository.ThemeRepository;
 import net.jforum.security.AdministrationRule;
-import net.jforum.services.ViewService;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.annotations.Parameter;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
  */
-@Component(Domain.THEMES_ADMIN)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.THEMES_ADMIN)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class ThemeActions {
-	private final ViewPropertyBag propertyBag;
-	private final ViewService viewService;
 	private final ThemeRepository repository;
+	private final Result result;
 
-	public ThemeActions(ViewPropertyBag propertyBag, ViewService viewService, ThemeRepository repository) {
-		this.propertyBag = propertyBag;
-		this.viewService = viewService;
+	public ThemeActions(Result result, ThemeRepository repository) {
+		this.result = result;
 		this.repository = repository;
 	}
 
 	public void list() {
-		this.propertyBag.put("themes", this.repository.getAll());
+		this.result.include("themes", this.repository.getAll());
 	}
 
 	public void add() {
 
 	}
 
-	public void addSave(@Parameter(key = "theme") Theme theme) {
+	public void addSave(Theme theme) {
 		this.repository.add(theme);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
-	public void edit(@Parameter(key = "themeId") int themeId) {
-		this.propertyBag.put("theme", this.repository.get(themeId));
+	public void edit(int themeId) {
+		this.result.include("theme", this.repository.get(themeId));
 	}
 
-	public void editSave(@Parameter(key = "theme") Theme theme) {
+	public void editSave(Theme theme) {
 		this.repository.update(theme);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
-	public void delete(@Parameter(key = "themeId") int themeId) {
+	public void delete(int themeId) {
 		Theme theme = this.repository.get(themeId);
 		this.repository.remove(theme);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 }

@@ -11,3 +11,4 @@ out
 .settings/
 webapp/upload/
 src/main/resources/jforumConfig/jforum-custom.properties
+*.DS_Store

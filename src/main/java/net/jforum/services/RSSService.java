@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import br.com.caelum.vraptor.Result;
+
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.exceptions.ForumException;
@@ -53,7 +55,7 @@ public class RSSService {
 	 * @param forumId the forum id
 	 * @return the rss contents
 	 */
-	public String forForum(int forumId, ViewService viewService) {
+	public String forForum(int forumId, Result result) {
 		Forum forum = this.forumRepository.get(forumId);
 
 		List<Topic> topics = this.rssRepository.getForumTopics(forum,
@@ -61,11 +63,11 @@ public class RSSService {
 
 		ChannelFeed feed = new ChannelFeed()
 			.setTitle(this.i18n.getFormattedMessage("RSS.ForumTopics.title", this.i18n.params(forum.getName())))
-			.addLink(this.buildForumLink(viewService, forum))
+			.addLink(this.buildForumLink(result, forum))
 			.setDescriptionOrSubtitle(forum.getDescription());
 
 		for (Topic topic : topics) {
-			String topicLink = this.buildTopicLink(viewService, topic);
+			String topicLink = this.buildTopicLink(result, topic);
 
 			feed.addItem(new ItemEntry()
 				.addLink(topicLink)

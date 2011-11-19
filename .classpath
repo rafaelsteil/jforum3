@@ -40,13 +40,11 @@
 	<classpathentry kind="lib" path="lib/casclient.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.1_3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-configuration-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-configuration-1.3.jar" sourcepath="/Users/carneiro/.m2/repository/commons-configuration/commons-configuration/1.3/commons-configuration-1.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-httpclient-3.1-beta1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-1.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang-2.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.3.jar" sourcepath="/Users/carneiro/.m2/repository/commons-lang/commons-lang/2.3/commons-lang-2.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/ehcache-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/ejb3-persistence.jar"/>
@@ -62,28 +60,46 @@
 	<classpathentry kind="lib" path="lib/jaxb-impl-2.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/jsr173_api-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/jstl-1.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/jta-1.0.1B.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.12.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-core-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.6-bin.jar"/>
 	<classpathentry kind="lib" path="lib/objenesis-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/paranamer-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/persistence-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/picocontainer-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-8.3-604.jdbc4.jar"/>
-	<classpathentry kind="lib" path="lib/spring.jar"/>
 	<classpathentry kind="lib" path="lib/standard-1.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/urlrewrite-3.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/vraptor-01082008.jar"/>
 	<classpathentry kind="lib" path="lib/xalan.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/xom-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.3.4.O.jar"/>
-	<classpathentry kind="lib" path="lib/xstream-1.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/yarfraw-0.92.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/aopalliance.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/guava-r07.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.14.0.GA.jar"/>
+	<classpathentry kind="lib" path="lib/jstl-api-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/jstl-impl-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/mirror-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/ognl-2.7.3.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.aop-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.asm-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.aspects-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.beans-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.context-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.core-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.expression-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.web-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/paranamer-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/scannotation-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/vraptor-3.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.3.1.jar"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>
 </classpath>

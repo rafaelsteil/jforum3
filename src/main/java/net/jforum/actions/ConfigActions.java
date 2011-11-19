@@ -17,52 +17,49 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import net.jforum.actions.helpers.Actions;
+import javax.servlet.http.HttpServletRequest;
+
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.exceptions.ForumException;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.security.AdministrationRule;
 import net.jforum.services.ConfigService;
-import net.jforum.services.ViewService;
 import net.jforum.util.JForumConfig;
-
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.http.VRaptorServletRequest;
+import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Resource;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Jose Donizetti de Brito Junior
  * @author Rafael Steil
  */
-@Component(Domain.CONFIG_ADMIN)
-@InterceptedBy(ActionSecurityInterceptor.class)
+@Resource
+@Path(Domain.CONFIG_ADMIN)
+// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class ConfigActions {
 	private final ConfigService service;
-	private final ViewPropertyBag propertyBag;
-	private final VRaptorServletRequest request;
+	// private final VRaptorServletRequest request;
+	private final HttpServletRequest request;
 	private final JForumConfig config;
-	private final ViewService viewService;
+	private final Result result;
 
-	public ConfigActions(ConfigService service, ViewPropertyBag propertyBag, VRaptorServletRequest request, 
-			JForumConfig config, ViewService viewService) {
+	public ConfigActions(ConfigService service, HttpServletRequest request,
+			JForumConfig config, Result result) {
 		this.service = service;
-		this.propertyBag = propertyBag;
 		this.request = request;
 		this.config = config;
-		this.viewService = viewService;
+		this.result = result;
 	}
 
-	public void list(){
-		this.propertyBag.put("locales", this.loadLocaleNames());
-		this.propertyBag.put("config", this.config);
+	public void list() {
+		this.result.include("locales", this.loadLocaleNames());
+		this.result.include("config", this.config);
 	}
 
 	public void save() {
 		this.service.save(this.request);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 
 	private List<String> loadLocaleNames() {
@@ -71,21 +68,23 @@ public class ConfigActions {
 		FileInputStream fis = null;
 
 		try {
-			locales.load(this.getClass().getResourceAsStream("/jforumConfig/languages/locales.properties"));
-		}
-		catch (IOException e) {
+			locales.load(this.getClass().getResourceAsStream(
+					"/jforumConfig/languages/locales.properties"));
+		} catch (IOException e) {
 			throw new ForumException(e);
-		}
-		finally {
+		} finally {
 			if (fis != null) {
-				try { fis.close(); } catch (Exception e) {}
+				try {
+					fis.close();
+				} catch (Exception e) {
+				}
 			}
 		}
 
 		List<String> localesList = new ArrayList<String>();
 
 		for (Enumeration<?> e = locales.keys(); e.hasMoreElements();) {
-			localesList.add((String)e.nextElement());
+			localesList.add((String) e.nextElement());
 		}
 
 		return localesList;
