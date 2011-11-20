@@ -21,23 +21,23 @@ import br.com.caelum.vraptor.ioc.RequestScoped;
 import br.com.caelum.vraptor.resource.ResourceMethod;
 
 /**
- * Intercepts and process the {@link SecurityConstraint} annotation for methods
+ * Intercepts and process the {@link SecurityConstraint} annotation for controllers
  * @author Rafael Steil
  */
 @Intercepts
 @RequestScoped
-public class MethodSecurityInterceptor extends SecurityInterceptor {
-	public MethodSecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession, Container container) {
+public class ControllerSecurityInterceptor extends SecurityInterceptor {
+	public ControllerSecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession, Container container) {
 		super(request, result, userSession, container);
 	}
 
 	@Override
 	protected SecurityConstraint getAnnotation(ResourceMethod method) {
-		return method.getMethod().getAnnotation(SecurityConstraint.class);
+		return method.getResource().getClass().getAnnotation(SecurityConstraint.class);
 	}
 
 	@Override
 	protected boolean isAnnotationPresent(ResourceMethod method) {
-		return method.getMethod().isAnnotationPresent(SecurityConstraint.class);
+		return method.getResource().getClass().isAnnotationPresent(SecurityConstraint.class);
 	}
 }

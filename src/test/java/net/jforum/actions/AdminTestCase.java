@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
+import net.jforum.actions.interceptors.ControllerSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.security.AdministrationRule;
 
@@ -44,6 +44,6 @@ public abstract class AdminTestCase {
 		Assert.assertTrue(type.isAnnotationPresent(InterceptedBy.class));
 		InterceptedBy interceptedBy = type.getAnnotation(InterceptedBy.class);
 		List<Class<? extends Interceptor>> interceptors = Arrays.asList(interceptedBy.value());
-		Assert.assertTrue(interceptors.contains(ActionSecurityInterceptor.class));
+		Assert.assertTrue(interceptors.contains(ControllerSecurityInterceptor.class));
 	}
 }

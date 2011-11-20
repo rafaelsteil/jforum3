@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
-import net.jforum.actions.interceptors.ExtensibleInterceptor;
+import net.jforum.actions.interceptors.ExtendsAnnotationInterceptor;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.controllers.MessageController;
 import net.jforum.controllers.TopicController;
@@ -124,7 +124,7 @@ public class TopicActionsTestCase {
 		Assert.assertTrue(topicAction.getClass().isAnnotationPresent(InterceptedBy.class));
 		InterceptedBy annotation = topicAction.getClass().getAnnotation(InterceptedBy.class);
 		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(ExtensibleInterceptor.class));
+		Assert.assertTrue(interceptors.contains(ExtendsAnnotationInterceptor.class));
 	}
 
 	@Test

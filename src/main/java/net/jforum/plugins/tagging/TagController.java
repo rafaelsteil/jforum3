@@ -16,8 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.actions.helpers.Domain;
+import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.tags.URLTag;
 import net.jforum.entities.Forum;
@@ -25,7 +24,6 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.TopicRepository;
 import net.jforum.security.ReplyTopicRule;
-import net.jforum.services.ViewService;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -39,18 +37,15 @@ import br.com.caelum.vraptor.Result;
 @Resource
 @Path("tag")
 public class TagController {
-	private ViewService viewService;
 	private TagService tagService;
 	private TopicRepository topicRepository;
 	private UserSession userSession;
 	private final Result result;
 
-	public TagController(TagService tagService, TopicRepository topicRepository,
-			ViewService viewService, UserSession userSession, Result result) {
+	public TagController(TagService tagService, TopicRepository topicRepository, UserSession userSession, Result result) {
 		this.result = result;
 		this.tagService = tagService;
 		this.topicRepository = topicRepository;
-		this.viewService = viewService;
 		this.userSession = userSession;
 	}
 
@@ -80,7 +75,7 @@ public class TagController {
 	public void replySave(Topic topic, String tagString) {
 		if (StringUtils.isNotEmpty(tagString) && topic != null) {
 			tagService.addTag(tagString, topic);
-			viewService.redirectToAction(Domain.TOPICS, Actions.LIST, topic.getId());
+			this.result.redirectTo(TopicController.class).list(topic.getId(), 0, false);
 		}
 	}
 

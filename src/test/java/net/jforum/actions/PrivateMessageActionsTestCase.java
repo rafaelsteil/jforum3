@@ -18,7 +18,7 @@ import java.util.List;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
-import net.jforum.actions.interceptors.ActionSecurityInterceptor;
+import net.jforum.actions.interceptors.ControllerSecurityInterceptor;
 import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.controllers.PrivateMessageController;
 import net.jforum.controllers.TopicController;
@@ -401,7 +401,7 @@ public class PrivateMessageActionsTestCase {
 		Assert.assertTrue(action.getClass().isAnnotationPresent(InterceptedBy.class));
 		InterceptedBy annotation = action.getClass().getAnnotation(InterceptedBy.class);
 		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(ActionSecurityInterceptor.class));
+		Assert.assertTrue(interceptors.contains(ControllerSecurityInterceptor.class));
 	}
 
 	@Test

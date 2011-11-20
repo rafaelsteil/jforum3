@@ -23,20 +23,24 @@ import br.com.caelum.vraptor.InterceptionException;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.core.InterceptorStack;
 import br.com.caelum.vraptor.interceptor.Interceptor;
+import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.resource.ResourceMethod;
 
 /**
+ * Handles the {@link SecurityConstraint} annotation, looking for AccessRules
  * @author Rafael Steil
  */
 public abstract class SecurityInterceptor implements Interceptor {
 	private final HttpServletRequest request;
 	private final Result result;
 	private final UserSession userSession;
+	private final Container container;
 
-	public SecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession) {
+	public SecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession, Container container) {
 		this.request = request;
 		this.result = result;
 		this.userSession = userSession;
+		this.container = container;
 	}
 
 	@Override
@@ -48,7 +52,7 @@ public abstract class SecurityInterceptor implements Interceptor {
 		boolean displayLogin = true;
 
 		if (!accessRuleClass.equals(EmptyRule.class)) {
-			AccessRule accessRule = this.findAccessRule(annotation.value().getName(), application, flow);
+			AccessRule accessRule = this.findAccessRule(annotation.value());
 			shouldProceed = accessRule.shouldProceed(userSession, request);
 			displayLogin = annotation.displayLogin();
 		}
@@ -60,7 +64,7 @@ public abstract class SecurityInterceptor implements Interceptor {
 			}
 			else {
 				for (Role role : multiRoles) {
-					AccessRule accessRule = this.findAccessRule(role.value().getName(), application, flow);
+					AccessRule accessRule = this.findAccessRule(role.value());
 
 					if (!accessRule.shouldProceed(userSession, request)) {
 						shouldProceed = false;
@@ -84,13 +88,12 @@ public abstract class SecurityInterceptor implements Interceptor {
 		}
 	}
 
-	private AccessRule findAccessRule(String name, WebApplication application, LogicFlow flow) {
-		AccessRule accessRule = (AccessRule)application.getIntrospector().getBeanProvider()
-			.findAttribute(flow.getLogicRequest(), name);
+	private AccessRule findAccessRule(Class<? extends AccessRule> klass) {
+		AccessRule accessRule = container.instanceFor(klass);
 
 		if (accessRule == null) {
 			throw new NullPointerException(
-				String.format("Could not find the rule %s. Have you registered it in the configuration file?", name));
+				String.format("Could not find the rule %s. Have you registered it in the configuration file?", klass.getName()));
 		}
 
 		return accessRule;

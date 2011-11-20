@@ -23,6 +23,9 @@ public class HibernateAwareTask {
 	}
 
 	public void execute(HibernateRunnable runnable) {
+		// TODO
+		throw new RuntimeException("Not implemented");
+		/*
 		try {
 			TransactionSynchronizationManager.bindResource(this.sessionFactory,
 				new SessionHolder(this.sessionFactory.openSession()));
@@ -35,5 +38,6 @@ public class HibernateAwareTask {
 		finally {
 			TransactionSynchronizationManager.unbindResource(this.sessionFactory);
 		}
+		*/
 	}
 }

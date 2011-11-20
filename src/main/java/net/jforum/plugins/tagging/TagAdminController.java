@@ -10,9 +10,6 @@
  */
 package net.jforum.plugins.tagging;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.services.ViewService;
-
 import org.apache.commons.lang.ArrayUtils;
 
 import br.com.caelum.vraptor.Path;
@@ -21,12 +18,10 @@ import br.com.caelum.vraptor.Result;
 
 /**
  * @author Bill
- *
  */
 @Resource
 @Path("adminTags")
 public class TagAdminController {
-	private ViewService viewService;
 	private TagRepository repository;
 	private final Result result;
 
@@ -44,7 +39,7 @@ public class TagAdminController {
 			}
 		}
 
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.of(this).list();
 	}
 
 	public void list() {
@@ -56,11 +51,11 @@ public class TagAdminController {
 
 	public void edit(String tag) {
 		result.include("name", tag);
-		this.viewService.renderView(Actions.ADD);
+		this.result.of(this).add();
 	}
 
 	public void editsave(String oldTag, String newTag) {
 		this.repository.update(oldTag,newTag);
-		this.viewService.redirectToAction(Actions.LIST);
+		this.result.redirectTo(this).list();
 	}
 }

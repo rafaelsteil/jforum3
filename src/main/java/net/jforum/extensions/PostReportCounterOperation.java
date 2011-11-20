@@ -11,29 +11,31 @@
 package net.jforum.extensions;
 
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.util.SecurityConstants;
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class PostReportCounterOperation implements RequestOperation {
 	private final PostReportRepository repository;
-	private final ViewPropertyBag propertyBag;
 	private final SessionManager sessionManager;
+	private final Result result;
 
-	public PostReportCounterOperation(PostReportRepository repository, ViewPropertyBag propertyBag,
-			SessionManager sessionManager) {
+	public PostReportCounterOperation(PostReportRepository repository, SessionManager sessionManager, Result result) {
 		this.repository = repository;
-		this.propertyBag = propertyBag;
 		this.sessionManager = sessionManager;
+		this.result = result;
 	}
 
 	/**
 	 * @see net.jforum.extensions.RequestOperation#execute()
 	 */
+	@Override
 	public void execute() {
 		int total = 0;
 		UserSession userSession = this.sessionManager.getUserSession();
@@ -42,6 +44,6 @@ public class PostReportCounterOperation implements RequestOperation {
 			total = this.repository.countPendingReports(userSession.getRoleManager().getRoleValues(SecurityConstants.FORUM));
 		}
 
-		this.propertyBag.put("totalPostReports", total);
+		result.include("totalPostReports", total);
 	}
 }

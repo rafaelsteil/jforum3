@@ -12,6 +12,7 @@ package net.jforum.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -21,6 +22,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.actions.helpers.AttachedFile;
+import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Attachment;
 import net.jforum.entities.Post;
 import net.jforum.repository.AttachmentRepository;
@@ -88,7 +90,11 @@ public class AttachmentService {
 			String description = request.getParameter("attachment_description_" + i);
 
 			Attachment attachment = new Attachment();
-			attachment.setFilesize(fileInfo.getFile().length());
+			try {
+				attachment.setFilesize(fileInfo.getFile().available());
+			} catch (IOException e) {
+				throw new ForumException(e);
+			}
 			attachment.setDescription(description);
 			attachment.setMimetype(fileInfo.getContentType());
 
