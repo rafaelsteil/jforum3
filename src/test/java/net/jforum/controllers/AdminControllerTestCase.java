@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import net.jforum.controllers.AdminController;
 
@@ -16,9 +16,9 @@ import net.jforum.controllers.AdminController;
 /**
  * @author Rafael Steil
  */
-public class AdminActionsTestCase extends AdminTestCase {
+public class AdminControllerTestCase extends AdminTestCase {
 
-    public AdminActionsTestCase() {
+    public AdminControllerTestCase() {
         super(AdminController.class);
     }
 }

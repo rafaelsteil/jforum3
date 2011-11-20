@@ -11,43 +11,39 @@
 package net.jforum.plugins.tagging;
 
 
+import static org.hamcrest.Matchers.is;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.actions.helpers.Domain;
+import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.TopicRepository;
 import net.jforum.security.ReplyTopicRule;
 import net.jforum.security.RoleManager;
-import net.jforum.services.ViewService;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.*;
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Bill
- *
  */
-public class TagActionTestCase {
+public class TagControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private TagService tagService = context.mock(TagService.class);
 	private TopicRepository topicRepository = context.mock(TopicRepository.class);
 	private UserSession userSession = context.mock(UserSession.class);
-	private TagController tagAction;
+	private MockResult mockResult = new MockResult();
+	private TagController tagAction = new TagController(tagService, topicRepository, userSession, mockResult);
 
 	@Test
 	public void find(){
@@ -55,8 +51,8 @@ public class TagActionTestCase {
 		context.checking(new Expectations() {{
 			one(userSession).getRoleManager();
 			one(tagService).search(with(is(tag)), with(any(RoleManager.class))); will(returnValue(new ArrayList<Topic>()));
-			one(propertyBag).put("topics", new ArrayList<Topic>(0));
-			one(propertyBag).put("tag", tag);
+			one(mockResult).include("topics", new ArrayList<Topic>(0));
+			one(mockResult).include("tag", tag);
 		}});
 
 		tagAction.find(tag);
@@ -77,10 +73,10 @@ public class TagActionTestCase {
 		context.checking(new Expectations() {{
 			Topic topic = new Topic(topicId);
 			one(topicRepository).get(topicId); will(returnValue(topic));
-			one(propertyBag).put(with(is("forum")), with(any(Forum.class)));
-			one(propertyBag).put("topic", topic);
+			one(mockResult).include(with(is("forum")), with(any(Forum.class)));
+			one(mockResult).include("topic", topic);
 			one(tagService).getTagString(topic); will(returnValue("tags,tags"));
-			one(propertyBag).put("tags", "tags,tags");
+			one(mockResult).include("tags", "tags,tags");
 		}});
 
 		tagAction.reply(topicId);
@@ -101,7 +97,7 @@ public class TagActionTestCase {
 		final Topic topic = new Topic();
 		context.checking(new Expectations() {{
 			one(tagService).addTag(with(is(tagString)), with(any(Topic.class)));
-			one(viewService).redirectToAction(Domain.TOPICS, Actions.LIST,topic.getId());
+			one(mockResult).redirectTo(TopicController.class).list(topic.getId(), 0, false);
 		}});
 
 		tagAction.replySave(topic, tagString);
@@ -113,15 +109,10 @@ public class TagActionTestCase {
 		context.checking(new Expectations() {{
 			one(userSession).getRoleManager();
 			one(tagService).getHotTags(with(is(200)), with(is(7)), with(any(RoleManager.class))); will(returnValue(new LinkedHashMap<String,Integer>()));
-			one(propertyBag).put("tags", new LinkedHashMap<String,Integer>());
+			one(mockResult).include("tags", new LinkedHashMap<String,Integer>());
 		}});
 
 		tagAction.list();
 		context.assertIsSatisfied();
-	}
-
-	@Before
-	public void setup() {
-		tagAction = new TagController(propertyBag, tagService, topicRepository, viewService, userSession);
 	}
 }

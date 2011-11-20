@@ -8,20 +8,14 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import junit.framework.Assert;
-import net.jforum.actions.helpers.Actions;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
-import net.jforum.controllers.PostReportController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.PostReport;
@@ -33,7 +27,6 @@ import net.jforum.entities.util.Pagination;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.security.ModerationRule;
 import net.jforum.security.RoleManager;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
@@ -43,15 +36,13 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
 
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
-public class PostReportActionsTestCase {
+public class PostReportControllerTestCase {
 	private Mockery mockery = TestCaseUtils.newMockery();
 	private SessionManager sessionManager = mockery.mock(SessionManager.class);
 	private UserSession userSession = mockery.mock(UserSession.class);
@@ -89,14 +80,6 @@ public class PostReportActionsTestCase {
 		Assert.assertNotNull(methodName, method);
 		Assert.assertTrue(methodName, method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(methodName, ModerationRule.class, method.getAnnotation(SecurityConstraint.class).value());
-	}
-
-	@Test
-	public void shouldBeInterceptedByMethodSecurityInterceptor() {
-		Assert.assertTrue(action.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy interceptedBy = action.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(interceptedBy.value());
-		Assert.assertTrue(interceptors.contains(MethodSecurityInterceptor.class));
 	}
 
 	@Test

@@ -8,19 +8,13 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
-
-import java.util.Arrays;
-import java.util.List;
+package net.jforum.controllers;
 
 import junit.framework.Assert;
-import net.jforum.actions.interceptors.ControllerSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.security.AdministrationRule;
 
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
 
 /**
  * @author Rafael Steil
@@ -37,13 +31,5 @@ public abstract class AdminTestCase {
 		Assert.assertTrue(type.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(AdministrationRule.class, type.getAnnotation(SecurityConstraint.class).value());
 		Assert.assertTrue(type.getAnnotation(SecurityConstraint.class).displayLogin());
-	}
-
-	@Test
-	public void shouldBeInterceptedByActionSecurityInterceptor() {
-		Assert.assertTrue(type.isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy interceptedBy = type.getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(interceptedBy.value());
-		Assert.assertTrue(interceptors.contains(ControllerSecurityInterceptor.class));
 	}
 }

@@ -27,7 +27,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cache.Cache;
 import org.hibernate.cache.QueryCache;
 import org.hibernate.engine.SessionFactoryImplementor;
-import org.hinjector.spring.SpringSessionFactory;
 
 /**
  * @author Rafael Steil
@@ -44,7 +43,7 @@ public class CacheEvictionRules {
 		}
 		else {
 			this.sessionFactory = factory;
-			this.factoryImplementor = (SessionFactoryImplementor)((SpringSessionFactory)factory).getOriginal();
+			//this.factoryImplementor = (SessionFactoryImplementor)((SpringSessionFactory)factory).getOriginal();
 		}
 	}
 

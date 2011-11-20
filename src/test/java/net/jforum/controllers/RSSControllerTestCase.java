@@ -8,10 +8,9 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import net.jforum.actions.helpers.Actions;
-import net.jforum.controllers.RSSController;
 import net.jforum.entities.UserSession;
 import net.jforum.security.RoleManager;
 import net.jforum.services.RSSService;
@@ -29,7 +28,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class RSSActionsTestCase {
+public class RSSControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private RSSService rssService = context.mock(RSSService.class);
 	private UserSession userSession = context.mock(UserSession.class);
@@ -47,7 +46,7 @@ public class RSSActionsTestCase {
 				will(returnValue(true));
 				one(roleManager).isForumAllowed(1);
 				will(returnValue(true));
-				one(rssService).forForum(1, mockResult);
+				one(rssService).forForum(1);
 				will(returnValue("contents"));
 				one(mockResult).include("contents", "contents");
 				one(mockResult).forwardTo(Actions.RSS);

@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ import org.junit.Test;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
 
-public class AvatarAdminActionsTestCase extends AdminTestCase {
+public class AvatarAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private AvatarRepository repository = context.mock(AvatarRepository.class);
 	private AvatarService service = context.mock(AvatarService.class);
@@ -35,7 +35,7 @@ public class AvatarAdminActionsTestCase extends AdminTestCase {
 	private AvatarAdminController avatarAction = new AvatarAdminController(
 			mockResult, repository, service);
 
-	public AvatarAdminActionsTestCase() {
+	public AvatarAdminControllerTestCase() {
 		super(SmilieAdminController.class);
 	}
 

@@ -8,11 +8,10 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,13 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
-import net.jforum.actions.interceptors.ExtendsAnnotationInterceptor;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
-import net.jforum.controllers.MessageController;
-import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
@@ -49,7 +43,6 @@ import net.jforum.security.CreateNewTopicRule;
 import net.jforum.security.RoleManager;
 import net.jforum.services.AttachmentService;
 import net.jforum.services.TopicService;
-import net.jforum.services.ViewService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
@@ -59,9 +52,6 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.http.VRaptorServletRequest;
 
 import br.com.caelum.vraptor.util.test.MockResult;
 
@@ -69,7 +59,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
  * @author Rafael Steil
  */
 @SuppressWarnings("unchecked")
-public class TopicActionsTestCase { 
+public class TopicControllerTestCase {
 
 	private Mockery context = TestCaseUtils.newMockery();
 	private JForumConfig config = context.mock(JForumConfig.class);
@@ -117,22 +107,6 @@ public class TopicActionsTestCase {
 
 		topicAction.list(1, 0, false);
 		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void shouldBeExtensible() throws Exception {
-		Assert.assertTrue(topicAction.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = topicAction.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(ExtendsAnnotationInterceptor.class));
-	}
-
-	@Test
-	public void shouldBeInterceptedByMethodSecurityInterceptor() throws Exception {
-		Assert.assertTrue(topicAction.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = topicAction.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(MethodSecurityInterceptor.class));
 	}
 
 	@Test
@@ -222,7 +196,6 @@ public class TopicActionsTestCase {
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(5));
 
 			String url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
-			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, pageExpected, topic.getId()); will(returnValue(url));
 			one(mockResult).redirectTo(url + "#0");
 		}});
 	}
@@ -298,7 +271,7 @@ public class TopicActionsTestCase {
 			one(roleManager).isModerator(); will(returnValue(true));
 			one(roleManager).getCanCreatePolls(); will(returnValue(false));
 			ignoring(roleManager).getCanCreateStickyAnnouncementTopics();
-			ignoring(userSession); ignoring(topicService); ignoring(viewService);
+			ignoring(userSession); ignoring(topicService);
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			one(mockResult).include("topic", topic);
 		}});
@@ -356,7 +329,6 @@ public class TopicActionsTestCase {
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			ignoring(roleManager);
 			String url = "/topics/list/0.page";
-			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 0); will(returnValue(url));
 			one(mockResult).redirectTo(url + "#0");
 			one(mockResult).include("topic", topic);
 		}});
@@ -430,7 +402,6 @@ public class TopicActionsTestCase {
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 
 			String url = "/topics/list/1.page";
-			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 1); will(returnValue(url));
 			one(mockResult).redirectTo(url + "#0");
 		}});
 
@@ -458,7 +429,6 @@ public class TopicActionsTestCase {
 			ignoring(userSession); ignoring(topicService);
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			String url = "/topics/list/2.page";
-			one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 2); will(returnValue(url));
 			one(mockResult).redirectTo(url + "#0");
 		}});
 
@@ -530,7 +500,7 @@ public class TopicActionsTestCase {
 			one(mockResult).include("topic", new Topic());
 			one(mockResult).include("forum", new Forum());
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
-			
+
 			//TODO pass zero?
 			one(mockResult).redirectTo(TopicController.class).add(0);
 		}});

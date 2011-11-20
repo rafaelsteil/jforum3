@@ -8,25 +8,17 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
-import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
-import net.jforum.actions.interceptors.ControllerSecurityInterceptor;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
-import net.jforum.controllers.PrivateMessageController;
-import net.jforum.controllers.TopicController;
 import net.jforum.core.Role;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ForumException;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Group;
 import net.jforum.entities.Post;
 import net.jforum.entities.PrivateMessage;
@@ -41,7 +33,6 @@ import net.jforum.security.AuthenticatedRule;
 import net.jforum.security.PrivateMessageOwnerRule;
 import net.jforum.security.RoleManager;
 import net.jforum.services.PrivateMessageService;
-import net.jforum.services.ViewService;
 import net.jforum.util.SecurityConstants;
 import net.jforum.util.TestCaseUtils;
 
@@ -49,16 +40,13 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
-import org.vraptor.interceptor.MultipartRequestInterceptor;
 
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
-public class PrivateMessageActionsTestCase {
+public class PrivateMessageControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private UserSession userSession = context.mock(UserSession.class);
 	private PrivateMessageRepository repository = context.mock(PrivateMessageRepository.class);
@@ -217,7 +205,7 @@ public class PrivateMessageActionsTestCase {
 			one(mockResult).include("pmRecipient", recipient);
 
 			ignoring(mockResult); ignoring(smilieRepository);
-			
+
 			//TODO pass zero?
 			one(mockResult).forwardTo(TopicController.class).add(0);
 		}});
@@ -279,7 +267,7 @@ public class PrivateMessageActionsTestCase {
 
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
 			one(mockResult).forwardTo("sendToDenied");
-			
+
 			ignoring(mockResult); ignoring(smilieRepository);
 		}});
 
@@ -346,7 +334,7 @@ public class PrivateMessageActionsTestCase {
 			one(mockResult).include("attachmentsEnabled", false);
 			one(mockResult).include("user", user);
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
-			
+
 			//TODO pass zero?
 			one(mockResult).forwardTo(TopicController.class).add(0);
 		}});
@@ -394,30 +382,6 @@ public class PrivateMessageActionsTestCase {
 		Method method = action.getClass().getMethod("review", int.class);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(PrivateMessageOwnerRule.class, method.getAnnotation(SecurityConstraint.class).value());
-	}
-
-	@Test
-	public void shouldBeInterceptedByActionSecurityInterceptor() throws Exception {
-		Assert.assertTrue(action.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = action.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(ControllerSecurityInterceptor.class));
-	}
-
-	@Test
-	public void shouldBeInterceptedByMethodSecurityInterceptor() throws Exception {
-		Assert.assertTrue(action.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = action.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(MethodSecurityInterceptor.class));
-	}
-
-	@Test
-	public void shouldBeInterceptedByMultipartRequestInterceptor() throws Exception {
-		Assert.assertTrue(action.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = action.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(MultipartRequestInterceptor.class));
 	}
 
 	@Test

@@ -24,7 +24,6 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.ADMIN)
-// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class AdminController {
 	private final SessionManager sessionManager;

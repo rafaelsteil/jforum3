@@ -13,36 +13,34 @@ package net.jforum.plugins.tagging;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.jforum.actions.AdminTestCase;
 import net.jforum.actions.helpers.Actions;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
-import net.jforum.services.ViewService;
+import net.jforum.controllers.AdminTestCase;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Bill
- *
  */
-public class TagAdminActionsTestCase extends AdminTestCase {
+public class TagAdminControllerTestCase extends AdminTestCase {
 
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewService viewService = context.mock(ViewService.class);
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private TagRepository repository = context.mock(TagRepository.class);
-	private TagAdminController action = new TagAdminController(propertyBag,viewService,repository);
+	private MockResult mockResult = new MockResult();
+	private TagAdminController action = new TagAdminController(repository, mockResult);
 
-	public TagAdminActionsTestCase() {
+	public TagAdminControllerTestCase() {
 		super(TagAdminController.class);
 	}
 
 	@Test
 	public void deleteUsingNullShouldIgnore() {
 		context.checking(new Expectations() {{
-			one(viewService).redirectToAction(Actions.LIST);
+			one(mockResult).redirectTo(Actions.LIST);
 		}});
 
 		String tag = null;
@@ -60,8 +58,7 @@ public class TagAdminActionsTestCase extends AdminTestCase {
 
 			one(repository).remove(tag1);
 			one(repository).remove(tag2);
-
-			one(viewService).redirectToAction(Actions.LIST);
+			one(mockResult).redirectTo(Actions.LIST);
 		}});
 
 		action.delete(tag1, tag2);
@@ -74,7 +71,7 @@ public class TagAdminActionsTestCase extends AdminTestCase {
 		context.checking(new Expectations() {{
 			List<String> list = new ArrayList<String>();
 			one(repository).getAll(); will(returnValue(list));
-			one(propertyBag).put("tags", list);
+			one(mockResult).include("tags", list);
 		}});
 
 		action.list();
@@ -86,8 +83,7 @@ public class TagAdminActionsTestCase extends AdminTestCase {
 		final String name = "IT";
 
 		context.checking(new Expectations() {{
-			one(propertyBag).put("name", name);
-			one(viewService).renderView(Actions.ADD);
+			one(mockResult).include("name", name);
 		}});
 
 		action.edit(name);
@@ -101,11 +97,10 @@ public class TagAdminActionsTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {{
 			one(repository).update(oldTag,newTag);
-			one(viewService).redirectToAction(Actions.LIST);
+			one(mockResult).redirectTo(Actions.LIST);
 		}});
 
 		action.editsave(oldTag,newTag);
 		context.assertIsSatisfied();
 	}
-
 }

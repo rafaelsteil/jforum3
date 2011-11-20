@@ -50,7 +50,6 @@ import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
  */
 @Resource
 @Path(Domain.USER)
-//@InterceptedBy( {MethodInterceptorInterceptor.class,MultipartRequestInterceptor.class, MethodSecurityInterceptor.class })
 public class UserController {
 	private UserRepository userRepository;
 	private UserService userService;

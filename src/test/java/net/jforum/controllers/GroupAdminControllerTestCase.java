@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 
@@ -35,7 +35,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class GroupAdminActionsTestCase extends AdminTestCase {
+public class GroupAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private GroupAdminController component;
 	private GroupRepository repository = context.mock(GroupRepository.class);
@@ -47,7 +47,7 @@ public class GroupAdminActionsTestCase extends AdminTestCase {
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private MockResult mockResult = new MockResult();
 
-	public GroupAdminActionsTestCase() {
+	public GroupAdminControllerTestCase() {
 		super(GroupAdminController.class);
 	}
 

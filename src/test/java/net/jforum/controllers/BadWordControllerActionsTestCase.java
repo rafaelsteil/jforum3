@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +28,8 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class BadWordAdminActionsTestCase extends AdminTestCase {
-	public BadWordAdminActionsTestCase() {
+public class BadWordControllerActionsTestCase extends AdminTestCase {
+	public BadWordControllerActionsTestCase() {
 		super(BadWordAdminController.class);
 	}
 

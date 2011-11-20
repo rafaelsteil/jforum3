@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class SearchActionsTestCase {
+public class SearchControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private CategoryRepository categoryRepository = context
 			.mock(CategoryRepository.class);

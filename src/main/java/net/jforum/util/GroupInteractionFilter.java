@@ -28,7 +28,7 @@ public class GroupInteractionFilter {
 	/**
 	 * Filter the property bag for forums/show, based on group interaction
 	 * settings
-	 * 
+	 *
 	 * @param propertyBag
 	 *            the property bag for the "show" method of the
 	 *            {@link ForumController} action
@@ -37,8 +37,7 @@ public class GroupInteractionFilter {
 	 */
 	public void filterForumListing(Result result, UserSession userSession) {
 		@SuppressWarnings("unchecked")
-		Collection<UserSession> sessions = (Collection<UserSession>) result
-				.included().get("onlineUsers");
+		Collection<UserSession> sessions = (Collection<UserSession>) result.included().get("onlineUsers");
 
 		if (sessions == null) {
 			sessions = new ArrayList<UserSession>();

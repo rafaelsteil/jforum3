@@ -8,18 +8,14 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.controllers.ForumController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.MostUsersEverOnline;
@@ -44,15 +40,13 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.InterceptedBy;
 
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
-public class ForumActionsTestCase {
+public class ForumControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private CategoryRepository categoryRepository = context
 			.mock(CategoryRepository.class);
@@ -67,19 +61,6 @@ public class ForumActionsTestCase {
 			.mock(GroupInteractionFilter.class);
 	private ForumController forumAction;
 	private MockResult mockResult = new MockResult();
-
-	@Test
-	public void shouldBeInterceptedByMethodSecurityInterceptor()
-			throws Exception {
-		Assert.assertTrue(forumAction.getClass().isAnnotationPresent(
-				InterceptedBy.class));
-		InterceptedBy annotation = forumAction.getClass().getAnnotation(
-				InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays
-				.asList(annotation.value());
-		Assert.assertTrue(interceptors
-				.contains(MethodSecurityInterceptor.class));
-	}
 
 	@Test
 	public void showShouldHaveAccessForumConstraint() throws Exception {

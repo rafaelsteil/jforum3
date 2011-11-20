@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.Arrays;
 
@@ -28,7 +28,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class RankingAdminActionsTestCase extends AdminTestCase {
+public class RankingAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private RankingAdminController component;
 	private RankingRepository repository = context
@@ -36,7 +36,7 @@ public class RankingAdminActionsTestCase extends AdminTestCase {
 	private RankingService service = context.mock(RankingService.class);
 	private MockResult mockResult = new MockResult();
 
-	public RankingAdminActionsTestCase() {
+	public RankingAdminControllerTestCase() {
 		super(RankingAdminController.class);
 	}
 

@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 
@@ -28,7 +28,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class SmilieAdminActionsTestCase extends AdminTestCase {
+public class SmilieAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private SmilieRepository repository = context.mock(SmilieRepository.class);
 	private SmilieService service = context.mock(SmilieService.class);
@@ -36,7 +36,7 @@ public class SmilieAdminActionsTestCase extends AdminTestCase {
 	private SmilieAdminController smilieAction = new SmilieAdminController(service,
 			repository, mockResult);
 
-	public SmilieAdminActionsTestCase() {
+	public SmilieAdminControllerTestCase() {
 		super(SmilieAdminController.class);
 	}
 

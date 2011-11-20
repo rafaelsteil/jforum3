@@ -11,15 +11,11 @@
 package net.jforum.actions.extensions;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.interceptors.MethodSecurityInterceptor;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
 import net.jforum.entities.User;
@@ -28,16 +24,12 @@ import net.jforum.extensions.ActionExtension;
 import net.jforum.extensions.Extends;
 import net.jforum.security.AuthenticatedRule;
 import net.jforum.services.TopicWatchService;
-import net.jforum.services.ViewService;
 import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
-import org.vraptor.Interceptor;
-import org.vraptor.annotations.Component;
-import org.vraptor.annotations.InterceptedBy;
 
 import br.com.caelum.vraptor.util.test.MockResult;
 
@@ -119,24 +111,9 @@ public class TopicWatchExtensionTestCase {
 	}
 
 	@Test
-	public void componentShouldBeTopics() {
-		Assert.assertTrue(extension.getClass().isAnnotationPresent(Component.class));
-		Component annotation = extension.getClass().getAnnotation(Component.class);
-		Assert.assertEquals(Domain.TOPICS, annotation.value());
-	}
-
-	@Test
 	public void shouldBeAnExtensionOfTopics() {
 		Assert.assertTrue(extension.getClass().isAnnotationPresent(ActionExtension.class));
 		ActionExtension annotation = extension.getClass().getAnnotation(ActionExtension.class);
 		Assert.assertEquals(Domain.TOPICS, annotation.value());
-	}
-
-	@Test
-	public void shouldBeInterceptedByMethodSecurityInterceptor() throws Exception {
-		Assert.assertTrue(extension.getClass().isAnnotationPresent(InterceptedBy.class));
-		InterceptedBy annotation = extension.getClass().getAnnotation(InterceptedBy.class);
-		List<Class<? extends Interceptor>> interceptors = Arrays.asList(annotation.value());
-		Assert.assertTrue(interceptors.contains(MethodSecurityInterceptor.class));
 	}
 }

@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 
@@ -27,14 +27,14 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class BanlistAdminActionsTestCase extends AdminTestCase {
+public class BanlistAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private BanlistAdminController component;
 	private BanlistRepository repository = context
 			.mock(BanlistRepository.class);
 	private MockResult mockResult = new MockResult();
 
-	public BanlistAdminActionsTestCase() {
+	public BanlistAdminControllerTestCase() {
 		super(BanlistAdminController.class);
 	}
 

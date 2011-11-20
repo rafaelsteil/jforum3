@@ -8,15 +8,15 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.controllers.MessageController;
 import net.jforum.util.I18n;
 import net.jforum.util.TestCaseUtils;
+import net.jforum.util.URLBuilder;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -28,7 +28,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class MessageActionsTestCase {
+public class MessageControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private I18n i18n = context.mock(I18n.class);
 	private MockResult mockResult = new MockResult();
@@ -36,18 +36,11 @@ public class MessageActionsTestCase {
 
 	@Test
 	public void replyWaitingModeration() {
-		context.checking(new Expectations() {
-			{
-				one(viewService).buildUrl(Domain.TOPICS, Actions.LIST, 1);
-				will(returnValue("url"));
-				one(i18n).params("url");
-				will(returnValue(new Object[] { "url" }));
-				one(i18n).getFormattedMessage("PostShow.waitingModeration",
-						new Object[] { "url" });
-				will(returnValue("msg moderation 1"));
-				one(mockResult).include("message", "msg moderation 1");
-			}
-		});
+		context.checking(new Expectations() {{
+			one(i18n).params(URLBuilder.build(Domain.TOPICS, Actions.LIST, 1)); will(returnValue(new Object[] { "url" }));
+			one(i18n).getFormattedMessage("PostShow.waitingModeration", new Object[] { "url" }); will(returnValue("msg moderation 1"));
+			one(mockResult).forwardTo(Actions.MESSAGE);
+		}});
 
 		action.replyWaitingModeration(1);
 		context.assertIsSatisfied();
@@ -55,18 +48,11 @@ public class MessageActionsTestCase {
 
 	@Test
 	public void topicWaitingModeration() {
-		context.checking(new Expectations() {
-			{
-				one(viewService).buildUrl(Domain.FORUMS, Actions.SHOW, 1);
-				will(returnValue("url"));
-				one(i18n).params("url");
-				will(returnValue(new Object[] { "url" }));
-				one(i18n).getFormattedMessage("PostShow.waitingModeration",
-						new Object[] { "url" });
-				will(returnValue("msg moderation 1"));
-				one(mockResult).include("message", "msg moderation 1");
-			}
-		});
+		context.checking(new Expectations() {{
+			one(i18n).params(URLBuilder.build(Domain.TOPICS, Actions.LIST, 1)); will(returnValue(new Object[] { "url" }));
+			one(i18n).getFormattedMessage("PostShow.waitingModeration", new Object[] { "url" }); will(returnValue("msg moderation 1"));
+			one(mockResult).forwardTo(Actions.MESSAGE);
+		}});
 
 		action.topicWaitingModeration(1);
 		context.assertIsSatisfied();

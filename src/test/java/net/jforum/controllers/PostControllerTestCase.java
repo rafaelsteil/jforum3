@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 
@@ -16,9 +16,6 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.AttachedFile;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
-import net.jforum.controllers.ForumController;
-import net.jforum.controllers.PostController;
-import net.jforum.controllers.TopicController;
 import net.jforum.entities.Forum;
 import net.jforum.entities.ModerationLog;
 import net.jforum.entities.PollOption;
@@ -43,21 +40,18 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class PostActionsTestCase {
+public class PostControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private PostRepository postRepository = context.mock(PostRepository.class);
-	private SmilieRepository smilieRepository = context
-			.mock(SmilieRepository.class);
-	private TopicRepository topicRepository = context
-			.mock(TopicRepository.class);
+	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
+	private TopicRepository topicRepository = context.mock(TopicRepository.class);
 	private PostService postService = context.mock(PostService.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private MockResult mockResult = new MockResult();
 
 	private PostController component = new PostController(postRepository,
-			smilieRepository, postService, config, userSession, null, null,
-			mockResult);
+		smilieRepository, postService, config, userSession, null, null, mockResult);
 	private ModerationLog moderationLog = new ModerationLog();
 
 	@Test
@@ -197,17 +191,10 @@ public class PostActionsTestCase {
 				String url;
 
 				if (pageExpected > 0) {
-					url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS,
-							Actions.LIST, pageExpected, topic.getId());
-					one(viewService).buildUrl(Domain.TOPICS, Actions.LIST,
-							pageExpected, topic.getId());
-					will(returnValue(url));
-				} else {
-					url = String.format("/%s/%s/%s.page", Domain.TOPICS,
-							Actions.LIST, topic.getId());
-					one(viewService).buildUrl(Domain.TOPICS, Actions.LIST,
-							topic.getId());
-					will(returnValue(url));
+					url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
+				}
+				else {
+					url = String.format("/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, topic.getId());
 				}
 
 				one(mockResult).redirectTo(url);

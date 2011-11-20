@@ -8,7 +8,7 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.actions;
+package net.jforum.controllers;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
-public class CategoryAdminActionsTestCase extends AdminTestCase {
+public class CategoryAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private CategoryAdminController component;
 	private final CategoryRepository repository = context
@@ -37,7 +37,7 @@ public class CategoryAdminActionsTestCase extends AdminTestCase {
 	private final CategoryService service = context.mock(CategoryService.class);
 	private MockResult mockResult = new MockResult();
 
-	public CategoryAdminActionsTestCase() {
+	public CategoryAdminControllerTestCase() {
 		super(CategoryAdminController.class);
 	}
 
