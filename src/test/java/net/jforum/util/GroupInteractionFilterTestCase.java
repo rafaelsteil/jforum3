@@ -13,14 +13,16 @@ package net.jforum.util;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 
+import org.hsqldb.lib.HashMap;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
+
+import br.com.caelum.vraptor.util.test.MockResult;
 
 
 /**
@@ -28,8 +30,8 @@ import org.junit.Test;
  */
 public class GroupInteractionFilterTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private UserSession userSession = context.mock(UserSession.class);
+	private MockResult mockResult = new MockResult();
 
 	@Test
 	public void filterForumListing() {
@@ -44,19 +46,19 @@ public class GroupInteractionFilterTestCase {
 			u2.addGroup(g1); u2.addGroup(g2);
 			u3.addGroup(g3);
 
-			UserSession us1 = new UserSession(); us1.setSessionId("1"); us1.setUser(u1);
-			UserSession us2 = new UserSession(); us2.setSessionId("2"); us2.setUser(u2);
-			UserSession us3 = new UserSession(); us3.setSessionId("3"); us3.setUser(u3);
+			final UserSession us1 = new UserSession(); us1.setSessionId("1"); us1.setUser(u1);
+			final UserSession us2 = new UserSession(); us2.setSessionId("2"); us2.setUser(u2);
+			final UserSession us3 = new UserSession(); us3.setSessionId("3"); us3.setUser(u3);
 
 			one(userSession).getUser(); will(returnValue(u1));
-			one(propertyBag).get("onlineUsers"); will(returnValue(Arrays.asList(us1, us2, us3)));
+			one(mockResult).included(); will(returnValue(new HashMap() {{ put("onlineUsers", Arrays.asList(us1, us2, us3)); }}));
 
-			one(propertyBag).put("totalLoggedUsers", 2);
-			one(propertyBag).put("onlineUsers", new HashSet<UserSession>(Arrays.asList(us1, us2)));
+			one(mockResult).include("totalLoggedUsers", 2);
+			one(mockResult).include("onlineUsers", new HashSet<UserSession>(Arrays.asList(us1, us2)));
 		}});
 
 		GroupInteractionFilter filter = new GroupInteractionFilter();
-		filter.filterForumListing(propertyBag, userSession);
+		filter.filterForumListing(mockResult, userSession);
 		context.assertIsSatisfied();
 	}
 }

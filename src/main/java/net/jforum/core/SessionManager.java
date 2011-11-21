@@ -38,9 +38,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
+ * Manages all user sessions
  * @author Rafael Steil
  */
+@Component
+@ApplicationScoped
 public class SessionManager {
 	private static final Logger logger = Logger.getLogger(SessionManager.class);
 	private Map<String, UserSession> loggedSessions = new HashMap<String, UserSession>();

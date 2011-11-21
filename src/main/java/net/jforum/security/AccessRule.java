@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.entities.UserSession;
 
-
-
 /**
  * Check if determined method can be executed.
  * This is used together with {@link SecurityConstraint} in some actions.

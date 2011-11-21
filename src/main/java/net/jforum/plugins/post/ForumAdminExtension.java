@@ -13,52 +13,49 @@ package net.jforum.plugins.post;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Forum;
 import net.jforum.extensions.ActionExtension;
 import net.jforum.extensions.Extends;
 import net.jforum.repository.ForumRepository;
 import net.jforum.security.RoleManager;
+import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-
-import org.vraptor.annotations.Parameter;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Bill
  */
 @ActionExtension(Domain.FORUMS_ADMIN)
 public class ForumAdminExtension {
-
 	private ForumLimitedTimeRepository repository;
 	private ForumRepository forumRepository;
 	private JForumConfig config;
-	private ViewPropertyBag propertyBag;
 	private SessionManager sessionManager;
+	private final Result result;
 
-	public ForumAdminExtension(JForumConfig config,
-			ForumRepository forumRepository, ViewPropertyBag propertyBag,
-			ForumLimitedTimeRepository repository, SessionManager sessionManager) {
+	public ForumAdminExtension(JForumConfig config, ForumRepository forumRepository,
+			ForumLimitedTimeRepository repository, SessionManager sessionManager, Result result) {
 		this.config = config;
 		this.forumRepository = forumRepository;
-		this.propertyBag = propertyBag;
+		this.result = result;
 		this.repository = repository;
 		this.sessionManager = sessionManager;
 	}
 
 	@Extends(Actions.EDIT)
-	public void edit(@Parameter(key = "forumId") int forumId) {
+	public void edit(int forumId) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 
 		if(isEnabled){
 			Forum forum = forumRepository.get(forumId);
 			long time = this.repository.getLimitedTime(forum);
-			this.propertyBag.put("forumTimeLimitedEnable", true);
-			this.propertyBag.put("forumLimitedTime", time);
+			this.result.include("forumTimeLimitedEnable", true);
+			this.result.include("forumLimitedTime", time);
 		}
 	}
 
 	@Extends(Actions.EDITSAVE)
-	public void editSave(@Parameter(key = "forum") Forum forum, @Parameter(key = "forumLimitedTime", create=true) long forumLimitedTime) {
+	public void editSave(Forum forum, long forumLimitedTime) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
 			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
@@ -79,18 +76,19 @@ public class ForumAdminExtension {
 	public void add() {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
-			this.propertyBag.put("fourmTimeLimitedEnable", true);
-			this.propertyBag.put("fourmLimitedTime", 0);
+			this.result.include("fourmTimeLimitedEnable", true);
+			this.result.include("fourmLimitedTime", 0);
 		}
 	}
 
 	@Extends(Actions.ADDSAVE)
-	public void addSave(@Parameter(key = "fourmLimitedTime",create=true) long fourmLimitedTime) {
+	public void addSave(long fourmLimitedTime) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
 			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
 
-			Forum forum = (Forum) this.propertyBag.get("forum");
+			Forum forum = (Forum) this.result.included().get("forum");
+
 			if (forum != null && (roleManager.isAdministrator() || roleManager.isCategoryAllowed(forum.getCategory().getId()))) {
 				if(fourmLimitedTime > 0){
 					ForumLimitedTime current = new ForumLimitedTime();
@@ -103,7 +101,7 @@ public class ForumAdminExtension {
 	}
 
 	@Extends("delete")
-	public void delete(@Parameter(key = "forumsId") int... forumsId) {
+	public void delete(int... forumsId) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
 			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();

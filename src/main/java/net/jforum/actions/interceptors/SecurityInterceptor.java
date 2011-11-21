@@ -10,102 +10,103 @@
  */
 package net.jforum.actions.interceptors;
 
+import javax.servlet.http.HttpServletRequest;
+
+import net.jforum.controllers.MessageController;
+import net.jforum.controllers.UserController;
 import net.jforum.core.Role;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.entities.UserSession;
 import net.jforum.security.AccessRule;
 import net.jforum.security.EmptyRule;
-import net.jforum.services.ViewService;
-import net.jforum.util.ConfigKeys;
-
-import org.vraptor.Interceptor;
-import org.vraptor.LogicException;
-import org.vraptor.LogicFlow;
-import org.vraptor.LogicRequest;
-import org.vraptor.view.ViewException;
-import org.vraptor.webapp.WebApplication;
+import br.com.caelum.vraptor.InterceptionException;
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.core.InterceptorStack;
+import br.com.caelum.vraptor.interceptor.Interceptor;
+import br.com.caelum.vraptor.ioc.Container;
+import br.com.caelum.vraptor.resource.ResourceMethod;
 
 /**
+ * Handles the {@link SecurityConstraint} annotation, looking for AccessRules
  * @author Rafael Steil
  */
 public abstract class SecurityInterceptor implements Interceptor {
-	/**
-	 * @see org.vraptor.Interceptor#intercept(org.vraptor.LogicFlow)
-	 */
-	public void intercept(LogicFlow flow) throws LogicException, ViewException {
-		LogicRequest logicRequest = flow.getLogicRequest();
+	private final HttpServletRequest request;
+	private final Result result;
+	private final UserSession userSession;
+	private final Container container;
 
-		if (!this.isAnnotationPresent(logicRequest)) {
-			flow.execute();
+	public SecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession, Container container) {
+		this.request = request;
+		this.result = result;
+		this.userSession = userSession;
+		this.container = container;
+	}
+
+	@Override
+	public void intercept(InterceptorStack stack, ResourceMethod method, Object resourceInstance) throws InterceptionException {
+		SecurityConstraint annotation = this.getAnnotation(method);
+		Class<? extends AccessRule> accessRuleClass = annotation.value();
+
+		boolean shouldProceed = true;
+		boolean displayLogin = true;
+
+		if (!accessRuleClass.equals(EmptyRule.class)) {
+			AccessRule accessRule = this.findAccessRule(annotation.value());
+			shouldProceed = accessRule.shouldProceed(userSession, request);
+			displayLogin = annotation.displayLogin();
 		}
 		else {
-			WebApplication application = (WebApplication)flow.getLogicRequest().getServletContext()
-				.getAttribute(WebApplication.class.getName());
+			Role[] multiRoles = annotation.multiRoles();
 
-			SecurityConstraint annotation = this.getAnnotation(logicRequest);
-			Class<? extends AccessRule> accessRuleClass = annotation.value();
-			UserSession userSession = (UserSession)logicRequest.getRequest().getAttribute(ConfigKeys.USER_SESSION);
-
-			boolean shouldProceed = true;
-			boolean displayLogin = true;
-
-			if (!accessRuleClass.equals(EmptyRule.class)) {
-				AccessRule accessRule = this.findAccessRule(annotation.value().getName(), application, flow);
-				shouldProceed = accessRule.shouldProceed(userSession, logicRequest.getRequest());
-				displayLogin = annotation.displayLogin();
+			if (multiRoles.length == 0) {
+				throw new IllegalStateException("@SecurityConstraint does not have an access rule nor multi roles. Cannot continue");
 			}
 			else {
-				Role[] multiRoles = annotation.multiRoles();
+				for (Role role : multiRoles) {
+					AccessRule accessRule = this.findAccessRule(role.value());
 
-				if (multiRoles.length == 0) {
-					throw new IllegalStateException("@SecurityConstraint does not have an access rule nor multi roles. Cannot continue");
-				}
-				else {
-					for (Role role : multiRoles) {
-						AccessRule accessRule = this.findAccessRule(role.value().getName(), application, flow);
-
-						if (!accessRule.shouldProceed(userSession, logicRequest.getRequest())) {
-							shouldProceed = false;
-							displayLogin = role.displayLogin();
-							break;
-						}
+					if (!accessRule.shouldProceed(userSession, request)) {
+						shouldProceed = false;
+						displayLogin = role.displayLogin();
+						break;
 					}
 				}
 			}
+		}
 
-			if (shouldProceed) {
-				flow.execute();
+		if (shouldProceed) {
+			stack.next(method, resourceInstance);
+		}
+		else {
+			if (displayLogin) {
+				this.result.redirectTo(UserController.class).login(null);
 			}
 			else {
-				ViewService viewService = (ViewService)application.getIntrospector().getBeanProvider()
-					.findAttribute(flow.getLogicRequest(), ViewService.class.getName());
-				this.executeViewService(viewService, displayLogin);
+				this.result.redirectTo(MessageController.class).accessDenied();
 			}
 		}
 	}
 
-	private AccessRule findAccessRule(String name, WebApplication application, LogicFlow flow) {
-		AccessRule accessRule = (AccessRule)application.getIntrospector().getBeanProvider()
-			.findAttribute(flow.getLogicRequest(), name);
+	private AccessRule findAccessRule(Class<? extends AccessRule> klass) {
+		AccessRule accessRule = container.instanceFor(klass);
 
 		if (accessRule == null) {
 			throw new NullPointerException(
-				String.format("Could not find the rule %s. Have you registered it in the configuration file?", name));
+				String.format("Could not find the rule %s. Have you registered it in the configuration file?", klass.getName()));
 		}
 
 		return accessRule;
 	}
 
-	private void executeViewService(ViewService viewService, boolean displayLogin) {
-		if (displayLogin) {
-			viewService.displayLogin();
-		}
-		else {
-			viewService.accessDenied();
-		}
+
+	protected abstract SecurityConstraint getAnnotation(ResourceMethod method);
+
+	protected abstract boolean isAnnotationPresent(ResourceMethod method);
+
+
+	@Override
+	public boolean accepts(ResourceMethod method) {
+		return this.isAnnotationPresent(method);
 	}
-
-	protected abstract SecurityConstraint getAnnotation(LogicRequest logicRequest);
-
-	protected abstract boolean isAnnotationPresent(LogicRequest logicRequest);
 }

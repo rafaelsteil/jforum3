@@ -33,10 +33,15 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.SessionScoped;
+
 /**
  * Stores information about an user's session.
  * @author Rafael Steil
  */
+@Component
+@SessionScoped
 public class UserSession  {
 	private static final Logger logger = Logger.getLogger(UserSession.class);
 	private User user = new User();
@@ -323,11 +328,10 @@ public class UserSession  {
 		return this.getRequest().getSession().getAttribute(name);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void clearAllAttributes() {
 		HttpSession session = this.getRequest().getSession();
 
-		for (Enumeration e = session.getAttributeNames(); e.hasMoreElements(); ) {
+		for (Enumeration<?> e = session.getAttributeNames(); e.hasMoreElements(); ) {
 			String key = (String)e.nextElement();
 			session.removeAttribute(key);
 		}

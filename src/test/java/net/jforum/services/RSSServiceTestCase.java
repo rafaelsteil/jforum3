@@ -39,7 +39,6 @@ public class RSSServiceTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private RSSRepository rssRepository = context.mock(RSSRepository.class);
-	private ViewService viewService = context.mock(ViewService.class);
 	private I18n i18n = context.mock(I18n.class);
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private RSSService service = new RSSService(config, rssRepository, i18n, forumRepository);
@@ -58,7 +57,7 @@ public class RSSServiceTestCase {
 			one(config).getValue(ConfigKeys.RSS_DATE_TIME_FORMAT); will(returnValue("EEE, d MMM yyyy HH:mm:ss"));
 		}});
 
-		String result = service.forForum(1, viewService);
+		String result = service.forForum(1);
 		context.assertIsSatisfied();
 
 		System.out.println(result);
@@ -77,7 +76,6 @@ public class RSSServiceTestCase {
 	@Before
 	public void setup() {
 		context.checking(new Expectations() {{
-			allowing(viewService).getForumLink(); will(returnValue("http://site.link/"));
 			allowing(config).getValue(ConfigKeys.SERVLET_EXTENSION); will(returnValue(".page"));
 		}});
 	}

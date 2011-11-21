@@ -11,7 +11,6 @@
 package net.jforum.extensions;
 
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.security.RoleManager;
@@ -23,23 +22,25 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.util.test.MockResult;
+
 /**
  * @author Rafael Steil
  */
 public class PostReportCounterOperationTestCase {
 	private Mockery mockery = TestCaseUtils.newMockery();
 	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
-	private ViewPropertyBag propertyBag = mockery.mock(ViewPropertyBag.class);
 	private SessionManager sessionManager = mockery.mock(SessionManager.class);
 	private UserSession userSession = mockery.mock(UserSession.class);
 	private RoleManager roleManager = mockery.mock(RoleManager.class);
-	PostReportCounterOperation operation = new PostReportCounterOperation(repository, propertyBag, sessionManager);
+	private MockResult mockResult = new MockResult();
+	private PostReportCounterOperation operation = new PostReportCounterOperation(repository, sessionManager, mockResult);
 
 	@Test
 	public void notLoggedExpectZero() {
 		mockery.checking(new Expectations() {{
 			one(userSession).isLogged(); will(returnValue(false));
-			one(propertyBag).put("totalPostReports", 0);
+			one(mockResult).include("totalPostReports", 0);
 		}});
 
 		operation.execute();
@@ -52,7 +53,7 @@ public class PostReportCounterOperationTestCase {
 			one(userSession).isLogged(); will(returnValue(true));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isModerator(); will(returnValue(false));
-			one(propertyBag).put("totalPostReports", 0);
+			one(mockResult).include("totalPostReports", 0);
 		}});
 
 		operation.execute();
@@ -69,7 +70,7 @@ public class PostReportCounterOperationTestCase {
 			one(roleManager).isModerator(); will(returnValue(true));
 			one(roleManager).getRoleValues(SecurityConstants.FORUM); will(returnValue(forumIds));
 			one(repository).countPendingReports(forumIds); will(returnValue(10));
-			one(propertyBag).put("totalPostReports", 10);
+			one(mockResult).include("totalPostReports", 10);
 		}});
 
 		operation.execute();

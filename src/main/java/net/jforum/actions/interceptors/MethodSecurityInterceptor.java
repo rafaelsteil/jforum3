@@ -10,30 +10,34 @@
  */
 package net.jforum.actions.interceptors;
 
-import net.jforum.core.SecurityConstraint;
+import javax.servlet.http.HttpServletRequest;
 
-import org.vraptor.LogicRequest;
+import net.jforum.core.SecurityConstraint;
+import net.jforum.entities.UserSession;
+import br.com.caelum.vraptor.Intercepts;
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.ioc.Container;
+import br.com.caelum.vraptor.ioc.RequestScoped;
+import br.com.caelum.vraptor.resource.ResourceMethod;
 
 /**
  * Intercepts and process the {@link SecurityConstraint} annotation for methods
  * @author Rafael Steil
  */
+@Intercepts
+@RequestScoped
 public class MethodSecurityInterceptor extends SecurityInterceptor {
-	/**
-	 * @see net.jforum.actions.interceptors.SecurityInterceptor#isAnnotationPresent(org.vraptor.LogicRequest)
-	 */
-	@Override
-	protected boolean isAnnotationPresent(LogicRequest logicRequest) {
-		return logicRequest.getLogicDefinition().getLogicMethod().getMetadata()
-			.isAnnotationPresent(SecurityConstraint.class);
+	public MethodSecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession, Container container) {
+		super(request, result, userSession, container);
 	}
 
-	/**
-	 * @see net.jforum.actions.interceptors.SecurityInterceptor#getAnnotation(org.vraptor.LogicRequest)
-	 */
 	@Override
-	protected SecurityConstraint getAnnotation(LogicRequest logicRequest) {
-		return logicRequest.getLogicDefinition().getLogicMethod().getMetadata()
-			.getAnnotation(SecurityConstraint.class);
+	protected SecurityConstraint getAnnotation(ResourceMethod method) {
+		return method.getMethod().getAnnotation(SecurityConstraint.class);
+	}
+
+	@Override
+	protected boolean isAnnotationPresent(ResourceMethod method) {
+		return method.getMethod().isAnnotationPresent(SecurityConstraint.class);
 	}
 }

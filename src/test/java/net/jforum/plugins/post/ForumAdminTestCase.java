@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SessionManager;
-import net.jforum.core.support.vraptor.ViewPropertyBag;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.User;
@@ -32,9 +31,12 @@ import net.jforum.security.RoleManager;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
 
+import org.hsqldb.lib.HashMap;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
+
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
@@ -42,27 +44,26 @@ import org.junit.Test;
 public class ForumAdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 
-	private ViewPropertyBag propertyBag = context.mock(ViewPropertyBag.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private ForumLimitedTimeRepository repository = context.mock(ForumLimitedTimeRepository.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private ForumAdminExtension extension = new ForumAdminExtension(config, forumRepository, propertyBag, repository, sessionManager);
-	
+	private MockResult mockResult = new MockResult();
+	private ForumAdminExtension extension = new ForumAdminExtension(config, forumRepository, repository, sessionManager, mockResult);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 
-	@SuppressWarnings("serial")
 	@Test
+	@SuppressWarnings("serial")
 	public void edit() {
 		final int forumId = 1;
 
 		context.checking(new Expectations() {{
 			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-			
+
 			one(forumRepository).get(forumId); will(returnValue(new Forum(){{setId(1);}}));
 			one(repository).getLimitedTime(with(any(Forum.class))); will(returnValue(0L));
-			one(propertyBag).put("forumTimeLimitedEnable", true);
-			one(propertyBag).put("forumLimitedTime", 0L);
+			one(mockResult).include("forumTimeLimitedEnable", true);
+			one(mockResult).include("forumLimitedTime", 0L);
 		}});
 
 		extension.edit(forumId);
@@ -73,8 +74,8 @@ public class ForumAdminTestCase {
 	public void add() {
 		context.checking(new Expectations() {{
 			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-			one(propertyBag).put("fourmTimeLimitedEnable", true);
-			one(propertyBag).put("fourmLimitedTime", 0);
+			one(mockResult).include("fourmTimeLimitedEnable", true);
+			one(mockResult).include("fourmLimitedTime", 0);
 		}});
 
 		extension.add();
@@ -102,15 +103,15 @@ public class ForumAdminTestCase {
 	@Test
 	public void addSave() {
 		this.securityChecking();
-		
+
 		context.checking(new Expectations() {{
 			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
 
-			Forum forum = new Forum();
+			final Forum forum = new Forum();
 			forum.setId(1);
-			
+
 			one(roleManager).isAdministrator(); will(returnValue(true));
-			one(propertyBag).get("forum"); will(returnValue(forum));
+			one(mockResult).included(); will(returnValue(new HashMap() {{ put("forum", forum); }}));
 			one(repository).add(with(any(ForumLimitedTime.class)));
 		}});
 
