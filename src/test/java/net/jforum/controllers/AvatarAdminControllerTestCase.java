@@ -13,8 +13,6 @@ package net.jforum.controllers;
 import java.util.ArrayList;
 
 import net.jforum.actions.helpers.Actions;
-import net.jforum.controllers.AvatarAdminController;
-import net.jforum.controllers.SmilieAdminController;
 import net.jforum.entities.Avatar;
 import net.jforum.repository.AvatarRepository;
 import net.jforum.services.AvatarService;
@@ -24,6 +22,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
 
@@ -31,7 +30,9 @@ public class AvatarAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private AvatarRepository repository = context.mock(AvatarRepository.class);
 	private AvatarService service = context.mock(AvatarService.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
+	private AvatarAdminController mockAdminController = context
+			.mock(AvatarAdminController.class);
 	private AvatarAdminController avatarAction = new AvatarAdminController(
 			mockResult, repository, service);
 
@@ -60,7 +61,9 @@ public class AvatarAdminControllerTestCase extends AdminTestCase {
 			{
 				one(service).update(with(aNonNull(Avatar.class)),
 						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(avatarAction);
+				will(returnValue(mockAdminController));
+				one(mockAdminController).list();
 			}
 		});
 
@@ -84,7 +87,10 @@ public class AvatarAdminControllerTestCase extends AdminTestCase {
 				one(repository).get(3);
 				will(returnValue(avatar));
 				one(repository).remove(avatar);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(avatarAction);
+				will(returnValue(mockAdminController));
+				one(mockAdminController).list();
+
 			}
 		});
 

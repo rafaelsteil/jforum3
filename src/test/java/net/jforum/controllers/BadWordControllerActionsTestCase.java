@@ -13,8 +13,6 @@ package net.jforum.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.controllers.BadWordAdminController;
 import net.jforum.entities.BadWord;
 import net.jforum.repository.BadWordRepository;
 import net.jforum.util.TestCaseUtils;
@@ -23,28 +21,34 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
 public class BadWordControllerActionsTestCase extends AdminTestCase {
-	public BadWordControllerActionsTestCase() {
-		super(BadWordAdminController.class);
-	}
 
 	private Mockery context = TestCaseUtils.newMockery();
 	private BadWordRepository repository = context
 			.mock(BadWordRepository.class);
-	private MockResult mockResult = new MockResult();
-	private BadWordAdminController action = new BadWordAdminController(mockResult,
-			repository);
+	private Result mockResult = context.mock(MockResult.class);
+	private BadWordAdminController mockBadWordAdminController = context
+			.mock(BadWordAdminController.class);
+	private BadWordAdminController action = new BadWordAdminController(
+			mockResult, repository);
+
+	public BadWordControllerActionsTestCase() {
+		super(BadWordAdminController.class);
+	}
 
 	@Test
 	public void deleteUsingNullShouldIgnore() {
 		context.checking(new Expectations() {
 			{
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockBadWordAdminController));
+				one(mockBadWordAdminController).list();
 			}
 		});
 
@@ -67,7 +71,9 @@ public class BadWordControllerActionsTestCase extends AdminTestCase {
 				one(repository).remove(w1);
 				one(repository).remove(w2);
 
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockBadWordAdminController));
+				one(mockBadWordAdminController).list();
 			}
 		});
 
@@ -97,7 +103,9 @@ public class BadWordControllerActionsTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(repository).add(word);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockBadWordAdminController));
+				one(mockBadWordAdminController).list();
 			}
 		});
 
@@ -114,7 +122,9 @@ public class BadWordControllerActionsTestCase extends AdminTestCase {
 				one(repository).get(1);
 				will(returnValue(word));
 				one(mockResult).include("word", word);
-				one(mockResult).forwardTo(Actions.ADD);
+				one(mockResult).forwardTo(action);
+				will(returnValue(mockBadWordAdminController));
+				one(mockBadWordAdminController).add();
 			}
 		});
 
@@ -129,7 +139,9 @@ public class BadWordControllerActionsTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(repository).update(word);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockBadWordAdminController));
+				one(mockBadWordAdminController).list();
 			}
 		});
 

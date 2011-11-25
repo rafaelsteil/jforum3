@@ -12,7 +12,6 @@ package net.jforum.controllers;
 
 import java.util.ArrayList;
 
-import net.jforum.controllers.BanlistAdminController;
 import net.jforum.entities.Banlist;
 import net.jforum.repository.BanlistRepository;
 import net.jforum.util.TestCaseUtils;
@@ -22,17 +21,19 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
 public class BanlistAdminControllerTestCase extends AdminTestCase {
+
 	private Mockery context = TestCaseUtils.newMockery();
 	private BanlistAdminController component;
 	private BanlistRepository repository = context
 			.mock(BanlistRepository.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
 
 	public BanlistAdminControllerTestCase() {
 		super(BanlistAdminController.class);

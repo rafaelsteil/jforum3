@@ -23,6 +23,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -31,30 +32,48 @@ import br.com.caelum.vraptor.util.test.MockResult;
 public class MessageControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private I18n i18n = context.mock(I18n.class);
-	private MockResult mockResult = new MockResult();
-	private MessageController action = new MessageController(i18n, mockResult);
+	private Result mockResult = context.mock(MockResult.class);
+	private MessageController controller = new MessageController(i18n,
+			mockResult);
+	private MessageController mockMessageController = context.mock(MessageController.class);
 
 	@Test
 	public void replyWaitingModeration() {
-		context.checking(new Expectations() {{
-			one(i18n).params(URLBuilder.build(Domain.TOPICS, Actions.LIST, 1)); will(returnValue(new Object[] { "url" }));
-			one(i18n).getFormattedMessage("PostShow.waitingModeration", new Object[] { "url" }); will(returnValue("msg moderation 1"));
-			one(mockResult).forwardTo(Actions.MESSAGE);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(i18n).params(
+						URLBuilder.build(Domain.TOPICS, Actions.LIST, 1));
+				will(returnValue(new Object[] { "url" }));
+				one(i18n).getFormattedMessage("PostShow.waitingModeration",
+						new Object[] { "url" });
+				will(returnValue("msg moderation 1"));
+			
+				//one(mockResult).forwardTo(Actions.MESSAGE);
+				one(mockResult.forwardTo(controller));
+				will(returnValue(mockMessageController));
+				one(mockMessageController);
+			}
+		});
 
-		action.replyWaitingModeration(1);
+		controller.replyWaitingModeration(1);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void topicWaitingModeration() {
-		context.checking(new Expectations() {{
-			one(i18n).params(URLBuilder.build(Domain.TOPICS, Actions.LIST, 1)); will(returnValue(new Object[] { "url" }));
-			one(i18n).getFormattedMessage("PostShow.waitingModeration", new Object[] { "url" }); will(returnValue("msg moderation 1"));
-			one(mockResult).forwardTo(Actions.MESSAGE);
-		}});
+		context.checking(new Expectations() {
+			{
+				one(i18n).params(
+						URLBuilder.build(Domain.TOPICS, Actions.LIST, 1));
+				will(returnValue(new Object[] { "url" }));
+				one(i18n).getFormattedMessage("PostShow.waitingModeration",
+						new Object[] { "url" });
+				will(returnValue("msg moderation 1"));
+				one(mockResult).forwardTo(Actions.MESSAGE);
+			}
+		});
 
-		action.topicWaitingModeration(1);
+		controller.topicWaitingModeration(1);
 		context.assertIsSatisfied();
 	}
 
@@ -68,7 +87,7 @@ public class MessageControllerTestCase {
 			}
 		});
 
-		action.accessDenied();
+		controller.accessDenied();
 		context.assertIsSatisfied();
 	}
 

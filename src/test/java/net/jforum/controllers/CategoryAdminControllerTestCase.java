@@ -12,8 +12,6 @@ package net.jforum.controllers;
 
 import java.util.ArrayList;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.controllers.CategoryAdminController;
 import net.jforum.entities.Category;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.services.CategoryService;
@@ -24,18 +22,22 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
  * @author Rafael Steil
  */
 public class CategoryAdminControllerTestCase extends AdminTestCase {
+
 	private Mockery context = TestCaseUtils.newMockery();
-	private CategoryAdminController component;
+	private CategoryAdminController action;
 	private final CategoryRepository repository = context
 			.mock(CategoryRepository.class);
 	private final CategoryService service = context.mock(CategoryService.class);
-	private MockResult mockResult = new MockResult();
+	private CategoryAdminController mockCategoryAdminController = context
+			.mock(CategoryAdminController.class);
+	private Result mockResult = context.mock(MockResult.class);
 
 	public CategoryAdminControllerTestCase() {
 		super(CategoryAdminController.class);
@@ -46,11 +48,13 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).delete(1, 2);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockCategoryAdminController));
+				one(mockCategoryAdminController).list();
 			}
 		});
 
-		component.delete(1, 2);
+		action.delete(1, 2);
 		context.assertIsSatisfied();
 	}
 
@@ -65,11 +69,13 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).add(c);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockCategoryAdminController));
+				one(mockCategoryAdminController).list();
 			}
 		});
 
-		component.addSave(c);
+		action.addSave(c);
 		context.assertIsSatisfied();
 	}
 
@@ -80,11 +86,13 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 				one(repository).get(5);
 				will(returnValue(new Category()));
 				one(mockResult).include("category", new Category());
-				one(mockResult).forwardTo(Actions.ADD);
+				one(mockResult).forwardTo(action);
+				will(returnValue(mockCategoryAdminController));
+				one(mockCategoryAdminController).add();
 			}
 		});
 
-		component.edit(5);
+		action.edit(5);
 		context.assertIsSatisfied();
 	}
 
@@ -96,16 +104,19 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).update(c);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockCategoryAdminController));
+				one(mockCategoryAdminController).list();
 			}
 		});
 
-		component.editSave(c);
+		action.editSave(c);
 		context.assertIsSatisfied();
 	}
 
 	/**
-	 * Test method for {@link net.jforum.controllers.CategoryAdminController#list()}.
+	 * Test method for
+	 * {@link net.jforum.controllers.CategoryAdminController#list()}.
 	 */
 	@Test
 	public void list() {
@@ -118,46 +129,52 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.list();
+		action.list();
 		context.assertIsSatisfied();
 	}
 
 	/**
 	 * Test method for
-	 * {@link net.jforum.controllers.CategoryAdminController#up(java.lang.Integer)}.
+	 * {@link net.jforum.controllers.CategoryAdminController#up(java.lang.Integer)}
+	 * .
 	 */
 	@Test
 	public void up() {
 		context.checking(new Expectations() {
 			{
 				one(service).upCategoryOrder(1);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockCategoryAdminController));
+				one(mockCategoryAdminController).list();
 			}
 		});
 
-		component.up(1);
+		action.up(1);
 		context.assertIsSatisfied();
 	}
 
 	/**
 	 * Test method for
-	 * {@link net.jforum.controllers.CategoryAdminController#down(java.lang.Integer)}.
+	 * {@link net.jforum.controllers.CategoryAdminController#down(java.lang.Integer)}
+	 * .
 	 */
 	@Test
 	public void down() {
 		context.checking(new Expectations() {
 			{
 				one(service).downCategoryOrder(2);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(action);
+				will(returnValue(mockCategoryAdminController));
+				one(mockCategoryAdminController).list();
 			}
 		});
 
-		component.down(2);
+		action.down(2);
 		context.assertIsSatisfied();
 	}
 
 	@Before
 	public void setup() {
-		component = new CategoryAdminController(repository, service, mockResult);
+		action = new CategoryAdminController(repository, service, mockResult);
 	}
 }

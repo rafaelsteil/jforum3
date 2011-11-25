@@ -12,9 +12,7 @@ package net.jforum.controllers;
 
 import java.util.ArrayList;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.PermissionOptions;
-import net.jforum.controllers.GroupAdminController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Group;
@@ -30,6 +28,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -37,7 +36,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class GroupAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private GroupAdminController component;
+	private GroupAdminController controller;
 	private GroupRepository repository = context.mock(GroupRepository.class);
 	private GroupService service = context.mock(GroupService.class);
 	private CategoryRepository categoryRepository = context
@@ -45,7 +44,9 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
+	private GroupAdminController mockGroupAdminController = context
+			.mock(GroupAdminController.class);
 
 	public GroupAdminControllerTestCase() {
 		super(GroupAdminController.class);
@@ -72,7 +73,7 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.permissions(1);
+		controller.permissions(1);
 		context.assertIsSatisfied();
 	}
 
@@ -85,11 +86,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).isAdministrator();
 				will(returnValue(true));
 				one(service).savePermissions(1, permissions);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.permissionsSave(1, permissions);
+		controller.permissionsSave(1, permissions);
 		context.assertIsSatisfied();
 	}
 
@@ -100,11 +103,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).isAdministrator();
 				will(returnValue(true));
 				one(service).delete(1, 2);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.delete(1, 2);
+		controller.delete(1, 2);
 		context.assertIsSatisfied();
 	}
 
@@ -114,11 +119,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 			{
 				one(roleManager).isAdministrator();
 				will(returnValue(false));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.delete(1, 2);
+		controller.delete(1, 2);
 		context.assertIsSatisfied();
 	}
 
@@ -132,7 +139,7 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
@@ -145,11 +152,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				one(repository).get(2);
 				will(returnValue(new Group()));
 				one(mockResult).include("group", new Group());
-				one(mockResult).forwardTo(Actions.ADD);
+				one(mockResult).forwardTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).add();
 			}
 		});
 
-		component.edit(2);
+		controller.edit(2);
 		context.assertIsSatisfied();
 	}
 
@@ -163,11 +172,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				will(returnValue(true));
 
 				one(service).update(group);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.editSave(group);
+		controller.editSave(group);
 		context.assertIsSatisfied();
 	}
 
@@ -183,11 +194,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				will(returnValue(true));
 
 				one(service).update(group);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.editSave(group);
+		controller.editSave(group);
 		context.assertIsSatisfied();
 	}
 
@@ -202,11 +215,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).isGroupManager(group.getId());
 				will(returnValue(false));
 
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.editSave(group);
+		controller.editSave(group);
 		context.assertIsSatisfied();
 	}
 
@@ -217,11 +232,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).isAdministrator();
 				will(returnValue(true));
 				one(service).add(with(aNonNull(Group.class)));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.addSave(new Group());
+		controller.addSave(new Group());
 		context.assertIsSatisfied();
 	}
 
@@ -231,11 +248,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 			{
 				one(roleManager).isAdministrator();
 				will(returnValue(false));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.addSave(new Group());
+		controller.addSave(new Group());
 		context.assertIsSatisfied();
 	}
 
@@ -245,11 +264,13 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 			{
 				one(roleManager).isAdministrator();
 				will(returnValue(false));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockGroupAdminController));
+				one(mockGroupAdminController).list();
 			}
 		});
 
-		component.add();
+		controller.add();
 		context.assertIsSatisfied();
 	}
 
@@ -262,14 +283,14 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.add();
+		controller.add();
 		context.assertIsSatisfied();
 	}
 
 	@Before
 	public void setup() {
-		component = new GroupAdminController(service, repository, sessionManager,
-				categoryRepository, mockResult);
+		controller = new GroupAdminController(service, repository,
+				sessionManager, categoryRepository, mockResult);
 
 		context.checking(new Expectations() {
 			{

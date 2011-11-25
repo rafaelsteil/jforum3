@@ -12,8 +12,6 @@ package net.jforum.controllers;
 
 import java.util.Arrays;
 
-import net.jforum.actions.helpers.Actions;
-import net.jforum.controllers.ForumAdminController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
@@ -29,6 +27,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -36,7 +35,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class ForumAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private ForumAdminController component;
+	private ForumAdminController controller;
 	private CategoryRepository categoryRepository = context
 			.mock(CategoryRepository.class);
 	private ForumService service = context.mock(ForumService.class);
@@ -45,7 +44,9 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private MockResult mockResult = new MockResult();
+	private ForumAdminController mockForumAdminController = context
+			.mock(ForumAdminController.class);
+	private Result mockResult = context.mock(MockResult.class);
 
 	public ForumAdminControllerTestCase() {
 		super(ForumAdminController.class);
@@ -62,11 +63,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).isAdministrator();
 				will(returnValue(true));
 				one(service).delete(1, 2);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.delete(1, 2);
+		controller.delete(1, 2);
 		context.assertIsSatisfied();
 	}
 
@@ -80,11 +83,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
 				will(returnValue(false));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.delete(1, 2);
+		controller.delete(1, 2);
 		context.assertIsSatisfied();
 	}
 
@@ -100,7 +105,7 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
@@ -115,7 +120,7 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.add();
+		controller.add();
 		context.assertIsSatisfied();
 	}
 
@@ -136,11 +141,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(mockResult).include("forum", new Forum());
 				one(mockResult).include("categories",
 						Arrays.asList(new Category()));
-				one(mockResult).forwardTo(Actions.ADD);
+				one(mockResult).forwardTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).add();
 			}
 		});
 
-		component.edit(3);
+		controller.edit(3);
 		context.assertIsSatisfied();
 	}
 
@@ -155,11 +162,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).isAdministrator();
 				will(returnValue(true));
 				one(service).update(with(aNonNull(Forum.class)));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.editSave(new Forum());
+		controller.editSave(new Forum());
 		context.assertIsSatisfied();
 	}
 
@@ -176,7 +185,9 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).getCanModerateForum(0);
 				will(returnValue(true));
 				one(service).update(with(aNonNull(Forum.class)));
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
@@ -184,7 +195,7 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 		forum.setCategory(new Category());
 		forum.getCategory().setId(1);
 
-		component.editSave(forum);
+		controller.editSave(forum);
 		context.assertIsSatisfied();
 	}
 
@@ -205,11 +216,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).getCanModerateForum(0);
 				will(returnValue(true));
 				one(service).update(forum);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.editSave(forum);
+		controller.editSave(forum);
 		context.assertIsSatisfied();
 	}
 
@@ -228,11 +241,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				will(returnValue(true));
 				one(mockResult).include("forum", f);
 				one(service).add(f);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.addSave(f);
+		controller.addSave(f);
 		context.assertIsSatisfied();
 	}
 
@@ -255,11 +270,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				will(returnValue(true));
 				one(mockResult).include("forum", f);
 				one(service).add(f);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.addSave(f);
+		controller.addSave(f);
 		context.assertIsSatisfied();
 	}
 
@@ -282,11 +299,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				will(returnValue(true));
 				one(service).add(forum);
 				one(mockResult).include("forum", forum);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.addSave(forum);
+		controller.addSave(forum);
 		context.assertIsSatisfied();
 	}
 
@@ -301,11 +320,13 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).getCanModerateForum(1);
 				will(returnValue(true));
 				one(service).upForumOrder(1);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.up(1);
+		controller.up(1);
 		context.assertIsSatisfied();
 	}
 
@@ -320,17 +341,19 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 				one(roleManager).getCanModerateForum(2);
 				will(returnValue(true));
 				one(service).downForumOrder(2);
-				one(mockResult).redirectTo(Actions.LIST);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockForumAdminController));
+				one(mockForumAdminController).list();
 			}
 		});
 
-		component.down(2);
+		controller.down(2);
 		context.assertIsSatisfied();
 	}
 
 	@Before
 	public void setup() {
-		component = new ForumAdminController(service, forumRepository,
+		controller = new ForumAdminController(service, forumRepository,
 				categoryRepository, sessionManager, mockResult);
 	}
 }

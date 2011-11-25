@@ -33,6 +33,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -53,8 +54,9 @@ public class ModerationControllerTestCase {
 	private ModerationLogRepository moderationLogRepository = context
 			.mock(ModerationLogRepository.class);
 	private User user = new User();
-	private MockResult mockResult = new MockResult();
-	private ModerationController action = new ModerationController(mockResult,
+	private Result mockResult = context.mock(MockResult.class);
+	private ModerationController mockModerationController = context.mock(ModerationController.class);
+	private ModerationController controller = new ModerationController(mockResult,
 			roleManager, service, categoryRepository, topicRepository,
 			jForumConfig, moderationLogRepository, userSession);
 
@@ -72,7 +74,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.moveTopics(1, "return path", moderationLog, 2, 3, 4);
+		controller.moveTopics(1, "return path", moderationLog, 2, 3, 4);
 		context.assertIsSatisfied();
 	}
 
@@ -86,7 +88,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.moveTopics(1, "return path", moderationLog, 1, 2);
+		controller.moveTopics(1, "return path", moderationLog, 1, 2);
 		context.assertIsSatisfied();
 	}
 
@@ -106,7 +108,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.askMoveDestination("return path", 10, 1, 2, 3);
+		controller.askMoveDestination("return path", 10, 1, 2, 3);
 		context.assertIsSatisfied();
 	}
 
@@ -120,7 +122,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.askMoveDestination("return path", 1, 2, 3);
+		controller.askMoveDestination("return path", 1, 2, 3);
 		context.assertIsSatisfied();
 	}
 
@@ -137,7 +139,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.lockUnlock(1, null, moderationLog, new int[] { 1, 2, 3 });
+		controller.lockUnlock(1, null, moderationLog, new int[] { 1, 2, 3 });
 		context.assertIsSatisfied();
 	}
 
@@ -151,7 +153,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.lockUnlock(1, null, moderationLog, new int[] { 1 });
+		controller.lockUnlock(1, null, moderationLog, new int[] { 1 });
 		context.assertIsSatisfied();
 	}
 
@@ -171,11 +173,13 @@ public class ModerationControllerTestCase {
 						Arrays.asList(new Topic(), new Topic()), moderationLog);
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class).show(1, 0);
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockModerationController));
+				one(mockModerationController).show(1, 0);
 			}
 		});
 
-		action.deleteTopics(1, null, new int[] { 4, 5 }, moderationLog);
+		controller.deleteTopics(1, null, new int[] { 4, 5 }, moderationLog);
 		context.assertIsSatisfied();
 	}
 
@@ -190,7 +194,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.deleteTopics(1, null, new int[] { 4 }, moderationLog);
+		controller.deleteTopics(1, null, new int[] { 4 }, moderationLog);
 		context.assertIsSatisfied();
 	}
 
@@ -206,7 +210,7 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.approve(1, Arrays.asList(new ApproveInfo[0]));
+		controller.approve(1, Arrays.asList(new ApproveInfo[0]));
 	}
 
 	@Test
@@ -220,6 +224,6 @@ public class ModerationControllerTestCase {
 			}
 		});
 
-		action.approve(1, Arrays.asList(new ApproveInfo[0]));
+		controller.approve(1, Arrays.asList(new ApproveInfo[0]));
 	}
 }

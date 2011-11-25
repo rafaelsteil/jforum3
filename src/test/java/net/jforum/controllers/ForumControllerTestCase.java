@@ -13,7 +13,6 @@ package net.jforum.controllers;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import net.jforum.controllers.ForumController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
@@ -41,6 +40,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -59,12 +59,12 @@ public class ForumControllerTestCase {
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private GroupInteractionFilter groupInteractionFilter = context
 			.mock(GroupInteractionFilter.class);
-	private ForumController forumAction;
-	private MockResult mockResult = new MockResult();
+	private ForumController controller;
+	private Result mockResult = context.mock(MockResult.class);
 
 	@Test
 	public void showShouldHaveAccessForumConstraint() throws Exception {
-		Method method = forumAction.getClass().getMethod("show", int.class,
+		Method method = controller.getClass().getMethod("show", int.class,
 				int.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
@@ -100,7 +100,7 @@ public class ForumControllerTestCase {
 			}
 		});
 
-		forumAction.show(1, 0);
+		controller.show(1, 0);
 		context.assertIsSatisfied();
 	}
 
@@ -134,7 +134,7 @@ public class ForumControllerTestCase {
 			}
 		});
 
-		forumAction.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
@@ -186,13 +186,13 @@ public class ForumControllerTestCase {
 			}
 		});
 
-		forumAction.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
 	@Before
 	public void setup() {
-		forumAction = new ForumController(categoryRepository, sessionManager,
+		controller = new ForumController(categoryRepository, sessionManager,
 				forumRepository, userRepository, mostUsersEverOnlineService,
 				config, groupInteractionFilter, mockResult);
 	}
