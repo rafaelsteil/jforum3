@@ -41,6 +41,7 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -55,8 +56,9 @@ public class PrivateMessageControllerTestCase {
 	private PrivateMessageService service = context.mock(PrivateMessageService.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private MockResult mockResult = new MockResult();
-	private PrivateMessageController action = new PrivateMessageController(repository,
+	private Result mockResult = context.mock(MockResult.class);
+	private TopicController mockTopicController = context.mock(TopicController.class);
+	private PrivateMessageController controller = new PrivateMessageController(repository,
 		smilieRepository, userRepository, service, sessionManager, mockResult);
 
 	@Test
@@ -68,7 +70,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).include("post", pm.asPost());
 		}});
 
-		action.review(1);
+		controller.review(1);
 		context.assertIsSatisfied();
 	}
 
@@ -81,7 +83,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).redirectTo(Actions.INBOX);
 		}});
 
-		action.delete(1, 2, 3);
+		controller.delete(1, 2, 3);
 		context.assertIsSatisfied();
 	}
 
@@ -107,7 +109,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).include("post", new Post());
 		}});
 
-		action.read(1);
+		controller.read(1);
 		context.assertIsSatisfied();
 	}
 
@@ -134,7 +136,7 @@ public class PrivateMessageControllerTestCase {
 			ignoring(mockResult);
 		}});
 
-		action.read(1);
+		controller.read(1);
 		context.assertIsSatisfied();
 		Assert.assertEquals(PrivateMessageType.READ, pm.getType());
 	}
@@ -150,7 +152,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).forwardTo(Actions.MESSAGES);
 		}});
 
-		action.sent();
+		controller.sent();
 		context.assertIsSatisfied();
 	}
 
@@ -167,7 +169,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).redirectTo(Actions.INBOX);
 		}});
 
-		action.sendSave(new Post(), new PostFormOptions(), null, 1);
+		controller.sendSave(new Post(), new PostFormOptions(), null, 1);
 		context.assertIsSatisfied();
 	}
 
@@ -177,7 +179,7 @@ public class PrivateMessageControllerTestCase {
 			one(userRepository).getByUsername("invalid user"); will(returnValue(null));
 		}});
 
-		action.sendSave(null, null, "invalid user", 0);
+		controller.sendSave(null, null, "invalid user", 0);
 		context.assertIsSatisfied();
 	}
 
@@ -187,7 +189,7 @@ public class PrivateMessageControllerTestCase {
 			one(userRepository).get(1); will(returnValue(null));
 		}});
 
-		action.sendSave(null, null, null, 1);
+		controller.sendSave(null, null, null, 1);
 		context.assertIsSatisfied();
 	}
 
@@ -206,11 +208,14 @@ public class PrivateMessageControllerTestCase {
 
 			ignoring(mockResult); ignoring(smilieRepository);
 
+			one(mockResult).forwardTo(TopicController.class);
+			will(returnValue(mockTopicController));
+			
 			//TODO pass zero?
-			one(mockResult).forwardTo(TopicController.class).add(0);
+			one(mockTopicController).add(0);
 		}});
 
-		action.sendTo(1);
+		controller.sendTo(1);
 		context.assertIsSatisfied();
 	}
 
@@ -242,7 +247,7 @@ public class PrivateMessageControllerTestCase {
 			ignoring(mockResult); ignoring(smilieRepository);
 		}});
 
-		action.sendTo(1);
+		controller.sendTo(1);
 		context.assertIsSatisfied();
 	}
 
@@ -271,7 +276,7 @@ public class PrivateMessageControllerTestCase {
 			ignoring(mockResult); ignoring(smilieRepository);
 		}});
 
-		action.sendTo(1);
+		controller.sendTo(1);
 		context.assertIsSatisfied();
 	}
 
@@ -287,7 +292,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).include("username", "an user");
 		}});
 
-		action.findUser("an user");
+		controller.findUser("an user");
 		context.assertIsSatisfied();
 	}
 
@@ -308,7 +313,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).include("username", "an user");
 		}});
 
-		action.findUser("an user");
+		controller.findUser("an user");
 		context.assertIsSatisfied();
 	}
 
@@ -318,7 +323,7 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).include("username", null);
 		}});
 
-		action.findUser(null);
+		controller.findUser(null);
 		context.assertIsSatisfied();
 	}
 
@@ -335,11 +340,15 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).include("user", user);
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 
+			
+			one(mockResult).forwardTo(TopicController.class);
+			will(returnValue(mockTopicController));
+			
 			//TODO pass zero?
-			one(mockResult).forwardTo(TopicController.class).add(0);
+			one(mockTopicController).add(0);
 		}});
 
-		action.send();
+		controller.send();
 		context.assertIsSatisfied();
 	}
 
@@ -358,36 +367,36 @@ public class PrivateMessageControllerTestCase {
 
 	@Test
 	public void quoteShouldHaveOwnerConstraint() throws Exception {
-		Method method = action.getClass().getMethod("quote", int.class);
+		Method method = controller.getClass().getMethod("quote", int.class);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(PrivateMessageOwnerRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void replyShouldHaveOwnerConstraint() throws Exception {
-		Method method = action.getClass().getMethod("reply", int.class);
+		Method method = controller.getClass().getMethod("reply", int.class);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(PrivateMessageOwnerRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void readShouldHaveOwnerConstraint() throws Exception {
-		Method method = action.getClass().getMethod("read", int.class);
+		Method method = controller.getClass().getMethod("read", int.class);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(PrivateMessageOwnerRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void reviewShouldHaveOwnerConstraint() throws Exception {
-		Method method = action.getClass().getMethod("review", int.class);
+		Method method = controller.getClass().getMethod("review", int.class);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(PrivateMessageOwnerRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void shouldHaveAuthenticatedConstraintAndDisplayLogin() throws Exception {
-		Assert.assertTrue(action.getClass().isAnnotationPresent(SecurityConstraint.class));
-		SecurityConstraint annotation = action.getClass().getAnnotation(SecurityConstraint.class);
+		Assert.assertTrue(controller.getClass().isAnnotationPresent(SecurityConstraint.class));
+		SecurityConstraint annotation = controller.getClass().getAnnotation(SecurityConstraint.class);
 		Role[] roles = annotation.multiRoles();
 		boolean found = false;
 

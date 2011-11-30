@@ -22,6 +22,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
 
@@ -32,9 +33,10 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private SmilieRepository repository = context.mock(SmilieRepository.class);
 	private SmilieService service = context.mock(SmilieService.class);
-	private MockResult mockResult = new MockResult();
-	private SmilieAdminController smilieAction = new SmilieAdminController(service,
+	private Result mockResult = context.mock(MockResult.class);
+	private SmilieAdminController controller = new SmilieAdminController(service,
 			repository, mockResult);
+	private SmilieAdminController mockSmilieAdminController = context.mock(SmilieAdminController.class);
 
 	public SmilieAdminControllerTestCase() {
 		super(SmilieAdminController.class);
@@ -47,11 +49,13 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 				one(repository).get(1);
 				will(returnValue(new Smilie()));
 				one(mockResult).include("smilie", new Smilie());
-				one(mockResult).forwardTo(SmilieAdminController.class).add();
+				one(mockResult).forwardTo(controller);
+				will(returnValue(mockSmilieAdminController));
+				one(mockSmilieAdminController).add();
 			}
 		});
 
-		smilieAction.edit(1);
+		controller.edit(1);
 		context.assertIsSatisfied();
 	}
 
@@ -61,11 +65,13 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 			{
 				one(service).update(with(aNonNull(Smilie.class)),
 						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(SmilieAdminController.class).list();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockSmilieAdminController));
+				one(mockSmilieAdminController).list();
 			}
 		});
 
-		smilieAction.editSave(new Smilie(), null);
+		controller.editSave(new Smilie(), null);
 		context.assertIsSatisfied();
 	}
 
@@ -74,11 +80,13 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).delete(1, 2, 3);
-				one(mockResult).redirectTo(SmilieAdminController.class).list();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockSmilieAdminController ));
+				one(mockSmilieAdminController).list();
 			}
 		});
 
-		smilieAction.delete(1, 2, 3);
+		controller.delete(1, 2, 3);
 		context.assertIsSatisfied();
 	}
 
@@ -92,7 +100,7 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		smilieAction.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
@@ -102,11 +110,13 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 			{
 				one(service).add(with(aNonNull(Smilie.class)),
 						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(SmilieAdminController.class).list();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockSmilieAdminController));
+				one(mockSmilieAdminController).list();
 			}
 		});
 
-		smilieAction.addSave(new Smilie(), null);
+		controller.addSave(new Smilie(), null);
 		context.assertIsSatisfied();
 	}
 }

@@ -109,7 +109,7 @@ public class EmptyCache implements Cache {
 	/**
 	 * @see org.hibernate.cache.Cache#toMap()
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Map toMap() {
 		return null;
 	}

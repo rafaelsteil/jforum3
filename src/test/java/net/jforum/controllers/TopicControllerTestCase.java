@@ -53,6 +53,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -77,8 +78,10 @@ public class TopicControllerTestCase {
 	private AttachmentService attachmentService = context.mock(AttachmentService.class);
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
     private ForumLimitedTimeRepository forumLimitedTimeRepository = context.mock(ForumLimitedTimeRepository.class);
-    private MockResult mockResult = new MockResult();
-	private TopicController topicAction;
+    private Result mockResult = context.mock(MockResult.class);
+    private TopicController mockTopicController = context.mock(TopicController.class);
+    private MessageController mockMessageController = context.mock(MessageController.class);
+	private TopicController topicController;
 
 	@Test
 	public void replyReview() {
@@ -92,7 +95,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("posts", new ArrayList<Post>());
 		}});
 
-		topicAction.replyReview(1);
+		topicController.replyReview(1);
 		context.assertIsSatisfied();
 	}
 
@@ -102,16 +105,18 @@ public class TopicControllerTestCase {
 
 		context.checking(new Expectations() {{
 			one(topicRepository).get(1); will(returnValue(topic));
-			one(mockResult).redirectTo(MessageController.class).topicWaitingModeration(2);
+			one(mockResult).redirectTo(MessageController.class);
+			will(returnValue(mockMessageController));
+			one(mockMessageController).topicWaitingModeration(2);
 		}});
 
-		topicAction.list(1, 0, false);
+		topicController.list(1, 0, false);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void listShouldHaveAccessForumConstraint() throws Exception {
-		Method method = topicAction.getClass().getMethod("list", int.class, int.class, boolean.class);
+		Method method = topicController.getClass().getMethod("list", int.class, int.class, boolean.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(AccessForumRule.class, method.getAnnotation(SecurityConstraint.class).value());
@@ -120,7 +125,7 @@ public class TopicControllerTestCase {
 
 	@Test
 	public void addShouldHaveCreateNewTopicConstraint() throws Exception {
-		Method method = topicAction.getClass().getMethod("add", int.class);
+		Method method = topicController.getClass().getMethod("add", int.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(CreateNewTopicRule.class, method.getAnnotation(SecurityConstraint.class).value());
@@ -128,7 +133,7 @@ public class TopicControllerTestCase {
 
 	@Test
 	public void addSaveShouldHaveCreateNewTopicConstraint() throws Exception {
-		Method method = topicAction.getClass().getMethod("addSave", Topic.class, Post.class, PostFormOptions.class, List.class);
+		Method method = topicController.getClass().getMethod("addSave", Topic.class, Post.class, PostFormOptions.class, List.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(CreateNewTopicRule.class, method.getAnnotation(SecurityConstraint.class).value());
@@ -156,7 +161,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", topic);
 		}});
 
-		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
+		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
 		context.assertIsSatisfied();
 	}
 
@@ -181,7 +186,7 @@ public class TopicControllerTestCase {
 
 		this.addReplyPaginationRedirect(topic, 4);
 
-		topicAction.replySave(topic, new Post(), new PostFormOptions());
+		topicController.replySave(topic, new Post(), new PostFormOptions());
 		context.assertIsSatisfied();
 	}
 
@@ -211,7 +216,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 		}});
 
-		topicAction.add(1);
+		topicController.add(1);
 		context.assertIsSatisfied();
 	}
 
@@ -222,7 +227,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 		}});
 
-		topicAction.listSmilies();
+		topicController.listSmilies();
 		context.assertIsSatisfied();
 	}
 
@@ -248,7 +253,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", topic);
 		}});
 
-		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
+		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
 		context.assertIsSatisfied();
 		Assert.assertEquals(Topic.TYPE_NORMAL, topic.getType());
 	}
@@ -276,7 +281,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", topic);
 		}});
 
-		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
+		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
 		context.assertIsSatisfied();
 		Assert.assertFalse(topic.isWaitingModeration());
 	}
@@ -303,7 +308,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", topic);
 		}});
 
-		topicAction.addSave(topic, new Post(), new PostFormOptions(), null);
+		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
 		context.assertIsSatisfied();
 		Assert.assertTrue(topic.isWaitingModeration());
 	}
@@ -333,7 +338,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", topic);
 		}});
 
-		topicAction.addSave(topic, post, new PostFormOptions(), null);
+		topicController.addSave(topic, post, new PostFormOptions(), null);
 		context.assertIsSatisfied();
 
 		Assert.assertNotNull(topic.getUser());
@@ -377,7 +382,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("viewPollResults", false);
 		}});
 
-		topicAction.list(1, 0, false);
+		topicController.list(1, 0, false);
 		context.assertIsSatisfied();
 	}
 
@@ -407,7 +412,7 @@ public class TopicControllerTestCase {
 
 		Post post = new Post();
 
-		topicAction.replySave(topic, post, new PostFormOptions());
+		topicController.replySave(topic, post, new PostFormOptions());
 		context.assertIsSatisfied();
 
 		Assert.assertEquals("123", post.getUserIp());
@@ -434,7 +439,7 @@ public class TopicControllerTestCase {
 
 		Post post = new Post(); post.setModerate(false);
 
-		topicAction.replySave(topic, post, new PostFormOptions());
+		topicController.replySave(topic, post, new PostFormOptions());
 		context.assertIsSatisfied();
 		Assert.assertFalse(post.isWaitingModeration());
 	}
@@ -456,7 +461,7 @@ public class TopicControllerTestCase {
 
 		Post post = new Post(); post.setModerate(false);
 
-		topicAction.replySave(topic, post, new PostFormOptions());
+		topicController.replySave(topic, post, new PostFormOptions());
 		context.assertIsSatisfied();
 		Assert.assertTrue(post.isWaitingModeration());
 	}
@@ -474,7 +479,7 @@ public class TopicControllerTestCase {
 
 		Post post = new Post(); post.setModerate(true);
 
-		topicAction.replySave(topic, post, new PostFormOptions());
+		topicController.replySave(topic, post, new PostFormOptions());
 		context.assertIsSatisfied();
 	}
 
@@ -502,10 +507,12 @@ public class TopicControllerTestCase {
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
 
 			//TODO pass zero?
-			one(mockResult).redirectTo(TopicController.class).add(0);
+			one(mockResult).redirectTo(topicController);
+			will(returnValue(mockTopicController));
+			one(mockTopicController).add(0);
 		}});
 
-		topicAction.reply(1);
+		topicController.reply(1);
 		context.assertIsSatisfied();
 	}
 
@@ -531,17 +538,21 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", post.getTopic());
 			one(mockResult).include("forum", post.getForum());
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
+			
+			one(mockResult).redirectTo(topicController);
+			will(returnValue(mockTopicController));
+			
 			//TODO pass zero?
-			one(mockResult).redirectTo(TopicController.class).add(0);
+			one(mockTopicController).add(0);
 		}});
 
-		topicAction.quote(1);
+		topicController.quote(1);
 		context.assertIsSatisfied();
 	}
 
 	@Before
 	public void setup() {
-		topicAction = new TopicController(mockResult, config, topicService,
+		topicController = new TopicController(mockResult, config, topicService,
 			forumRepository, smilieRepository, postRepository, topicRepository, categoryRepository,
 			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request);
 	}

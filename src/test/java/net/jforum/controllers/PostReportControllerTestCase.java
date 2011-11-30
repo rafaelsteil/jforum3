@@ -37,6 +37,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -49,8 +50,9 @@ public class PostReportControllerTestCase {
 	private RoleManager roleManager = mockery.mock(RoleManager.class);
 	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
 	private JForumConfig config = mockery.mock(JForumConfig.class);
-	private MockResult mockResult = new MockResult();
-	private PostReportController action = new PostReportController(repository, sessionManager, config, mockResult);
+	private Result mockResult = mockery.mock(MockResult.class);
+	private PostReportController mockPostReportController = mockery.mock(PostReportController.class);
+	private PostReportController controller = new PostReportController(repository, sessionManager, config, mockResult);
 
 	@Test
 	public void listResolved() {
@@ -63,7 +65,7 @@ public class PostReportControllerTestCase {
 			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
-		action.listResolved(0);
+		controller.listResolved(0);
 		mockery.assertIsSatisfied();
 	}
 
@@ -76,7 +78,7 @@ public class PostReportControllerTestCase {
 	}
 
 	private void assertMethodModerationRule(String methodName, Class<?>... argumentTypes) throws Exception {
-		Method method = action.getClass().getMethod(methodName, argumentTypes);
+		Method method = controller.getClass().getMethod(methodName, argumentTypes);
 		Assert.assertNotNull(methodName, method);
 		Assert.assertTrue(methodName, method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(methodName, ModerationRule.class, method.getAnnotation(SecurityConstraint.class).value());
@@ -88,7 +90,7 @@ public class PostReportControllerTestCase {
 			one(userSession).isLogged(); will(returnValue(false));
 		}});
 
-		action.report(1, "x");
+		controller.report(1, "x");
 		mockery.assertIsSatisfied();
 	}
 
@@ -100,7 +102,7 @@ public class PostReportControllerTestCase {
 			one(repository).add(with(any(PostReport.class)));
 		}});
 
-		action.report(1, "x");
+		controller.report(1, "x");
 		mockery.assertIsSatisfied();
 	}
 
@@ -118,10 +120,12 @@ public class PostReportControllerTestCase {
 
 			one(repository).get(1); will(returnValue(report));
 
-			one(mockResult).redirectTo(PostReportController.class).list();
+			one(mockResult).redirectTo(controller);
+			will(returnValue(mockPostReportController));
+			one(mockPostReportController).list();
 		}});
 
-		action.delete(1);
+		controller.delete(1);
 		mockery.assertIsSatisfied();
 	}
 
@@ -139,10 +143,12 @@ public class PostReportControllerTestCase {
 
 			one(repository).get(1); will(returnValue(report));
 			one(repository).remove(report);
-			one(mockResult).redirectTo(PostReportController.class).list();
+			one(mockResult).redirectTo(controller);
+			will(returnValue(mockPostReportController));
+			one(mockPostReportController).list();
 		}});
 
-		action.delete(1);
+		controller.delete(1);
 		mockery.assertIsSatisfied();
 	}
 
@@ -158,7 +164,7 @@ public class PostReportControllerTestCase {
 			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
-		action.list();
+		controller.list();
 		mockery.assertIsSatisfied();
 	}
 
@@ -169,7 +175,7 @@ public class PostReportControllerTestCase {
 			one(repository).getAll(PostReportStatus.UNRESOLVED, new int[] {});
 		}});
 
-		action.list();
+		controller.list();
 		mockery.assertIsSatisfied();
 	}
 
@@ -181,7 +187,7 @@ public class PostReportControllerTestCase {
 			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
-		action.list();
+		controller.list();
 		mockery.assertIsSatisfied();
 	}
 
@@ -194,7 +200,7 @@ public class PostReportControllerTestCase {
 			one(mockResult).include("reports", new ArrayList<PostReport>());
 		}});
 
-		action.list();
+		controller.list();
 		mockery.assertIsSatisfied();
 	}
 

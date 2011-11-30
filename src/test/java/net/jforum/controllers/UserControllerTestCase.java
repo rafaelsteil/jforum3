@@ -42,6 +42,7 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
 
@@ -60,9 +61,11 @@ public class UserControllerTestCase {
 	private AvatarService avatarService = context.mock(AvatarService.class);
 	private User user = new User();
 	private RankingRepository rankingRepository = context.mock(RankingRepository.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
 	private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-	private UserController userAction = new UserController(userRepository, userSession, userService, sessionManager,
+	private UserController mockUserController = context.mock(UserController.class);
+	private ForumController mockForumController = context.mock(ForumController.class);
+	private UserController userController = new UserController(userRepository, userSession, userService, sessionManager,
 		config, lostPasswordService, avatarService, rankingRepository, mockResult, mockRequest);
 
 	@Test
@@ -77,7 +80,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("avatars", new ArrayList<Avatar>());
 		}});
 
-		userAction.edit(1);
+		userController.edit(1);
 		context.assertIsSatisfied();
 	}
 
@@ -92,10 +95,12 @@ public class UserControllerTestCase {
 			one(roleManager).isCoAdministrator(); will(returnValue(false));
 			one(userService).update(user, false);
 			one(config).getValue(ConfigKeys.AUTHENTICATION_TYPE);
-			one(mockResult).redirectTo(UserController.class).edit(user.getId());
+			one(mockResult).redirectTo(userController);
+			will(returnValue(mockUserController));
+			one(mockUserController).edit(user.getId());
 		}});
 
-		userAction.editSave(user,null, null, null);
+		userController.editSave(user,null, null, null);
 		context.assertIsSatisfied();
 	}
 
@@ -105,7 +110,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("hash", "123");
 		}});
 
-		userAction.recoverPassword("123");
+		userController.recoverPassword("123");
 		context.assertIsSatisfied();
 	}
 
@@ -117,7 +122,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("message", "PasswordRecovery.invalidData");
 		}});
 
-		userAction.recoverPasswordValidate("hash", "user", "123");
+		userController.recoverPasswordValidate("hash", "user", "123");
 		context.assertIsSatisfied();
 	}
 
@@ -128,7 +133,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("message", "PasswordRecovery.ok");
 		}});
 
-		userAction.recoverPasswordValidate("hash", "user", "123");
+		userController.recoverPasswordValidate("hash", "user", "123");
 		context.assertIsSatisfied();
 	}
 
@@ -139,7 +144,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("success", true);
 		}});
 
-		userAction.lostPasswordSend("username", "email");
+		userController.lostPasswordSend("username", "email");
 		context.assertIsSatisfied();
 	}
 
@@ -150,7 +155,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("returnPath", "some referer");
 		}});
 
-		userAction.login(null);
+		userController.login(null);
 		context.assertIsSatisfied();
 	}
 
@@ -160,7 +165,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("returnPath", "some return path");
 		}});
 
-		userAction.login("some return path");
+		userController.login("some return path");
 		context.assertIsSatisfied();
 	}
 
@@ -170,13 +175,13 @@ public class UserControllerTestCase {
 			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(true));
 		}});
 
-		userAction.login(null);
+		userController.login(null);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void editShouldHaveEditUserRule() throws Exception {
-		Method method = userAction.getClass().getMethod("edit", int.class);
+		Method method = userController.getClass().getMethod("edit", int.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
 		Assert.assertEquals(EditUserRule.class, method.getAnnotation(SecurityConstraint.class).value());
@@ -184,7 +189,7 @@ public class UserControllerTestCase {
 
 	@Test
 	public void editSaveShouldHaveEditUserRule() throws Exception {
-		Method method = userAction.getClass().getMethod("editSave", User.class, Integer.class,
+		Method method = userController.getClass().getMethod("editSave", User.class, Integer.class,
 			UploadedFile.class, Integer.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
@@ -200,7 +205,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("users", new ArrayList<User>());
 		}});
 
-		userAction.list(0);
+		userController.list(0);
 		context.assertIsSatisfied();
 	}
 
@@ -220,7 +225,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
 		}});
 
-		userAction.list(0);
+		userController.list(0);
 		context.assertIsSatisfied();
 	}
 
@@ -243,7 +248,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
 		}});
 
-		userAction.list(0);
+		userController.list(0);
 		context.assertIsSatisfied();
 	}
 
@@ -261,10 +266,13 @@ public class UserControllerTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
-			one(mockResult).redirectTo(ForumController.class).list();
+			
+			one(mockResult).redirectTo(ForumController.class);
+			will(returnValue(mockForumController));
+			one(mockForumController).list();
 		}});
 
-		userAction.logout();
+		userController.logout();
 		context.assertIsSatisfied();
 	}
 
@@ -276,7 +284,7 @@ public class UserControllerTestCase {
 			one(mockResult).forwardTo(Actions.LOGIN);
 		}});
 
-		userAction.authenticateUser("user", "passwd", false, null);
+		userController.authenticateUser("user", "passwd", false, null);
 		context.assertIsSatisfied();
 	}
 
@@ -297,10 +305,12 @@ public class UserControllerTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_ID); will(returnValue("z"));
 			one(userSession).addCookie("z", Integer.toString(user.getId()));
 			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(ForumController.class).list();
+			one(mockResult).redirectTo(ForumController.class);
+			will(returnValue(mockForumController));
+			one(mockForumController).list();
 		}});
 
-		userAction.authenticateUser("user", "passwd", true, null);
+		userController.authenticateUser("user", "passwd", true, null);
 		context.assertIsSatisfied();
 		Assert.assertEquals("456", user.getSecurityHash());
 	}
@@ -318,10 +328,12 @@ public class UserControllerTestCase {
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
 			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(ForumController.class).list();
+			one(mockResult).redirectTo(ForumController.class);
+			will(returnValue(mockForumController));
+			one(mockForumController).list();
 		}});
 
-		userAction.authenticateUser("user", "passwd", false, null);
+		userController.authenticateUser("user", "passwd", false, null);
 		context.assertIsSatisfied();
 	}
 
@@ -333,7 +345,7 @@ public class UserControllerTestCase {
 			one(mockResult).redirectTo("return path");
 		}});
 
-		userAction.authenticateUser("user1", "pass1", false, "return path");
+		userController.authenticateUser("user1", "pass1", false, "return path");
 		context.assertIsSatisfied();
 	}
 
@@ -341,10 +353,12 @@ public class UserControllerTestCase {
 	public void registrationCompletedWithAnonymousUserExpectRedirect() {
 		context.checking(new Expectations() {{
 			one(userSession).isLogged(); will(returnValue(false));
-			one(mockResult).redirectTo(UserController.class).insert();
+			one(mockResult).redirectTo(userController);
+			will(returnValue(mockUserController));
+			one(mockUserController).insert();
 		}});
 
-		userAction.registrationCompleted();
+		userController.registrationCompleted();
 		context.assertIsSatisfied();
 	}
 
@@ -356,7 +370,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("user", new User());
 		}});
 
-		userAction.registrationCompleted();
+		userController.registrationCompleted();
 		context.assertIsSatisfied();
 	}
 
@@ -366,10 +380,12 @@ public class UserControllerTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(1));
 			one(mockResult).include("error", "User.usernameTooBig");
-			one(mockResult).redirectTo(UserController.class).insert();
+			one(mockResult).redirectTo(userController);
+			will(returnValue(mockUserController));
+			one(mockUserController).insert();
 		}});
 
-		userAction.insertSave(new User() {{ setUsername("username1"); }});
+		userController.insertSave(new User() {{ setUsername("username1"); }});
 		context.assertIsSatisfied();
 	}
 
@@ -382,7 +398,7 @@ public class UserControllerTestCase {
 			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
-		userAction.insertSave(new User() {{ setUsername("<username"); }});
+		userController.insertSave(new User() {{ setUsername("<username"); }});
 		context.assertIsSatisfied();
 	}
 
@@ -395,7 +411,7 @@ public class UserControllerTestCase {
 			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
-		userAction.insertSave(new User() {{ setUsername(">username"); }});
+		userController.insertSave(new User() {{ setUsername(">username"); }});
 		context.assertIsSatisfied();
 	}
 
@@ -409,7 +425,7 @@ public class UserControllerTestCase {
 			one(mockResult).redirectTo(UserController.class).insert();
 		}});
 
-		userAction.insertSave(new User() {{ setUsername("username"); }});
+		userController.insertSave(new User() {{ setUsername("username"); }});
 		context.assertIsSatisfied();
 	}
 
@@ -423,10 +439,12 @@ public class UserControllerTestCase {
 			one(userRepository).isUsernameAvailable("username", null); will(returnValue(true));
 			one(userSession).becomeLogged();
 			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(UserController.class).registrationCompleted();
+			one(mockResult).redirectTo(userController);
+			will(returnValue(mockUserController));
+			one(mockUserController).registrationCompleted();
 		}});
 
-		userAction.insertSave(new User() {{ setId(1); setUsername("username"); }});
+		userController.insertSave(new User() {{ setId(1); setUsername("username"); }});
 
 		context.assertIsSatisfied();
 	}
@@ -453,7 +471,7 @@ public class UserControllerTestCase {
 			one(mockResult).include("canEdit", true);
 		}});
 
-		userAction.profile(1);
+		userController.profile(1);
 		context.assertIsSatisfied();
 	}
 
@@ -465,7 +483,7 @@ public class UserControllerTestCase {
 			one(mockResult).redirectTo(MessageController.class).accessDenied();
 		}});
 
-		userAction.profile(1);
+		userController.profile(1);
 		context.assertIsSatisfied();
 	}
 }

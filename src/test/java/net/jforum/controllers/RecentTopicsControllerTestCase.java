@@ -24,6 +24,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -35,7 +36,7 @@ public class RecentTopicsControllerTestCase {
 			.mock(RecentTopicsRepository.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserSession userSession = context.mock(UserSession.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
 	private RecentTopicsController component = new RecentTopicsController(repository,
 			config, userSession, mockResult);
 

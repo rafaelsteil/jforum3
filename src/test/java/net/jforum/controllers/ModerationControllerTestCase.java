@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.jforum.actions.helpers.ApproveInfo;
-import net.jforum.controllers.ForumController;
-import net.jforum.controllers.ModerationController;
 import net.jforum.entities.Category;
 import net.jforum.entities.ModerationLog;
 import net.jforum.entities.Topic;
@@ -55,10 +53,11 @@ public class ModerationControllerTestCase {
 			.mock(ModerationLogRepository.class);
 	private User user = new User();
 	private Result mockResult = context.mock(MockResult.class);
-	private ModerationController mockModerationController = context.mock(ModerationController.class);
-	private ModerationController controller = new ModerationController(mockResult,
-			roleManager, service, categoryRepository, topicRepository,
-			jForumConfig, moderationLogRepository, userSession);
+	private ForumController mockForumController = context
+			.mock(ForumController.class);
+	private ModerationController controller = new ModerationController(
+			mockResult, roleManager, service, categoryRepository,
+			topicRepository, jForumConfig, moderationLogRepository, userSession);
 
 	@Test
 	public void moveTopics() {
@@ -135,7 +134,10 @@ public class ModerationControllerTestCase {
 				one(roleManager).getCanLockUnlockTopics();
 				will(returnValue(true));
 				one(service).lockUnlock(new int[] { 1, 2, 3 }, moderationLog);
-				ignoring(mockResult);
+				// ignoring(mockResult);
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
+				one(mockForumController).show(1, 0);
 			}
 		});
 
@@ -149,7 +151,10 @@ public class ModerationControllerTestCase {
 			{
 				one(roleManager).getCanLockUnlockTopics();
 				will(returnValue(false));
-				ignoring(mockResult);
+				// ignoring(mockResult);
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
+				one(mockForumController).show(1, 0);
 			}
 		});
 
@@ -172,10 +177,11 @@ public class ModerationControllerTestCase {
 				one(service).deleteTopics(
 						Arrays.asList(new Topic(), new Topic()), moderationLog);
 
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
+
 				// TODO pass zero?
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockModerationController));
-				one(mockModerationController).show(1, 0);
+				one(mockForumController).show(1, 0);
 			}
 		});
 
@@ -189,8 +195,11 @@ public class ModerationControllerTestCase {
 			{
 				one(roleManager).getCanDeletePosts();
 				will(returnValue(false));
+
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class).show(1, 0);
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
+				one(mockForumController).show(1, 0);
 			}
 		});
 
@@ -205,8 +214,11 @@ public class ModerationControllerTestCase {
 				one(roleManager).getCanApproveMessages();
 				will(returnValue(true));
 				one(service).doApproval(1, Arrays.asList(new ApproveInfo[0]));
+
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class).show(1, 0);
+				one(mockForumController).show(1, 0);
 			}
 		});
 
@@ -219,8 +231,10 @@ public class ModerationControllerTestCase {
 			{
 				one(roleManager).getCanApproveMessages();
 				will(returnValue(false));
-				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class).show(1, 0);
+
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
+				one(mockForumController).show(1, 0);
 			}
 		});
 

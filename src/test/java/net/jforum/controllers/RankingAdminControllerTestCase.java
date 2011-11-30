@@ -23,6 +23,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -30,11 +31,12 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class RankingAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private RankingAdminController component;
+	private RankingAdminController controller;
 	private RankingRepository repository = context
 			.mock(RankingRepository.class);
 	private RankingService service = context.mock(RankingService.class);
-	private MockResult mockResult = new MockResult();
+	private RankingAdminController mockRankingAdminController = context.mock(RankingAdminController.class);
+	private Result mockResult = context.mock(MockResult.class);
 
 	public RankingAdminControllerTestCase() {
 		super(RankingAdminController.class);
@@ -54,11 +56,13 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).add(with(aNonNull(Ranking.class)));
-				one(mockResult).redirectTo(RankingAdminController.class).list();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockRankingAdminController));
+				one(mockRankingAdminController).list();
 			}
 		});
 
-		component.addSave(new Ranking());
+		controller.addSave(new Ranking());
 		context.assertIsSatisfied();
 	}
 
@@ -69,11 +73,13 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 				one(repository).get(1);
 				will(returnValue(new Ranking()));
 				one(mockResult).include("ranking", new Ranking());
-				one(mockResult).redirectTo(RankingAdminController.class).add();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockRankingAdminController));
+				one(mockRankingAdminController).add();
 			}
 		});
 
-		component.edit(1);
+		controller.edit(1);
 		context.assertIsSatisfied();
 	}
 
@@ -82,11 +88,13 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).update(with(aNonNull(Ranking.class)));
-				one(mockResult).redirectTo(RankingAdminController.class).list();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockRankingAdminController));
+				one(mockRankingAdminController).list();
 			}
 		});
 
-		component.editSave(new Ranking());
+		controller.editSave(new Ranking());
 		context.assertIsSatisfied();
 	}
 
@@ -95,11 +103,13 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 		context.checking(new Expectations() {
 			{
 				one(service).delete(1, 2, 3, 4);
-				one(mockResult).redirectTo(RankingAdminController.class).list();
+				one(mockResult).redirectTo(controller);
+				will(returnValue(mockRankingAdminController));
+				one(mockRankingAdminController).list();
 			}
 		});
 
-		component.delete(1, 2, 3, 4);
+		controller.delete(1, 2, 3, 4);
 		context.assertIsSatisfied();
 	}
 
@@ -114,12 +124,12 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 			}
 		});
 
-		component.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
 	@Before
 	public void setup() {
-		component = new RankingAdminController(repository, service, mockResult);
+		controller = new RankingAdminController(repository, service, mockResult);
 	}
 }

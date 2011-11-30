@@ -23,6 +23,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -34,7 +35,7 @@ public class RSSControllerTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
 	private RSSController action = new RSSController(mockResult, rssService,
 			userSession, config);
 

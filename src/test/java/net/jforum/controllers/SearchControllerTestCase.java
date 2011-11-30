@@ -34,6 +34,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -48,8 +49,8 @@ public class SearchControllerTestCase {
 			.mock(SearchRepository.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private MockResult mockResult = new MockResult();
-	private SearchController action = new SearchController(categoryRepository,
+	private Result mockResult = context.mock(MockResult.class);
+	private SearchController controller = new SearchController(categoryRepository,
 			config, searchRepository, userSession, mockResult);
 
 	@Test
@@ -62,7 +63,7 @@ public class SearchControllerTestCase {
 
 		SearchParams params = new SearchParams();
 		params.setQuery("");
-		action.execute(params);
+		controller.execute(params);
 	}
 
 	@Test
@@ -98,7 +99,7 @@ public class SearchControllerTestCase {
 			}
 		});
 
-		action.execute(params);
+		controller.execute(params);
 		context.assertIsSatisfied();
 		Assert.assertEquals(2, result.getTotalRecords());
 		Assert.assertEquals(2, result.getResults().size());
@@ -118,7 +119,7 @@ public class SearchControllerTestCase {
 			}
 		});
 
-		action.filters();
+		controller.filters();
 		context.assertIsSatisfied();
 	}
 

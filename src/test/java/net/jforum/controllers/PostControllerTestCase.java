@@ -35,6 +35,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -48,9 +49,11 @@ public class PostControllerTestCase {
 	private PostService postService = context.mock(PostService.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserSession userSession = context.mock(UserSession.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(MockResult.class);
+	private TopicController mockTopicController = context.mock(TopicController.class);
+	private ForumController mockForumController = context.mock(ForumController.class);
 
-	private PostController component = new PostController(postRepository,
+	private PostController action = new PostController(postRepository,
 		smilieRepository, postService, config, userSession, null, null, mockResult);
 	private ModerationLog moderationLog = new ModerationLog();
 
@@ -87,7 +90,7 @@ public class PostControllerTestCase {
 
 		this.redirectToPage(post.getTopic(), expectedPage);
 
-		component.delete(2);
+		action.delete(2);
 		context.assertIsSatisfied();
 	}
 
@@ -107,12 +110,14 @@ public class PostControllerTestCase {
 															// event dispatch
 
 				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class).show(
+				one(mockResult).redirectTo(ForumController.class);
+				will(returnValue(mockForumController));
+				one(mockForumController).show(
 						post.getTopic().getForum().getId(), 0);
 			}
 		});
 
-		component.delete(2);
+		action.delete(2);
 		context.assertIsSatisfied();
 	}
 
@@ -133,13 +138,14 @@ public class PostControllerTestCase {
 						new ArrayList<AttachedFile>(), moderationLog);
 
 				// TODO pass zero and true?
-				one(mockResult).redirectTo(TopicController.class).list(
-						post.getTopic().getId(), 0, true);
+				one(mockResult).redirectTo(TopicController.class);
+				will(returnValue(mockTopicController));
+				one(mockTopicController).list(post.getTopic().getId(), 0, true);
 
 			}
 		});
 
-		component.editSave(post, options, null, moderationLog);
+		action.editSave(post, options, null, moderationLog);
 		context.assertIsSatisfied();
 	}
 
@@ -174,11 +180,13 @@ public class PostControllerTestCase {
 				one(mockResult).include("smilies", new ArrayList<Smilie>());
 
 				// TODO pass zero?
-				one(mockResult).forwardTo(TopicController.class).add(0);
+				one(mockResult).forwardTo(TopicController.class);
+				will(returnValue(mockTopicController));
+				one(mockTopicController).add(0);
 			}
 		});
 
-		component.edit(1);
+		action.edit(1);
 		context.assertIsSatisfied();
 	}
 

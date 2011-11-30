@@ -52,7 +52,7 @@ import org.hibernate.type.Type;
 /**
  * @author Rafael Steil
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes") 
 public class FakeSessionFactory implements SessionFactoryImplementor {
 
 	/**
