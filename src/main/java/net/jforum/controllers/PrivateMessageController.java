@@ -27,7 +27,6 @@ import net.jforum.entities.PrivateMessage;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PrivateMessageRepository;
-import net.jforum.repository.SmilieRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.AuthenticatedRule;
 import net.jforum.security.PrivateMessageEnabledRule;
@@ -47,25 +46,20 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.PRIVATE_MESSAGES)
-// @InterceptedBy({ MultipartRequestInterceptor.class,
-// ActionSecurityInterceptor.class, MethodSecurityInterceptor.class })
 @SecurityConstraint(multiRoles = {
 		@Role(value = AuthenticatedRule.class, displayLogin = true),
 		@Role(PrivateMessageEnabledRule.class) })
 public class PrivateMessageController {
 	private PrivateMessageRepository repository;
 	private UserRepository userRepository;
-	private SmilieRepository smilieRepository;
 	private PrivateMessageService service;
 	private SessionManager sessionManager;
 	private final Result result;
 
 	public PrivateMessageController(PrivateMessageRepository repository,
-			SmilieRepository smilieRepository, UserRepository userRepository,
-			PrivateMessageService service, SessionManager sessionManager,
-			Result result) {
+			UserRepository userRepository, PrivateMessageService service,
+			SessionManager sessionManager, Result result) {
 		this.repository = repository;
-		this.smilieRepository = smilieRepository;
 		this.userRepository = userRepository;
 		this.service = service;
 		this.sessionManager = sessionManager;
@@ -74,7 +68,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Delete a set of private message
-	 * 
+	 *
 	 * @param ids
 	 *            the id of the messages to delete
 	 */
@@ -86,7 +80,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Shows the page to review a private message while writing a reply
-	 * 
+	 *
 	 * @param id
 	 *            the id of the message being replied
 	 */
@@ -99,7 +93,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Shows the page to quote a private message
-	 * 
+	 *
 	 * @param id
 	 *            the id of the message
 	 */
@@ -115,7 +109,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Shows the page to reply a private message
-	 * 
+	 *
 	 * @param id
 	 *            the id of the message to reply
 	 */
@@ -131,7 +125,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Shows the page to read a specific message
-	 * 
+	 *
 	 * @param id
 	 *            the message id
 	 */
@@ -160,7 +154,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Send a private message to some user
-	 * 
+	 *
 	 * @param post
 	 *            the subject and the text
 	 * @param options
@@ -197,7 +191,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Shows the page to search for users
-	 * 
+	 *
 	 * @param username
 	 *            if set, search for this username
 	 */
@@ -245,10 +239,7 @@ public class PrivateMessageController {
 		this.result.include("post", new Post());
 		this.result.include("isPrivateMessage", true);
 		this.result.include("attachmentsEnabled", false);
-		this.result.include("user", this.sessionManager.getUserSession()
-				.getUser());
-		this.result.include("smilies", this.smilieRepository.getAllSmilies());
-		// this.viewService.renderView(Domain.TOPICS, Actions.ADD);
+		this.result.include("user", this.sessionManager.getUserSession().getUser());
 
 		// TODO pass zero?
 		this.result.forwardTo(TopicController.class).add(0);
@@ -256,7 +247,7 @@ public class PrivateMessageController {
 
 	/**
 	 * Send a private message to a specific user
-	 * 
+	 *
 	 * @param userId
 	 */
 	public void sendTo(int userId) {

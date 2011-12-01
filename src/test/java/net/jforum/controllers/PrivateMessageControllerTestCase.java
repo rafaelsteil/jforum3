@@ -23,11 +23,9 @@ import net.jforum.entities.Group;
 import net.jforum.entities.Post;
 import net.jforum.entities.PrivateMessage;
 import net.jforum.entities.PrivateMessageType;
-import net.jforum.entities.Smilie;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PrivateMessageRepository;
-import net.jforum.repository.SmilieRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.AuthenticatedRule;
 import net.jforum.security.PrivateMessageOwnerRule;
@@ -52,14 +50,13 @@ public class PrivateMessageControllerTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private PrivateMessageRepository repository = context.mock(PrivateMessageRepository.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
-	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
 	private PrivateMessageService service = context.mock(PrivateMessageService.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private Result mockResult = context.mock(MockResult.class);
 	private TopicController mockTopicController = context.mock(TopicController.class);
 	private PrivateMessageController controller = new PrivateMessageController(repository,
-		smilieRepository, userRepository, service, sessionManager, mockResult);
+		userRepository, service, sessionManager, mockResult);
 
 	@Test
 	public void review() {
@@ -91,18 +88,8 @@ public class PrivateMessageControllerTestCase {
 	public void readExpectSuccess() {
 		context.checking(new Expectations() {{
 			PrivateMessage pm = new PrivateMessage();
-			pm.setToUser(new User() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(1); }});
-			pm.setFromUser(new User() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(3); }});
+			pm.setToUser(new User() {{ setId(1); }});
+			pm.setFromUser(new User() {{ setId(3); }});
 
 			one(repository).get(1); will(returnValue(pm));
 			one(mockResult).include("pm", pm);
@@ -116,22 +103,11 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void readStatusIsNewShouldMarkAsRead() {
 		final PrivateMessage pm = new PrivateMessage();
-		pm.setToUser(new User() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
-		pm.setFromUser(new User() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(3); }});
+		pm.setToUser(new User() {{ setId(1); }});
+		pm.setFromUser(new User() {{ setId(3); }});
 		pm.setType(PrivateMessageType.NEW);
 
 		context.checking(new Expectations() {{
-
 			one(repository).get(1); will(returnValue(pm));
 			ignoring(mockResult);
 		}});
@@ -205,12 +181,14 @@ public class PrivateMessageControllerTestCase {
 
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
 			one(mockResult).include("pmRecipient", recipient);
-
-			ignoring(mockResult); ignoring(smilieRepository);
+			one(mockResult).include("isPrivateMessage", true);
+			one(mockResult).include("attachmentsEnabled", false);
+			one(mockResult).include("user", recipient);
+			one(mockResult).include("post", new Post());
 
 			one(mockResult).forwardTo(TopicController.class);
 			will(returnValue(mockTopicController));
-			
+
 			//TODO pass zero?
 			one(mockTopicController).add(0);
 		}});
@@ -244,7 +222,7 @@ public class PrivateMessageControllerTestCase {
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
 			one(mockResult).forwardTo("sendToDenied");
 
-			ignoring(mockResult); ignoring(smilieRepository);
+			ignoring(mockResult);
 		}});
 
 		controller.sendTo(1);
@@ -273,7 +251,7 @@ public class PrivateMessageControllerTestCase {
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
 			one(mockResult).forwardTo("sendToDenied");
 
-			ignoring(mockResult); ignoring(smilieRepository);
+			ignoring(mockResult);
 		}});
 
 		controller.sendTo(1);
@@ -333,17 +311,14 @@ public class PrivateMessageControllerTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			User user = new User(); user.setId(1);
 			one(userSession).getUser(); will(returnValue(user));
-			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
 			one(mockResult).include("post", new Post());
 			one(mockResult).include("isPrivateMessage", true);
 			one(mockResult).include("attachmentsEnabled", false);
 			one(mockResult).include("user", user);
-			one(mockResult).include("smilies", new ArrayList<Smilie>());
 
-			
 			one(mockResult).forwardTo(TopicController.class);
 			will(returnValue(mockTopicController));
-			
+
 			//TODO pass zero?
 			one(mockTopicController).add(0);
 		}});
