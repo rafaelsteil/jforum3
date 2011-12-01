@@ -333,27 +333,20 @@ public class TopicController {
 	/**
 	 * Saves a new topic.
 	 *
-	 * @param topic
-	 *            the topic to save.
-	 * @param post
-	 *            the post itself
-	 * @param options
-	 *            the formatting options
+	 * @param topic the topic to save.
+	 * @param post the post itself
+	 * @param opti the formatting options
 	 */
 	@SecurityConstraint(CreateNewTopicRule.class)
 	public void addSave(Topic topic, Post post, PostFormOptions options,
 			List<PollOption> pollOptions) {
 
-		// TODO verify this -> @Parameter(key = "pollOptions", create = true)
-
 		ActionUtils.definePostOptions(post, options);
 		UserSession userSession = this.sessionManager.getUserSession();
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
 
-		if (userSession.getRoleManager().isAttachmentsAlllowed(
-				topic.getForum().getId())) {
-			attachments = this.attachmentService
-					.processNewAttachments(this.request);
+		if (userSession.getRoleManager().isAttachmentsAlllowed(topic.getForum().getId())) {
+			attachments = this.attachmentService.processNewAttachments(this.request);
 		}
 
 		topic.setType(options.getTopicType());
@@ -368,8 +361,7 @@ public class TopicController {
 			topic.setPendingModeration(true);
 		}
 
-		if (!userSession.getRoleManager()
-				.getCanCreateStickyAnnouncementTopics()) {
+		if (!userSession.getRoleManager().getCanCreateStickyAnnouncementTopics()) {
 			topic.setType(Topic.TYPE_NORMAL);
 		}
 

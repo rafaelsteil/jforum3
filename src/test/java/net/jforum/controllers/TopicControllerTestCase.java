@@ -79,7 +79,6 @@ public class TopicControllerTestCase {
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
     private ForumLimitedTimeRepository forumLimitedTimeRepository = context.mock(ForumLimitedTimeRepository.class);
     private Result mockResult = context.mock(MockResult.class);
-    private TopicController mockTopicController = context.mock(TopicController.class);
     private MessageController mockMessageController = context.mock(MessageController.class);
 	private TopicController topicController;
 
@@ -238,19 +237,16 @@ public class TopicControllerTestCase {
 
 		context.checking(new Expectations() {{
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
-			one(forumRepository).get(3); will(returnValue(new Forum() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(3); setModerated(false); }}));
+			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(false); }}));
+			ignoring(topicService);
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
+			ignoring(userSession);
 			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
 			one(roleManager).getCanCreateStickyAnnouncementTopics(); will(returnValue(false));
 			one(roleManager).getCanCreatePolls(); will(returnValue(false));
-			ignoring(userSession); ignoring(topicService); ignoring(mockResult);
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			one(mockResult).include("topic", topic);
+			one(mockResult).redirectTo("/topics/list/0.page#0");
 		}});
 
 		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
@@ -265,12 +261,7 @@ public class TopicControllerTestCase {
 
 		context.checking(new Expectations() {{
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
-			one(forumRepository).get(3); will(returnValue(new Forum() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(3); setModerated(true); }}));
+			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(true); }}));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
 			one(roleManager).isModerator(); will(returnValue(true));
@@ -279,6 +270,7 @@ public class TopicControllerTestCase {
 			ignoring(userSession); ignoring(topicService);
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			one(mockResult).include("topic", topic);
+			one(mockResult).redirectTo("/topics/list/0.page#0");
 		}});
 
 		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
@@ -293,18 +285,16 @@ public class TopicControllerTestCase {
 
 		context.checking(new Expectations() {{
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
-			one(forumRepository).get(3); will(returnValue(new Forum() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(3); setModerated(true); }}));
+			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(true); }}));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
 			one(roleManager).isModerator(); will(returnValue(false));
 			one(roleManager).getCanCreatePolls(); will(returnValue(false));
 			ignoring(roleManager).getCanCreateStickyAnnouncementTopics();
-			ignoring(userSession); ignoring(topicService); ignoring(mockResult);
+			ignoring(userSession);
+			ignoring(topicService);
+			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
+			one(mockMessageController).topicWaitingModeration(topic.getForum().getId());
 			one(mockResult).include("topic", topic);
 		}});
 
@@ -324,12 +314,7 @@ public class TopicControllerTestCase {
 			one(userSession).getIp(); will(returnValue("123"));
 			one(topicService).addTopic(with(aNonNull(Topic.class)),
 				with(aNull(List.class)), with(aNonNull(List.class)));
-			one(forumRepository).get(3); will(returnValue(new Forum() {/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-			{ setId(3); setModerated(false); }}));
+			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(false); }}));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
 			ignoring(roleManager);
@@ -456,7 +441,8 @@ public class TopicControllerTestCase {
 			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
 			one(roleManager).isModerator(); will(returnValue(false));
 			ignoring(userSession); ignoring(topicService);
-			one(mockResult).redirectTo(MessageController.class).replyWaitingModeration(2);
+			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
+			one(mockMessageController).replyWaitingModeration(2);
 		}});
 
 		Post post = new Post(); post.setModerate(false);
@@ -474,7 +460,8 @@ public class TopicControllerTestCase {
 			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			ignoring(userSession); ignoring(topicService);
 			one(topicRepository).get(1); will(returnValue(topic));
-			one(mockResult).redirectTo(MessageController.class).replyWaitingModeration(1);
+			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
+			one(mockMessageController).replyWaitingModeration(1);
 		}});
 
 		Post post = new Post(); post.setModerate(true);
@@ -505,11 +492,7 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", new Topic());
 			one(mockResult).include("forum", new Forum());
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
-
-			//TODO pass zero?
-			one(mockResult).redirectTo(topicController);
-			will(returnValue(mockTopicController));
-			one(mockTopicController).add(0);
+			one(mockResult).forwardTo(Actions.ADD);
 		}});
 
 		topicController.reply(1);
@@ -538,12 +521,8 @@ public class TopicControllerTestCase {
 			one(mockResult).include("topic", post.getTopic());
 			one(mockResult).include("forum", post.getForum());
 			one(mockResult).include("smilies", new ArrayList<Smilie>());
-			
-			one(mockResult).redirectTo(topicController);
-			will(returnValue(mockTopicController));
-			
-			//TODO pass zero?
-			one(mockTopicController).add(0);
+
+			one(mockResult).forwardTo(Actions.ADD);
 		}});
 
 		topicController.quote(1);
