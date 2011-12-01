@@ -62,7 +62,7 @@ public class MessageController {
 	 */
 	public void replyWaitingModeration(int topicId) {
 		this.result.include("message", this.i18n.getFormattedMessage("PostShow.waitingModeration",
-			this.i18n.params(URLBuilder.build(Domain.TOPICS, Actions.LIST, topicId))));
+			URLBuilder.build(Domain.TOPICS, Actions.LIST, topicId)));
 		this.result.forwardTo(Actions.MESSAGE);
 	}
 }

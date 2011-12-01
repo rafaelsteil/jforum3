@@ -33,25 +33,18 @@ public class MessageControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private I18n i18n = context.mock(I18n.class);
 	private Result mockResult = context.mock(MockResult.class);
-	private MessageController controller = new MessageController(i18n,
-			mockResult);
-	private MessageController mockMessageController = context.mock(MessageController.class);
+	private MessageController controller = new MessageController(i18n, mockResult);
 
 	@Test
 	public void replyWaitingModeration() {
 		context.checking(new Expectations() {
 			{
-				one(i18n).params(
-						URLBuilder.build(Domain.TOPICS, Actions.LIST, 1));
-				will(returnValue(new Object[] { "url" }));
 				one(i18n).getFormattedMessage("PostShow.waitingModeration",
-						new Object[] { "url" });
+					URLBuilder.build(Domain.TOPICS, Actions.LIST, 1));
 				will(returnValue("msg moderation 1"));
-			
-				//one(mockResult).forwardTo(Actions.MESSAGE);
-				one(mockResult.forwardTo(controller));
-				will(returnValue(mockMessageController));
-				one(mockMessageController);
+
+				one(mockResult).include("message", "msg moderation 1");
+				one(mockResult).forwardTo(Actions.MESSAGE);
 			}
 		});
 
@@ -63,12 +56,10 @@ public class MessageControllerTestCase {
 	public void topicWaitingModeration() {
 		context.checking(new Expectations() {
 			{
-				one(i18n).params(
-						URLBuilder.build(Domain.TOPICS, Actions.LIST, 1));
-				will(returnValue(new Object[] { "url" }));
 				one(i18n).getFormattedMessage("PostShow.waitingModeration",
-						new Object[] { "url" });
+					URLBuilder.build(Domain.FORUMS, Actions.SHOW, 1));
 				will(returnValue("msg moderation 1"));
+				one(mockResult).include("message", "msg moderation 1");
 				one(mockResult).forwardTo(Actions.MESSAGE);
 			}
 		});
@@ -84,6 +75,7 @@ public class MessageControllerTestCase {
 				one(i18n).getMessage("Message.accessDenied");
 				will(returnValue("msg denied"));
 				one(mockResult).include("message", "msg denied");
+				one(mockResult).forwardTo(Actions.MESSAGE);
 			}
 		});
 
@@ -95,9 +87,7 @@ public class MessageControllerTestCase {
 	public void setup() {
 		context.checking(new Expectations() {
 			{
-				one(mockResult).forwardTo(Actions.MESSAGE);
-				HttpServletRequest request = context
-						.mock(HttpServletRequest.class);
+				HttpServletRequest request = context.mock(HttpServletRequest.class);
 				allowing(request).getContextPath();
 			}
 		});
