@@ -32,7 +32,6 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.USERS_ADMIN)
-// @InterceptedBy({MethodInterceptorInterceptor.class,ActionSecurityInterceptor.class})
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class UserAdminController {
 	private UserRepository userRepository;
@@ -56,21 +55,17 @@ public class UserAdminController {
 
 	/**
 	 * Shows the page to edit an user
-	 * 
+	 *
 	 * @param userId
 	 *            the id of the user to edit
 	 */
-	// @InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void edit(int userId) {
-		this.result.include("user", this.userRepository.get(userId));
-
-		// TODO pass zero or userId?
-		this.result.forwardTo(UserController.class).edit(0);
+		this.result.forwardTo(UserController.class).edit(userId);
 	}
 
 	/**
 	 * Shows the page to edit the user groups
-	 * 
+	 *
 	 * @param userId
 	 */
 	// @InterceptedBy(ExternalUserManagementInterceptor.class)
@@ -85,7 +80,7 @@ public class UserAdminController {
 
 	/**
 	 * Save the groups
-	 * 
+	 *
 	 * @param userId
 	 *            the user id
 	 * @param groupIds
@@ -115,7 +110,7 @@ public class UserAdminController {
 
 	/**
 	 * Search for users
-	 * 
+	 *
 	 * @param username
 	 *            the username to search
 	 */
@@ -130,7 +125,7 @@ public class UserAdminController {
 
 	/**
 	 * List all users
-	 * 
+	 *
 	 * @param page
 	 */
 	public void list(int page) {

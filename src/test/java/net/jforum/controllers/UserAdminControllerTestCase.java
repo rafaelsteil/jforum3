@@ -12,8 +12,6 @@ package net.jforum.controllers;
 
 import java.util.ArrayList;
 
-import net.jforum.controllers.UserController;
-import net.jforum.controllers.UserAdminController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
@@ -72,7 +70,7 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 
 				one(mockResult).forwardTo(controller);
 				will(returnValue(mockUserAdminController));
-				
+
 				// TODO pass zero?
 				one(mockUserAdminController).list(0);
 			}
@@ -101,7 +99,7 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 
 				one(mockResult).forwardTo(controller);
 				will(returnValue(mockUserAdminController));
-				
+
 				// TODO pass zero?
 				one(mockUserAdminController).list(0);
 			}
@@ -126,7 +124,7 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 
 				one(mockResult).forwardTo(controller);
 				will(returnValue(mockUserAdminController));
-				
+
 				// TODO pass zero?
 				one(mockUserAdminController).list(0);
 			}
@@ -159,22 +157,9 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 	public void edit() {
 		context.checking(new Expectations() {
 			{
-				User user = new User();
-				user.setId(1);
-				one(repository).get(1);
-				will(returnValue(user));
-				one(mockResult).include("user", user);
-
-				one(mockResult).forwardTo(controller);
-				will(returnValue(mockUserAdminController));
-				
-				// TODO pass zero?
-				one(mockUserAdminController).list(0);
-
-				// TODO pass zero?
 				one(mockResult).forwardTo(UserController.class);
 				will(returnValue(mockUserController));
-				one(mockUserController).edit(0);
+				one(mockUserController).edit(1);
 			}
 		});
 
