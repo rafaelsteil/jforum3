@@ -36,8 +36,8 @@ public class RSSControllerTestCase {
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private Result mockResult = context.mock(MockResult.class);
-	private RSSController action = new RSSController(mockResult, rssService,
-			userSession, config);
+	private RSSController controller = new RSSController(mockResult, rssService, userSession, config);
+	private MessageController mockMessageController = context.mock(MessageController.class);
 
 	@Test
 	public void forumTopicsExpectSuccess() {
@@ -54,7 +54,7 @@ public class RSSControllerTestCase {
 			}
 		});
 
-		action.forumTopics(1);
+		controller.forumTopics(1);
 		context.assertIsSatisfied();
 	}
 
@@ -66,11 +66,12 @@ public class RSSControllerTestCase {
 				will(returnValue(true));
 				one(roleManager).isForumAllowed(1);
 				will(returnValue(false));
-				one(mockResult).forwardTo(Actions.ACCESS_DENIED);
+				one(mockResult).forwardTo(MessageController.class); will(returnValue(mockMessageController));
+				one(mockMessageController).accessDenied();
 			}
 		});
 
-		action.forumTopics(1);
+		controller.forumTopics(1);
 		context.assertIsSatisfied();
 	}
 
@@ -80,11 +81,12 @@ public class RSSControllerTestCase {
 			{
 				one(config).getBoolean(ConfigKeys.RSS_ENABLED);
 				will(returnValue(false));
-				one(mockResult).forwardTo(Actions.ACCESS_DENIED);
+				one(mockResult).forwardTo(MessageController.class); will(returnValue(mockMessageController));
+				one(mockMessageController).accessDenied();
 			}
 		});
 
-		action.forumTopics(1);
+		controller.forumTopics(1);
 		context.assertIsSatisfied();
 	}
 
