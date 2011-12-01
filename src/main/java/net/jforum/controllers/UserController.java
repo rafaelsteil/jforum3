@@ -238,7 +238,6 @@ public class UserController {
 	 * Adds a new user
 	 * @param user the user to add
 	 */
-	//@InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void insertSave(User user) {
 		boolean error = false;
 

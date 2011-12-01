@@ -65,6 +65,7 @@ public class UserControllerTestCase {
 	private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 	private UserController mockUserController = context.mock(UserController.class);
 	private ForumController mockForumController = context.mock(ForumController.class);
+	private MessageController mockMessageController = context.mock(MessageController.class);
 	private UserController userController = new UserController(userRepository, userSession, userService, sessionManager,
 		config, lostPasswordService, avatarService, rankingRepository, mockResult, mockRequest);
 
@@ -152,6 +153,7 @@ public class UserControllerTestCase {
 	public void loginWithReferer() {
 		context.checking(new Expectations() {{
 			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(false));
+			one(mockRequest).getHeader("Referer"); will(returnValue("some referer"));
 			one(mockResult).include("returnPath", "some referer");
 		}});
 
@@ -266,7 +268,7 @@ public class UserControllerTestCase {
 			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
 			one(userSession).removeCookie("x");
 			one(userSession).removeCookie("y");
-			
+
 			one(mockResult).redirectTo(ForumController.class);
 			will(returnValue(mockForumController));
 			one(mockForumController).list();
@@ -380,7 +382,7 @@ public class UserControllerTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(1));
 			one(mockResult).include("error", "User.usernameTooBig");
-			one(mockResult).redirectTo(userController);
+			one(mockResult).forwardTo(userController);
 			will(returnValue(mockUserController));
 			one(mockUserController).insert();
 		}});
@@ -395,7 +397,8 @@ public class UserControllerTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(mockResult).include("error", "User.usernameInvalidChars");
-			one(mockResult).redirectTo(UserController.class).insert();
+			one(mockResult).forwardTo(userController); will(returnValue(mockUserController));
+			one(mockUserController).insert();
 		}});
 
 		userController.insertSave(new User() {{ setUsername("<username"); }});
@@ -408,7 +411,8 @@ public class UserControllerTestCase {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(mockResult).include("error", "User.usernameInvalidChars");
-			one(mockResult).redirectTo(UserController.class).insert();
+			one(mockResult).forwardTo(userController); will(returnValue(mockUserController));
+			one(mockUserController).insert();
 		}});
 
 		userController.insertSave(new User() {{ setUsername(">username"); }});
@@ -422,7 +426,8 @@ public class UserControllerTestCase {
 			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
 			one(userRepository).isUsernameAvailable("username", null); will(returnValue(false));
 			one(mockResult).include("error", "User.usernameNotAvailable");
-			one(mockResult).redirectTo(UserController.class).insert();
+			one(mockResult).forwardTo(userController); will(returnValue(mockUserController));
+			one(mockUserController).insert();
 		}});
 
 		userController.insertSave(new User() {{ setUsername("username"); }});
@@ -480,7 +485,8 @@ public class UserControllerTestCase {
 		context.checking(new Expectations() {{
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager); will(returnValue(false));
-			one(mockResult).redirectTo(MessageController.class).accessDenied();
+			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
+			one(mockMessageController).accessDenied();
 		}});
 
 		userController.profile(1);
