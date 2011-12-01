@@ -25,7 +25,6 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.RANKINGS_ADMIN)
-// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class RankingAdminController {
 	private RankingRepository repository;

@@ -12,7 +12,6 @@ package net.jforum.controllers;
 
 import java.util.Arrays;
 
-import net.jforum.controllers.RankingAdminController;
 import net.jforum.entities.Ranking;
 import net.jforum.repository.RankingRepository;
 import net.jforum.services.RankingService;
@@ -32,10 +31,9 @@ import br.com.caelum.vraptor.util.test.MockResult;
 public class RankingAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private RankingAdminController controller;
-	private RankingRepository repository = context
-			.mock(RankingRepository.class);
+	private RankingRepository repository = context.mock(RankingRepository.class);
 	private RankingService service = context.mock(RankingService.class);
-	private RankingAdminController mockRankingAdminController = context.mock(RankingAdminController.class);
+	private RankingAdminController mockController = context.mock(RankingAdminController.class);
 	private Result mockResult = context.mock(MockResult.class);
 
 	public RankingAdminControllerTestCase() {
@@ -57,8 +55,8 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 			{
 				one(service).add(with(aNonNull(Ranking.class)));
 				one(mockResult).redirectTo(controller);
-				will(returnValue(mockRankingAdminController));
-				one(mockRankingAdminController).list();
+				will(returnValue(mockController));
+				one(mockController).list();
 			}
 		});
 
@@ -70,12 +68,11 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 	public void edit() {
 		context.checking(new Expectations() {
 			{
-				one(repository).get(1);
-				will(returnValue(new Ranking()));
-				one(mockResult).include("ranking", new Ranking());
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockRankingAdminController));
-				one(mockRankingAdminController).add();
+				Ranking ranking = new Ranking();
+				one(repository).get(1); will(returnValue(ranking));
+				one(mockResult).include("ranking", ranking);
+				one(mockResult).forwardTo(controller); will(returnValue(mockController));
+				one(mockController).add();
 			}
 		});
 
@@ -89,8 +86,8 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 			{
 				one(service).update(with(aNonNull(Ranking.class)));
 				one(mockResult).redirectTo(controller);
-				will(returnValue(mockRankingAdminController));
-				one(mockRankingAdminController).list();
+				will(returnValue(mockController));
+				one(mockController).list();
 			}
 		});
 
@@ -104,8 +101,8 @@ public class RankingAdminControllerTestCase extends AdminTestCase {
 			{
 				one(service).delete(1, 2, 3, 4);
 				one(mockResult).redirectTo(controller);
-				will(returnValue(mockRankingAdminController));
-				one(mockRankingAdminController).list();
+				will(returnValue(mockController));
+				one(mockController).list();
 			}
 		});
 
