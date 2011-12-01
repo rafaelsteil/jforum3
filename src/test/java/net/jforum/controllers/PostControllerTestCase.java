@@ -53,7 +53,7 @@ public class PostControllerTestCase {
 	private TopicController mockTopicController = context.mock(TopicController.class);
 	private ForumController mockForumController = context.mock(ForumController.class);
 
-	private PostController action = new PostController(postRepository,
+	private PostController controller = new PostController(postRepository,
 		smilieRepository, postService, config, userSession, null, null, mockResult);
 	private ModerationLog moderationLog = new ModerationLog();
 
@@ -71,8 +71,6 @@ public class PostControllerTestCase {
 		final Post post = new Post();
 		post.setId(2);
 		post.setTopic(new Topic() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public int getTotalPosts() {
 				return totalPosts;
@@ -82,15 +80,14 @@ public class PostControllerTestCase {
 
 		context.checking(new Expectations() {
 			{
-				one(postRepository).get(2);
-				will(returnValue(post));
+				one(postRepository).get(2); will(returnValue(post));
 				one(postService).delete(post);
 			}
 		});
 
 		this.redirectToPage(post.getTopic(), expectedPage);
 
-		action.delete(2);
+		controller.delete(2);
 		context.assertIsSatisfied();
 	}
 
@@ -117,7 +114,7 @@ public class PostControllerTestCase {
 			}
 		});
 
-		action.delete(2);
+		controller.delete(2);
 		context.assertIsSatisfied();
 	}
 
@@ -145,7 +142,7 @@ public class PostControllerTestCase {
 			}
 		});
 
-		action.editSave(post, options, null, moderationLog);
+		controller.editSave(post, options, null, moderationLog);
 		context.assertIsSatisfied();
 	}
 
@@ -186,11 +183,11 @@ public class PostControllerTestCase {
 			}
 		});
 
-		action.edit(1);
+		controller.edit(1);
 		context.assertIsSatisfied();
 	}
 
-	private void redirectToPage(final Topic topic, final int pageExpected) {
+	private void redirectToPage(final Topic topic, final int expectedPage) {
 		context.checking(new Expectations() {
 			{
 				one(config).getInt(ConfigKeys.POSTS_PER_PAGE);
@@ -198,8 +195,8 @@ public class PostControllerTestCase {
 
 				String url;
 
-				if (pageExpected > 0) {
-					url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
+				if (expectedPage > 0) {
+					url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, expectedPage, topic.getId());
 				}
 				else {
 					url = String.format("/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, topic.getId());

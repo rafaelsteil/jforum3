@@ -17,7 +17,7 @@ public class URLBuilder {
 	 * @return the URL
 	 */
 	public static String build(Object... args) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder().append('/');
 
 		for (int i = 0; i < args.length - 1; i++) {
 			sb.append(args[i]).append('/');
