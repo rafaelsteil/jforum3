@@ -22,7 +22,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.com.caelum.vraptor.util.test.MockResult;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
@@ -33,7 +33,7 @@ public class PostReportCounterOperationTestCase {
 	private SessionManager sessionManager = mockery.mock(SessionManager.class);
 	private UserSession userSession = mockery.mock(UserSession.class);
 	private RoleManager roleManager = mockery.mock(RoleManager.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = mockery.mock(Result.class);
 	private PostReportCounterOperation operation = new PostReportCounterOperation(repository, sessionManager, mockResult);
 
 	@Test

@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
@@ -31,12 +33,11 @@ import net.jforum.security.RoleManager;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
 
-import org.hsqldb.lib.HashMap;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
-import br.com.caelum.vraptor.util.test.MockResult;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
@@ -48,7 +49,7 @@ public class ForumAdminTestCase {
 	private ForumLimitedTimeRepository repository = context.mock(ForumLimitedTimeRepository.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(Result.class);
 	private ForumAdminExtension extension = new ForumAdminExtension(config, forumRepository, repository, sessionManager, mockResult);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 
@@ -101,6 +102,7 @@ public class ForumAdminTestCase {
 	}
 
 	@Test
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void addSave() {
 		this.securityChecking();
 
@@ -111,7 +113,10 @@ public class ForumAdminTestCase {
 			forum.setId(1);
 
 			one(roleManager).isAdministrator(); will(returnValue(true));
-			one(mockResult).included(); will(returnValue(new HashMap() {{ put("forum", forum); }}));
+			Map m = new HashMap();
+			m.put("forum", forum);
+			one(mockResult).included();
+			will(returnValue(m));
 			one(repository).add(with(any(ForumLimitedTime.class)));
 		}});
 

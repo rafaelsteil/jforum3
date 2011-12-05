@@ -11,18 +11,20 @@
 package net.jforum.util;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 
-import org.hsqldb.lib.HashMap;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
-import br.com.caelum.vraptor.util.test.MockResult;
+import br.com.caelum.vraptor.Result;
 
 
 /**
@@ -31,7 +33,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 public class GroupInteractionFilterTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private UserSession userSession = context.mock(UserSession.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(Result.class);
 
 	@Test
 	public void filterForumListing() {
@@ -51,7 +53,10 @@ public class GroupInteractionFilterTestCase {
 			final UserSession us3 = new UserSession(); us3.setSessionId("3"); us3.setUser(u3);
 
 			one(userSession).getUser(); will(returnValue(u1));
-			one(mockResult).included(); will(returnValue(new HashMap() {{ put("onlineUsers", Arrays.asList(us1, us2, us3)); }}));
+
+			Map<String, List<UserSession>> m = new HashMap<String, List<UserSession>>();
+			m.put("onlineUsers", Arrays.asList(us1, us2, us3));
+			one(mockResult).included(); will(returnValue(m));
 
 			one(mockResult).include("totalLoggedUsers", 2);
 			one(mockResult).include("onlineUsers", new HashSet<UserSession>(Arrays.asList(us1, us2)));

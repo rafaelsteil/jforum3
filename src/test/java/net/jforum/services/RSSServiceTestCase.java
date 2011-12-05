@@ -55,6 +55,7 @@ public class RSSServiceTestCase {
 			one(i18n).params("forum x"); will(returnValue(new Object[] { "forum x" }));
 			one(i18n).getFormattedMessage("RSS.ForumTopics.title", new Object[] { "forum x" }); will(returnValue("channel title"));
 			one(config).getValue(ConfigKeys.RSS_DATE_TIME_FORMAT); will(returnValue("EEE, d MMM yyyy HH:mm:ss"));
+			allowing(config).getString(ConfigKeys.FORUM_LINK); will(returnValue("http://site.link/"));
 		}});
 
 		String result = service.forForum(1);

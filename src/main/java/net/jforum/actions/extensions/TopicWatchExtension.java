@@ -28,15 +28,14 @@ import br.com.caelum.vraptor.Result;
 
 /**
  * Topic watch extension for {@link TopicController}
- * 
+ *
  * @author Rafael Steil
  */
 @Resource
 @Path(Domain.TOPICS)
 @ActionExtension(Domain.TOPICS)
-// @InterceptedBy(MethodSecurityInterceptor.class)
 public class TopicWatchExtension {
-	
+
 	private final SessionManager sessionManager;
 	private final TopicWatchService watchService;
 	private final Result result;
@@ -70,7 +69,7 @@ public class TopicWatchExtension {
 
 	/**
 	 * Makes the current logged user watch a specific topic.
-	 * 
+	 *
 	 * @param topicId
 	 *            the id of the topic to watch
 	 */
@@ -87,7 +86,7 @@ public class TopicWatchExtension {
 
 	/**
 	 * Makes the current user to unwatch a specific topic
-	 * 
+	 *
 	 * @param topicId
 	 *            the id of the topic to unwatch
 	 */
@@ -101,10 +100,10 @@ public class TopicWatchExtension {
 		this.watchService.unwatch(topic, userSession.getUser());
 		this.result.redirectTo(this).list(topicId);
 	}
-	
+
 	//TODO finish this logic
 	public void list(int topicId) {
-		
-		
+
+
 	}
 }

@@ -10,6 +10,9 @@
  */
 package net.jforum.plugins.tagging;
 
+import net.jforum.core.SecurityConstraint;
+import net.jforum.security.AdministrationRule;
+
 import org.apache.commons.lang.ArrayUtils;
 
 import br.com.caelum.vraptor.Path;
@@ -21,6 +24,7 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path("adminTags")
+@SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class TagAdminController {
 	private TagRepository repository;
 	private final Result result;

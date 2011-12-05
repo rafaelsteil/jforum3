@@ -11,6 +11,7 @@
 package net.jforum.actions.extensions;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
@@ -31,7 +32,7 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 
-import br.com.caelum.vraptor.util.test.MockResult;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Rafael Steil
@@ -40,7 +41,7 @@ public class TopicWatchExtensionTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private TopicWatchService service = context.mock(TopicWatchService.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(Result.class);
 	private TopicWatchExtension extension = new TopicWatchExtension(sessionManager, service, mockResult);
 
 	@Test
@@ -60,7 +61,8 @@ public class TopicWatchExtensionTestCase {
 		this.afterListExpectations(true);
 
 		context.checking(new Expectations() {{
-			Topic t = new Topic(); t.setId(1);
+			Topic t = new Topic();
+			t.setId(1);
 			one(service).getSubscription(t, new User()); will(returnValue(new TopicWatch()));
 			one(mockResult).include("isUserWatchingTopic", true);
 		}});
@@ -76,7 +78,10 @@ public class TopicWatchExtensionTestCase {
 			Topic t = new Topic(); t.setId(1);
 
 			if (isLogged) {
-				one(mockResult).included().get("topic"); will(returnValue(t));
+				@SuppressWarnings("unchecked")
+				Map<String, Object> m = context.mock(Map.class);
+				one(mockResult).included(); will(returnValue(m));
+				one(m).get("topic"); will(returnValue(t));
 			}
 
 			one(us).isLogged(); will(returnValue(isLogged));

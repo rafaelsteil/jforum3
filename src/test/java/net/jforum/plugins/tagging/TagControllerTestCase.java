@@ -32,7 +32,7 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 
-import br.com.caelum.vraptor.util.test.MockResult;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Bill
@@ -42,7 +42,7 @@ public class TagControllerTestCase {
 	private TagService tagService = context.mock(TagService.class);
 	private TopicRepository topicRepository = context.mock(TopicRepository.class);
 	private UserSession userSession = context.mock(UserSession.class);
-	private MockResult mockResult = new MockResult();
+	private Result mockResult = context.mock(Result.class);
 	private TagController tagAction = new TagController(tagService, topicRepository, userSession, mockResult);
 
 	@Test
@@ -95,9 +95,11 @@ public class TagControllerTestCase {
 	public void replySave(){
 		final String tagString ="tags,tags";
 		final Topic topic = new Topic();
+		final TopicController mockTopicController = context.mock(TopicController.class);
 		context.checking(new Expectations() {{
 			one(tagService).addTag(with(is(tagString)), with(any(Topic.class)));
-			one(mockResult).redirectTo(TopicController.class).list(topic.getId(), 0, false);
+			one(mockResult).redirectTo(TopicController.class); will(returnValue(mockTopicController));
+			one(mockTopicController).list(topic.getId(), 0, false);
 		}});
 
 		tagAction.replySave(topic, tagString);

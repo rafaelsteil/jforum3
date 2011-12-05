@@ -28,8 +28,6 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.FORUMS_ADMIN)
-// @InterceptedBy({ActionSecurityInterceptor.class,
-// ExtensibleInterceptor.class})
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class ForumAdminController {
 	private CategoryRepository categoryRepository;

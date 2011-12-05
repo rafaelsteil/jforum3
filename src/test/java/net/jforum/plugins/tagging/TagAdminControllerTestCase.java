@@ -13,7 +13,6 @@ package net.jforum.plugins.tagging;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.controllers.AdminTestCase;
 import net.jforum.util.TestCaseUtils;
 
@@ -21,7 +20,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 
-import br.com.caelum.vraptor.util.test.MockResult;
+import br.com.caelum.vraptor.Result;
 
 /**
  * @author Bill
@@ -30,8 +29,9 @@ public class TagAdminControllerTestCase extends AdminTestCase {
 
 	private Mockery context = TestCaseUtils.newMockery();
 	private TagRepository repository = context.mock(TagRepository.class);
-	private MockResult mockResult = new MockResult();
-	private TagAdminController action = new TagAdminController(repository, mockResult);
+	private Result mockResult = context.mock(Result.class);
+	private TagAdminController controller = new TagAdminController(repository, mockResult);
+	private TagAdminController mockController = context.mock(TagAdminController.class);
 
 	public TagAdminControllerTestCase() {
 		super(TagAdminController.class);
@@ -40,11 +40,12 @@ public class TagAdminControllerTestCase extends AdminTestCase {
 	@Test
 	public void deleteUsingNullShouldIgnore() {
 		context.checking(new Expectations() {{
-			one(mockResult).redirectTo(Actions.LIST);
+			one(mockResult).of(controller); will(returnValue(mockController));
+			one(mockController).list();
 		}});
 
 		String tag = null;
-		action.delete(tag);
+		controller.delete(tag);
 
 		context.assertIsSatisfied();
 	}
@@ -55,13 +56,13 @@ public class TagAdminControllerTestCase extends AdminTestCase {
 		final String tag2 = "Indonesia";
 
 		context.checking(new Expectations() {{
-
 			one(repository).remove(tag1);
 			one(repository).remove(tag2);
-			one(mockResult).redirectTo(Actions.LIST);
+			one(mockResult).of(controller); will(returnValue(mockController));
+			one(mockController).list();
 		}});
 
-		action.delete(tag1, tag2);
+		controller.delete(tag1, tag2);
 		context.assertIsSatisfied();
 	}
 
@@ -74,7 +75,7 @@ public class TagAdminControllerTestCase extends AdminTestCase {
 			one(mockResult).include("tags", list);
 		}});
 
-		action.list();
+		controller.list();
 		context.assertIsSatisfied();
 	}
 
@@ -84,9 +85,11 @@ public class TagAdminControllerTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {{
 			one(mockResult).include("name", name);
+			one(mockResult).of(controller); will(returnValue(mockController));
+			one(mockController).add();
 		}});
 
-		action.edit(name);
+		controller.edit(name);
 		context.assertIsSatisfied();
 	}
 
@@ -97,10 +100,11 @@ public class TagAdminControllerTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {{
 			one(repository).update(oldTag,newTag);
-			one(mockResult).redirectTo(Actions.LIST);
+			one(mockResult).redirectTo(controller); will(returnValue(mockController));
+			one(mockController).list();
 		}});
 
-		action.editsave(oldTag,newTag);
+		controller.editsave(oldTag,newTag);
 		context.assertIsSatisfied();
 	}
 }
