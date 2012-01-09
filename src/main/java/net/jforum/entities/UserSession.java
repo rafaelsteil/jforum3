@@ -31,7 +31,6 @@ import net.jforum.util.JForumConfig;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import br.com.caelum.vraptor.ioc.Component;
 import br.com.caelum.vraptor.ioc.SessionScoped;
@@ -51,6 +50,11 @@ public class UserSession  {
 	private long creationTime;
 	private long lastVisit;
 	private String sessionId;
+	private final HttpServletRequest request;
+
+	public UserSession(HttpServletRequest request) {
+		this.request = request;
+	}
 
 	/**
 	 * Flag a specific topic as "read" by the user
@@ -115,12 +119,14 @@ public class UserSession  {
 		return this.roleManager;
 	}
 
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+
 	public String getIp() {
 		if(new JForumConfig().getBoolean(ConfigKeys.BLOCK_IP)) {
 			return null;
 		}
-
-		HttpServletRequest request = this.getRequest();
 
 		// We look if the request is forwarded
 		// If it is not call the older function.
@@ -278,7 +284,7 @@ public class UserSession  {
 	 * @return The <code>Cookie</code> object if found, or <code>null</code> oterwhise
 	 */
 	public Cookie getCookie(String name) {
-		Cookie[] cookies = this.getRequest().getCookies();
+		Cookie[] cookies = request.getCookies();
 
 		if (cookies != null) {
 			for (Cookie c : cookies) {
@@ -321,15 +327,15 @@ public class UserSession  {
 	}
 
 	public void setAttribute(String name, Object value) {
-		this.getRequest().getSession().setAttribute(name, value);
+		request.getSession().setAttribute(name, value);
 	}
 
 	public Object getAttribute(String name) {
-		return this.getRequest().getSession().getAttribute(name);
+		return request.getSession().getAttribute(name);
 	}
 
 	public void clearAllAttributes() {
-		HttpSession session = this.getRequest().getSession();
+		HttpSession session = request.getSession();
 
 		for (Enumeration<?> e = session.getAttributeNames(); e.hasMoreElements(); ) {
 			String key = (String)e.nextElement();
@@ -351,11 +357,6 @@ public class UserSession  {
 		session.setLastVisit(new Date(this.getLastVisit()));
 
 		return session;
-	}
-
-	private HttpServletRequest getRequest() {
-		RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
-		return ((ServletRequestAttributes)attributes).getRequest();
 	}
 
 	private HttpServletResponse getResponse() {

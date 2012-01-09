@@ -33,7 +33,6 @@ import org.junit.Test;
 public class UserSessionTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-//	private HttpServletResponse response = context.mock(HttpServletResponse.class);
 	private HttpSession httpSession = context.mock(HttpSession.class);
 	private States state = context.states("userSessionState");
 	private Map<Integer, Long> topicsReadTime;
@@ -41,7 +40,7 @@ public class UserSessionTestCase {
 
 	@Before
 	public void setup() {
-		userSession = new UserSession();
+		userSession = new UserSession(null);
 
 		context.checking(new Expectations() {{
 			allowing(request).getSession(); will(returnValue(httpSession));
@@ -51,7 +50,7 @@ public class UserSessionTestCase {
 
 		this.loadTopicsReadTime();
 	}
-	
+
 	@Test
 	public void isForumReadLastPostTimeNewerThanLastVisitTopicTrackingSmallerThanLastPostExpectFalse() {
 		state.become("logged");

@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Session;
@@ -233,23 +231,21 @@ public class SessionManager {
 	 * authentication if the session is new or the SSO user has changed
 	 * @throws IOException
 	 */
-	public UserSession refreshSession(HttpServletRequest request, HttpServletResponse response) {
+	public UserSession refreshSession(UserSession userSession) {
 		boolean isSSOAuthentication = ConfigKeys.TYPE_SSO.equals(this.config.getValue(ConfigKeys.AUTHENTICATION_TYPE));
-		request.setAttribute("sso", isSSOAuthentication);
-		request.setAttribute("ssoLogout", this.config.getValue(ConfigKeys.SSO_LOGOUT));
+		userSession.getRequest().setAttribute("sso", isSSOAuthentication);
+		userSession.getRequest().setAttribute("ssoLogout", this.config.getValue(ConfigKeys.SSO_LOGOUT));
 
-		UserSession userSession = this.getUserSession(request.getSession().getId());
 		int anonymousUserId = this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID);
 
-		if (userSession == null) {
-			userSession = new UserSession();
-			userSession.setSessionId(request.getSession().getId());
+		if (this.getUserSession(userSession.getRequest().getSession().getId()) == null) {
+			userSession.setSessionId(userSession.getRequest().getSession().getId());
 			userSession.setCreationTime(System.currentTimeMillis());
 
 			//if (!JForumExecutionContext.getForumContext().isBot()) {
 			if (true) {
 				if (isSSOAuthentication) {
-					this.checkSSO(userSession, request);
+					this.checkSSO(userSession);
 				}
 				else {
 					boolean autoLoginEnabled = this.config.getBoolean(ConfigKeys.AUTO_LOGIN_ENABLED);
@@ -264,7 +260,7 @@ public class SessionManager {
 
 			this.add(userSession);
 
-			logger.info("Registered new userSession: " + request.getSession().getId());
+			logger.info("Registered new userSession: " + userSession.getSessionId());
 		}
 		else if (isSSOAuthentication) {
 			SSO sso;
@@ -277,15 +273,15 @@ public class SessionManager {
 			}
 
 			// Check if the session is valid
-			if (!sso.isSessionValid(userSession, request)) {
+			if (!sso.isSessionValid(userSession)) {
 				User user = userSession.getUser();
 
 				logger.info("sso session is no longer valid. Forcing a refresh. username is " + (user != null ? user.getUsername() : "returned null")
-					+ ", jforumUserId is " + (user != null ? user.getId() : "returned null") + ". Session ID: " + request.getSession().getId());
+					+ ", jforumUserId is " + (user != null ? user.getId() : "returned null") + ". Session ID: " + userSession.getSessionId());
 
 				// If the session is not valid, create a new one
 				this.remove(userSession.getSessionId());
-				return this.refreshSession(request, response);
+				return this.refreshSession(userSession);
 			}
 			else {
 				if (userSession.getUser().getId() == 0) {
@@ -299,7 +295,7 @@ public class SessionManager {
 				if (user == null) {
 					// FIXME: now what? we didn't find the user, so something must be wrong
 					logger.warn(String.format("refreshSession did not find an user that should be registered. jforumUserId is %d, session ID is %s",
-						userSession.getUser().getId(), request.getSession().getId()));
+						userSession.getUser().getId(), userSession.getSessionId()));
 				}
 				else {
 					userSession.setUser(user);
@@ -318,7 +314,7 @@ public class SessionManager {
 			logger.warn("After userSession.ping() -> userSession.getUser returned null or user.id is zero. " +
 				"User is null? " + ( userSession.getUser() == null ) + ". user.id is: "
 					+ (userSession.getUser() == null ? "getUser() returned null" : userSession.getUser().getId())
-					+ ". As we have a problem, will force the user to become anonymous. Session ID: " + request.getSession().getId());
+					+ ". As we have a problem, will force the user to become anonymous. Session ID: " + userSession.getSessionId());
 			userSession.becomeAnonymous(anonymousUserId);
 
 			User anonymousUser = this.userRepository.get(userSession.getUser().getId());
@@ -337,7 +333,7 @@ public class SessionManager {
 			roleManager.setGroups(userSession.getUser().getGroups());
 		}
 		else {
-			logger.warn("At last step userSession.getUser() still returned null. Ignoring the roles. Session ID: " + request.getSession().getId());
+			logger.warn("At last step userSession.getUser() still returned null. Ignoring the roles. Session ID: " + userSession.getSessionId());
 		}
 
 		userSession.setRoleManager(roleManager);
@@ -416,16 +412,16 @@ public class SessionManager {
 	 * @param userSession UserSession
 	 * @param request TODO
 	 */
-	private void checkSSO(UserSession userSession, HttpServletRequest request) {
+	private void checkSSO(UserSession userSession) {
 		try {
 			SSO sso = (SSO)Class.forName(this.config.getValue(ConfigKeys.SSO_IMPLEMENTATION)).newInstance();
 			sso.setConfig(this.config);
-			String username = sso.authenticateUser(request);
+			String username = sso.authenticateUser(userSession.getRequest());
 
-			logger.info(String.format("SSO authenticated an user with username %s. Session ID %s", username, request.getSession().getId()));
+			logger.info(String.format("SSO authenticated an user with username %s. Session ID %s", username, userSession.getSessionId()));
 
 			if (StringUtils.isEmpty(username)) {
-				logger.warn(String.format("checkSSO found an empty / null username. Going anonymous. Session ID %s", request.getSession().getId()));
+				logger.warn(String.format("checkSSO found an empty / null username. Going anonymous. Session ID %s", userSession.getSessionId()));
 				userSession.becomeAnonymous(this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));
 			}
 			else {

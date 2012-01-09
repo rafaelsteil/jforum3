@@ -28,12 +28,14 @@ public class RemoteUserSSO implements SSO {
 	 * @see net.jforum.sso.SSO#authenticateUser(net.jforum.context.RequestContext)
 	 * @param request AWebContextRequest * @return String
 	 */
+	@Override
 	public String authenticateUser(HttpServletRequest request) {
 		return request.getRemoteUser();
 	}
 
-	public boolean isSessionValid(UserSession userSession, HttpServletRequest request) {
-		String remoteUser = request.getRemoteUser();
+	@Override
+	public boolean isSessionValid(UserSession userSession) {
+		String remoteUser = userSession.getRequest().getRemoteUser();
 
 		// user has since logged out
 		if (remoteUser == null && userSession.getUser().getId() != this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
@@ -54,6 +56,7 @@ public class RemoteUserSSO implements SSO {
 	/**
 	 * @see net.jforum.sso.SSO#setConfig(net.jforum.util.JForumConfig)
 	 */
+	@Override
 	public void setConfig(JForumConfig config) {
 		this.config = config;
 	}

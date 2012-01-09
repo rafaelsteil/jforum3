@@ -38,8 +38,7 @@ public interface SSO {
 	 * Check to see if the user for the current {@link UserSession} is the same user by single sign on mechanisim.
 	 *
 	 * @param userSession the current user session
-	 * @param request the current request
 	 * @return if the UserSession is valid
 	 */
-	public boolean isSessionValid(UserSession userSession, HttpServletRequest request);
+	public boolean isSessionValid(UserSession userSession);
 }

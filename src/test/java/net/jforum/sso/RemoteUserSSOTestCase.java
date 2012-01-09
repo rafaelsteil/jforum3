@@ -30,7 +30,7 @@ public class RemoteUserSSOTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-	private UserSession us = new UserSession();
+	private UserSession us = new UserSession(null);
 	private SSO sso;
 
 	@Test
@@ -41,7 +41,7 @@ public class RemoteUserSSOTestCase {
 
 		us.getUser().setUsername("another user");
 
-		Assert.assertFalse(sso.isSessionValid(us, request));
+		Assert.assertFalse(sso.isSessionValid(us));
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class RemoteUserSSOTestCase {
 
 		us.getUser().setId(1);
 
-		Assert.assertFalse(sso.isSessionValid(us, request));
+		Assert.assertFalse(sso.isSessionValid(us));
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class RemoteUserSSOTestCase {
 			one(request).getRemoteUser(); will(returnValue(null));
 		}});
 
-		Assert.assertFalse(sso.isSessionValid(us, request));
+		Assert.assertFalse(sso.isSessionValid(us));
 	}
 
 	@Before

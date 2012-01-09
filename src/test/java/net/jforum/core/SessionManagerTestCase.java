@@ -105,7 +105,7 @@ public class SessionManagerTestCase {
 			one(sessionRepository).add(with(aNonNull(Session.class)));
 		}});
 
-		UserSession us = new UserSession();
+		UserSession us = new UserSession(null);
 		us.setSessionId("123");
 		us.getUser().setId(2);
 
@@ -120,7 +120,7 @@ public class SessionManagerTestCase {
 			allowing(httpSession).getId(); will(returnValue("123"));
 		}});
 
-		UserSession us = new UserSession();
+		UserSession us = new UserSession(null);
 		us.setSessionId("123");
 		us.getUser().setId(1);
 
@@ -463,7 +463,7 @@ public class SessionManagerTestCase {
 
 	@Test
 	public void addBotShouldIgnore() {
-		UserSession us = new UserSession() {
+		UserSession us = new UserSession(null) {
 			@Override
 			public boolean isBot() { return true; }
 
@@ -532,7 +532,7 @@ public class SessionManagerTestCase {
 	}
 
 	private UserSession newUserSession(String sessionId) {
-		UserSession us = new UserSession();
+		UserSession us = new UserSession(null);
 
 		us.setSessionId(sessionId);
 		us.getUser().setId(1);
