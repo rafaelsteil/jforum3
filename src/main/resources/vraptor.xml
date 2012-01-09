@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<vraptor>
-	<plugin type="net.jforum.core.support.vraptor.SpringPlugin">
-		<property name="configFile">/jforumConfig/spring-config.xml</property>
-		<property name="contextName">springContext</property>
-	</plugin>
-</vraptor>
