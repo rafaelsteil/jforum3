@@ -10,7 +10,6 @@
  */
 package net.jforum.extensions;
 
-import net.jforum.core.SessionManager;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.security.RoleManager;
@@ -19,7 +18,6 @@ import net.jforum.util.TestCaseUtils;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.Before;
 import org.junit.Test;
 
 import br.com.caelum.vraptor.Result;
@@ -30,11 +28,10 @@ import br.com.caelum.vraptor.Result;
 public class PostReportCounterOperationTestCase {
 	private Mockery mockery = TestCaseUtils.newMockery();
 	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
-	private SessionManager sessionManager = mockery.mock(SessionManager.class);
 	private UserSession userSession = mockery.mock(UserSession.class);
 	private RoleManager roleManager = mockery.mock(RoleManager.class);
 	private Result mockResult = mockery.mock(Result.class);
-	private PostReportCounterOperation operation = new PostReportCounterOperation(repository, sessionManager, mockResult);
+	private PostReportCounterOperation operation = new PostReportCounterOperation(repository, mockResult, userSession);
 
 	@Test
 	public void notLoggedExpectZero() {
@@ -75,12 +72,5 @@ public class PostReportCounterOperationTestCase {
 
 		operation.execute();
 		mockery.assertIsSatisfied();
-	}
-
-	@Before
-	public void setup() {
-		mockery.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
-		}});
 	}
 }

@@ -14,7 +14,6 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
 import net.jforum.entities.UserSession;
@@ -36,14 +35,12 @@ import br.com.caelum.vraptor.Result;
 @ActionExtension(Domain.TOPICS)
 public class TopicWatchExtension {
 
-	private final SessionManager sessionManager;
 	private final TopicWatchService watchService;
 	private final Result result;
+	private final UserSession userSession;
 
-	public TopicWatchExtension(SessionManager sessionManager,
-			 TopicWatchService watchService,
-			Result result) {
-		this.sessionManager = sessionManager;
+	public TopicWatchExtension(TopicWatchService watchService, Result result, UserSession userSession) {
+		this.userSession = userSession;
 		this.watchService = watchService;
 		this.result = result;
 	}
@@ -51,7 +48,7 @@ public class TopicWatchExtension {
 	@Extends(Actions.LIST)
 	public void afterList() {
 		boolean isWatching = false;
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 
 		if (userSession.isLogged()) {
 			Topic topic = (Topic) this.result.included().get("topic");
@@ -78,7 +75,7 @@ public class TopicWatchExtension {
 		Topic topic = new Topic();
 		topic.setId(topicId);
 
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 
 		this.watchService.watch(topic, userSession.getUser());
 		this.result.redirectTo(Actions.LIST + "/" + topicId);
@@ -95,13 +92,9 @@ public class TopicWatchExtension {
 		Topic topic = new Topic();
 		topic.setId(topicId);
 
-		UserSession userSession = this.sessionManager.getUserSession();
-
 		this.watchService.unwatch(topic, userSession.getUser());
 		this.result.redirectTo(this).list(topicId);
 	}
-
-	//TODO finish this logic
 	public void list(int topicId) {
 
 

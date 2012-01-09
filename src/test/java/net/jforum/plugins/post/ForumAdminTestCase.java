@@ -21,7 +21,6 @@ import java.util.Map;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.User;
@@ -45,12 +44,12 @@ import br.com.caelum.vraptor.Result;
 public class ForumAdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 
-	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private ForumLimitedTimeRepository repository = context.mock(ForumLimitedTimeRepository.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private Result mockResult = context.mock(Result.class);
-	private ForumAdminExtension extension = new ForumAdminExtension(config, forumRepository, repository, sessionManager, mockResult);
+	private UserSession userSession = context.mock(UserSession.class);
+	private ForumAdminExtension extension = new ForumAdminExtension(config, forumRepository, repository, mockResult, userSession);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 
 	@Test
@@ -146,10 +145,8 @@ public class ForumAdminTestCase {
 
 	private void securityChecking() {
 		context.checking(new Expectations() {{
-			UserSession us = context.mock(UserSession.class);
-			one(sessionManager).getUserSession(); will(returnValue(us));
-			one(us).getRoleManager(); will(returnValue(roleManager));
-			allowing(us).getUser(); will(returnValue(new User()));
+			one(userSession).getRoleManager(); will(returnValue(roleManager));
+			allowing(userSession).getUser(); will(returnValue(new User()));
 		}});
 	}
 

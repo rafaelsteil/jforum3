@@ -39,30 +39,31 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.FORUMS)
-//@InterceptedBy(MethodSecurityInterceptor.class)
 public class ForumController {
 	private CategoryRepository categoryRepository;
 	private ForumRepository forumRepository;
 	private UserRepository userRepository;
-	private SessionManager sessionManager;
 	private MostUsersEverOnlineService mostUsersEverOnlineService;
 	private JForumConfig config;
 	private GroupInteractionFilter groupInteractionFilter;
 	private final Result result;
+	private final UserSession userSession;
+	private final SessionManager sessionManager;
 
 	public ForumController(CategoryRepository categoryRepository,
-		SessionManager sessionManager, ForumRepository forumRepository,
+		ForumRepository forumRepository, UserSession userSession,
 		UserRepository userRepository, MostUsersEverOnlineService mostUsersEverOnlineService,
 		JForumConfig config, GroupInteractionFilter groupInteractionFilter,
-		Result result) {
+		Result result, SessionManager sessionManager) {
 		this.categoryRepository = categoryRepository;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 		this.forumRepository = forumRepository;
 		this.userRepository = userRepository;
 		this.mostUsersEverOnlineService = mostUsersEverOnlineService;
 		this.config = config;
 		this.groupInteractionFilter = groupInteractionFilter;
 		this.result = result;
+		this.sessionManager = sessionManager;
 	}
 
 	/**
@@ -70,7 +71,7 @@ public class ForumController {
 	 */
 	@SecurityConstraint(value = AuthenticatedRule.class, displayLogin = true)
 	public void newMessages(int page) {
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 		int recordsPerPage = this.config.getInt(ConfigKeys.TOPICS_PER_PAGE);
 
 		PaginatedResult<Topic> newMessages = this.forumRepository.getNewMessages(new Date(userSession.getLastVisit()),
@@ -114,8 +115,6 @@ public class ForumController {
 		this.result.include("postsPerPage", this.config.getInt(ConfigKeys.POSTS_PER_PAGE));
 		this.result.include("mostUsersEverOnline", mostUsersEverOnlineService
 			.getMostRecentData(this.sessionManager.getTotalUsers()));
-
-		UserSession userSession = this.sessionManager.getUserSession();
 
 		if (userSession.isLogged() && !userSession.getRoleManager().roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
 			this.groupInteractionFilter.filterForumListing(this.result, userSession);

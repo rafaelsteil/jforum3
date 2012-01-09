@@ -201,7 +201,6 @@ public class UserControllerTestCase {
 	@Test
 	public void listUsingListingIsDisabledShouldForceEmptyList() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isUserListingEnabled(); will(returnValue(false));
 			one(mockResult).include("users", new ArrayList<User>());
@@ -214,7 +213,6 @@ public class UserControllerTestCase {
 	@Test
 	public void listCanInteractWithOtherGroups() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
@@ -234,7 +232,6 @@ public class UserControllerTestCase {
 	@Test
 	public void listCannotInteractWithOtherGroups() {
 		context.checking(new Expectations() {{
-			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(false));
@@ -258,7 +255,6 @@ public class UserControllerTestCase {
 	public void logout() {
 		context.checking(new Expectations() {{
 			one(config).getInt(ConfigKeys.ANONYMOUS_USER_ID); will(returnValue(1));
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).becomeAnonymous(1);
 			allowing(userSession).getSessionId(); will(returnValue("123"));
 			one(sessionManager).storeSession("123");

@@ -19,7 +19,6 @@ import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PostFormOptions;
 import net.jforum.core.Role;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Group;
 import net.jforum.entities.Post;
@@ -53,17 +52,17 @@ public class PrivateMessageController {
 	private PrivateMessageRepository repository;
 	private UserRepository userRepository;
 	private PrivateMessageService service;
-	private SessionManager sessionManager;
 	private final Result result;
+	private final UserSession userSession;
 
 	public PrivateMessageController(PrivateMessageRepository repository,
 			UserRepository userRepository, PrivateMessageService service,
-			SessionManager sessionManager, Result result) {
+			Result result, UserSession userSession) {
 		this.repository = repository;
 		this.userRepository = userRepository;
 		this.service = service;
-		this.sessionManager = sessionManager;
 		this.result = result;
+		this.userSession = userSession;
 	}
 
 	/**
@@ -74,7 +73,7 @@ public class PrivateMessageController {
 	 */
 	public void delete(int... ids) {
 		this.service
-				.delete(this.sessionManager.getUserSession().getUser(), ids);
+				.delete(this.userSession.getUser(), ids);
 		this.result.redirectTo(Actions.INBOX);
 	}
 
@@ -145,7 +144,7 @@ public class PrivateMessageController {
 	 * Shows the page ot sent messages
 	 */
 	public void sent() {
-		User user = this.sessionManager.getUserSession().getUser();
+		User user = this.userSession.getUser();
 		this.result.include("privateMessages",
 				this.repository.getFromSentBox(user));
 		this.result.include("sentbox", true);
@@ -176,11 +175,11 @@ public class PrivateMessageController {
 		}
 
 		PrivateMessage pm = new PrivateMessage();
-		pm.setFromUser(this.sessionManager.getUserSession().getUser());
+		pm.setFromUser(this.userSession.getUser());
 		pm.setToUser(toUser);
 		pm.setSubject(post.getSubject());
 		pm.setText(post.getText());
-		pm.setIp(this.sessionManager.getUserSession().getIp());
+		pm.setIp(this.userSession.getIp());
 
 		ActionUtils.definePrivateMessageOptions(pm, options);
 
@@ -197,7 +196,7 @@ public class PrivateMessageController {
 	 */
 	public void findUser(String username) {
 		if (!StringUtils.isEmpty(username)) {
-			RoleManager roleManager = this.sessionManager.getUserSession()
+			RoleManager roleManager = this.userSession
 					.getRoleManager();
 
 			if (roleManager.getCanOnlyContactModerators()) {
@@ -221,7 +220,7 @@ public class PrivateMessageController {
 					this.result.include("users",
 							this.userRepository.findByUserName(username));
 				} else {
-					User currentUser = this.sessionManager.getUserSession()
+					User currentUser = this.userSession
 							.getUser();
 					this.result.include("users", this.userRepository
 							.findByUserName(username, currentUser.getGroups()));
@@ -239,7 +238,7 @@ public class PrivateMessageController {
 		this.result.include("post", new Post());
 		this.result.include("isPrivateMessage", true);
 		this.result.include("attachmentsEnabled", false);
-		this.result.include("user", this.sessionManager.getUserSession().getUser());
+		this.result.include("user", this.userSession.getUser());
 
 		// TODO pass zero?
 		this.result.forwardTo(TopicController.class).add(0);
@@ -262,7 +261,7 @@ public class PrivateMessageController {
 	}
 
 	private boolean canSendMessageTo(User toUser) {
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 		RoleManager roleManager = userSession.getRoleManager();
 
 		if (roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
@@ -292,7 +291,7 @@ public class PrivateMessageController {
 	 * Shows the inbox of the current logged user
 	 */
 	public void inbox() {
-		User user = this.sessionManager.getUserSession().getUser();
+		User user = this.userSession.getUser();
 		this.result.include("inbox", true);
 		this.result.include("privateMessages",
 				this.repository.getFromInbox(user));

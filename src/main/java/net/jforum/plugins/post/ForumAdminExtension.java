@@ -12,8 +12,8 @@ package net.jforum.plugins.post;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Forum;
+import net.jforum.entities.UserSession;
 import net.jforum.extensions.ActionExtension;
 import net.jforum.extensions.Extends;
 import net.jforum.repository.ForumRepository;
@@ -30,16 +30,17 @@ public class ForumAdminExtension {
 	private ForumLimitedTimeRepository repository;
 	private ForumRepository forumRepository;
 	private JForumConfig config;
-	private SessionManager sessionManager;
 	private final Result result;
+	private final UserSession userSession;
 
 	public ForumAdminExtension(JForumConfig config, ForumRepository forumRepository,
-			ForumLimitedTimeRepository repository, SessionManager sessionManager, Result result) {
+			ForumLimitedTimeRepository repository,
+			Result result, UserSession userSession) {
 		this.config = config;
 		this.forumRepository = forumRepository;
 		this.result = result;
 		this.repository = repository;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 	}
 
 	@Extends(Actions.EDIT)
@@ -58,7 +59,7 @@ public class ForumAdminExtension {
 	public void editSave(Forum forum, long forumLimitedTime) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
-			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+			RoleManager roleManager = this.userSession.getRoleManager();
 
  			if (roleManager.isAdministrator() || roleManager.isCategoryAllowed(forum.getCategory().getId())) {
 				ForumLimitedTime current = this.repository.getForumLimitedTime(forum);
@@ -85,7 +86,7 @@ public class ForumAdminExtension {
 	public void addSave(long fourmLimitedTime) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
-			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+			RoleManager roleManager = this.userSession.getRoleManager();
 
 			Forum forum = (Forum) this.result.included().get("forum");
 
@@ -104,7 +105,7 @@ public class ForumAdminExtension {
 	public void delete(int... forumsId) {
 		boolean isEnabled = this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
 		if(isEnabled){
-			RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+			RoleManager roleManager = this.userSession.getRoleManager();
 
 			if (roleManager.isAdministrator()) {
 				for(int forumId : forumsId){

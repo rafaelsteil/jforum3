@@ -19,6 +19,7 @@ import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
+import net.jforum.entities.UserSession;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.RoleManager;
@@ -26,18 +27,24 @@ import net.jforum.util.SecurityConstants;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class GroupService {
 	private GroupRepository repository;
-	private SessionManager sessionManager;
 	private UserRepository userRepository;
+	private UserSession userSession;
+	private SessionManager sessionManager;
 
-	public GroupService(GroupRepository repository, SessionManager sessionManager, UserRepository userRepository) {
+	public GroupService(GroupRepository repository, UserRepository userRepository,
+			UserSession userSession, SessionManager sessionManager) {
 		this.repository = repository;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 		this.userRepository = userRepository;
+		this.sessionManager = sessionManager;
 	}
 
 	/**
@@ -67,7 +74,7 @@ public class GroupService {
 		}
 
 		boolean canInteractwithOtherGroups = currentRoles.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS);
-		boolean isSuperAdministrator = this.sessionManager.getUserSession().getRoleManager().isAdministrator();
+		boolean isSuperAdministrator = this.userSession.getRoleManager().isAdministrator();
 
 		this.registerRole(group, SecurityConstants.ADMINISTRATOR, isSuperAdministrator ? permissions.isAdministrator() : isAdministrator);
 		this.registerRole(group, SecurityConstants.CAN_MANAGE_FORUMS, isSuperAdministrator ? permissions.getCanManageForums() : canManageForums);

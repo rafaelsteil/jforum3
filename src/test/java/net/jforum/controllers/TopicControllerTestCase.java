@@ -155,7 +155,6 @@ public class TopicControllerTestCase {
 		this.addReplyPaginationRedirect(topic, 3);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(forumRepository).get(topic.getForum().getId()); will(returnValue(topic.getForum()));
 			one(mockResult).include("topic", topic);
 		}});
@@ -178,10 +177,6 @@ public class TopicControllerTestCase {
 			}
 		};
 		topic.setId(10);
-
-		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
-		}});
 
 		this.addReplyPaginationRedirect(topic, 4);
 
@@ -236,7 +231,6 @@ public class TopicControllerTestCase {
 		topic.getForum().setId(3);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(false); }}));
 			ignoring(topicService);
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
@@ -260,7 +254,6 @@ public class TopicControllerTestCase {
 		topic.getForum().setId(3);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(true); }}));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
@@ -284,7 +277,6 @@ public class TopicControllerTestCase {
 		topic.getForum().setId(3);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(true); }}));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
@@ -309,7 +301,6 @@ public class TopicControllerTestCase {
 		Post post = new Post();
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getUser(); will(returnValue(new User()));
 			one(userSession).getIp(); will(returnValue("123"));
 			one(topicService).addTopic(with(aNonNull(Topic.class)),
@@ -345,7 +336,6 @@ public class TopicControllerTestCase {
 				public int getTotalPosts() { return 10; }
 			};
 
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).isLogged(); will(returnValue(false));
 
 			one(topicRepository).get(1); will(returnValue(topic));
@@ -381,7 +371,6 @@ public class TopicControllerTestCase {
 		{ setId(1); }}; topic.getForum().setId(1);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getIp(); will(returnValue("123"));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
@@ -411,7 +400,6 @@ public class TopicControllerTestCase {
 		topic.getForum().setId(1); topic.getForum().setModerated(true);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(topicRepository).get(2); will(returnValue(topic));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
@@ -435,7 +423,6 @@ public class TopicControllerTestCase {
 		topic.getForum().setId(1); topic.getForum().setModerated(true);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(topicRepository).get(2); will(returnValue(topic));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
@@ -457,7 +444,6 @@ public class TopicControllerTestCase {
 		final Topic topic = new Topic(); topic.setId(1); topic.getForum().setId(1);
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			ignoring(userSession); ignoring(topicService);
 			one(topicRepository).get(1); will(returnValue(topic));
 			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
@@ -533,6 +519,6 @@ public class TopicControllerTestCase {
 	public void setup() {
 		topicController = new TopicController(mockResult, config, topicService,
 			forumRepository, smilieRepository, postRepository, topicRepository, categoryRepository,
-			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request);
+			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request, userSession);
 	}
 }

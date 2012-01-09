@@ -35,18 +35,21 @@ public class PostEditInterceptor implements Interceptor {
 	private final ForumLimitedTimeRepository repository;
 	private final PostRepository postRepository;
 	private final JForumConfig config;
-	private final SessionManager sessionManager;
 	private final HttpServletRequest request;
 	private final Result result;
+	private final UserSession userSession;
+	private final SessionManager sessionManager;
 
 	public PostEditInterceptor(PostRepository postRepository, ForumLimitedTimeRepository repository,
-			JForumConfig config, SessionManager sessionManager, HttpServletRequest request, Result result) {
+			JForumConfig config, HttpServletRequest request, Result result,
+			UserSession userSession, SessionManager sessionManager) {
 		this.postRepository = postRepository;
 		this.repository = repository;
 		this.config = config;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 		this.request = request;
 		this.result = result;
+		this.sessionManager = sessionManager;
 	}
 
 	@Override
@@ -56,7 +59,6 @@ public class PostEditInterceptor implements Interceptor {
 
 	@Override
 	public void intercept(InterceptorStack stack, ResourceMethod method, Object resourceInstance) throws InterceptionException {
-		UserSession userSession = this.sessionManager.getUserSession();
 		RoleManager roleManager = userSession.getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isModerator() && !roleManager.getCanEditPosts()) {

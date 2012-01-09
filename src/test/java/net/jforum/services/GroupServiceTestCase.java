@@ -34,14 +34,13 @@ public class GroupServiceTestCase {
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
-	private GroupService service = new GroupService(repository, sessionManager, userRepository);
+	private GroupService service = new GroupService(repository, userRepository, userSession, sessionManager);
 
 	@Test
 	public void savePermissions() {
 		final Group group = new Group();
 
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).isAdministrator(); will(returnValue(false));
 			one(userRepository).changeAllowAvatarState(false, group);

@@ -12,7 +12,6 @@ package net.jforum.controllers;
 
 import java.util.Arrays;
 
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.UserSession;
@@ -36,16 +35,12 @@ import br.com.caelum.vraptor.util.test.MockResult;
 public class ForumAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private ForumAdminController controller;
-	private CategoryRepository categoryRepository = context
-			.mock(CategoryRepository.class);
+	private CategoryRepository categoryRepository = context.mock(CategoryRepository.class);
 	private ForumService service = context.mock(ForumService.class);
-	private ForumRepository forumRepository = context
-			.mock(ForumRepository.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
+	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
-	private ForumAdminController mockForumAdminController = context
-			.mock(ForumAdminController.class);
+	private ForumAdminController mockForumAdminController = context.mock(ForumAdminController.class);
 	private Result mockResult = context.mock(MockResult.class);
 
 	public ForumAdminControllerTestCase() {
@@ -56,8 +51,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void deleteIsFullAdministratorShouldAllow() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -77,8 +70,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void deleteIsNotFullAdministratorShouldIgnore() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -128,8 +119,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void editExpectForumAndCategories() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).getCanModerateForum(3);
@@ -155,8 +144,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void editSaveIsSuperAdministratorExpectsSuccess() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -176,8 +163,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void editSaveIsCategoryAllowedExpectsSuccess() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -207,8 +192,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -233,8 +216,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -260,8 +241,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -289,8 +268,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -313,8 +290,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void up() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).getCanModerateForum(1);
@@ -334,8 +309,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	public void down() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).getCanModerateForum(2);
@@ -354,6 +327,6 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 	@Before
 	public void setup() {
 		controller = new ForumAdminController(service, forumRepository,
-				categoryRepository, sessionManager, mockResult);
+				categoryRepository, mockResult, userSession);
 	}
 }

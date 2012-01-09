@@ -14,7 +14,6 @@ import java.util.Date;
 
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Post;
 import net.jforum.entities.PostReport;
 import net.jforum.entities.PostReportStatus;
@@ -39,17 +38,16 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.POST_REPORT)
-// @InterceptedBy(MethodSecurityInterceptor.class)
 public class PostReportController {
 	private final PostReportRepository repository;
-	private final SessionManager sessionManager;
 	private final JForumConfig config;
 	private final Result result;
+	private final UserSession userSession;
 
-	public PostReportController(PostReportRepository repository,
-			SessionManager sessionManager, JForumConfig config, Result result) {
+	public PostReportController(PostReportRepository repository, JForumConfig config,
+			Result result, UserSession userSession) {
 		this.repository = repository;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 		this.config = config;
 		this.result = result;
 	}
@@ -101,7 +99,7 @@ public class PostReportController {
 	}
 
 	public void report(int postId, String description) {
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 
 		if (userSession.isLogged()) {
 			PostReport report = new PostReport();
@@ -118,7 +116,7 @@ public class PostReportController {
 	}
 
 	private boolean canManipulateReport(PostReport report) {
-		int[] forumIds = this.sessionManager.getUserSession().getRoleManager()
+		int[] forumIds = this.userSession.getRoleManager()
 				.getRoleValues(SecurityConstants.FORUM);
 
 		for (int forumId : forumIds) {
@@ -138,7 +136,7 @@ public class PostReportController {
 
 	private int[] getForumIdsToFilter() {
 		int[] forumIds = null;
-		RoleManager roleManager = this.sessionManager.getUserSession()
+		RoleManager roleManager = this.userSession
 				.getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isCoAdministrator()) {

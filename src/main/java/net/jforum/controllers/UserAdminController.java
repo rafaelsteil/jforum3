@@ -14,8 +14,8 @@ import java.util.List;
 
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.User;
+import net.jforum.entities.UserSession;
 import net.jforum.entities.util.Pagination;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
@@ -38,19 +38,18 @@ public class UserAdminController {
 	private GroupRepository groupRepository;
 	private JForumConfig config;
 	private UserService userService;
-	private SessionManager sessionManager;
 	private final Result result;
+	private final UserSession userSession;
 
 	public UserAdminController(UserRepository repository,
 			GroupRepository groupRepository, JForumConfig config,
-			UserService userService, SessionManager sessionManager,
-			Result result) {
+			UserService userService, Result result, UserSession userSession) {
 		this.userRepository = repository;
 		this.groupRepository = groupRepository;
 		this.config = config;
 		this.userService = userService;
-		this.sessionManager = sessionManager;
 		this.result = result;
+		this.userSession = userSession;
 	}
 
 	/**
@@ -86,9 +85,8 @@ public class UserAdminController {
 	 * @param groupIds
 	 *            the id of the groups for the user
 	 */
-	// @InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void groupsSave(int userId, int... groupIds) {
-		RoleManager roleManager = this.sessionManager.getUserSession()
+		RoleManager roleManager = this.userSession
 				.getRoleManager();
 		boolean canSave = roleManager.isAdministrator();
 

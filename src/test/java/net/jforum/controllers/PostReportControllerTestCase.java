@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import junit.framework.Assert;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.PostReport;
@@ -45,19 +44,18 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class PostReportControllerTestCase {
 	private Mockery mockery = TestCaseUtils.newMockery();
-	private SessionManager sessionManager = mockery.mock(SessionManager.class);
 	private UserSession userSession = mockery.mock(UserSession.class);
 	private RoleManager roleManager = mockery.mock(RoleManager.class);
 	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
 	private JForumConfig config = mockery.mock(JForumConfig.class);
 	private Result mockResult = mockery.mock(MockResult.class);
 	private PostReportController mockPostReportController = mockery.mock(PostReportController.class);
-	private PostReportController controller = new PostReportController(repository, sessionManager, config, mockResult);
+	private PostReportController controller = new PostReportController(repository, config, mockResult, userSession);
 
 	@Test
 	public void listResolved() {
 		mockery.checking(new Expectations() {{
-			ignoring(sessionManager); ignoring(roleManager);
+			ignoring(roleManager);
 			allowing(config).getInt(ConfigKeys.TOPICS_PER_PAGE); will(returnValue(10));
 			one(repository).getPaginated(0, 10, PostReportStatus.RESOLVED, new int[] {});
 				will(returnValue(new PaginatedResult<PostReport>(new ArrayList<PostReport>(), 10)));
@@ -171,7 +169,7 @@ public class PostReportControllerTestCase {
 	@Test
 	public void listNullStatusDefaultShouldBeUnresolved() {
 		mockery.checking(new Expectations() {{
-			ignoring(sessionManager); ignoring(roleManager); ignoring(mockResult);
+			ignoring(roleManager); ignoring(mockResult);
 			one(repository).getAll(PostReportStatus.UNRESOLVED, new int[] {});
 		}});
 
@@ -207,7 +205,6 @@ public class PostReportControllerTestCase {
 	@Before
 	public void setup() {
 		mockery.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
 		}});
 	}

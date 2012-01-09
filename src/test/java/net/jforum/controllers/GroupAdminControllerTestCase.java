@@ -13,7 +13,6 @@ package net.jforum.controllers;
 import java.util.ArrayList;
 
 import net.jforum.actions.helpers.PermissionOptions;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Group;
 import net.jforum.entities.UserSession;
@@ -39,14 +38,11 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 	private GroupAdminController controller;
 	private GroupRepository repository = context.mock(GroupRepository.class);
 	private GroupService service = context.mock(GroupService.class);
-	private CategoryRepository categoryRepository = context
-			.mock(CategoryRepository.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
+	private CategoryRepository categoryRepository = context.mock(CategoryRepository.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private Result mockResult = context.mock(MockResult.class);
-	private GroupAdminController mockGroupAdminController = context
-			.mock(GroupAdminController.class);
+	private GroupAdminController mockGroupAdminController = context.mock(GroupAdminController.class);
 
 	public GroupAdminControllerTestCase() {
 		super(GroupAdminController.class);
@@ -67,8 +63,7 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 
 				one(mockResult).include("group", new Group());
 				one(mockResult).include("groups", new ArrayList<Group>());
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
+				one(mockResult).include("categories", new ArrayList<Category>());
 				one(mockResult).include("permissions", new PermissionOptions());
 			}
 		});
@@ -289,13 +284,10 @@ public class GroupAdminControllerTestCase extends AdminTestCase {
 
 	@Before
 	public void setup() {
-		controller = new GroupAdminController(service, repository,
-				sessionManager, categoryRepository, mockResult);
+		controller = new GroupAdminController(service, repository, categoryRepository, mockResult, userSession);
 
 		context.checking(new Expectations() {
 			{
-				allowing(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				allowing(userSession).getRoleManager();
 				will(returnValue(roleManager));
 			}

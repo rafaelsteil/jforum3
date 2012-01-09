@@ -48,30 +48,24 @@ import br.com.caelum.vraptor.util.test.MockResult;
  */
 public class ForumControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private CategoryRepository categoryRepository = context
-			.mock(CategoryRepository.class);
-	private ForumRepository forumRepository = context
-			.mock(ForumRepository.class);
+	private CategoryRepository categoryRepository = context.mock(CategoryRepository.class);
+	private ForumRepository forumRepository = context.mock(ForumRepository.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
 	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private MostUsersEverOnlineService mostUsersEverOnlineService = context
-			.mock(MostUsersEverOnlineService.class);
+	private MostUsersEverOnlineService mostUsersEverOnlineService = context.mock(MostUsersEverOnlineService.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
-	private GroupInteractionFilter groupInteractionFilter = context
-			.mock(GroupInteractionFilter.class);
+	private GroupInteractionFilter groupInteractionFilter = context.mock(GroupInteractionFilter.class);
 	private ForumController controller;
+	private UserSession userSession = context.mock(UserSession.class);
 	private Result mockResult = context.mock(MockResult.class);
 
 	@Test
 	public void showShouldHaveAccessForumConstraint() throws Exception {
-		Method method = controller.getClass().getMethod("show", int.class,
-				int.class);
+		Method method = controller.getClass().getMethod("show", int.class, int.class);
 		Assert.assertNotNull(method);
 		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(AccessForumRule.class,
-				method.getAnnotation(SecurityConstraint.class).value());
-		Assert.assertTrue(method.getAnnotation(SecurityConstraint.class)
-				.displayLogin());
+		Assert.assertEquals(AccessForumRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		Assert.assertTrue(method.getAnnotation(SecurityConstraint.class).displayLogin());
 	}
 
 	@Test
@@ -92,10 +86,8 @@ public class ForumControllerTestCase {
 				will(returnValue(true));
 				one(mockResult).include("topics", new ArrayList<Topic>());
 				one(mockResult).include("forum", forum);
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
-				one(mockResult).include("pagination",
-						new Pagination(0, 0, 0, "", 0));
+				one(mockResult).include("categories", new ArrayList<Category>());
+				one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
 				one(mockResult).include("isModeratorOnline", true);
 			}
 		});
@@ -117,8 +109,6 @@ public class ForumControllerTestCase {
 
 				RoleManager roleManager = context.mock(RoleManager.class);
 				UserSession userSession = context.mock(UserSession.class);
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 
@@ -126,11 +116,9 @@ public class ForumControllerTestCase {
 
 				one(userSession).isLogged();
 				will(returnValue(true));
-				one(roleManager).roleExists(
-						SecurityConstants.INTERACT_OTHER_GROUPS);
+				one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS);
 				will(returnValue(false));
-				one(groupInteractionFilter).filterForumListing(mockResult,
-						userSession);
+				one(groupInteractionFilter).filterForumListing(mockResult, userSession);
 			}
 		});
 
@@ -158,18 +146,15 @@ public class ForumControllerTestCase {
 				will(returnValue(4));
 				one(userRepository).getLastRegisteredUser();
 				will(returnValue(new User()));
-				one(mostUsersEverOnlineService).getMostRecentData(
-						with(any(int.class)));
+				one(mostUsersEverOnlineService).getMostRecentData(with(any(int.class)));
 				will(returnValue(most));
 				one(sessionManager).getTotalUsers();
 				will(returnValue(3));
 				one(config).getInt(ConfigKeys.POSTS_PER_PAGE);
 				will(returnValue(7));
 
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
-				one(mockResult).include("onlineUsers",
-						new ArrayList<UserSession>());
+				one(mockResult).include("categories", new ArrayList<Category>());
+				one(mockResult).include("onlineUsers", new ArrayList<UserSession>());
 				one(mockResult).include("totalRegisteredUsers", 1);
 				one(mockResult).include("totalMessages", 2);
 				one(mockResult).include("totalLoggedUsers", 3);
@@ -179,8 +164,6 @@ public class ForumControllerTestCase {
 				one(mockResult).include("postsPerPage", 7);
 
 				UserSession userSession = context.mock(UserSession.class);
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).isLogged();
 				will(returnValue(false));
 			}
@@ -192,8 +175,7 @@ public class ForumControllerTestCase {
 
 	@Before
 	public void setup() {
-		controller = new ForumController(categoryRepository, sessionManager,
-				forumRepository, userRepository, mostUsersEverOnlineService,
-				config, groupInteractionFilter, mockResult);
+		controller = new ForumController(categoryRepository, forumRepository, userSession, userRepository,
+			mostUsersEverOnlineService, config, groupInteractionFilter, mockResult, sessionManager);
 	}
 }

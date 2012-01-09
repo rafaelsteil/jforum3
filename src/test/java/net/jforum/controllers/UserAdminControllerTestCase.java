@@ -12,7 +12,6 @@ package net.jforum.controllers;
 
 import java.util.ArrayList;
 
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
@@ -40,11 +39,9 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private UserRepository repository = context.mock(UserRepository.class);
 	private UserAdminController controller;
-	private GroupRepository groupRepository = context
-			.mock(GroupRepository.class);
+	private GroupRepository groupRepository = context.mock(GroupRepository.class);
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private UserService userService = context.mock(UserService.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private UserSession userSession = context.mock(UserSession.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private Result mockResult = context.mock(MockResult.class);
@@ -59,8 +56,6 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 	public void groupsSaveIsSuperAdministratorShouldAccept() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -84,8 +79,6 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 	public void groupsNotSuperAdministratorIsGroupManagerShouldAccept() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -113,8 +106,6 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 	public void groupsSaveNotSuperAdminNotGroupManagerShouldIgnore() {
 		context.checking(new Expectations() {
 			{
-				one(sessionManager).getUserSession();
-				will(returnValue(userSession));
 				one(userSession).getRoleManager();
 				will(returnValue(roleManager));
 				one(roleManager).isAdministrator();
@@ -190,6 +181,6 @@ public class UserAdminControllerTestCase extends AdminTestCase {
 	@Before
 	public void setup() {
 		controller = new UserAdminController(repository, groupRepository, config,
-				userService, sessionManager, mockResult);
+				userService, mockResult, userSession);
 	}
 }

@@ -17,7 +17,6 @@ import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.PostFormOptions;
 import net.jforum.core.Role;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Group;
 import net.jforum.entities.Post;
@@ -51,12 +50,11 @@ public class PrivateMessageControllerTestCase {
 	private PrivateMessageRepository repository = context.mock(PrivateMessageRepository.class);
 	private UserRepository userRepository = context.mock(UserRepository.class);
 	private PrivateMessageService service = context.mock(PrivateMessageService.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private RoleManager roleManager = context.mock(RoleManager.class);
 	private Result mockResult = context.mock(MockResult.class);
 	private TopicController mockTopicController = context.mock(TopicController.class);
 	private PrivateMessageController controller = new PrivateMessageController(repository,
-		userRepository, service, sessionManager, mockResult);
+		userRepository, service, mockResult, userSession);
 
 	@Test
 	public void review() {
@@ -74,7 +72,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void delete() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getUser(); will(returnValue(new User()));
 			one(service).delete(new User(), 1, 2, 3);
 			one(mockResult).redirectTo(Actions.INBOX);
@@ -120,7 +117,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void sent() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getUser(); will(returnValue(new User()));
 			one(repository).getFromSentBox(new User()); will(returnValue(new ArrayList<PrivateMessage>()));
 			one(mockResult).include("privateMessages", new ArrayList<PrivateMessage>());
@@ -135,7 +131,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void sendSaveExpectSuccess() {
 		context.checking(new Expectations() {{
-			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getIp(); will(returnValue("0.0.0.0"));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
@@ -175,7 +170,6 @@ public class PrivateMessageControllerTestCase {
 			User recipient = new User();
 			one(userRepository).get(1); will(returnValue(recipient));
 
-			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(userSession).getUser(); will(returnValue(new User()));
 
@@ -189,7 +183,6 @@ public class PrivateMessageControllerTestCase {
 			one(mockResult).forwardTo(TopicController.class);
 			will(returnValue(mockTopicController));
 
-			//TODO pass zero?
 			one(mockTopicController).add(0);
 		}});
 
@@ -206,7 +199,6 @@ public class PrivateMessageControllerTestCase {
 
 			one(userRepository).get(1); will(returnValue(recipient));
 
-			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(false));
@@ -238,7 +230,6 @@ public class PrivateMessageControllerTestCase {
 
 			one(userRepository).get(1); will(returnValue(recipient));
 
-			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 
 			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(false));
@@ -261,7 +252,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void findUserWithUsernameCanInteractWithOtherGroups() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(true));
 
@@ -277,7 +267,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void findUserWithUsernameCannotInteractWithOtherGroups() {
 		context.checking(new Expectations() {{
-			allowing(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getRoleManager(); will(returnValue(roleManager));
 			one(roleManager).getCanOnlyContactModerators(); will(returnValue(false));
 
@@ -308,7 +297,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void send() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			User user = new User(); user.setId(1);
 			one(userSession).getUser(); will(returnValue(user));
 			one(mockResult).include("post", new Post());
@@ -330,7 +318,6 @@ public class PrivateMessageControllerTestCase {
 	@Test
 	public void inbox() {
 		context.checking(new Expectations() {{
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			User user = new User(); user.setId(1);
 			one(userSession).getUser(); will(returnValue(user));
 			one(repository).getFromInbox(user); will(returnValue(new ArrayList<PrivateMessage>()));

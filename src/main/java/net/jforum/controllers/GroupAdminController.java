@@ -15,8 +15,8 @@ import java.util.Arrays;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Group;
+import net.jforum.entities.UserSession;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.GroupRepository;
 import net.jforum.security.AdministrationRule;
@@ -31,22 +31,20 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.GROUPS_ADMIN)
-// @InterceptedBy({MethodInterceptorInterceptor.class,ActionSecurityInterceptor.class})
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class GroupAdminController {
 	private GroupRepository groupRepository;
 	private CategoryRepository categoryRepository;
 	private GroupService service;
-	private SessionManager sessionManager;
 	private final Result result;
+	private final UserSession userSession;
 
 	public GroupAdminController(GroupService service, GroupRepository repository,
-			SessionManager sessionManager,
-			CategoryRepository categoryRepository, Result result) {
+			CategoryRepository categoryRepository, Result result, UserSession userSession) {
 		this.service = service;
 		this.groupRepository = repository;
 		this.categoryRepository = categoryRepository;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 		this.result = result;
 	}
 
@@ -59,7 +57,7 @@ public class GroupAdminController {
 	public void permissions(int groupId) {
 		Group group = this.groupRepository.get(groupId);
 
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isGroupManager(groupId)) {
 			this.result.redirectTo(this).list();
@@ -81,7 +79,7 @@ public class GroupAdminController {
 	 *            the set of permissions of this group
 	 */
 	public void permissionsSave(int groupId, PermissionOptions permissions) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 		if (roleManager.isAdministrator() || roleManager.isGroupManager(groupId)) {
 			this.service.savePermissions(groupId, permissions);
 		}
@@ -100,7 +98,7 @@ public class GroupAdminController {
 	 * Shows the page to add a new group
 	 */
 	public void add() {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (!roleManager.isAdministrator()) {
 			this.result.redirectTo(this).list();
@@ -114,7 +112,7 @@ public class GroupAdminController {
 	 *            the id of the groups to delete
 	 */
 	public void delete(int... groupId) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAdministrator()) {
 			this.service.delete(groupId);
@@ -129,7 +127,7 @@ public class GroupAdminController {
 	 * @param groupId
 	 */
 	public void edit(int groupId) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isGroupManager(groupId)) {
 			this.result.redirectTo(this).list();
@@ -146,7 +144,7 @@ public class GroupAdminController {
 	 * @param group
 	 */
 	public void editSave(Group group) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAdministrator() || roleManager.isGroupManager(group.getId())) {
 			this.service.update(group);
@@ -161,7 +159,7 @@ public class GroupAdminController {
 	 * @param group
 	 */
 	public void addSave(Group group) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAdministrator()) {
 			this.service.add(group);

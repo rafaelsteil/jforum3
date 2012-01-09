@@ -36,7 +36,6 @@ import net.jforum.util.MD5;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
@@ -201,14 +200,6 @@ public class SessionManager {
 	public UserSession getUserSession(String sessionId) {
 		UserSession us = this.anonymousSessions.get(sessionId);
 		return us != null ? us : this.loggedSessions.get(sessionId);
-	}
-
-	/**
-	 * Return the {@link UserSession} associated to the current thread
-	 * @return the user session
-	 */
-	public UserSession getUserSession() {
-		return this.getUserSession(RequestContextHolder.currentRequestAttributes().getSessionId());
 	}
 
 	/**

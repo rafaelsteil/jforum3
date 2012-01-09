@@ -77,6 +77,7 @@ public class TopicController {
 	private HttpServletRequest request;
 	private final ForumLimitedTimeRepository forumLimitedTimeRepository;
 	private final Result result;
+	private final UserSession userSession;
 
 	public TopicController(Result result, JForumConfig config,
 			TopicService topicService, ForumRepository forumRepository,
@@ -86,7 +87,7 @@ public class TopicController {
 			RankingRepository rankingRepository, SessionManager sessionManager,
 			PollRepository pollRepository,
 			ForumLimitedTimeRepository forumLimitedTimeRepository,
-			AttachmentService attachmentService, HttpServletRequest request) {
+			AttachmentService attachmentService, HttpServletRequest request, UserSession userSession) {
 		this.result = result;
 		this.forumRepository = forumRepository;
 		this.smilieRepository = smilieRepository;
@@ -101,6 +102,7 @@ public class TopicController {
 		this.forumLimitedTimeRepository = forumLimitedTimeRepository;
 		this.attachmentService = attachmentService;
 		this.request = request;
+		this.userSession = userSession;
 	}
 
 	public void preList(int topicId, int postId) {
@@ -146,7 +148,7 @@ public class TopicController {
 	}
 
 	public void vote(int topicId, int pollId, int optionId) {
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 
 		if (userSession.isLogged() && optionId != 0) {
 			User user = userSession.getUser();
@@ -240,7 +242,7 @@ public class TopicController {
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void replySave(Topic topic, Post post, PostFormOptions options) {
 
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 
 		post.setUserIp(userSession.getIp());
 		post.setUser(userSession.getUser());
@@ -289,7 +291,7 @@ public class TopicController {
 
 		// FIXME resolve cache issues
 		// topic.incrementViews();
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 		userSession.markTopicAsRead(topicId);
 
 		Pagination pagination = new Pagination(this.config, page).forTopic(topic);
@@ -342,7 +344,7 @@ public class TopicController {
 			List<PollOption> pollOptions) {
 
 		ActionUtils.definePostOptions(post, options);
-		UserSession userSession = this.sessionManager.getUserSession();
+		UserSession userSession = this.userSession;
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
 
 		if (userSession.getRoleManager().isAttachmentsAlllowed(topic.getForum().getId())) {

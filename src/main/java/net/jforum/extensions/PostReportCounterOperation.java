@@ -10,7 +10,6 @@
  */
 package net.jforum.extensions;
 
-import net.jforum.core.SessionManager;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.util.SecurityConstants;
@@ -23,13 +22,13 @@ import br.com.caelum.vraptor.ioc.Component;
 @Component
 public class PostReportCounterOperation implements RequestOperation {
 	private final PostReportRepository repository;
-	private final SessionManager sessionManager;
 	private final Result result;
+	private final UserSession userSession;
 
-	public PostReportCounterOperation(PostReportRepository repository, SessionManager sessionManager, Result result) {
+	public PostReportCounterOperation(PostReportRepository repository, Result result, UserSession userSession) {
 		this.repository = repository;
-		this.sessionManager = sessionManager;
 		this.result = result;
+		this.userSession = userSession;
 	}
 
 	/**
@@ -38,8 +37,6 @@ public class PostReportCounterOperation implements RequestOperation {
 	@Override
 	public void execute() {
 		int total = 0;
-		UserSession userSession = this.sessionManager.getUserSession();
-
 		if (userSession != null && userSession.isLogged() && userSession.getRoleManager().isModerator()) {
 			total = this.repository.countPendingReports(userSession.getRoleManager().getRoleValues(SecurityConstants.FORUM));
 		}

@@ -12,7 +12,6 @@ package net.jforum.core.events.category;
 
 import java.util.Arrays;
 
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
@@ -35,8 +34,7 @@ public class NewCategoryGroupPermissionsEventTestCase {
 	private GroupRepository groupRepository = context.mock(GroupRepository.class);
 	private GroupService groupService = context.mock(GroupService.class);
 	private UserSession userSession = context.mock(UserSession.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private NewCategoryGroupPermissionsEvent event = new NewCategoryGroupPermissionsEvent(groupRepository, groupService, sessionManager);
+	private NewCategoryGroupPermissionsEvent event = new NewCategoryGroupPermissionsEvent(groupRepository, groupService, userSession);
 
 	@Test
 	public void added() {
@@ -53,7 +51,6 @@ public class NewCategoryGroupPermissionsEventTestCase {
 			user.getGroups().add(group2);
 			user.getGroups().add(group4);
 
-			one(sessionManager).getUserSession(); will(returnValue(userSession));
 			one(userSession).getUser(); will(returnValue(user));
 
 			one(groupService).appendRole(group1, SecurityConstants.CATEGORY, 1);

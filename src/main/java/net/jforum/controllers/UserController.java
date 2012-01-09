@@ -64,7 +64,8 @@ public class UserController {
 
 	public UserController(UserRepository userRepository, UserSession userSession, UserService userService,
 		SessionManager sessionFacade, JForumConfig config, LostPasswordService lostPasswordService,
-		AvatarService avatarService, RankingRepository rankingRepository, Result result, HttpServletRequest request) {
+		AvatarService avatarService, RankingRepository rankingRepository, Result result,
+		HttpServletRequest request) {
 		this.userRepository = userRepository;
 		this.userService = userService;
 		this.sessionManager = sessionFacade;
@@ -82,7 +83,7 @@ public class UserController {
 	 * @param page the pagination first record to start showing
 	 */
 	public void list(int page) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (!roleManager.isUserListingEnabled()) {
 			this.result.include("users", new ArrayList<User>());
@@ -96,7 +97,7 @@ public class UserController {
 					pagination.getRecordsPerPage()));
 			}
 			else {
-				User currentUser = this.sessionManager.getUserSession().getUser();
+				User currentUser = this.userSession.getUser();
 				this.result.include("users", this.userRepository.getAllUsers(pagination.getStart(),
 					pagination.getRecordsPerPage(), currentUser.getGroups()));
 			}
@@ -109,7 +110,7 @@ public class UserController {
 	 * Logout an authenticated user
 	 */
 	public void logout() {
-		UserSession us = this.sessionManager.getUserSession();
+		UserSession us = this.userSession;
 		this.sessionManager.storeSession(us.getSessionId());
 
 		us.becomeAnonymous(this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID));

@@ -13,9 +13,9 @@ package net.jforum.core.events.forum;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
+import net.jforum.entities.UserSession;
 import net.jforum.events.EmptyForumEvent;
 import net.jforum.repository.GroupRepository;
 import net.jforum.services.GroupService;
@@ -27,13 +27,12 @@ import net.jforum.util.SecurityConstants;
 public class NewForumGroupPermissionsEvent extends EmptyForumEvent {
 	private GroupRepository groupRepository;
 	private GroupService groupService;
-	private SessionManager sessionManager;
+	private final UserSession userSession;
 
-	public NewForumGroupPermissionsEvent(GroupRepository groupRepository, GroupService groupService,
-		SessionManager sessionManager) {
+	public NewForumGroupPermissionsEvent(GroupRepository groupRepository, GroupService groupService, UserSession userSession) {
 		this.groupRepository = groupRepository;
 		this.groupService = groupService;
-		this.sessionManager = sessionManager;
+		this.userSession = userSession;
 	}
 
 	/**
@@ -45,7 +44,7 @@ public class NewForumGroupPermissionsEvent extends EmptyForumEvent {
 	@Override
 	public void added(Forum forum) {
 		List<Group> allGroups = this.groupRepository.getAllGroups();
-		List<Group> userGroups = this.sessionManager.getUserSession().getUser().getGroups();
+		List<Group> userGroups = this.userSession.getUser().getGroups();
 		List<Group> processedGroups = new ArrayList<Group>();
 
 		for (Group group : userGroups) {

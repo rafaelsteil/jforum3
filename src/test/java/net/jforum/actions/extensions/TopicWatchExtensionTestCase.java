@@ -16,7 +16,6 @@ import java.util.Map;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
 import net.jforum.entities.User;
@@ -39,10 +38,10 @@ import br.com.caelum.vraptor.Result;
  */
 public class TopicWatchExtensionTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
-	private SessionManager sessionManager = context.mock(SessionManager.class);
 	private TopicWatchService service = context.mock(TopicWatchService.class);
 	private Result mockResult = context.mock(Result.class);
-	private TopicWatchExtension extension = new TopicWatchExtension(sessionManager, service, mockResult);
+	private UserSession userSession = context.mock(UserSession.class);
+	private TopicWatchExtension extension = new TopicWatchExtension(service, mockResult, userSession);
 
 	@Test
 	public void afterListNogLoggedWatchingShouldBeFalse() {
@@ -74,7 +73,6 @@ public class TopicWatchExtensionTestCase {
 	private void afterListExpectations(final boolean isLogged) {
 		context.checking(new Expectations() {{
 			UserSession us = context.mock(UserSession.class);
-			one(sessionManager).getUserSession(); will(returnValue(us));
 			Topic t = new Topic(); t.setId(1);
 
 			if (isLogged) {

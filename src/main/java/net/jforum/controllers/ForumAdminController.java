@@ -12,8 +12,8 @@ package net.jforum.controllers;
 
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.SessionManager;
 import net.jforum.entities.Forum;
+import net.jforum.entities.UserSession;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.ForumRepository;
 import net.jforum.security.AdministrationRule;
@@ -33,18 +33,16 @@ public class ForumAdminController {
 	private CategoryRepository categoryRepository;
 	private ForumRepository forumRepository;
 	private ForumService forumService;
-	private SessionManager sessionManager;
 	private final Result result;
+	private final UserSession userSession;
 
-	public ForumAdminController(ForumService service,
-			ForumRepository forumRepository,
-			CategoryRepository categoryRepository,
-			SessionManager sessionManager, Result result) {
+	public ForumAdminController(ForumService service, ForumRepository forumRepository,
+			CategoryRepository categoryRepository, Result result, UserSession userSession) {
 		this.forumService = service;
 		this.categoryRepository = categoryRepository;
 		this.forumRepository = forumRepository;
-		this.sessionManager = sessionManager;
 		this.result = result;
+		this.userSession = userSession;
 	}
 
 	/**
@@ -60,7 +58,7 @@ public class ForumAdminController {
 	 * Removes a list of forums
 	 */
 	public void delete(int... forumsId) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAdministrator()) {
 			this.forumService.delete(forumsId);
@@ -82,7 +80,7 @@ public class ForumAdminController {
 	 * @param forum
 	 */
 	public void addSave(Forum forum) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAdministrator() || roleManager.isCategoryAllowed(forum.getCategory().getId())) {
 			this.forumService.add(forum);
@@ -98,7 +96,7 @@ public class ForumAdminController {
 	 * @param forumId
 	 */
 	public void edit(int forumId) {
-		RoleManager roleManager = this.sessionManager.getUserSession().getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (!roleManager.getCanModerateForum(forumId)) {
 			this.result.redirectTo(this).list();
@@ -116,7 +114,7 @@ public class ForumAdminController {
 	 * @param forum
 	 */
 	public void editSave(Forum forum) {
-		RoleManager roleManager = this.sessionManager.getUserSession()
+		RoleManager roleManager = this.userSession
 				.getRoleManager();
 
 		if (roleManager.isAdministrator()
@@ -134,8 +132,7 @@ public class ForumAdminController {
 	 *            the id of the category to change
 	 */
 	public void up(int forumId) {
-		RoleManager roleManager = this.sessionManager.getUserSession()
-				.getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.getCanModerateForum(forumId)) {
 			this.forumService.upForumOrder(forumId);
@@ -151,8 +148,7 @@ public class ForumAdminController {
 	 *            the id of the category to change
 	 */
 	public void down(int forumId) {
-		RoleManager roleManager = this.sessionManager.getUserSession()
-				.getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.getCanModerateForum(forumId)) {
 			this.forumService.downForumOrder(forumId);
