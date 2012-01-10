@@ -35,7 +35,6 @@ import net.jforum.util.MD5;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
 
 /**
@@ -43,17 +42,16 @@ import br.com.caelum.vraptor.ioc.Component;
  * @author Rafael Steil
  */
 @Component
-@ApplicationScoped
 public class SessionManager {
 	private static final Logger logger = Logger.getLogger(SessionManager.class);
-	private Map<String, UserSession> loggedSessions = new HashMap<String, UserSession>();
-	private Map<String, UserSession> anonymousSessions = new HashMap<String, UserSession>();
+	private static Map<String, UserSession> loggedSessions = new HashMap<String, UserSession>();
+	private static Map<String, UserSession> anonymousSessions = new HashMap<String, UserSession>();
 	private UserRepository userRepository;
 	private SessionRepository sessionRepository;
 	private JForumConfig config;
 	private int moderatorsOnline;
 
-	public SessionManager(JForumConfig config, UserRepository userRepository, SessionRepository sessionRepository) {
+	public SessionManager(JForumConfig config, SessionRepository sessionRepository, UserRepository userRepository) {
 		this.config = config;
 		this.userRepository = userRepository;
 		this.sessionRepository = sessionRepository;
