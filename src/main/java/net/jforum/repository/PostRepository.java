@@ -12,14 +12,24 @@ package net.jforum.repository;
 
 import net.jforum.entities.Post;
 
+import org.hibernate.Session;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface PostRepository extends Repository<Post> {
-	/**
-	 * Count how many posts there are in a specific topic until this post id
-	 * @param postId the post id to check
-	 * @return the number of posts until this post, in the same topic
-	 */
-	public int countPreviousPosts(int postId);
+@Component
+public class PostRepository extends HibernateGenericDAO<Post> implements Repository<Post> {
+	public PostRepository(Session session) {
+		super(session);
+	}
+
+	public int countPreviousPosts(int postId) {
+		return ((Long)session.createQuery("select count(*) from Post p " +
+			"where p.topic = (select p2.topic from Post p2 where p2.id = :id) and p.id <= :id")
+			.setParameter("id", postId)
+			.setComment("postDAO.countPreviousPosts")
+			.uniqueResult()).intValue();
+	}
 }

@@ -17,9 +17,7 @@
   	
   	<context-param>
     	<param-name>br.com.caelum.vraptor.packages</param-name>
-    	<param-value>
-        	br.com.caelum.vraptor.util.hibernate
-    	</param-value>
+    	<param-value>br.com.caelum.vraptor.util.hibernate</param-value>
 	</context-param>
 
 	<!-- JForum2 URL Compatibility. Uncoment if necessary -->

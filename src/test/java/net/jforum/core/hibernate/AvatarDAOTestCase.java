@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.jforum.entities.Avatar;
 import net.jforum.entities.AvatarType;
+import net.jforum.repository.AvatarRepository;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +25,7 @@ import org.junit.Test;
 public class AvatarDAOTestCase extends AbstractDAOTestCase<Avatar> {
 	@Test
 	public void getAllSmiliesExpectTwoResults() {
-		AvatarDAO dao = this.newDao();
+		AvatarRepository dao = this.newDao();
 
 		this.insert(this.createAvatar(120,150, "diskname1"), dao);
 		this.insert(this.createAvatar(130,140, "diskname2"), dao);
@@ -37,7 +38,7 @@ public class AvatarDAOTestCase extends AbstractDAOTestCase<Avatar> {
 
 	@Test
 	public void insert() {
-		AvatarDAO dao = this.newDao();
+		AvatarRepository dao = this.newDao();
 		Avatar s = this.createAvatar(120,150, "diskname");
 		this.insert(s, dao);
 
@@ -53,12 +54,12 @@ public class AvatarDAOTestCase extends AbstractDAOTestCase<Avatar> {
 
 	@Test
 	public void getAllAvatarsExpectEmtpyList() {
-		AvatarDAO dao = this.newDao();
+		AvatarRepository dao = this.newDao();
 		Assert.assertEquals(0, dao.getAll().size());
 	}
 
-	private AvatarDAO newDao() {
-		return new AvatarDAO(sessionFactory);
+	private AvatarRepository newDao() {
+		return new AvatarRepository(session());
 	}
 
 	private Avatar createAvatar(Integer width,Integer height, String diskName) {

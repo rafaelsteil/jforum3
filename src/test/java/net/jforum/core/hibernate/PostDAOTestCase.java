@@ -11,6 +11,9 @@
 package net.jforum.core.hibernate;
 
 import net.jforum.entities.Post;
+import net.jforum.repository.PostRepository;
+import net.jforum.repository.TopicRepository;
+import net.jforum.repository.UserRepository;
 import net.jforum.util.JDBCLoader;
 
 import org.junit.Assert;
@@ -28,7 +31,7 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 		this.commit();
 		this.beginTransaction();
 
-		PostDAO dao = this.newDao();
+		PostRepository dao = this.newDao();
 		int total = dao.countPreviousPosts(6);
 		Assert.assertEquals(6, total);
 	}
@@ -41,7 +44,7 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 		this.commit();
 		this.beginTransaction();
 
-		PostDAO dao = this.newDao();
+		PostRepository dao = this.newDao();
 		int total = dao.countPreviousPosts(3);
 		Assert.assertEquals(3, total);
 	}
@@ -51,7 +54,7 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 	public void add() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection()) .run("/postdao/dump.sql");
 
-		PostDAO dao = this.newDao();
+		PostRepository dao = this.newDao();
 		Post post = this.newPost();
 		this.insert(post, dao);
 
@@ -68,15 +71,15 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 		return post;
 	}
 
-	private TopicDAO newTopicDao() {
-		return new TopicDAO(sessionFactory);
+	private TopicRepository newTopicDao() {
+		return new TopicRepository(session());
 	}
 
-	private UserDAO newUserDao() {
-		return new UserDAO(sessionFactory);
+	private UserRepository newUserDao() {
+		return new UserRepository(session());
 	}
 
-	private PostDAO newDao() {
-		return new PostDAO(sessionFactory);
+	private PostRepository newDao() {
+		return new PostRepository(session());
 	}
 }

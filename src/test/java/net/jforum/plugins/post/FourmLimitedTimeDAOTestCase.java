@@ -24,7 +24,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/posteditlimited/dump.sql");
 
-		ForumLimitedTimeDAO dao = this.newFourmLimitedTimeDAO();
+		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
 		Forum forum = new Forum();
 		forum.setId(2);
 
@@ -40,7 +40,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/posteditlimited/dump.sql");
 
-		ForumLimitedTimeDAO dao = this.newFourmLimitedTimeDAO();
+		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
 		Forum forum = new Forum();
 		forum.setId(5);
 
@@ -55,7 +55,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/posteditlimited/dump.sql");
 
-		ForumLimitedTimeDAO dao = this.newFourmLimitedTimeDAO();
+		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
 		Forum forum = new Forum();
 		forum.setId(1);
 
@@ -70,7 +70,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 		.run("/posteditlimited/dump.sql");
 
-		ForumLimitedTimeDAO dao = this.newFourmLimitedTimeDAO();
+		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
 		Forum forum = new Forum();
 		forum.setId(5);
 
@@ -79,7 +79,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 		Assert.assertEquals(0, limitedTime);
 	}
 
-	private ForumLimitedTimeDAO newFourmLimitedTimeDAO() {
-		return new ForumLimitedTimeDAO(sessionFactory);
+	private ForumLimitedTimeRepository newFourmLimitedTimeDAO() {
+		return new ForumLimitedTimeRepository(session());
 	}
 }

@@ -15,11 +15,33 @@ import net.jforum.entities.PollOption;
 import net.jforum.entities.PollVoter;
 import net.jforum.entities.User;
 
+import org.hibernate.Session;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface PollRepository {
-	public void registerVote(PollVoter voter);
-	public boolean hasUserVoted(Poll poll, User user);
-	public PollOption getOption(int optionId);
+@Component
+public class PollRepository extends HibernateGenericDAO<PollVoter> {
+	public PollRepository(Session session) {
+		super(session);
+	}
+
+	public void registerVote(PollVoter voter) {
+		session.save(voter);
+	}
+
+	public boolean hasUserVoted(Poll poll, User user) {
+		return session.createQuery("from PollVoter voter where voter.user = :user and voter.poll = :poll")
+			.setParameter("user", user)
+			.setParameter("poll", poll)
+			.uniqueResult() != null;
+	}
+
+	public PollOption getOption(int optionId) {
+		return (PollOption)session.createQuery("from PollOption o where o.id = :id")
+			.setParameter("id", optionId)
+			.uniqueResult();
+	}
 }

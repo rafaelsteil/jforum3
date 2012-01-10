@@ -14,9 +14,22 @@ import java.util.List;
 
 import net.jforum.entities.BadWord;
 
+import org.hibernate.Session;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface BadWordRepository extends Repository<BadWord> {
-	public List<BadWord> getAll();
+@Component
+public class BadWordRepository extends HibernateGenericDAO<BadWord> implements Repository<BadWord> {
+
+	public BadWordRepository(Session session) {
+		super(session);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<BadWord> getAll() {
+		return session.createCriteria(BadWord.class).list();
+	}
 }

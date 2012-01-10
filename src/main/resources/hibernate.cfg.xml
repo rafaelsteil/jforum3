@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.show_sql">true</property>
+		<property name="hibernate.format_sql">true</property>
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost/jforum3</property>
+
+		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.connection.password"></property>
+		<!-- 
+		<property name="hibernate.current_session_context_class">thread</property>
+		 -->
+		<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<property name="hibernate.search.autoregister_listeners">false</property>
+		<property name="hibernate.search.default.indexBase">/tmp/jforumIndexesTest</property>
+		<property name="hibernate.cache.use_structured_entries">true</property>
+		<property name="hibernate.cache.use_query_cache">false</property>
+		<property name="hibernate.cache.use_second_level_cache">false</property>
+
+		<mapping class="net.jforum.entities.Category" />
+		<mapping class="net.jforum.entities.Forum" />
+		<mapping class="net.jforum.entities.Group" />
+		<mapping class="net.jforum.entities.User" />
+		<mapping class="net.jforum.entities.Ranking" />
+		<mapping class="net.jforum.entities.Banlist" />
+		<mapping class="net.jforum.entities.Smilie" />
+		<mapping class="net.jforum.entities.Post" />
+		<mapping class="net.jforum.entities.Topic" />
+		<mapping class="net.jforum.entities.Theme" />
+		<mapping class="net.jforum.entities.UserSession" />
+		<mapping class="net.jforum.entities.Config"/>
+		<mapping class="net.jforum.entities.Role"/>
+		<mapping class="net.jforum.entities.PrivateMessage" />
+		<mapping class="net.jforum.entities.TopicWatch" />
+		<mapping class="net.jforum.entities.Session" />
+		<mapping class="net.jforum.entities.BadWord" />
+		<mapping class="net.jforum.entities.Avatar" />
+		<mapping class="net.jforum.entities.PostReport" />
+		<mapping class="net.jforum.entities.Poll" />
+		<mapping class="net.jforum.entities.PollOption" />
+		<mapping class="net.jforum.entities.Attachment" />
+		<mapping class="net.jforum.plugins.post.ForumLimitedTime" />
+	</session-factory>
+</hibernate-configuration>

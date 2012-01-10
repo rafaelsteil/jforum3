@@ -15,6 +15,8 @@ import java.util.List;
 
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
+import net.jforum.repository.CategoryRepository;
+import net.jforum.repository.ForumRepository;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +30,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 		Category c1 = this.newCategory("c1", false);
 		Category c2 = this.newCategory("c2", false);
 
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 
 		this.insert(c1, dao);
 		this.insert(c2, dao);
@@ -43,7 +45,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 		boolean moderated = false;
 
 		Category c = this.newCategory(name, moderated);
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 
 		this.insert(c, dao);
 		Assert.assertTrue(c.getId() > 0);
@@ -58,7 +60,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 
 	@Test
 	public void updateChangingAnInstanceLoadedFromTheDb() {
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 		Category c = this.newCategory("c1", false);
 
 		this.insert(c, dao);
@@ -80,7 +82,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 
 	@Test
 	public void updateChangingAnInstanceCreatedByHandUsingARealId() {
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 		Category c = this.newCategory("c1", false);
 		this.insert(c, dao);
 
@@ -102,7 +104,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 
 	@Test
 	public void delete() {
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 		Category c = this.newCategory("c3", false);
 		this.insert(c, dao);
 
@@ -115,7 +117,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 
 	@Test
 	public void selectAll() {
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 
 		for (int i = 0; i < 3; i++) {
 			this.insert(this.newCategory("name" + i, false), dao);
@@ -138,8 +140,8 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 
 	@Test
 	public void insertThreeCategoriesWithTwoForumsEachExpectSelectInCorrectOrder() {
-		CategoryDAO dao = this.newDao();
-		ForumDAO forumDao = new ForumDAO(sessionFactory);
+		CategoryRepository dao = this.newDao();
+		ForumRepository forumDao = new ForumRepository(session());
 		int totalCategories = 3;
 
 		for (int i = 1; i <= totalCategories; i++) {
@@ -197,11 +199,11 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 
 	@Test
 	public void createCategoryAndTwoForumsGetCategoryExpectForumsInCorrectOrder() {
-		CategoryDAO dao = this.newDao();
+		CategoryRepository dao = this.newDao();
 		Category category = this.newCategory("cat1", false);
 		this.insert(category, dao);
 
-		ForumDAO forumDao = new ForumDAO(sessionFactory);
+		ForumRepository forumDao = new ForumRepository(session());
 
 		forumDao.add(this.newForum("f1", category));
 		forumDao.add(this.newForum("f2", category));
@@ -233,7 +235,7 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 		return c;
 	}
 
-	private CategoryDAO newDao() {
-		return new CategoryDAO(sessionFactory);
+	private CategoryRepository newDao() {
+		return new CategoryRepository(session());
 	}
 }

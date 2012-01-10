@@ -8,64 +8,58 @@
  * The JForum Project
  * http://www.jforum.net
  */
-package net.jforum.core.hibernate;
+package net.jforum.repository;
 
 import java.lang.reflect.ParameterizedType;
 
-import net.jforum.repository.Repository;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 /**
  * @author Rafael Steil
  */
 public class HibernateGenericDAO<T> implements Repository<T> {
 	protected Class<T> persistClass;
-	private SessionFactory sessionFactory;
+	protected final Session session;
 
 	@SuppressWarnings("unchecked")
-	public HibernateGenericDAO(SessionFactory sessionFactory) {
+	public HibernateGenericDAO(Session session) {
+		this.session = session;
 		this.persistClass = (Class<T>)((ParameterizedType)this.getClass()
 			.getGenericSuperclass()).getActualTypeArguments()[0];
-		this.sessionFactory = sessionFactory;
-	}
-
-	/**
-	 * Returns the session for the current executing context
-	 * @return the session
-	 */
-	protected Session session() {
-		return this.sessionFactory.getCurrentSession();
 	}
 
 	/**
 	 *
 	 * @see net.jforum.repository.Repository#remove(java.lang.Object)
 	 */
+	@Override
 	public void remove(T entity) {
-		this.session().delete(entity);
+		session.delete(entity);
 	}
 
 	/**
 	 * @see net.jforum.repository.Repository#get(int)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public T get(int id) {
-		return (T)this.session().get(this.persistClass, id);
+		return (T)session.get(this.persistClass, id);
 	}
 
 	/**
 	 * @see net.jforum.repository.Repository#add(java.lang.Object)
 	 */
+	@Override
 	public void add(T entity) {
-		this.session().save(entity);
+		session.save(entity);
 	}
 
 	/**
 	 * @see net.jforum.repository.Repository#update(java.lang.Object)
 	 */
+	@Override
 	public void update(T entity) {
-		this.session().update(entity);
+		session.update(entity);
 	}
 }

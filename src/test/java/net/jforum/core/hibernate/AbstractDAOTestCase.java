@@ -11,6 +11,8 @@
 package net.jforum.core.hibernate;
 
 
+import net.jforum.repository.HibernateGenericDAO;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;

@@ -15,6 +15,7 @@ import java.util.List;
 import junit.framework.Assert;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
+import net.jforum.repository.RSSRepository;
 import net.jforum.util.JDBCLoader;
 
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class RSSDAOTestCase extends AbstractDAOTestCase<Object> {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/rssdao/getForumTopics.sql");
 
-		RSSDAO dao = this.newDao();
+		RSSRepository dao = this.newDao();
 		Forum forum = new Forum(); forum.setId(1);
 		List<Topic> topics = dao.getForumTopics(forum, 10);
 
@@ -40,7 +41,7 @@ public class RSSDAOTestCase extends AbstractDAOTestCase<Object> {
 		Assert.assertEquals(3, topics.get(2).getId());
 	}
 
-	private RSSDAO newDao() {
-		return new RSSDAO(sessionFactory);
+	private RSSRepository newDao() {
+		return new RSSRepository(session());
 	}
 }

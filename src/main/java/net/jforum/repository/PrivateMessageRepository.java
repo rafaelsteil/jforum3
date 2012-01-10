@@ -13,25 +13,64 @@ package net.jforum.repository;
 import java.util.List;
 
 import net.jforum.entities.PrivateMessage;
+import net.jforum.entities.PrivateMessageType;
 import net.jforum.entities.User;
+
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
-public interface PrivateMessageRepository extends Repository<PrivateMessage> {
-	/**
-	 * Selects all messages from the user's inbox.
-	 *
-	 * @param the user who received the messages
-	 * @return al messages
-	 */
-	public List<PrivateMessage> getFromInbox(User user);
+@Component
+public class PrivateMessageRepository extends HibernateGenericDAO<PrivateMessage> implements Repository<PrivateMessage> {
+	public PrivateMessageRepository(Session session) {
+		super(session);
+	}
+
+	@Override
+	public void add(PrivateMessage entity) {
+		PrivateMessage targetCopy = new PrivateMessage(entity);
+
+		// First copy is to the sender's list
+		entity.setType(PrivateMessageType.SENT);
+		super.add(entity);
+
+		// Second copy is the target
+		targetCopy.setType(PrivateMessageType.NEW);
+		super.add(targetCopy);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PrivateMessage> getFromInbox(User user) {
+		return session.createCriteria(this.persistClass)
+			.add(Restrictions.eq("toUser", user))
+			.add(Restrictions.disjunction()
+				.add(Restrictions.eq("type", PrivateMessageType.NEW))
+				.add(Restrictions.eq("type", PrivateMessageType.READ))
+				.add(Restrictions.eq("type", PrivateMessageType.UNREAD))
+			)
+			.setComment("privateMessageDAO.getFromInbox")
+			.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PrivateMessage> getFromSentBox(User user) {
+		return session.createCriteria(this.persistClass)
+			.add(Restrictions.eq("fromUser", user))
+			.add(Restrictions.eq("type", PrivateMessageType.SENT))
+			.setComment("privateMessageDAO.getFromSentBox")
+			.list();
+	}
 
 	/**
-	 * Selects all messages from the user's sent box.
-	 *
-	 * @param user the user who sent the message
-	 * @return all messages found
+	 * This method will always throw UnsupportedOperationException
+	 * @throws UnsupportedOperationException
 	 */
-	public List<PrivateMessage> getFromSentBox(User user);
+	@Override
+	public void update(PrivateMessage entity) {
+		throw new UnsupportedOperationException("Update is not supported for Private Messages");
+	}
 }

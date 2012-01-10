@@ -20,6 +20,7 @@ import net.jforum.entities.PostReport;
 import net.jforum.entities.PostReportStatus;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
+import net.jforum.repository.PostReportRepository;
 import net.jforum.util.JDBCLoader;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@SuppressWarnings("deprecation")
 	public void countPendingReportsShouldFilterByForum() {
 		new JDBCLoader(this.session().connection()).run("/postreport/countPendingReports.sql");
-		PostReportDAO dao = this.newDAO();
+		PostReportRepository dao = this.newDAO();
 		Assert.assertEquals(1, dao.countPendingReports(1));
 	}
 
@@ -40,7 +41,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@SuppressWarnings("deprecation")
 	public void countPendingReportsWithoutFilteringShouldReturnAllResultsExceptResolved() {
 		new JDBCLoader(this.session().connection()).run("/postreport/countPendingReports.sql");
-		PostReportDAO dao = this.newDAO();
+		PostReportRepository dao = this.newDAO();
 		Assert.assertEquals(2, dao.countPendingReports());
 	}
 
@@ -64,7 +65,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 		PostReport report1 = this.createPostReport(2, 2, PostReportStatus.RESOLVED);
 		PostReport report2 = this.createPostReport(2, 2, PostReportStatus.RESOLVED);
 
-		PostReportDAO dao = this.newDAO();
+		PostReportRepository dao = this.newDAO();
 		List<PostReport> reports = dao.getAll(PostReportStatus.RESOLVED, null);
 
 		Assert.assertEquals(2, reports.size());
@@ -87,7 +88,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	}
 
 	private List<PostReport> getAll(int expectedCount, int... forumIds) {
-		PostReportDAO dao = this.newDAO();
+		PostReportRepository dao = this.newDAO();
 
 		List<PostReport> reports = dao.getAll(PostReportStatus.UNRESOLVED, forumIds);
 		Assert.assertEquals(expectedCount, reports.size());
@@ -122,13 +123,13 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 		report.getUser().setId(1);
 		report.setStatus(status);
 
-		PostReportDAO dao = this.newDAO();
+		PostReportRepository dao = this.newDAO();
 		this.insert(report, dao);
 
 		return report;
 	}
 
-	private PostReportDAO newDAO() {
-		return new PostReportDAO(sessionFactory);
+	private PostReportRepository newDAO() {
+		return new PostReportRepository(session());
 	}
 }

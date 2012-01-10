@@ -11,31 +11,41 @@
 package net.jforum.plugins.post;
 
 import net.jforum.entities.Forum;
+import net.jforum.repository.HibernateGenericDAO;
 import net.jforum.repository.Repository;
+
+import org.hibernate.Session;
+
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Bill
  */
-public interface ForumLimitedTimeRepository extends Repository<ForumLimitedTime> {
+@Component
+public class ForumLimitedTimeRepository extends HibernateGenericDAO<ForumLimitedTime> implements Repository<ForumLimitedTime> {
+
+	public ForumLimitedTimeRepository(Session session) {
+		super(session);
+	}
 
 	/**
-	 * get the limited time for gaven forum
-	 * if not setted or no limited will return 0
-	 * @param forum
-	 * @return
+	 * @see net.jforum.plugins.post.ForumLimitedTimeRepository#getLimitedTime(net.jforum.entities.Forum)
 	 */
-	long getLimitedTime(Forum forum);
+	public long getLimitedTime(Forum forum) {
+		ForumLimitedTime forumLimited = this.getForumLimitedTime(forum);
+		return forumLimited != null ? forumLimited.getLimitedTime() : 0;
+	}
+
+	public ForumLimitedTime getForumLimitedTime(Forum forum) {
+		return (ForumLimitedTime) session.createQuery("from ForumLimitedTime f where f.forum = :forum")
+				.setParameter("forum", forum)
+				.setMaxResults(1).uniqueResult();
+	}
 
 	/**
-	 * get the FourmLimitedTime for gaven forum
-	 * @param forum
-	 * @return
+	 * @see net.jforum.plugins.post.ForumLimitedTimeRepository#saveOrUpdate(net.jforum.plugins.post.ForumLimitedTime)
 	 */
-	public ForumLimitedTime getForumLimitedTime(Forum forum);
-
-	/**
-	 * save or Updates the information of an existing object
-	 * @param instance the instance to update
-	 */
-	public void saveOrUpdate(ForumLimitedTime fourmLimitedTime);
+	public void saveOrUpdate(ForumLimitedTime fourmLimitedTime) {
+		session.saveOrUpdate(fourmLimitedTime);
+	}
 }

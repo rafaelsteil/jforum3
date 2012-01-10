@@ -15,6 +15,8 @@ import java.util.List;
 import net.jforum.entities.PrivateMessage;
 import net.jforum.entities.PrivateMessageType;
 import net.jforum.entities.User;
+import net.jforum.repository.PrivateMessageRepository;
+import net.jforum.repository.UserRepository;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +30,7 @@ public class PrivateMessageDAOTestCase extends AbstractDAOTestCase<PrivateMessag
 		User fromUser = this.createUser("fromUser");
 		User toUser = this.createUser("toUser");
 
-		PrivateMessageDAO dao = this.newDao();
+		PrivateMessageRepository dao = this.newDao();
 		PrivateMessage pm = this.newPm("subject", "text", fromUser, toUser);
 
 		this.insert(pm, dao);
@@ -47,7 +49,7 @@ public class PrivateMessageDAOTestCase extends AbstractDAOTestCase<PrivateMessag
 
 	@Test
 	public void deleteFromInboxShouldNotRemoveOtherUserSentBox() {
-		PrivateMessageDAO dao = this.newDao();
+		PrivateMessageRepository dao = this.newDao();
 
 		User fromUser = this.createUser("fromUser");
 		User toUser = this.createUser("toUser");
@@ -69,7 +71,7 @@ public class PrivateMessageDAOTestCase extends AbstractDAOTestCase<PrivateMessag
 
 	@Test
 	public void insert() {
-		PrivateMessageDAO dao = this.newDao();
+		PrivateMessageRepository dao = this.newDao();
 
 		User fromUser = this.createUser("fromUser");
 		User toUser = this.createUser("toUser");
@@ -108,7 +110,7 @@ public class PrivateMessageDAOTestCase extends AbstractDAOTestCase<PrivateMessag
 
 	@Test
 	public void selectFromInboxExpectZeroResults() {
-		PrivateMessageDAO dao = this.newDao();
+		PrivateMessageRepository dao = this.newDao();
 
 		User user = new User(); user.setId(99);
 
@@ -117,7 +119,7 @@ public class PrivateMessageDAOTestCase extends AbstractDAOTestCase<PrivateMessag
 
 	@Test
 	public void selectFromSentExpectZeroResults() {
-		PrivateMessageDAO dao = this.newDao();
+		PrivateMessageRepository dao = this.newDao();
 
 		User user = new User(); user.setId(88);
 
@@ -141,15 +143,15 @@ public class PrivateMessageDAOTestCase extends AbstractDAOTestCase<PrivateMessag
 		return pm;
 	}
 
-	private PrivateMessageDAO newDao() {
-		return new PrivateMessageDAO(sessionFactory);
+	private PrivateMessageRepository newDao() {
+		return new PrivateMessageRepository(session());
 	}
 
 	private User createUser(String username) {
 		User user = new User();
 		user.setUsername(username);
 
-		UserDAO dao = new UserDAO(sessionFactory);
+		UserRepository dao = new UserRepository(session());
 		dao.add(user);
 
 		return user;

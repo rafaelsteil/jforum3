@@ -15,9 +15,37 @@ import java.util.List;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface RSSRepository {
-	public List<Topic> getForumTopics(Forum forum, int count);
+@Component
+public class RSSRepository {
+	private final Session session;
+
+	public RSSRepository(Session session) {
+		this.session = session;
+	}
+
+	/**
+	 * @see net.jforum.repository.RSSRepository#getForumTopics(net.jforum.entities.Forum, int)
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Topic> getForumTopics(Forum forum, int count) {
+		return session.createCriteria(Topic.class)
+			.add(Restrictions.eq("forum", forum))
+			.add(Restrictions.eq("pendingModeration", false))
+			.addOrder(Order.desc("date"))
+			.setMaxResults(count)
+			.setCacheable(true)
+			.setCacheRegion("rssDAO.getForumTopics#" + forum.getId())
+			.setComment("rssDAO.getForumTopics#" + forum.getId())
+			.list();
+	}
+
 }

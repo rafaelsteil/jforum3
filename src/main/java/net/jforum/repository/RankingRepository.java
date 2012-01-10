@@ -14,15 +14,27 @@ import java.util.List;
 
 import net.jforum.entities.Ranking;
 
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface RankingRepository extends Repository<Ranking> {
+@Component
+public class RankingRepository extends HibernateGenericDAO<Ranking> implements Repository<Ranking> {
+	public RankingRepository(Session session) {
+		super(session);
+	}
 
-	/**
-	 * Selects all ranking data from the database.
-	 *
-	 * @return List with the rankings.
-	 */
-	public List<Ranking> getAllRankings();
+	@SuppressWarnings("unchecked")
+	public List<Ranking> getAllRankings() {
+		return session.createCriteria(this.persistClass)
+			.addOrder(Order.asc("min"))
+			.setCacheable(true)
+			.setCacheRegion("rankingDAO")
+			.setComment("rankingDAO.getAllRankings")
+			.list();
+	}
 }

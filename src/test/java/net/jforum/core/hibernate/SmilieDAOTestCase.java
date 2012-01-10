@@ -13,6 +13,7 @@ package net.jforum.core.hibernate;
 import java.util.List;
 
 import net.jforum.entities.Smilie;
+import net.jforum.repository.SmilieRepository;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import org.junit.Test;
 public class SmilieDAOTestCase extends AbstractDAOTestCase<Smilie> {
 	@Test
 	public void getAllSmiliesExpectTwoResults() {
-		SmilieDAO dao = this.newDao();
+		SmilieRepository dao = this.newDao();
 
 		this.insert(this.createSmilie("[b1]", "diskname1"), dao);
 		this.insert(this.createSmilie("[b1]", "diskname2"), dao);
@@ -36,7 +37,7 @@ public class SmilieDAOTestCase extends AbstractDAOTestCase<Smilie> {
 
 	@Test
 	public void insert() {
-		SmilieDAO dao = this.newDao();
+		SmilieRepository dao = this.newDao();
 		Smilie s = this.createSmilie("x", "diskname");
 		this.insert(s, dao);
 
@@ -51,12 +52,12 @@ public class SmilieDAOTestCase extends AbstractDAOTestCase<Smilie> {
 
 	@Test
 	public void getAllSmiliesExpectEmtpyList() {
-		SmilieDAO dao = this.newDao();
+		SmilieRepository dao = this.newDao();
 		Assert.assertEquals(0, dao.getAllSmilies().size());
 	}
 
-	private SmilieDAO newDao() {
-		return new SmilieDAO(sessionFactory);
+	private SmilieRepository newDao() {
+		return new SmilieRepository(session());
 	}
 
 	private Smilie createSmilie(String code, String diskName) {

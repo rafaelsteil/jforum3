@@ -14,6 +14,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 import net.jforum.entities.BadWord;
+import net.jforum.repository.BadWordRepository;
 
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public class BadWordDAOTestCase extends AbstractDAOTestCase<BadWord> {
 		BadWord w1 = new BadWord(); w1.setWord("w1");
 		BadWord w2 = new BadWord(); w2.setWord("w2");
 
-		BadWordDAO dao = this.newDao();
+		BadWordRepository dao = this.newDao();
 
 		this.insert(w1, dao);
 		this.insert(w2, dao);
@@ -35,7 +36,7 @@ public class BadWordDAOTestCase extends AbstractDAOTestCase<BadWord> {
 		Assert.assertEquals(2, words.size());
 	}
 
-	private BadWordDAO newDao() {
-		return new BadWordDAO(sessionFactory);
+	private BadWordRepository newDao() {
+		return new BadWordRepository(session());
 	}
 }

@@ -16,41 +16,63 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
 import net.jforum.entities.User;
 
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface TopicWatchRepository extends Repository<TopicWatch> {
+@Component
+public class TopicWatchRepository extends HibernateGenericDAO<TopicWatch> implements Repository<TopicWatch> {
+	public TopicWatchRepository(Session session) {
+		super(session);
+	}
 
-	/**
-	 * Get the users to notify
-	 *
-	 * @param topic The topic
-	 * @return <code>ArrayList</code> of <code>User</code> objects. Each
-	 * entry is an user who will receive the topic anwser notification
-	 * */
-	public List<User> getUsersWaitingNotification(Topic topic);
+	@SuppressWarnings("unchecked")
+	public List<User> getUsersWaitingNotification(Topic topic) {
+		List<User> users = session.createQuery("select u from TopicWatch tw " +
+			" inner join tw.user u where tw.topic = :topic " +
+			" and (tw.read = true or u.notifyAlways = true)")
+			.setEntity("topic", topic)
+			.setComment("topicWatchDAO.getUsersWaitingNotification")
+			.list();
 
-	/**
-	 * Check the subscrition status of the user on the topic.
-	 *
-	 * @param topic the topic
-	 * @param user the user
-	 * @return true if the user is watching the topic
-	 */
-	public TopicWatch getSubscription(Topic topic, User user);
+		if (users.size() > 0) {
+			this.markAllAsUnread(topic);
+		}
 
-	/**
-	 * Clear all subscriptions of some topic
-	 *
-	 * @param topic the topic
-	 */
-	public void removeSubscription(Topic topic);
+		return users;
+	}
 
-	/**
-	 * Remove the subscription of a specific user
-	 * @param topic the topic to remove the subscription
-	 * @param user the user to remove the subscription
-	 */
-	public void removeSubscription(Topic topic, User user);
+	public TopicWatch getSubscription(Topic topic, User user) {
+		return (TopicWatch)session.createCriteria(this.persistClass)
+			.add(Restrictions.eq("topic", topic))
+			.add(Restrictions.eq("user", user))
+			.setComment("topicWatchDAO.isUserSubscribed")
+			.uniqueResult();
+	}
 
+	public void removeSubscription(Topic topic, User user) {
+		session.createQuery("delete from TopicWatch tw where tw.topic = :topic and tw.user = :user")
+			.setEntity("topic", topic)
+			.setEntity("user", user)
+			.setComment("topicWatchDAO.removeSubscriptionByUser")
+			.executeUpdate();
+	}
+
+	public void removeSubscription(Topic topic) {
+		session.createQuery("delete from TopicWatch tw where tw.topic = :topic")
+			.setEntity("topic", topic)
+			.setComment("topicWatchDAO.removeSubscription")
+			.executeUpdate();
+	}
+
+	private void markAllAsUnread(Topic topic) {
+		session.createQuery("update TopicWatch set read = false where topic = :topic")
+			.setEntity("topic", topic)
+			.setComment("topicWatchDAO.markAllAsRead")
+			.executeUpdate();
+	}
 }

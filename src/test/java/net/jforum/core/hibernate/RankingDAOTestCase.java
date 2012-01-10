@@ -13,6 +13,7 @@ package net.jforum.core.hibernate;
 import java.util.List;
 
 import net.jforum.entities.Ranking;
+import net.jforum.repository.RankingRepository;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import org.junit.Test;
 public class RankingDAOTestCase extends AbstractDAOTestCase<Ranking> {
 	@Test
 	public void delete() {
-		RankingDAO dao = this.newDao();
+		RankingRepository dao = this.newDao();
 		Ranking r = this.createRanking("image1", "title1", 7, false);
 
 		this.insert(r, dao);
@@ -34,7 +35,7 @@ public class RankingDAOTestCase extends AbstractDAOTestCase<Ranking> {
 
 	@Test
 	public void update() {
-		RankingDAO dao = this.newDao();
+		RankingRepository dao = this.newDao();
 
 		Ranking r = this.createRanking("image1", "title1", 7, false);
 
@@ -58,7 +59,7 @@ public class RankingDAOTestCase extends AbstractDAOTestCase<Ranking> {
 
 	@Test
 	public void getAllRankingsExpectEmptyList() {
-		RankingDAO dao = this.newDao();
+		RankingRepository dao = this.newDao();
 		List<Ranking> rankings = dao.getAllRankings();
 		Assert.assertNotNull(rankings);
 		Assert.assertEquals(0, rankings.size());
@@ -66,7 +67,7 @@ public class RankingDAOTestCase extends AbstractDAOTestCase<Ranking> {
 
 	@Test
 	public void getAllRankingsExpectTwoRecordsOrderedAsc() {
-		RankingDAO dao = this.newDao();
+		RankingRepository dao = this.newDao();
 
 		this.insert(this.createRanking("img", "r1", 1, false), dao);
 		this.insert(this.createRanking("img2", "r2", 2, false), dao);
@@ -80,7 +81,7 @@ public class RankingDAOTestCase extends AbstractDAOTestCase<Ranking> {
 
 	@Test
 	public void insert() {
-		RankingDAO dao = this.newDao();
+		RankingRepository dao = this.newDao();
 
 		Ranking r = this.createRanking("some image", "ranking title", 10, true);
 
@@ -95,8 +96,8 @@ public class RankingDAOTestCase extends AbstractDAOTestCase<Ranking> {
 		Assert.assertEquals(true, loaded.isSpecial());
 	}
 
-	private RankingDAO newDao() {
-		return new RankingDAO(sessionFactory);
+	private RankingRepository newDao() {
+		return new RankingRepository(session());
 	}
 
 	private Ranking createRanking(String image, String title, int min, boolean special) {

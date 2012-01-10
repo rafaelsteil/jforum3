@@ -14,9 +14,21 @@ import java.util.List;
 
 import net.jforum.entities.Theme;
 
+import org.hibernate.Session;
+
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
-public interface ThemeRepository extends Repository<Theme> {
-	public List<Theme> getAll();
+@Component
+public class ThemeRepository extends HibernateGenericDAO<Theme> implements Repository<Theme> {
+	public ThemeRepository(Session session) {
+		super(session);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Theme> getAll() {
+		return session.createCriteria(Theme.class).list();
+	}
 }

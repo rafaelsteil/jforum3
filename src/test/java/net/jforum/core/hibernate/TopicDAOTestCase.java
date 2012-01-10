@@ -17,6 +17,9 @@ import net.jforum.entities.Poll;
 import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
+import net.jforum.repository.PostRepository;
+import net.jforum.repository.TopicRepository;
+import net.jforum.repository.UserRepository;
 import net.jforum.util.JDBCLoader;
 
 import org.junit.Assert;
@@ -43,7 +46,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 
 		t.setPoll(p);
 
-		TopicDAO dao = this.newTopicDao();
+		TopicRepository dao = this.newTopicDao();
 		this.insert(t, dao);
 
 		t = dao.get(t.getId());
@@ -58,7 +61,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/topicdao/removeShouldDeletePostsAndUpdateUserTotalMessages.sql");
 
-		TopicDAO dao = this.newTopicDao();
+		TopicRepository dao = this.newTopicDao();
 		Topic topic = dao.get(1);
 
 		Assert.assertEquals(3, dao.getTotalPosts(topic));
@@ -67,7 +70,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 
 		Assert.assertEquals(0, dao.getTotalPosts(topic));
 
-		UserDAO userDao = this.newUserDao();
+		UserRepository userDao = this.newUserDao();
 		Assert.assertEquals(1, userDao.get(1).getTotalPosts());
 	}
 
@@ -76,12 +79,12 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 	public void getPostsShouldNotFetchModeratedExpectTwoResults() {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection()) .run("/postdao/dump.sql");
 
-		PostDAO postDao = this.newPostDao();
+		PostRepository postDao = this.newPostDao();
 		Post post1 = this.newPost(); postDao.add(post1);
 		Post post2 = this.newPost(); postDao.add(post2);
 		Post post3 = this.newPost(); post3.setModerate(true); postDao.add(post3);
 
-		TopicDAO topicDao = this.newTopicDao();
+		TopicRepository topicDao = this.newTopicDao();
 		Topic topic = topicDao.get(1);
 		List<Post> posts = topicDao.getPosts(topic, 0, 10);
 
@@ -96,7 +99,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/topicdao/totalPostsExpectTwoResults.sql");
 
-		TopicDAO dao = this.newTopicDao();
+		TopicRepository dao = this.newTopicDao();
 		Topic topic = dao.get(1);
 		Assert.assertEquals(2, dao.getTotalPosts(topic));
 	}
@@ -107,7 +110,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/topicdao/firstLastPost.sql");
 
-		TopicDAO dao = this.newTopicDao();
+		TopicRepository dao = this.newTopicDao();
 		Topic t = new Topic(); t.setId(1);
 		Post expectedFirst = new Post(); expectedFirst.setId(2);
 
@@ -120,23 +123,23 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 		new JDBCLoader(sessionFactory.getCurrentSession().connection())
 			.run("/topicdao/firstLastPost.sql");
 
-		TopicDAO dao = this.newTopicDao();
+		TopicRepository dao = this.newTopicDao();
 		Topic t = new Topic(); t.setId(1);
 		Post expectedFirst = new Post(); expectedFirst.setId(1);
 
 		Assert.assertEquals(expectedFirst, dao.getFirstPost(t));
 	}
 
-	private UserDAO newUserDao() {
-		return new UserDAO(sessionFactory);
+	private UserRepository newUserDao() {
+		return new UserRepository(session());
 	}
 
-	private PostDAO newPostDao() {
-		return new PostDAO(sessionFactory);
+	private PostRepository newPostDao() {
+		return new PostRepository(session());
 	}
 
-	private TopicDAO newTopicDao() {
-		return new TopicDAO(sessionFactory);
+	private TopicRepository newTopicDao() {
+		return new TopicRepository(session());
 	}
 
 	private Post newPost() {
