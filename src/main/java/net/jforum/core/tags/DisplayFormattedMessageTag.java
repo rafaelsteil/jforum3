@@ -31,7 +31,7 @@ public class DisplayFormattedMessageTag extends JForumTag {
 
 	public DisplayFormattedMessageTag() {
 		if (formatters == null) {
-			formatters = (PostFormatters)this.getBean(PostFormatters.class.getName());
+			formatters = this.getBean(PostFormatters.class);
 		}
 	}
 

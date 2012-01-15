@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSession;
 
 import net.jforum.security.RoleManager;
 import net.jforum.util.ConfigKeys;
-import net.jforum.util.JForumConfig;
 
 import org.apache.log4j.Logger;
 import org.springframework.web.context.request.RequestAttributes;
@@ -50,11 +49,7 @@ public class UserSession  {
 	private long creationTime;
 	private long lastVisit;
 	private String sessionId;
-	private final HttpServletRequest request;
-
-	public UserSession(HttpServletRequest request) {
-		this.request = request;
-	}
+	private HttpServletRequest request;
 
 	/**
 	 * Flag a specific topic as "read" by the user
@@ -65,6 +60,10 @@ public class UserSession  {
 		if (this.isLogged()) {
 			this.topicReadTime.put(topicId, System.currentTimeMillis());
 		}
+	}
+
+	public void setRequest(HttpServletRequest request) {
+		this.request = request;
 	}
 
 	/**
@@ -124,9 +123,11 @@ public class UserSession  {
 	}
 
 	public String getIp() {
+		/*
 		if(new JForumConfig().getBoolean(ConfigKeys.BLOCK_IP)) {
 			return null;
 		}
+		*/
 
 		// We look if the request is forwarded
 		// If it is not call the older function.
@@ -385,7 +386,8 @@ public class UserSession  {
 	 */
 	@Override
 	public int hashCode() {
-		return this.getSessionId().hashCode();
+		return super.hashCode();
+		//return this.getSessionId().hashCode();
 	}
 
 	/**

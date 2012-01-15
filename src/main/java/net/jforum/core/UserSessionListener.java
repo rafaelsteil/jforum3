@@ -60,12 +60,14 @@ public class UserSessionListener implements HttpSessionListener {
 	/**
 	 * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
 	 */
+	@Override
 	public void sessionCreated(HttpSessionEvent event) {
 	}
 
 	/**
 	 * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
 	 */
+	@Override
 	public void sessionDestroyed(HttpSessionEvent event) {
 		HttpSession session = event.getSession();
 
@@ -84,7 +86,7 @@ public class UserSessionListener implements HttpSessionListener {
 		else {
 			String sessionId = session.getId();
 
-			SessionManager sessionManager = (SessionManager)beanFactory.getBean(SessionManager.class.getName());
+			SessionManager sessionManager = beanFactory.getBean(SessionManager.class);
 
 			try {
 				sessionManager.storeSession(sessionId);

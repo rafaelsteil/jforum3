@@ -24,7 +24,7 @@ import br.com.caelum.vraptor.resource.ResourceMethod;
  * Intercepts and process the {@link SecurityConstraint} annotation for controllers
  * @author Rafael Steil
  */
-@Intercepts
+@Intercepts(after = SessionManagerInterceptor.class)
 @RequestScoped
 public class ControllerSecurityInterceptor extends SecurityInterceptor {
 	public ControllerSecurityInterceptor(HttpServletRequest request, Result result, UserSession userSession, Container container) {

@@ -1,10 +1,10 @@
 /*
  * Copyright (c) JForum Team. All rights reserved.
- * 
- * The software in this package is published under the terms of the LGPL 
- * license a copy of which has been included with this distribution in the 
+ *
+ * The software in this package is published under the terms of the LGPL
+ * license a copy of which has been included with this distribution in the
  * license.txt file.
- * 
+ *
  * The JForum Project
  * http://www.jforum.net
  */
@@ -28,47 +28,42 @@ import org.springframework.context.ApplicationContext;
  */
 public abstract class JForumTag extends SimpleTagSupport {
 	private static ApplicationContext springContext;
-	
+
 	protected HttpServletRequest request() {
 		return (HttpServletRequest)this.pageContext().getRequest();
 	}
-	
+
 	protected void setAttribute(String key, Object value) {
 		this.request().setAttribute(key, value);
 	}
-	
+
 	protected HttpServletResponse response() {
 		return (HttpServletResponse)this.pageContext().getResponse();
 	}
-	
+
 	protected JForumConfig config() {
-		return (JForumConfig)this.getBean(JForumConfig.class.getName());
+		return this.getBean(JForumConfig.class);
 	}
-	
+
 	protected void write(String content) throws IOException {
 		this.pageContext().getOut().write(content);
 	}
-	
+
 	protected void invokeJspBody() throws JspException, IOException {
 		this.getJspBody().invoke(this.pageContext().getOut());
 	}
-	
-	protected Object getBean(String beanId) {
+
+	protected <T> T getBean(Class<T> beanId) {
 		if (springContext == null) {
 			springContext = (ApplicationContext)this.pageContext()
 				.getServletContext().getAttribute(ConfigKeys.SPRING_CONTEXT);
 		}
-		
+
 		return springContext != null
 			? springContext.getBean(beanId)
 			: null;
 	}
-	
-	@SuppressWarnings("unchecked")
-	protected <T> T getBean(Class<T> c) {
-		return (T)this.getBean(c.getName());
-	}
-	
+
 	protected PageContext pageContext() {
 		return (PageContext)this.getJspContext();
 	}

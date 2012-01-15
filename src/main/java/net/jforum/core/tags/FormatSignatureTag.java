@@ -27,7 +27,7 @@ public class FormatSignatureTag extends JForumTag {
 
 	public FormatSignatureTag() {
 		if (formatters == null) {
-			formatters = (PostFormatters)this.getBean(PostFormatters.class.getName());
+			formatters = this.getBean(PostFormatters.class);
 		}
 	}
 

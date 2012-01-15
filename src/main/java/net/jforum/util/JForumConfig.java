@@ -12,12 +12,9 @@ package net.jforum.util;
 
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-import net.jforum.core.UrlPattern;
 import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Config;
 import net.jforum.repository.ConfigRepository;
@@ -36,16 +33,17 @@ import br.com.caelum.vraptor.ioc.Component;
 @Component
 @ApplicationScoped
 public class JForumConfig extends PropertiesConfiguration {
-	private Map<String, UrlPattern> urlPatterns = new HashMap<String, UrlPattern>();
 	private ConfigRepository configRepository;
 
-	public JForumConfig(ConfigRepository configRepository, HibernateAwareTask hibernateTask) {
+	public JForumConfig(/*ConfigRepository configRepository, HibernateAwareTask hibernateTask*/) {
 		this.setReloadingStrategy(new FileChangedReloadingStrategy());
 		this.setDelimiterParsingDisabled(true);
+
 
 		try {
 			loadProps();
 
+			/*
 			//in test environment, hibernateTask could be null
 			if(hibernateTask != null){
 				hibernateTask.execute(new HibernateRunnable() {
@@ -60,16 +58,9 @@ public class JForumConfig extends PropertiesConfiguration {
 					}
 				});
 			}
+			*/
 		}
 		catch (Exception e) {
-			throw new ForumException(e);
-		}
-	}
-
-	public JForumConfig() {
-		try {
-			loadProps();
-		} catch (Exception e) {
 			throw new ForumException(e);
 		}
 	}
@@ -111,10 +102,6 @@ public class JForumConfig extends PropertiesConfiguration {
 	@Override
 	protected void addPropertyDirect(String key, Object value) {
 		super.addPropertyDirect(key, value);
-	}
-
-	public UrlPattern getUrlPattern(String name) {
-		return this.urlPatterns.get(name);
 	}
 
 	/**

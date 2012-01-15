@@ -10,6 +10,8 @@
  */
 package net.jforum.actions.interceptors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.jforum.core.SessionManager;
 import net.jforum.entities.UserSession;
 import br.com.caelum.vraptor.InterceptionException;
@@ -22,8 +24,11 @@ import br.com.caelum.vraptor.resource.ResourceMethod;
 public class SessionManagerInterceptor implements Interceptor {
 	private final UserSession userSession;
 	private final SessionManager sessionManager;
+	private final HttpServletRequest request;
 
-	public SessionManagerInterceptor(UserSession userSession, SessionManager sessionManager) {
+	public SessionManagerInterceptor(UserSession userSession, SessionManager sessionManager, HttpServletRequest request) {
+		this.request = request;
+		userSession.setRequest(request);
 		this.userSession = userSession;
 		this.sessionManager = sessionManager;
 	}
@@ -31,6 +36,7 @@ public class SessionManagerInterceptor implements Interceptor {
 	@Override
 	public void intercept(InterceptorStack stack, ResourceMethod method, Object resourceInstance) throws InterceptionException {
 		sessionManager.refreshSession(userSession);
+		request.setAttribute("userSession", userSession);
 		stack.next(method, resourceInstance);
 	}
 

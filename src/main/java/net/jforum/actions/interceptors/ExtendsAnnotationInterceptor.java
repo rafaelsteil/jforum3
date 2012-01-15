@@ -13,7 +13,6 @@ package net.jforum.actions.interceptors;
 import net.jforum.extensions.ActionExtensionManager;
 import net.jforum.extensions.Extends;
 import br.com.caelum.vraptor.InterceptionException;
-import br.com.caelum.vraptor.Intercepts;
 import br.com.caelum.vraptor.core.InterceptorStack;
 import br.com.caelum.vraptor.interceptor.Interceptor;
 import br.com.caelum.vraptor.resource.ResourceMethod;
@@ -22,7 +21,7 @@ import br.com.caelum.vraptor.resource.ResourceMethod;
  * @author Rafael Steil
  * @author Bill
  */
-@Intercepts
+//@Intercepts
 public class ExtendsAnnotationInterceptor implements Interceptor {
 	private final ActionExtensionManager manager;
 

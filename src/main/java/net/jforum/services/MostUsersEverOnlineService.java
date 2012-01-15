@@ -16,10 +16,12 @@ import net.jforum.entities.Config;
 import net.jforum.entities.MostUsersEverOnline;
 import net.jforum.repository.ConfigRepository;
 import net.jforum.util.ConfigKeys;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class MostUsersEverOnlineService {
 	private ConfigRepository repository;
 

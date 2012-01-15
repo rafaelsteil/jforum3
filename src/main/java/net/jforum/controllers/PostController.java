@@ -95,8 +95,6 @@ public class PostController {
 	public void editSave( Post post,  PostFormOptions options,
 			List<PollOption> pollOptions,  ModerationLog moderationLog) {
 
-		//TODO Verify this -> @Parameter(create=true) in param pollOptions
-
 		ActionUtils.definePostOptions(post, options);
 		post.getTopic().setType(options.getTopicType());
 

@@ -16,9 +16,12 @@ import net.jforum.util.MD5;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class LostPasswordService {
 	private UserRepository userRepository;
 

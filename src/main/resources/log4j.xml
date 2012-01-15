@@ -41,7 +41,7 @@
 		<appender-ref ref="jforum.log"/>
 	</category>
 	
-	<category name="org.vraptor">
+	<category name="br.com.caelum.vraptor">
 		<priority value="info"/>
 		<appender-ref ref="jforum-stdout"/>
 	</category>

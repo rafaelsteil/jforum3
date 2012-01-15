@@ -46,6 +46,7 @@ import java.util.Map;
 
 import net.jforum.entities.User;
 import net.jforum.repository.UserRepository;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * Default login authenticator for JForum.
@@ -53,6 +54,7 @@ import net.jforum.repository.UserRepository;
  *
  * @author Rafael Steil
  */
+@Component
 public class DefaultLoginAuthenticator implements LoginAuthenticator {
 	private UserRepository repository;
 
@@ -63,6 +65,7 @@ public class DefaultLoginAuthenticator implements LoginAuthenticator {
 	/**
 	 * @see net.jforum.sso.LoginAuthenticator#validateLogin(String, String, java.util.Map)
 	 */
+	@Override
 	public User validateLogin(String username, String password, Map<String, Object> extraParams) {
 		User user = this.repository.validateLogin(username, password);
 

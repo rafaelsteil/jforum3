@@ -27,10 +27,12 @@ import net.jforum.util.JForumConfig;
 import net.jforum.util.MD5;
 import net.jforum.util.UploadUtils;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Bill
  */
+@Component
 public class AvatarService {
 	private AvatarRepository repository;
 	private JForumConfig config;

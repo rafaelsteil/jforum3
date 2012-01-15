@@ -42,6 +42,10 @@ public class MessageController {
 		this.result.forwardTo(Actions.MESSAGE);
 	}
 
+	public void message() {
+
+	}
+
 	/**
 	 * Displays a "waiting moderation" message for newly created topics in
 	 * moderated forums

@@ -20,10 +20,12 @@ import net.jforum.entities.Group;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class GroupInteractionFilter {
 	/**
 	 * Filter the property bag for forums/show, based on group interaction

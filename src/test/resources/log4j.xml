@@ -11,20 +11,33 @@
 		<param name="MaxFileSize"  value="1024KB"/>
 		<param name="MaxBackupIndex" value="4"/>
 
-		<param name="File" value="/tmp/jforum3.log"/>
+		<param name="File" value="/tmp/jforum.log"/>
 		
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p [%-c{1}] - %m%n"/>
 	   </layout>
 	</appender>
 	
+	<category name="org.springframework">
+		<priority value="info"/>
+		<appender-ref ref="jforum-stdout"/>
+	</category> 
+	
+	<category name="org.hibernate">
+		<priority value="info"/>
+		<appender-ref ref="jforum-stdout"/>
+	</category>
+
+	<!-- 
+	<category name="org.hibernate.cache">
+		<priority value="trace"/>
+		<appender-ref ref="jforum-stdout"/>
+	</category>
+	 -->
+
 	<category name="net.jforum">
 		<priority value="info" />
 		<appender-ref ref="jforum-stdout" />
-	</category>
-
-	<category name="org.hibernate">
-		<priority value="warn"/>
-		<appender-ref ref="jforum-stdout"/>
+		<appender-ref ref="jforum.log"/>
 	</category>
 </log4j:configuration>

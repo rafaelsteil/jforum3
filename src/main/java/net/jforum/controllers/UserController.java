@@ -271,6 +271,7 @@ public class UserController {
 	 * Shows the profile of some user
 	 * @param userId the user to show
 	 */
+	@Path("/profile/{userId}")
 	public void profile(int userId) {
 		if (!this.userSession.getRoleManager().getCanViewProfile()) {
 			this.result.redirectTo(MessageController.class).accessDenied();

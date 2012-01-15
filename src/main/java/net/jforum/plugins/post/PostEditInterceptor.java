@@ -12,6 +12,7 @@ package net.jforum.plugins.post;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.jforum.controllers.PostController;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
@@ -54,7 +55,9 @@ public class PostEditInterceptor implements Interceptor {
 
 	@Override
 	public boolean accepts(ResourceMethod method) {
-		return this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false);
+		return this.config.getBoolean(ConfigKeys.FORUM_TIME_LIMITED_ENABLE, false)
+			&& method.getResource().getType().equals(PostController.class)
+			&& method.getMethod().getName().equals("edit");
 	}
 
 	@Override
