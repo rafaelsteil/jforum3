@@ -50,7 +50,7 @@ function newCaptcha() {
 	document.getElementById("captcha_img").src = "<jforum:url address='/jforum'/>?module=captcha&action=regenerate&timestamp=" + new Date().getTime();
 }
 </script>
-<form id="formregister" accept-charset="${encoding}" name="formregister" action="<jforum:url address='/jforum'/>?module=user&action=insertSave" method="post" onsubmit="return validateRegistrationForm(this);">
+<form id="formregister" accept-charset="${encoding}" name="formregister" action="<jforum:url address='/user/insertSave'/>" method="post" onsubmit="return validateRegistrationForm(this);">
 
 <table cellspacing="2" cellpadding="2" width="100%" align="center" border="0">
 	<tr>

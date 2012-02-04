@@ -170,7 +170,7 @@
 			<br/>
         
 			<c:if test="${!userSession.logged && !sso}">
-				<form name="formlogin" accept-charset="<jforum:settings key='encoding'/>" action="<jforum:url address='/jforum'/>?module=user&action=authenticateUser" method="post">
+				<form name="formlogin" accept-charset="<jforum:settings key='encoding'/>" action="<jforum:url address='/user/authenticateUser'/>" method="post">
 					<table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 						<tr>
 							<td class="cathead" height="28"><a name="login2" id="login2"></a><span class="cattitle"><jforum:i18n key="Login.enter"/></span></td>

@@ -10,10 +10,12 @@
 	<listener>
 		<listener-class>beanface.el.functor.InstallFunctorListener</listener-class>
 	</listener>
-	
+
+	<!-- 	
 	<listener>
   		<listener-class>net.jforum.core.UserSessionListener</listener-class>
   	</listener>
+  	 -->
   	
   	<context-param>
     	<param-name>br.com.caelum.vraptor.packages</param-name>

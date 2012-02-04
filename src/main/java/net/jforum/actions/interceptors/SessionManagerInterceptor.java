@@ -11,6 +11,7 @@
 package net.jforum.actions.interceptors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import net.jforum.core.SessionManager;
 import net.jforum.entities.UserSession;
@@ -26,9 +27,11 @@ public class SessionManagerInterceptor implements Interceptor {
 	private final SessionManager sessionManager;
 	private final HttpServletRequest request;
 
-	public SessionManagerInterceptor(UserSession userSession, SessionManager sessionManager, HttpServletRequest request) {
+	public SessionManagerInterceptor(UserSession userSession, SessionManager sessionManager,
+			HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
 		userSession.setRequest(request);
+		userSession.setResponse(response);
 		this.userSession = userSession;
 		this.sessionManager = sessionManager;
 	}

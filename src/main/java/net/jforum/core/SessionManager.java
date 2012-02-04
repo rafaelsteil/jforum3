@@ -260,52 +260,11 @@ public class SessionManager {
 
 			logger.info("Registered new userSession: " + userSession.getSessionId());
 		}
-		else if (isSSOAuthentication) {
-			SSO sso;
-
-			try {
-				sso = (SSO) Class.forName(this.config.getValue(ConfigKeys.SSO_IMPLEMENTATION)).newInstance();
-			}
-			catch (Exception e) {
-				throw new ForumException(e);
-			}
-
-			// Check if the session is valid
-			if (!sso.isSessionValid(userSession)) {
-				User user = userSession.getUser();
-
-				logger.info("sso session is no longer valid. Forcing a refresh. username is " + (user != null ? user.getUsername() : "returned null")
-					+ ", jforumUserId is " + (user != null ? user.getId() : "returned null") + ". Session ID: " + userSession.getSessionId());
-
-				// If the session is not valid, create a new one
-				this.remove(userSession.getSessionId());
-				return this.refreshSession(userSession);
-			}
-			else {
-				if (userSession.getUser().getId() == 0) {
-					logger.warn("isSSOAuthentication -> get user from repository using user.id equals to zero. ");
-				}
-
-				// FIXME: Force a reload of the user instance, because if it's kept in the usersession,
-				// changes made to the group (like permissions) won't be seen.
-				User user = this.userRepository.get(userSession.getUser().getId());
-
-				if (user == null) {
-					// FIXME: now what? we didn't find the user, so something must be wrong
-					logger.warn(String.format("refreshSession did not find an user that should be registered. jforumUserId is %d, session ID is %s",
-						userSession.getUser().getId(), userSession.getSessionId()));
-				}
-				else {
-					userSession.setUser(user);
-				}
-			}
-		}
 		else {
 			// FIXME: Force a reload of the user instance, because if it's kept in the usersession,
 			// changes made to the group (like permissions) won't be seen.
-			userSession.setUser(this.userRepository.get(userSession.getUser().getId()));
+			//userSession.setUser(this.userRepository.get(userSession.getUser().getId()));
 		}
-
 		userSession.ping();
 
 		if (userSession.getUser() == null || userSession.getUser().getId() == 0) {

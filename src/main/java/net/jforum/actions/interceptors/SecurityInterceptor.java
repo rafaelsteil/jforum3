@@ -80,7 +80,7 @@ public abstract class SecurityInterceptor implements Interceptor {
 		}
 		else {
 			if (displayLogin) {
-				this.result.redirectTo(UserController.class).login(null);
+				this.result.redirectTo(UserController.class).login(null, false);
 			}
 			else {
 				this.result.redirectTo(MessageController.class).accessDenied();

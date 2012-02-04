@@ -15,7 +15,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
@@ -78,6 +77,10 @@ public class UserController {
 		this.request = request;
 	}
 
+	public void x() {
+
+	}
+
 	/**
 	 * Shows the page with all registered users
 	 * @param page the pagination first record to start showing
@@ -125,10 +128,12 @@ public class UserController {
 	/**
 	 * Shows the form to log in
 	 */
-	public void login(String returnPath) {
+	public void login(String returnPath, boolean failed) {
 		if (StringUtils.isEmpty(returnPath) && !this.config.getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER)) {
 			returnPath = this.request.getHeader("Referer");
 		}
+
+		result.include("invalidLogin", failed);
 
 		if (!StringUtils.isEmpty(returnPath)) {
 			this.result.include("returnPath", returnPath);
@@ -142,14 +147,14 @@ public class UserController {
 	 * @param password the password
 	 * @param autoLogin autoLogin
 	 */
+	@br.com.caelum.vraptor.Post
 	public void authenticateUser(String username,
 		String password, boolean autoLogin,
 		String returnPath) {
 		User user = this.userService.validateLogin(username, password);
 
 		if (user == null) {
-			this.result.include("invalidLogin", true);
-			this.result.forwardTo(Actions.LOGIN);
+			result.redirectTo(this).login(returnPath, true);
 		}
 		else {
 			this.userSession.setUser(user);
@@ -239,6 +244,7 @@ public class UserController {
 	 * Adds a new user
 	 * @param user the user to add
 	 */
+	@br.com.caelum.vraptor.Post
 	public void insertSave(User user) {
 		boolean error = false;
 

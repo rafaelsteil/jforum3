@@ -3,7 +3,7 @@
 
 <c:import url="../header.jsp"/>
 
-<form action="<jforum:url address='/jforum'/>?module=user&action=authenticateUser" method="post" name="loginform" id="loginform" accept-charset="${encoding}">
+<form action="<jforum:url address='/user/authenticateUser'/>" method="post" name="loginform" id="loginform" accept-charset="${encoding}">
   
   <c:if test="${not empty returnPath}">
   	<input type="hidden" name="returnPath" value="${returnPath}" />

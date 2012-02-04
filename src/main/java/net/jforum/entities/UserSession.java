@@ -14,7 +14,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -22,14 +21,11 @@ import java.util.StringTokenizer;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import net.jforum.security.RoleManager;
 import net.jforum.util.ConfigKeys;
 
 import org.apache.log4j.Logger;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import br.com.caelum.vraptor.ioc.Component;
 import br.com.caelum.vraptor.ioc.SessionScoped;
@@ -50,6 +46,11 @@ public class UserSession  {
 	private long lastVisit;
 	private String sessionId;
 	private HttpServletRequest request;
+	private HttpServletResponse response;
+
+	public void setResponse(HttpServletResponse response) {
+		this.response = response;
+	}
 
 	/**
 	 * Flag a specific topic as "read" by the user
@@ -67,7 +68,7 @@ public class UserSession  {
 	}
 
 	/**
-	 * Check if the user has read a specific topic.
+	 * Check if the user has read a specific topic.o
 	 * @param topic the topic. Check will be made against <code>topic.lastPost.date</code>
 	 * @return  true if the topic is read or if the user is not logged.
 	 */
@@ -264,11 +265,10 @@ public class UserSession  {
 	 * Makes the user session anonymous
 	 */
 	public void becomeAnonymous(int anonymousUserId) {
-		this.clearAllAttributes();
-
 		User user = new User();
 		user.setId(anonymousUserId);
 		this.setUser(user);
+		setAttribute(ConfigKeys.LOGGED, "0");
 	}
 
 	public void becomeLogged() {
@@ -316,7 +316,7 @@ public class UserSession  {
 		cookie.setMaxAge(maxAge);
 		cookie.setPath("/");
 
-		this.getResponse().addCookie(cookie);
+		response.addCookie(cookie);
 	}
 
 	/**
@@ -335,15 +335,6 @@ public class UserSession  {
 		return request.getSession().getAttribute(name);
 	}
 
-	public void clearAllAttributes() {
-		HttpSession session = request.getSession();
-
-		for (Enumeration<?> e = session.getAttributeNames(); e.hasMoreElements(); ) {
-			String key = (String)e.nextElement();
-			session.removeAttribute(key);
-		}
-	}
-
 	/**
 	 * Convert this instance to a {@link Session}
 	 * @return
@@ -360,16 +351,11 @@ public class UserSession  {
 		return session;
 	}
 
-	private HttpServletResponse getResponse() {
-		RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
-		return (HttpServletResponse)attributes.getAttribute(ConfigKeys.HTTP_SERVLET_RESPONSE, RequestAttributes.SCOPE_REQUEST);
-	}
-
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	@Override
-	public boolean equals(Object o) {
+	//@Override
+	public boolean eequals(Object o) {
 		if (o == this) {
 			return true;
 		}
@@ -386,8 +372,7 @@ public class UserSession  {
 	 */
 	@Override
 	public int hashCode() {
-		return super.hashCode();
-		//return this.getSessionId().hashCode();
+		return this.getSessionId().hashCode();
 	}
 
 	/**
