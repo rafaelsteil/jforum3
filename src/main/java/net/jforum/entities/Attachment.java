@@ -54,11 +54,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_attach")
+@Component
+@PrototypeScoped
 public class Attachment {
 	@Id
 	@Column(name = "attach_id")

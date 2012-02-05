@@ -28,12 +28,17 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Bill
  */
 @Entity
 @Table(name = "jforum_avatar")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Component
+@PrototypeScoped
 public class Avatar implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_avatar_seq")

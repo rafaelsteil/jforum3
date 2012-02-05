@@ -26,12 +26,17 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_privmsgs")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Component
+@PrototypeScoped
 public class PrivateMessage implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_privmsgs_seq")

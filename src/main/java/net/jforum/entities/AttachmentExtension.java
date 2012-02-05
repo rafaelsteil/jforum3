@@ -51,11 +51,16 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_attach_extensions")
+@Component
+@PrototypeScoped
 public class AttachmentExtension {
 	@Id
 	@Column(name = "extension_id")

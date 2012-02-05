@@ -25,7 +25,6 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.CATEGORIES_ADMIN)
-// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class CategoryAdminController {
 	private CategoryRepository categoryRepository;

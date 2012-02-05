@@ -38,7 +38,7 @@ import br.com.caelum.vraptor.ioc.SessionScoped;
 @SessionScoped
 public class UserSession  {
 	private static final Logger logger = Logger.getLogger(UserSession.class);
-	private User user = new User();
+	private User user = new User(null);
 	private RoleManager roleManager;
 	private Map<Integer, Long> topicReadTime = new HashMap<Integer, Long>();
 	private long lastAccessedTime;
@@ -265,7 +265,7 @@ public class UserSession  {
 	 * Makes the user session anonymous
 	 */
 	public void becomeAnonymous(int anonymousUserId) {
-		User user = new User();
+		User user = new User(null);
 		user.setId(anonymousUserId);
 		this.setUser(user);
 		setAttribute(ConfigKeys.LOGGED, "0");

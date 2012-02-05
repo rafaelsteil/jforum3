@@ -28,11 +28,16 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_vote_desc")
+@Component
+@PrototypeScoped
 public class Poll implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_vote_desc_seq")

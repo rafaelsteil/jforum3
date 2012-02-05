@@ -18,11 +18,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_quota_limit")
+@Component
+@PrototypeScoped
 public class AttachmentQuota {
 	@Transient
 	public static final int KB = 1;

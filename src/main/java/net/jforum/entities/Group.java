@@ -29,12 +29,17 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_groups")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Component
+@PrototypeScoped
 public class Group implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_groups_seq")
@@ -52,7 +57,7 @@ public class Group implements Serializable {
 	@Cascade({CascadeType.ALL, CascadeType.DELETE_ORPHAN})
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<Role> roles = new ArrayList<Role>();
-	
+
 	@ManyToMany(mappedBy = "groups")
 	private List<User> users = new ArrayList<User>();
 
@@ -65,7 +70,7 @@ public class Group implements Serializable {
 
 		return false;
 	}
-	
+
 	public boolean roleExists(String name, int value) {
 		for (Role role : this.roles) {
 			if (role.getName().equals(name)) {

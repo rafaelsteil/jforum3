@@ -41,6 +41,9 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
@@ -48,6 +51,8 @@ import org.hibernate.search.annotations.Store;
 @Indexed
 @Table(name = "jforum_posts")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Component
+@PrototypeScoped
 public class Post implements Serializable {
 	@Id
 	@DocumentId

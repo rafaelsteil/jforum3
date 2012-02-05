@@ -5,7 +5,7 @@
 </head>
 
 <frameset rows="*" cols="170,*" framespacing="0" frameborder="NO" border="0">
-	<frame src="<jforum:url address='/jforum'/>?module=admin&action=menu" name="leftFrame" scrolling="NO" noresize>
-	<frame src="<jforum:url address='/jforum'/>?module=admin&action=main" name="main">
+	<frame src="<jforum:url address='/admin/menu'/>" name="leftFrame" scrolling="NO" noresize>
+	<frame src="<jforum:url address='/admin/main'/>" name="main">
 </frameset>
 </html>

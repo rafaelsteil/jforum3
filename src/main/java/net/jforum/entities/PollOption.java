@@ -22,11 +22,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_vote_results")
+@Component
+@PrototypeScoped
 public class PollOption implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_vote_results_seq")

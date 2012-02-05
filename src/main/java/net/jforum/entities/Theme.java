@@ -18,11 +18,16 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_themes")
+@Component
+@PrototypeScoped
 public class Theme {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_themes_seq")

@@ -24,11 +24,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
+
 /**
  * @author Rafael Steil
  */
 @Entity
 @Table(name = "jforum_post_report")
+@Component
+@PrototypeScoped
 public class PostReport {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_post_report_seq")

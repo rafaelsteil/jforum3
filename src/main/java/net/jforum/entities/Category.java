@@ -26,6 +26,10 @@ import net.jforum.repository.CategoryRepository;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
 
 /**
  * @author Rafael Steil
@@ -33,6 +37,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "jforum_categories")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Component
+@PrototypeScoped
 public class Category implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_categories_seq")
@@ -59,6 +65,7 @@ public class Category implements Serializable {
 
 	public Category() {}
 
+	@Autowired
 	public Category(CategoryRepository repository) {
 		this.repository = repository;
 	}
@@ -125,10 +132,10 @@ public class Category implements Serializable {
 	 * @return All forums, regardless it is accessible to the user or not.
 	 */
 	public List<Forum> getForums() {
-		// FIXME We do not use @OneToMany because forums are ordered,
+		// We do not use @OneToMany because forums are ordered,
 		// thus changing the display order of a single forum will not
 		// automatically change its order in the collection, and manually
-		// executing a sort() seemed a worst appraoch
+		// executing a sort() appears to be a worst approach
 		return this.repository.getForums(this);
 	}
 

@@ -36,6 +36,10 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
 
 /**
  * Represents every topic in the forum.
@@ -46,6 +50,8 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Table(name = "jforum_topics")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
+@Component
+@PrototypeScoped
 public class Topic implements Serializable {
 	public static final int TYPE_NORMAL = 0;
 	public static final int TYPE_STICKY = 1;
@@ -131,6 +137,7 @@ public class Topic implements Serializable {
 		this.id = id;
 	}
 
+	@Autowired
 	public Topic(TopicRepository repository) {
 		this.repository = repository;
 	}

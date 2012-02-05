@@ -18,21 +18,18 @@ import net.jforum.repository.CategoryRepository;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class CategoryService {
 	private CategoryRepository repository;
 
 	public CategoryService(CategoryRepository repository) {
 		this.repository = repository;
 	}
-
-	/**
-	 * Required by CGLib.
-	 * Use {@link #CategoryService(CategoryRepository)} instead
-	 */
-	public CategoryService() {}
 
 	/**
 	 * Adds a new category
@@ -68,7 +65,7 @@ public class CategoryService {
 	 */
 	public void update(Category category) {
 		this.applyCommonConstraints(category);
-		
+
 		if (category.getId() == 0) {
 			throw new ValidationException("update() expects a category with an existing id");
 		}

@@ -16,11 +16,6 @@
   		<listener-class>net.jforum.core.UserSessionListener</listener-class>
   	</listener>
   	 -->
-  	
-  	<context-param>
-    	<param-name>br.com.caelum.vraptor.packages</param-name>
-    	<param-value>br.com.caelum.vraptor.util.hibernate</param-value>
-	</context-param>
 	
 	<context-param>
     	<param-name>br.com.caelum.vraptor.provider</param-name>

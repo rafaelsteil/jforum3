@@ -41,6 +41,10 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.PrototypeScoped;
 
 /**
  * @author Rafael Steil
@@ -49,6 +53,8 @@ import org.hibernate.search.annotations.Store;
 @Table(name = "jforum_users")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Component
+@PrototypeScoped
 public class User implements Serializable {
 	@Id
 	@SequenceGenerator(name = "sequence", sequenceName = "jforum_users_seq")
@@ -197,6 +203,7 @@ public class User implements Serializable {
 
 	public User() { }
 
+	@Autowired
 	public User(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
