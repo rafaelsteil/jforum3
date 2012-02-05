@@ -14,11 +14,13 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
 import net.jforum.entities.User;
 import net.jforum.repository.TopicWatchRepository;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * Topic Watching for posts (new posts)
  * @author Rafael Steil
  */
+@Component
 public class TopicWatchService {
 	private TopicWatchRepository repository;
 

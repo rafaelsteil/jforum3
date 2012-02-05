@@ -48,12 +48,6 @@ public class GroupService {
 	}
 
 	/**
-	 * Required by CGLib. Use {@link #GroupService(GroupRepository)} instead
-	 */
-	public GroupService() {
-	}
-
-	/**
 	 * Save the permissions for this group
 	 */
 	public void savePermissions(int groupId, PermissionOptions permissions) {

@@ -18,21 +18,18 @@ import net.jforum.repository.ForumRepository;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class ForumService {
 	private ForumRepository repository;
 
 	public ForumService(ForumRepository repository) {
 		this.repository = repository;
 	}
-
-	/**
-	 * Required by CGLib.
-	 * Use {@link #ForumService(ForumRepository)} instead
-	 */
-	public ForumService() {}
 
 	/**
 	 * Add a new forum

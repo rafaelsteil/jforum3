@@ -9,17 +9,18 @@ import net.jforum.repository.ConfigRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.I18n;
 import net.jforum.util.JForumConfig;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class ConfigService {
 	private final JForumConfig config;
 	private final ConfigRepository repository;
 	private final I18n i18n;
 
-	public ConfigService(JForumConfig config, ConfigRepository repository,
-			I18n i18n) {
+	public ConfigService(JForumConfig config, ConfigRepository repository, I18n i18n) {
 		this.config = config;
 		this.repository = repository;
 		this.i18n = i18n;

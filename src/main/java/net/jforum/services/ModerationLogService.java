@@ -21,10 +21,12 @@ import net.jforum.repository.ModerationLogRepository;
 import net.jforum.repository.TopicRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class ModerationLogService {
 	private final JForumConfig config;
 	private final ModerationLogRepository repository;

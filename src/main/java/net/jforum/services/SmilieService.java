@@ -23,10 +23,12 @@ import net.jforum.util.UploadUtils;
 import org.apache.commons.lang.StringUtils;
 
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class SmilieService {
 	private SmilieRepository repository;
 	private JForumConfig config;
@@ -38,7 +40,7 @@ public class SmilieService {
 
 	/**
 	 * Adds a new smilie
-	 * 
+	 *
 	 * @param smilie
 	 */
 	public void add(Smilie smilie, UploadedFile uploadedFile) {
@@ -63,7 +65,7 @@ public class SmilieService {
 
 	/**
 	 * Updates a existing smilie
-	 * 
+	 *
 	 * @param smilie
 	 * @param file
 	 */
@@ -90,7 +92,7 @@ public class SmilieService {
 
 	/**
 	 * Delete smilies
-	 * 
+	 *
 	 * @param smiliesId
 	 */
 	public void delete(int... smiliesId) {

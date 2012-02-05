@@ -24,9 +24,12 @@ import net.jforum.repository.TopicRepository;
 
 import org.apache.commons.lang.ArrayUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class ModerationService {
 	private PostRepository postRepository;
 	private ForumRepository forumRepository;
@@ -40,11 +43,6 @@ public class ModerationService {
 		this.topicRepository = topicRepository;
 		this.moderationLogService = moderationLogService;
 	}
-
-	/**
-	 * Required by CGLib. Use {@link #ModerationService(PostRepository, ForumRepository, TopicRepository)} instead
-	 */
-	public ModerationService() { }
 
 	/**
 	 * Move a set of topics to another forum

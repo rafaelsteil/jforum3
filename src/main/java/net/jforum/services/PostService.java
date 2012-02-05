@@ -23,9 +23,12 @@ import net.jforum.repository.TopicRepository;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class PostService {
 	private PostRepository postRepository;
 	private AttachmentService attachmentService;
@@ -41,11 +44,6 @@ public class PostService {
 		this.topicRepository = topicRepository;
 		this.moderationLogService = moderationLogService;
 	}
-
-	/**
-	 * Required by CGLib. Use {@link #PostService(PostRepository)} instead
-	 */
-	public PostService() { }
 
 	/**
 	 * Deletes an existing post

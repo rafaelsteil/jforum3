@@ -20,9 +20,12 @@ import net.jforum.repository.PrivateMessageRepository;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * @author Rafael Steil
  */
+@Component
 public class PrivateMessageService {
 	private PrivateMessageRepository repository;
 
