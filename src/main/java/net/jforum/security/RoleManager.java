@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
 import net.jforum.entities.Role;
@@ -27,6 +26,7 @@ import net.jforum.util.SecurityConstants;
  * The awkward syntax of many methods, following the javabeans
  * style and a "can" prefix, as in "getCanDoSomething" is to
  * make it play nice with JSP's EL.
+ *
  * @author Rafael Steil
  */
 public class RoleManager {
@@ -309,46 +309,9 @@ public class RoleManager {
 		return data;
 	}
 
-	/**
-	 * Convert this manager instance to an instance of {@link PermissionOptions}
-	 * @return
-	 */
-	public PermissionOptions asPermissionOptions() {
-		PermissionOptions permissions = new PermissionOptions();
-
-		permissions.setAdministrator(this.isAdministrator());
-		permissions.setAttachments(this.getRoleValues(SecurityConstants.ATTACHMENTS_ENABLED));
-		permissions.setAttachmentsDownload(this.getRoleValues(SecurityConstants.ATTACHMENTS_DOWNLOAD));
-		permissions.setCanApproveMessages(this.getCanApproveMessages());
-		permissions.setCanEditPosts(this.getCanEditPosts());
-		permissions.setCanLockUnlock(this.getCanLockUnlockTopics());
-		permissions.setCanMoveTopics(this.getCanMoveTopics());
-		permissions.setCanRemovePosts(this.getCanDeletePosts());
-		permissions.setCategories(this.getRoleValues(SecurityConstants.CATEGORY));
-		permissions.setForums(this.getRoleValues(SecurityConstants.FORUM));
-		permissions.setHtml(this.getRoleValues(SecurityConstants.HTML_ALLOWED));
-		permissions.setModeratedReplies(this.getRoleValues(SecurityConstants.MODERATE_REPLIES));
-		permissions.setModerateForums(this.getRoleValues(SecurityConstants.MODERATE_FORUM));
-		permissions.setModerator(this.isModerator());
-		permissions.setPoll(this.getCanCreatePolls());
-		permissions.setPollVote(this.getCanVoteOnPolls());
-		permissions.setReadOnly(this.getRoleValues(SecurityConstants.FORUM_READ_ONLY));
-		permissions.setReplyOnly(this.getRoleValues(SecurityConstants.FORUM_REPLY_ONLY));
-		permissions.setStickyAnnouncement(this.getCanCreateStickyAnnouncementTopics());
-		permissions.setCanInteractOtherGroups(this.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS));
-		permissions.setCanManageForums(this.roleExists(SecurityConstants.CAN_MANAGE_FORUMS));
-		permissions.setCoAdministrator(this.roleExists(SecurityConstants.CO_ADMINISTRATOR));
-		permissions.setGroups(this.getRoleValues(SecurityConstants.GROUPS));
-		permissions.setPrivateMessageAllowed(this.isPrivateMessageEnabled());
-		permissions.setUserListingAllowed(this.isUserListingEnabled());
-		permissions.setCanViewProfile(this.getCanViewProfile());
-		permissions.setCanHaveProfilePicture(this.getCanHaveProfilePicture());
-		permissions.setPostOnlyWithModeratorOnline(this.getPostOnlyWithModeratorOnline());
-		permissions.setPmOnlyToModerators(this.roleExists(SecurityConstants.PM_ONLY_TO_MODERATORS));
-		permissions.setCanViewActivityLog(this.roleExists(SecurityConstants.VIEW_MODERATION_LOG));
-		permissions.setCanViewFullActivityLog(this.roleExists(SecurityConstants.VIEW_FULL_MODERATION_LOG));
-
-		return permissions;
+	public List<Integer> getRoleValuesAsList(String name) {
+		Role role = this.get(name);
+		return role != null ? role.getRoleValues() : new ArrayList<Integer>();
 	}
 
 	public boolean roleExists(String name) {

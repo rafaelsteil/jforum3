@@ -13,8 +13,8 @@ package net.jforum.services;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Group;
@@ -50,7 +50,8 @@ public class GroupService {
 	/**
 	 * Save the permissions for this group
 	 */
-	public void savePermissions(int groupId, PermissionOptions permissions) {
+	@SuppressWarnings("unchecked")
+	public void savePermissions(int groupId, Map<String, Map<String, List<?>>> map) {
 		Group group = this.repository.get(groupId);
 
 		RoleManager currentRoles = new RoleManager();
@@ -70,45 +71,43 @@ public class GroupService {
 		boolean canInteractwithOtherGroups = currentRoles.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS);
 		boolean isSuperAdministrator = this.userSession.getRoleManager().isAdministrator();
 
-		this.registerRole(group, SecurityConstants.ADMINISTRATOR, isSuperAdministrator ? permissions.isAdministrator() : isAdministrator);
-		this.registerRole(group, SecurityConstants.CAN_MANAGE_FORUMS, isSuperAdministrator ? permissions.getCanManageForums() : canManageForums);
-		this.registerRole(group, SecurityConstants.CO_ADMINISTRATOR, isSuperAdministrator ? permissions.isCoAdministrator() : isCoAdministrator);
-		this.registerRole(group, SecurityConstants.GROUPS, isSuperAdministrator ? permissions.getAllowedGroups() : groups);
-		this.registerRole(group, SecurityConstants.INTERACT_OTHER_GROUPS, isSuperAdministrator ? permissions.getCanInteractOtherGroups() : canInteractwithOtherGroups);
+		for (Map.Entry<String, List<?>> entry : map.get("boolean").entrySet()) {
+			String key = entry.getKey();
+			Boolean value = (Boolean)entry.getValue().get(0);
 
-		this.registerRole(group, SecurityConstants.ATTACHMENTS_DOWNLOAD, permissions.getDownloadAttachments());
-		this.registerRole(group, SecurityConstants.ATTACHMENTS_ENABLED, permissions.getAttachments());
-		this.registerRole(group, SecurityConstants.CATEGORY, permissions.getAllowedCategories());
-		this.registerRole(group, SecurityConstants.POLL_CREATE, permissions.getCanCreatePoll());
-		this.registerRole(group, SecurityConstants.CREATE_STICKY_ANNOUNCEMENT_TOPICS, permissions.getCanCreateStickyAnnouncement());
-		this.registerRole(group, SecurityConstants.FORUM, permissions.getAllowedForums());
-		this.registerRole(group, SecurityConstants.HTML_ALLOWED, permissions.getHtml());
-		this.registerRole(group, SecurityConstants.MODERATOR, permissions.isModerator());
-		this.registerRole(group, SecurityConstants.APPROVE_MESSAGES, permissions.getCanApproveMessages());
-		this.registerRole(group, SecurityConstants.MODERATE_FORUM, permissions.getModerateForums());
-		this.registerRole(group, SecurityConstants.POST_EDIT, permissions.getCanEditPosts());
-		this.registerRole(group, SecurityConstants.POST_DELETE, permissions.getCanRemovePosts());
-		this.registerRole(group, SecurityConstants.TOPIC_LOCK_UNLOCK, permissions.getCanLockUnlock());
-		this.registerRole(group, SecurityConstants.TOPIC_MOVE, permissions.getCanMoveTopics());
-		this.registerRole(group, SecurityConstants.MODERATE_REPLIES, permissions.getModeratedReplies());
+			if (SecurityConstants.ADMINISTRATOR.equals(key)) {
+				registerRole(group, key, isSuperAdministrator ? value : isAdministrator);
+			}
+			else if (SecurityConstants.CAN_MANAGE_FORUMS.equals(key)) {
+				registerRole(group, key, isSuperAdministrator ? value : canManageForums);
+			}
+			else if (SecurityConstants.CO_ADMINISTRATOR.equals(key)) {
+				registerRole(group, key, isSuperAdministrator ? value : isCoAdministrator);
+			}
+			else if (SecurityConstants.INTERACT_OTHER_GROUPS.equals(key)) {
+				registerRole(group, key, isSuperAdministrator ? value : canInteractwithOtherGroups);
+			}
+			else {
+				registerRole(group, key, (Boolean)entry.getValue().get(0));
+			}
+		}
 
-		this.registerRole(group, SecurityConstants.FORUM_REPLY_ONLY, permissions.getReplyOnly());
-		this.registerRole(group, SecurityConstants.FORUM_READ_ONLY, permissions.getReadOnlyForums());
+		for (Map.Entry<String, List<?>> entry : map.get("multiple").entrySet()) {
+			String key = entry.getKey();
+			List<Integer> value = (List<Integer>) entry.getValue();
 
-		this.registerRole(group, SecurityConstants.POLL_VOTE, permissions.getAllowPollVote());
-		this.registerRole(group, SecurityConstants.PRIVATE_MESSAGE, permissions.isPrivateMessageAllowed());
-		this.registerRole(group, SecurityConstants.USER_LISTING, permissions.isUserListingAllowed());
-		this.registerRole(group, SecurityConstants.VIEW_PROFILE, permissions.getCanViewProfile());
-		this.registerRole(group, SecurityConstants.PROFILE_PICTURE, permissions.getCanHaveProfilePicture());
-		this.registerRole(group, SecurityConstants.POST_ONLY_WITH_MODERATOR_ONLINE, permissions.getPostOnlyWithModeratorOnline());
-		this.registerRole(group, SecurityConstants.PM_ONLY_TO_MODERATORS, permissions.isPmOnlyToModerators());
-		this.registerRole(group, SecurityConstants.VIEW_MODERATION_LOG, permissions.getCanViewActivityLog());
-		this.registerRole(group, SecurityConstants.VIEW_FULL_MODERATION_LOG, permissions.getCanViewFullActivityLog());
+			if (SecurityConstants.GROUPS.equals(key)) {
+				registerRole(group, key, isSuperAdministrator ? value : groups);
+			}
+			else {
+				registerRole(group, key, value);
+			}
+		}
 
 		this.repository.update(group);
 
 		this.sessionManager.computeAllOnlineModerators();
-		this.userRepository.changeAllowAvatarState(permissions.getCanHaveProfilePicture(), group);
+		//this.userRepository.changeAllowAvatarState(map.getCanHaveProfilePicture(), group);
 	}
 
 	/**
@@ -145,7 +144,7 @@ public class GroupService {
 	 */
 	public void delete(int... ids) {
 		if (ids != null) {
-			// TODO: Must not delete a group if it has users
+			// FIXME: Must not delete a group if it has users
 			for (int groupId : ids) {
 				Group group = this.repository.get(groupId);
 				this.repository.remove(group);

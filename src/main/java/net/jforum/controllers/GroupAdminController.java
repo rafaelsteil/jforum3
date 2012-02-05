@@ -10,10 +10,16 @@
  */
 package net.jforum.controllers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.actions.helpers.Domain;
-import net.jforum.actions.helpers.PermissionOptions;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.entities.Group;
 import net.jforum.entities.UserSession;
@@ -38,25 +44,26 @@ public class GroupAdminController {
 	private GroupService service;
 	private final Result result;
 	private final UserSession userSession;
+	private final HttpServletRequest request;
 
 	public GroupAdminController(GroupService service, GroupRepository repository,
-			CategoryRepository categoryRepository, Result result, UserSession userSession) {
+			CategoryRepository categoryRepository, Result result, UserSession userSession,
+			HttpServletRequest request) {
 		this.service = service;
 		this.groupRepository = repository;
 		this.categoryRepository = categoryRepository;
 		this.userSession = userSession;
 		this.result = result;
+		this.request = request;
 	}
 
 	/**
 	 * Shows the page to set permissions for a specific group
 	 *
-	 * @param groupId
-	 *            the group id
+	 * @param groupId the group id
 	 */
 	public void permissions(int groupId) {
 		Group group = this.groupRepository.get(groupId);
-
 		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (!roleManager.isAdministrator() && !roleManager.isGroupManager(groupId)) {
@@ -66,25 +73,54 @@ public class GroupAdminController {
 			this.result.include("group", group);
 			this.result.include("groups", this.groupRepository.getAllGroups());
 			this.result.include("categories", this.categoryRepository.getAllCategories());
-			this.result.include("permissions", this.convertRolesToPermissionOptions(group));
+
+			RoleManager groupRoleManager = new RoleManager();
+			groupRoleManager.setGroups(Arrays.asList(group));
+			this.result.include("roleManager", groupRoleManager);
 		}
 	}
 
 	/**
 	 * Save the permissions for this group
 	 *
-	 * @param groupId
-	 *            the id of the group to save
-	 * @param permissions
-	 *            the set of permissions of this group
+	 * @param groupId the id of the group to save
+	 * @param permissions the set of permissions of this group
 	 */
-	public void permissionsSave(int groupId, PermissionOptions permissions) {
+	public void permissionsSave(int groupId) {
 		RoleManager roleManager = this.userSession.getRoleManager();
+
 		if (roleManager.isAdministrator() || roleManager.isGroupManager(groupId)) {
-			this.service.savePermissions(groupId, permissions);
+			this.service.savePermissions(groupId, extractPermissiosnFromRequest());
 		}
 
 		this.result.redirectTo(this).list();
+	}
+
+	private Map<String, Map<String, List<?>>> extractPermissiosnFromRequest() {
+		Map<String, Map<String, List<?>>> m = new HashMap<String, Map<String,List<?>>>();
+		m.put("boolean", new HashMap<String, List<?>>());
+		m.put("multiple", new HashMap<String, List<?>>());
+
+		for (Enumeration<?> e = request.getParameterNames(); e.hasMoreElements(); ) {
+			String fieldName = (String)e.nextElement();
+
+			if (fieldName.startsWith("role_")) {
+				String key = fieldName.substring(7);
+
+				if (fieldName.startsWith("role_b$")) {
+					m.get("boolean").put(key, Arrays.asList("true".equals(request.getParameter(fieldName))));
+				}
+				else {
+					List<Integer> l = new ArrayList<Integer>();
+					for (String v : request.getParameterValues(fieldName)) {
+						l.add(Integer.parseInt(v));
+					}
+					m.get("multiple").put(key, l);
+				}
+			}
+		}
+
+		return m;
 	}
 
 	/**
@@ -166,12 +202,5 @@ public class GroupAdminController {
 		}
 
 		this.result.redirectTo(this).list();
-	}
-
-	private PermissionOptions convertRolesToPermissionOptions(Group group) {
-		RoleManager manager = new RoleManager();
-		manager.setGroups(Arrays.asList(group));
-
-		return manager.asPermissionOptions();
 	}
 }
