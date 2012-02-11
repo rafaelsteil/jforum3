@@ -265,7 +265,7 @@ public class UserSession  {
 	 * Makes the user session anonymous
 	 */
 	public void becomeAnonymous(int anonymousUserId) {
-		User user = new User(null);
+		User user = new User();
 		user.setId(anonymousUserId);
 		this.setUser(user);
 		setAttribute(ConfigKeys.LOGGED, "0");

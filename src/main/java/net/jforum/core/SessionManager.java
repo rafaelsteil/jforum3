@@ -263,8 +263,9 @@ public class SessionManager {
 		else {
 			// FIXME: Force a reload of the user instance, because if it's kept in the usersession,
 			// changes made to the group (like permissions) won't be seen.
-			//userSession.setUser(this.userRepository.get(userSession.getUser().getId()));
+			userSession.setUser(this.userRepository.get(userSession.getUser().getId()));
 		}
+
 		userSession.ping();
 
 		if (userSession.getUser() == null || userSession.getUser().getId() == 0) {

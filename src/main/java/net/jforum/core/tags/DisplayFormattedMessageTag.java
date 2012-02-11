@@ -25,14 +25,12 @@ import org.apache.commons.lang.StringUtils;
  * @author Rafael Steil
  */
 public class DisplayFormattedMessageTag extends JForumTag {
-	private static PostFormatters formatters;
+	private PostFormatters formatters;
 	private Post post;
 	private String rawMessage;
 
 	public DisplayFormattedMessageTag() {
-		if (formatters == null) {
-			formatters = this.getBean(PostFormatters.class);
-		}
+		formatters = this.getBean(PostFormatters.class);
 	}
 
 	/**

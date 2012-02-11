@@ -88,6 +88,7 @@ public class ForumController {
 	 * Show topics from a forum
 	 */
 	@SecurityConstraint(value = AccessForumRule.class, displayLogin = true)
+	@Path({"/show/{forumId}", "/show/{forumId}/{page}"})
 	public void show(int forumId, int page) {
 		Forum forum = this.forumRepository.get(forumId);
 

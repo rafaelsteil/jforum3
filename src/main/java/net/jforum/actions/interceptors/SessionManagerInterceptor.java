@@ -40,6 +40,7 @@ public class SessionManagerInterceptor implements Interceptor {
 	public void intercept(InterceptorStack stack, ResourceMethod method, Object resourceInstance) throws InterceptionException {
 		sessionManager.refreshSession(userSession);
 		request.setAttribute("userSession", userSession);
+		request.setAttribute("roleManager", userSession.getRoleManager());
 		stack.next(method, resourceInstance);
 	}
 

@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="net.jforum.formatters.BBConfigFormatter" class="net.jforum.formatters.BBConfigFormatter"/>
 	
 	<bean class="net.jforum.formatters.BBCodeConfigParser">
-		<constructor-arg value="classpath:/jforumConfig/bb_config.xml"/>
+		<!--  
+		<constructor-arg value="classpath:/bb_config.xml"/>
+		-->
+		<constructor-arg>
+			<value type="java.io.File">classpath:/bb_config.xml</value>
+		</constructor-arg>
 		<constructor-arg ref="net.jforum.formatters.BBConfigFormatter"/>
 	</bean>
 	
-	<bean id="net.jforum.formatters.PostFormatters" class="net.jforum.formatters.PostFormatters">
+	<bean class="net.jforum.formatters.PostFormatters">
 		<property name="formatters">
 			<!--  Order matters -->	
 			<list>

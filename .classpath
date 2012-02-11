@@ -38,8 +38,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hsqldb-1.8.0.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/htmlparser-1.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.14.0.GA.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaxb-api-2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaxb-impl-2.0.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jdom.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsr173_api-1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jstl-api-1.2.jar"/>
@@ -70,9 +68,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/standard-1.1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/urlrewrite-3.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/vraptor-3.4.0.jar" sourcepath="E:/dev/vraptor-3.4.0/src/main/java"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xalan.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xom-1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xpp3_min-1.1.3.4.O.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xstream-1.3.1.jar"/>
@@ -94,5 +89,10 @@
 	<classpathentry kind="lib" path="compile-lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="compile-lib/xmlunit-1.2.jar"/>
 	<classpathentry kind="lib" path="compile-lib/spring-test.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaxb-api-2.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaxb-impl-2.0.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xalan.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xml-apis.jar"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>
 </classpath>

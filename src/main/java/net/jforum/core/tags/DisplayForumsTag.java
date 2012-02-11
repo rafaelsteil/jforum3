@@ -35,9 +35,7 @@ public class DisplayForumsTag extends JForumTag {
 		int counter = 1;
 
 		for (Forum forum : this.forums) {
-			if (!this.isModerator && this.roleManager.isForumAllowed(forum.getId())
-				|| this.isModerator && this.roleManager.getCanModerateForum(forum.getId())
-				|| this.roleManager.isAdministrator()) {
+			if (this.roleManager.isForumAllowed(forum.getId())) {
 				this.setAttribute(this.var, forum);
 				this.setAttribute(this.var + "Counter", counter);
 				this.invokeJspBody();

@@ -18,6 +18,7 @@ import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.Forum;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.ForumRepository;
+import br.com.caelum.vraptor.ioc.Component;
 
 
 
@@ -27,6 +28,7 @@ import net.jforum.repository.ForumRepository;
  * if the current user can create a new topic on a given forum.
  * @author Rafael Steil
  */
+@Component
 public class CreateNewTopicRule implements AccessRule {
 	private ForumRepository repository;
 	private SessionManager sessionManager;
@@ -45,6 +47,7 @@ public class CreateNewTopicRule implements AccessRule {
 	 * </ul>
 	 * It is expected that the parameter <i>forumId</i> or <i>topic.forum.id</i> exists in the request
 	 */
+	@Override
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		RoleManager roleManager = userSession.getRoleManager();
 

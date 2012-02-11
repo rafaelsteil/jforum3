@@ -11,10 +11,12 @@
 package net.jforum.formatters;
 
 import net.jforum.util.SafeHtml;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class SafeHtmlAttributesFormatter implements Formatter {
 	private SafeHtml safeHtml;
 
@@ -25,6 +27,7 @@ public class SafeHtmlAttributesFormatter implements Formatter {
 	/**
 	 * @see net.jforum.formatters.Formatter#format(java.lang.String, net.jforum.formatters.PostOptions)
 	 */
+	@Override
 	public String format(String text, PostOptions postOptions) {
 		return this.safeHtml.ensureAllAttributesAreSafe(text);
 	}

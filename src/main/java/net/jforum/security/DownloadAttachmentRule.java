@@ -17,10 +17,12 @@ import net.jforum.entities.UserSession;
 import net.jforum.repository.AttachmentRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
+@Component
 public class DownloadAttachmentRule implements AccessRule {
 	private final JForumConfig config;
 	private final AttachmentRepository repository;
@@ -33,6 +35,7 @@ public class DownloadAttachmentRule implements AccessRule {
 	/**
 	 * @see net.jforum.security.AccessRule#shouldProceed(net.jforum.entities.UserSession, javax.servlet.http.HttpServletRequest)
 	 */
+	@Override
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		if (!userSession.isLogged() && !this.config.getBoolean(ConfigKeys.ATTACHMENTS_ANONYMOUS)) {
 			return false;

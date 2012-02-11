@@ -38,14 +38,6 @@
 							<br />
 						</c:if>
 					</td>
-
-					<!-- 
-					<td valign="middle"  nowrap="nowrap" align="right" class="gensmall">
-						<c:if test="${userSession.logged}">
-							<a href="<jforum:url address='/forums/readAll/${forum.id}'/>"><jforum:i18n key="ForumIndex.setAllTopicsAsRead"/></a>
-						</c:if>
-					</td>
-					 -->
 				</tr>
 			</table>
 
@@ -61,7 +53,7 @@
 						<c:set var="colspan" value="0"/>
 						
 						<td valign="middle" align="left" width="50">
-							<a href="<jforum:url address='/jforum'/>?module=topics&amp;action=add&amp;forumId=${forum.id}" rel="nofollow" class="icon_new_topic"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
+							<a href="<jforum:url address='/topics/add'/>?forumId=${forum.id}" rel="nofollow" class="icon_new_topic"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
 						</td>
 					</c:if>
 
@@ -201,7 +193,7 @@
 						<c:set var="colspan" value="0"/>
 						
 						<td valign="middle"  align="left" width="50">
-							<a href="<jforum:url address='/jforum'/>?module=topics&amp;action=add&amp;forumId=${forum.id}" rel="nofollow" class="icon_new_topic"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
+							<a href="<jforum:url address='/topics/add'/>?forumId=${forum.id}" rel="nofollow" class="icon_new_topic"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
 						</td>
 					</c:if>
 

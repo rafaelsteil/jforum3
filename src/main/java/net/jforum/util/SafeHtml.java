@@ -56,6 +56,8 @@ import org.htmlparser.Tag;
 import org.htmlparser.lexer.Lexer;
 import org.htmlparser.nodes.TextNode;
 
+import br.com.caelum.vraptor.ioc.Component;
+
 /**
  * Process text with html and remove possible malicious tags and attributes.
  * Work based on tips from Amit Klein and the following documents: <br>
@@ -64,6 +66,7 @@ import org.htmlparser.nodes.TextNode;
  *
  * @author Rafael Steil
  */
+@Component
 public class SafeHtml {
 	private Set<String> welcomeTags = new HashSet<String>();
 	private Set<String> welcomeAttributes = new HashSet<String>();

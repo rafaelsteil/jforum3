@@ -17,6 +17,7 @@ import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.TopicRepository;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * Check if the user has access to a forum
@@ -24,6 +25,7 @@ import net.jforum.repository.TopicRepository;
  * if the current user can access the contents of a forum
  * @author Rafael Steil
  */
+@Component
 public class AccessForumRule implements AccessRule {
 	private TopicRepository topicRepository;
 
@@ -38,6 +40,7 @@ public class AccessForumRule implements AccessRule {
 	 * </ul>
 	 * It is expected that the parameter <i>topicId</i> or <i>forumId</i> exists in the request
 	 */
+	@Override
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		int forumId = this.findForumId(request);
 		return userSession.getRoleManager().isForumAllowed(forumId);

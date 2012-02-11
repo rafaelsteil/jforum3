@@ -19,7 +19,7 @@
 				<td width="10" class="row1">&nbsp;</td>
 				<td class="row1 forumLink">${forum.name}</td>
 				<td class="row1 gen" align="center">
-					<a id="forumEdit" href="<jforum:url address='/adminForums/edit/${forum.id}'/>"><jforum:i18n key="Forums.List.Edit"/></a>
+					<a id="forumEdit" href="<jforum:url address='/adminForums/edit?forumId=${forum.id}'/>"><jforum:i18n key="Forums.List.Edit"/></a>
 				</td>
 				
 				<c:if test="${roleManager.administrator}">

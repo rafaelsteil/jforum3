@@ -243,8 +243,8 @@ function previewMessage() {
 	};
 
 	$.ajax({
-		type:"GET",
-		url:CONTEXTPATH + "jforum" + SERVLET_EXTENSION + "?module=topics&action=preview",
+		type:"POST",
+		url:CONTEXTPATH + "topics/preview",
 		data:p,
 		dataType:"html",
 		global:true,

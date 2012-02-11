@@ -22,6 +22,7 @@ import net.jforum.entities.UserSession;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
+import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * Check if the user can reply to an existing topic.
@@ -29,6 +30,7 @@ import net.jforum.repository.TopicRepository;
  * if the current user can reply to an existing topic.
  * @author Rafael Steil
  */
+@Component
 public class ReplyTopicRule implements AccessRule {
 	private TopicRepository topicRepository;
 	private PostRepository postRepository;
@@ -53,6 +55,7 @@ public class ReplyTopicRule implements AccessRule {
 	 * It is expected that the parameter <i>topicId</i>, <i>topic.forum.id</i>
 	 * or <i>postId</i> exists in the request
 	 */
+	@Override
 	public boolean shouldProceed(UserSession userSession, HttpServletRequest request) {
 		RoleManager roleManager = userSession.getRoleManager();
 		int forumId = this.findForumId(request);
