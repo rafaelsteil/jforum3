@@ -50,7 +50,6 @@ public class ConfigKeys {
 	public static final String RESOURCE_DIR = "resource.dir";
 
 	public static final String TEMPLATES_MAPPING = "templates.mapping";
-	public static final String TEMPLATE_NAME = "template.name";
 	public static final String TEMPLATE_DIRECTORY = "template.directory";
 	public static final String ENCODING = "encoding";
 	public static final String DEFAULT_CONTAINER_ENCODING = "default.container.encoding";

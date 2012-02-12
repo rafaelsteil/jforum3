@@ -51,10 +51,31 @@ public class JForumConfig extends PropertiesConfiguration {
 			loadProps();
 			setProperty(ConfigKeys.APPLICATION_PATH, servletContext.getRealPath(""));
 			loadDatabaseProperties();
+			normalizeTemplateDirectory();
 		}
 		catch (Exception e) {
 			throw new ForumException(e);
 		}
+	}
+
+	private void normalizeTemplateDirectory() {
+		StringBuilder sb = new StringBuilder(getValue(ConfigKeys.TEMPLATE_DIRECTORY));
+
+		if (sb.charAt(0) != '/') {
+			sb.insert(0, '/');
+		}
+
+		if (sb.charAt(sb.length() - 1) != '/') {
+			sb.append('/');
+		}
+
+		setProperty(ConfigKeys.TEMPLATE_DIRECTORY, sb.toString());
+	}
+
+	@Override
+	public void setProperty(String key, Object value) {
+		clearProperty(key);
+		super.setProperty(key, value);
 	}
 
 	public List<String> getValueAsList(String key) {

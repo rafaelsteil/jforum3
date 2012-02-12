@@ -10,18 +10,23 @@
  */
 package net.jforum.core;
 
+import net.jforum.util.ConfigKeys;
+import net.jforum.util.JForumConfig;
 import br.com.caelum.vraptor.http.FormatResolver;
 import br.com.caelum.vraptor.ioc.Component;
 import br.com.caelum.vraptor.view.DefaultPathResolver;
 
 @Component
 public class VRaptorCustomPathResolver extends DefaultPathResolver {
-	public VRaptorCustomPathResolver(FormatResolver resolver) {
+	private final JForumConfig config;
+
+	public VRaptorCustomPathResolver(FormatResolver resolver, JForumConfig config) {
 		super(resolver);
+		this.config = config;
 	}
 
 	@Override
 	protected String getPrefix() {
-		return "/templates/default/";
+		return config.getValue(ConfigKeys.TEMPLATE_DIRECTORY);
 	}
 }

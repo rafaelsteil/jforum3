@@ -28,8 +28,7 @@ public class TemplateResourceTag extends JForumTag {
 	public void doTag() throws IOException {
 		String path = new StringBuilder(128)
 			.append(this.request().getContextPath())
-			.append('/').append(this.config().getValue(ConfigKeys.TEMPLATE_DIRECTORY)).append('/')
-			.append(this.config().getValue(ConfigKeys.TEMPLATE_NAME))
+			.append(config().getValue(ConfigKeys.TEMPLATE_DIRECTORY))
 			.append(this.item)
 			.toString();
 
