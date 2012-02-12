@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <style type="text/css">@import url( <jforum:templateResource item='/styles/style.css'/> );</style>
 
-<form name="form" action="<jforum:url address='/jforum'/>?module=adminRankings&action=delete" method="post">
+<form name="form" action="<jforum:url address='/adminRankings/delete'/>" method="post">
 
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 	<tr>
@@ -31,7 +31,7 @@
 					</c:otherwise>
 				</c:choose>
 			</td>
-			<td width="26%" class="row1 gen" align="center"><a href="<jforum:url address='/adminRankings/edit/${rank.id}'/>"><jforum:i18n key="Rank.List.Edit"/></a></td>
+			<td width="26%" class="row1 gen" align="center"><a href="<jforum:url address='/adminRankings/edit?rankingId=${rank.id}'/>"><jforum:i18n key="Rank.List.Edit"/></a></td>
 			<td width="10%" class="row1" align="center"><input type="checkbox" name="rankingsId" value="${rank.id}"></td>
 		</tr>
 	</c:forEach>

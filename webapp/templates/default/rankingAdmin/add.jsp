@@ -24,7 +24,7 @@ function turnSpecial() {
 	<c:set var="action" value="editSave"/>
 </c:if>
 
-<form accept-charset="${encoding}" name="form" action="<jforum:url address="/jforum"/>?module=adminRankings&action=${action}" method="post">
+<form accept-charset="${encoding}" name="form" action="<jforum:url address="/adminRankings/${action}"/>" method="post">
 	<c:if test="${not empty ranking}">
 		<input type="hidden" name="ranking.id" value="${ranking.id}">
 	</c:if>
