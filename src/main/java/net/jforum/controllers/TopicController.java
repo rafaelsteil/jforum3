@@ -211,33 +211,46 @@ public class TopicController {
 	}
 
 	/**
+	 * Shows the page to create a new topic
+	 *
+	 * @param forumId
+	 *            the forum where the topic should be created
+	 */
+	@SecurityConstraint(CreateNewTopicRule.class)
+	public void add(int forumId) {
+		Forum forum = this.forumRepository.get(forumId);
+
+		this.result.include("forum", forum);
+		this.result.include("post", new Post());
+		this.result.include("isNewTopic", true);
+		this.result.include("smilies", this.smilieRepository.getAllSmilies());
+	}
+
+	/**
 	 * Shows the page to reply an existing topic
 	 *
-	 * @param topicId
-	 *            the id of the topic to reply
+	 * @param topicId the id of the topic to reply
 	 */
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void reply(int topicId) {
 		Topic topic = this.topicRepository.get(topicId);
+		Forum forum = topic.getForum();
 
 		this.result.include("isReply", true);
 		this.result.include("post", new Post());
 		this.result.include("topic", topic);
-		this.result.include("forum", topic.getForum());
+		this.result.include("forum", forum);
 		this.result.include("smilies", this.smilieRepository.getAllSmilies());
 
-		this.result.forwardTo(Actions.ADD);
+		result.of(this).add(forum.getId());
 	}
 
 	/**
 	 * Adds a reply to an existing topic.
 	 *
-	 * @param topic
-	 *            the topic the reply is made
-	 * @param post
-	 *            the reply itself
-	 * @param options
-	 *            post formatting options
+	 * @param topic the topic the reply is made
+	 * @param post the reply itself
+	 * @param options post formatting options
 	 */
 	@SecurityConstraint(ReplyTopicRule.class)
 	public void replySave(Topic topic, Post post, PostFormOptions options) {
@@ -383,7 +396,6 @@ public class TopicController {
 		this.result.include("smilies", this.smilieRepository.getAllSmilies());
 	}
 
-	// @Viewless
 	@SecurityConstraint(value = DownloadAttachmentRule.class)
 	public File downloadAttachment(int attachmentId) {
 		Attachment attachment = this.attachmentService.getAttachmentForDownload(attachmentId);
@@ -395,22 +407,6 @@ public class TopicController {
 		}
 
 		return new File(attachment.getRealFilename());
-	}
-
-	/**
-	 * Shows the page to create a new topic
-	 *
-	 * @param forumId
-	 *            the forum where the topic should be created
-	 */
-	@SecurityConstraint(CreateNewTopicRule.class)
-	public void add(int forumId) {
-		Forum forum = this.forumRepository.get(forumId);
-
-		this.result.include("forum", forum);
-		this.result.include("post", new Post());
-		this.result.include("isNewTopic", true);
-		this.result.include("smilies", this.smilieRepository.getAllSmilies());
 	}
 
 	private void redirecToListing(Topic topic, Post post) {

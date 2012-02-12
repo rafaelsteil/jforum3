@@ -138,7 +138,7 @@
 							</c:when>
 							<c:when test="${canPostReply}">
 								<td width="8%" align="left" valign="bottom" nowrap="nowrap">
-									<a href="<jforum:url address='/topics/reply/${topic.id}'/>" rel="nofollow" class="icon_reply nav"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
+									<a href="<jforum:url address='/topics/reply?topicId=${topic.id}'/>" rel="nofollow" class="icon_reply nav"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
 								</td>
 							</c:when>
 						</c:choose>
@@ -334,7 +334,7 @@
 							}
 							</script>
 
-							<form action="<jforum:url address='/jforum'/>?module=topics&action=replySave" method="post" name="post" id="post" onsubmit="return validatePostForm(this);" accept-charset="${encoding}">
+							<form action="<jforum:url address='/topics/replySave'/>" method="post" name="post" id="post" onsubmit="return validatePostForm(this);" accept-charset="${encoding}">
 								<input type="hidden" name="topic.forum.id" value="${forum.id}" />
 								<input type="hidden" name="topic.id" value="${topic.id}" />
 								<input type="hidden" name="postOptions.disableHtml" value="true" />
