@@ -23,7 +23,7 @@ public class URLBuilder {
 			sb.append(args[i]).append('/');
 		}
 
-		sb.append(args[args.length - 1]).append(".page");
+		sb.append(args[args.length - 1]);
 
 		return sb.toString();
 	}

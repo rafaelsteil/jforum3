@@ -275,12 +275,11 @@ public class TopicController {
 	/**
 	 * List all posts from a given topic
 	 *
-	 * @param topicId
-	 *            the id of the topic to show
-	 * @param page
-	 *            the initial page to start showing
+	 * @param topicId the id of the topic to show
+	 * @param page the initial page to start showing
 	 */
 	@SecurityConstraint(value = AccessForumRule.class, displayLogin = true)
+	@Path("/list/{topicId}")
 	public void list(int topicId, int page, boolean viewPollResults) {
 		Topic topic = this.topicRepository.get(topicId);
 
@@ -340,10 +339,9 @@ public class TopicController {
 	 * @param opti the formatting options
 	 */
 	@SecurityConstraint(CreateNewTopicRule.class)
-	public void addSave(Topic topic, Post post, PostFormOptions options,
-			List<PollOption> pollOptions) {
+	public void addSave(Topic topic, Post post, PostFormOptions postOptions, List<PollOption> pollOptions) {
 
-		ActionUtils.definePostOptions(post, options);
+		ActionUtils.definePostOptions(post, postOptions);
 		UserSession userSession = this.userSession;
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
 
@@ -351,7 +349,7 @@ public class TopicController {
 			attachments = this.attachmentService.processNewAttachments(this.request);
 		}
 
-		topic.setType(options.getTopicType());
+		topic.setType(postOptions.getTopicType());
 		topic.setSubject(post.getSubject());
 		topic.setUser(userSession.getUser());
 		post.setUserIp(userSession.getIp());

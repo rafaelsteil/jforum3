@@ -46,7 +46,7 @@ public class Avatar implements Serializable {
 	@Column(name = "id")
 	private int id;
 
-	@Column(name = "filename")
+	@Column(name = "file_name")
 	private String fileName;
 
 	@Column(name = "avatar_type", updatable = false)
