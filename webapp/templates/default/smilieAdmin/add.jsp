@@ -8,7 +8,7 @@
 	<c:set var="saveAction" value="editSave"/>
 </c:if>
 
-<form accept-charset="${encoding}" name="form" action="<jforum:url address='/jforum'/>?module=adminSmilies&action=${saveAction}" method="post" enctype="multipart/form-data">
+<form accept-charset="${encoding}" name="form" action="<jforum:url address='/adminSmilies/${saveAction}'/>" method="post" enctype="multipart/form-data">
 
 <c:if test="${not empty smilie}">
 	<input type="hidden" name="smilie.id" value="${smilie.id}">

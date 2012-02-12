@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <style type="text/css">@import url( <jforum:templateResource item='/styles/style.css'/> );</style>
 
-<form accept-charset="${encoding}" name="form" action="<jforum:url address='/jforum'/>?module=adminSmilies&action=delete" method="post">
+<form accept-charset="${encoding}" name="form" action="<jforum:url address='/adminSmilies/delete'/>" method="post">
 
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 	<tr>
@@ -14,7 +14,7 @@
 			<td class="row1" width="8%"><img src="<c:url value='/images/smilies/${smilie.diskName}'/>"></td>
 			<td class="row2 gen">${smilie.code}</td>
 			<td class="row2 gen">
-				<a href="<jforum:url address='/adminSmilies/edit/${smilie.id}'/>"><jforum:i18n key="Smilies.List.Edit"/></a>
+				<a href="<jforum:url address='/adminSmilies/edit?smilieId=${smilie.id}'/>"><jforum:i18n key="Smilies.List.Edit"/></a>
 			</td>
 			<td class="row2"><input type="checkbox" name="smiliesId" value="${smilie.id}"></td>
 		</tr>

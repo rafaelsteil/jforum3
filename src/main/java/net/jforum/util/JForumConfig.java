@@ -15,6 +15,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import net.jforum.core.exceptions.ForumException;
 import net.jforum.entities.Config;
 import net.jforum.repository.ConfigRepository;
@@ -35,13 +37,13 @@ import br.com.caelum.vraptor.ioc.Component;
 public class JForumConfig extends PropertiesConfiguration {
 	private ConfigRepository configRepository;
 
-	public JForumConfig(/*ConfigRepository configRepository, HibernateAwareTask hibernateTask*/) {
+	public JForumConfig(ServletContext servletContext /*ConfigRepository configRepository, HibernateAwareTask hibernateTask*/) {
 		this.setReloadingStrategy(new FileChangedReloadingStrategy());
 		this.setDelimiterParsingDisabled(true);
 
-
 		try {
 			loadProps();
+			setProperty(ConfigKeys.APPLICATION_PATH, servletContext.getRealPath(""));
 
 			/*
 			//in test environment, hibernateTask could be null

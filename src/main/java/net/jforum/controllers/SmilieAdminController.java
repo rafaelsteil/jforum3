@@ -26,7 +26,6 @@ import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
  */
 @Resource
 @Path(Domain.SMILIES_ADMIN)
-// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class SmilieAdminController {
 	private SmilieRepository repository;
@@ -56,7 +55,7 @@ public class SmilieAdminController {
 
 	/**
 	 * Saves a new smilie
-	 * 
+	 *
 	 * @param smilie
 	 */
 	public void addSave(Smilie smilie, UploadedFile image) {
@@ -79,7 +78,7 @@ public class SmilieAdminController {
 
 	/**
 	 * Deletes smilies
-	 * 
+	 *
 	 * @param smiliesId
 	 */
 	public void delete(int... smiliesId) {
