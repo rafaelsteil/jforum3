@@ -89,14 +89,13 @@ public class PostController {
 	/**
 	 * Saves an existing message
 	 * @param post the message to save
-	 * @param options the formatting options
+	 * @param postOptions the formatting options
 	 */
 	@SecurityConstraint(value = ChangePostRule.class)
-	public void editSave( Post post,  PostFormOptions options,
-			List<PollOption> pollOptions,  ModerationLog moderationLog) {
+	public void editSave( Post post,  PostFormOptions postOptions, List<PollOption> pollOptions,  ModerationLog moderationLog) {
 
-		ActionUtils.definePostOptions(post, options);
-		post.getTopic().setType(options.getTopicType());
+		ActionUtils.definePostOptions(post, postOptions);
+		post.getTopic().setType(postOptions.getTopicType());
 
 		Post currentPost = this.postRepository.get(post.getId());
 		List<AttachedFile> attachments = new ArrayList<AttachedFile>();
@@ -117,7 +116,6 @@ public class PostController {
 		}
 
 		this.postService.update(post, roleManager.getCanCreateStickyAnnouncementTopics(), pollOptions, attachments, moderationLog);
-		//TODO pass zero and true?
 		this.result.redirectTo(TopicController.class).list(post.getTopic().getId(), 0, true);
 	}
 
@@ -135,9 +133,6 @@ public class PostController {
 		this.result.include("forum", post.getTopic().getForum());
 		this.result.include("smilies", this.smilieRepository.getAllSmilies());
 
-		//this.viewService.renderView(Domain.TOPICS, Actions.ADD);
-
-		//TODO pass what to add method?
 		this.result.forwardTo(TopicController.class).add(0);
 
 	}

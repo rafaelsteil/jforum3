@@ -220,8 +220,14 @@ public class TopicController {
 	public void add(int forumId) {
 		Forum forum = this.forumRepository.get(forumId);
 
-		this.result.include("forum", forum);
-		this.result.include("post", new Post());
+		if (!result.included().containsKey("forum")) {
+			this.result.include("forum", forum);
+		}
+
+		if (!result.included().containsKey("post")) {
+			this.result.include("post", new Post());
+		}
+
 		this.result.include("isNewTopic", true);
 		this.result.include("smilies", this.smilieRepository.getAllSmilies());
 	}
