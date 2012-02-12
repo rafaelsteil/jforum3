@@ -45,9 +45,7 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.PRIVATE_MESSAGES)
-@SecurityConstraint(multiRoles = {
-		@Role(value = AuthenticatedRule.class, displayLogin = true),
-		@Role(PrivateMessageEnabledRule.class) })
+@SecurityConstraint(multiRoles = { @Role(value = AuthenticatedRule.class, displayLogin = true), @Role(PrivateMessageEnabledRule.class) })
 public class PrivateMessageController {
 	private PrivateMessageRepository repository;
 	private UserRepository userRepository;
@@ -55,9 +53,8 @@ public class PrivateMessageController {
 	private final Result result;
 	private final UserSession userSession;
 
-	public PrivateMessageController(PrivateMessageRepository repository,
-			UserRepository userRepository, PrivateMessageService service,
-			Result result, UserSession userSession) {
+	public PrivateMessageController(PrivateMessageRepository repository, UserRepository userRepository,
+			PrivateMessageService service, Result result, UserSession userSession) {
 		this.repository = repository;
 		this.userRepository = userRepository;
 		this.service = service;
@@ -65,23 +62,24 @@ public class PrivateMessageController {
 		this.userSession = userSession;
 	}
 
+	public void messages() {
+
+	}
+
 	/**
 	 * Delete a set of private message
 	 *
-	 * @param ids
-	 *            the id of the messages to delete
+	 * @param ids the id of the messages to delete
 	 */
 	public void delete(int... ids) {
-		this.service
-				.delete(this.userSession.getUser(), ids);
+		this.service.delete(this.userSession.getUser(), ids);
 		this.result.redirectTo(Actions.INBOX);
 	}
 
 	/**
 	 * Shows the page to review a private message while writing a reply
 	 *
-	 * @param id
-	 *            the id of the message being replied
+	 * @param id the id of the message being replied
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void review(int id) {
@@ -93,8 +91,7 @@ public class PrivateMessageController {
 	/**
 	 * Shows the page to quote a private message
 	 *
-	 * @param id
-	 *            the id of the message
+	 * @param id the id of the message
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void quote(int id) {
@@ -109,26 +106,25 @@ public class PrivateMessageController {
 	/**
 	 * Shows the page to reply a private message
 	 *
-	 * @param id
-	 *            the id of the message to reply
+	 * @param id the id of the message to reply
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
 	public void reply(int id) {
 		PrivateMessage pm = this.repository.get(id);
 
-		this.send();
-
 		this.result.include("pm", pm);
 		this.result.include("isPrivateMessageReply", true);
+
+		this.send();
 	}
 
 	/**
 	 * Shows the page to read a specific message
 	 *
-	 * @param id
-	 *            the message id
+	 * @param id the message id
 	 */
 	@SecurityConstraint(PrivateMessageOwnerRule.class)
+	@Path("/read/{id}")
 	public void read(int id) {
 		PrivateMessage pm = this.repository.get(id);
 
@@ -145,28 +141,20 @@ public class PrivateMessageController {
 	 */
 	public void sent() {
 		User user = this.userSession.getUser();
-		this.result.include("privateMessages",
-				this.repository.getFromSentBox(user));
+		this.result.include("privateMessages", this.repository.getFromSentBox(user));
 		this.result.include("sentbox", true);
-		this.result.forwardTo(Actions.MESSAGES);
+		result.of(this).messages();
 	}
 
 	/**
 	 * Send a private message to some user
 	 *
-	 * @param post
-	 *            the subject and the text
-	 * @param options
-	 *            formatting options
-	 * @param toUsername
-	 *            recipient username, only necessary if <code>toUserId</code>
-	 *            not set
-	 * @param toUserId
-	 *            recipient id, only necessary if <code>toUsername</code> not
-	 *            set
+	 * @param post  the subject and the text
+	 * @param options formatting options
+	 * @param toUsername recipient username, only necessary if <code>toUserId</code> not set
+	 * @param toUserId recipient id, only necessary if <code>toUsername</code> not set
 	 */
-	public void sendSave(Post post, PostFormOptions options, String toUsername,
-			int toUserId) {
+	public void sendSave(Post post, PostFormOptions options, String toUsername, int toUserId) {
 		User toUser = this.findToUser(toUserId, toUsername);
 
 		if (toUser == null || !this.canSendMessageTo(toUser)) {
@@ -184,20 +172,17 @@ public class PrivateMessageController {
 		ActionUtils.definePrivateMessageOptions(pm, options);
 
 		this.service.send(pm);
-
 		this.result.redirectTo(Actions.INBOX);
 	}
 
 	/**
 	 * Shows the page to search for users
 	 *
-	 * @param username
-	 *            if set, search for this username
+	 * @param username if set, search for this username
 	 */
 	public void findUser(String username) {
 		if (!StringUtils.isEmpty(username)) {
-			RoleManager roleManager = this.userSession
-					.getRoleManager();
+			RoleManager roleManager = this.userSession.getRoleManager();
 
 			if (roleManager.getCanOnlyContactModerators()) {
 				List<User> users = this.userRepository.findByUserName(username);
@@ -207,23 +192,19 @@ public class PrivateMessageController {
 					RoleManager roles = new RoleManager();
 					roles.setGroups(user.getGroups());
 
-					if (roles.isModerator() || roles.isAdministrator()
-							|| roles.isCoAdministrator()) {
+					if (roles.isModerator() || roles.isAdministrator() || roles.isCoAdministrator()) {
 						result.add(user);
 					}
 				}
 
 				this.result.include("users", result);
-			} else {
-				if (roleManager
-						.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
-					this.result.include("users",
-							this.userRepository.findByUserName(username));
+			}
+			else {
+				if (roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)) {
+					this.result.include("users", this.userRepository.findByUserName(username));
 				} else {
-					User currentUser = this.userSession
-							.getUser();
-					this.result.include("users", this.userRepository
-							.findByUserName(username, currentUser.getGroups()));
+					User currentUser = this.userSession.getUser();
+					this.result.include("users", this.userRepository.findByUserName(username, currentUser.getGroups()));
 				}
 			}
 		}
@@ -240,7 +221,6 @@ public class PrivateMessageController {
 		this.result.include("attachmentsEnabled", false);
 		this.result.include("user", this.userSession.getUser());
 
-		// TODO pass zero?
 		this.result.forwardTo(TopicController.class).add(0);
 	}
 
@@ -276,8 +256,7 @@ public class PrivateMessageController {
 					RoleManager roles = new RoleManager();
 					roles.setGroups(toUser.getGroups());
 
-					return roles.isModerator() || roles.isAdministrator()
-							|| roles.isCoAdministrator();
+					return roles.isModerator() || roles.isAdministrator() || roles.isCoAdministrator();
 				}
 
 				return true;
@@ -293,13 +272,11 @@ public class PrivateMessageController {
 	public void inbox() {
 		User user = this.userSession.getUser();
 		this.result.include("inbox", true);
-		this.result.include("privateMessages",
-				this.repository.getFromInbox(user));
-		this.result.forwardTo(Actions.MESSAGES);
+		this.result.include("privateMessages", this.repository.getFromInbox(user));
+		result.of(this).messages();
 	}
 
 	private User findToUser(int userId, String username) {
-		return userId == 0 ? this.userRepository.getByUsername(username)
-				: this.userRepository.get(userId);
+		return userId == 0 ? this.userRepository.getByUsername(username) : this.userRepository.get(userId);
 	}
 }

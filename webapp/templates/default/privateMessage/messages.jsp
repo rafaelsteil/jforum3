@@ -76,7 +76,7 @@
 				
 				<br clear="all" />
 				
-				<form action="<jforum:url address='/jforum'/>?module=pm&action=delete" method="post" name="privmsgs" id="privmsgs">
+				<form action="<jforum:url address='/pm/delete'/>" method="post" name="privmsgs" id="privmsgs">
 					
 					<table cellspacing="2" cellpadding="2" width="100%" align="center" border="0">
 						<tbody>
@@ -122,7 +122,7 @@
 								<tr>
 									<td class="row1" valign="middle" align="center" width="5%">
 										<c:choose>
-											<c:when test="${pm.new}">
+											<c:when test="${pm.isNew$}">
 												<img src="<jforum:templateResource item="/images/folder_new.gif"/>" alt="New Folder" />
 											</c:when>
 											<c:otherwise>

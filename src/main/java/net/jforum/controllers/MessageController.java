@@ -39,7 +39,7 @@ public class MessageController {
 	 */
 	public void accessDenied() {
 		this.result.include("message", this.i18n.getMessage("Message.accessDenied"));
-		this.result.forwardTo(Actions.MESSAGE);
+		result.of(this).message();
 	}
 
 	public void message() {
@@ -55,7 +55,7 @@ public class MessageController {
 	public void topicWaitingModeration(int forumId) {
 		this.result.include("message", this.i18n.getFormattedMessage(
 			"PostShow.waitingModeration", URLBuilder.build(Domain.FORUMS, Actions.SHOW, forumId)));
-		this.result.forwardTo(Actions.MESSAGE);
+		result.of(this).message();
 	}
 
 	/**
@@ -67,6 +67,6 @@ public class MessageController {
 	public void replyWaitingModeration(int topicId) {
 		this.result.include("message", this.i18n.getFormattedMessage("PostShow.waitingModeration",
 			URLBuilder.build(Domain.TOPICS, Actions.LIST, topicId)));
-		this.result.forwardTo(Actions.MESSAGE);
+		result.of(this).message();
 	}
 }

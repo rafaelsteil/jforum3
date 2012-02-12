@@ -23,7 +23,7 @@ function chooseUsername() {
 }
 </script>
 
-<form action="<jforum:url address="/jforum"/>?module=pm&action=findUser" method="post" name="search" id="search" accept-charset="${encoding}">
+<form action="<jforum:url address="/pm/findUser"/>" method="post" name="search" id="search" accept-charset="${encoding}">
 	<table cellspacing="0" cellpadding="10" width="100%" border="0">
 		<tr>
 			<td>

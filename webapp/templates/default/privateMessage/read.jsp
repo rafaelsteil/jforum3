@@ -28,11 +28,11 @@
                 
 				<br clear="all" />
 				
-				<form action="<jforum:url address='/jforum'/>?module=pm&action=delete" method="post">
+				<form action="<jforum:url address='/pm/delete'/>" method="post">
 					<table cellspacing="2" cellpadding="2" width="100%" border="0">
 						<tbody>
 							<tr>
-								<td valign="middle"><a href="<jforum:url address='/pm/reply/${pm.id}'/>" class="icon_reply"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
+								<td valign="middle"><a href="<jforum:url address='/pm/reply?id=${pm.id}'/>" class="icon_reply"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
 								</td>
 								<td width="100%">
 									<span class="nav">&nbsp;<a class="nav" href="<jforum:url address='/forums/list'/>"><jforum:i18n key='ForumListing.forumIndex'/></a></span>
@@ -61,7 +61,7 @@
 								<td class="row2" width="10%"><span class="genmed"><jforum:i18n key='PrivateMessage.subject'/>:</span></td>
 								<td class="row2"><span class="genmed">${post.subject}</span></td>
 								<td class="row2" nowrap="nowrap" align="right">
-									<a href="<jforum:url address='/pm/quote/${pm.id}'/>" class="icon_quote"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
+									<a href="<jforum:url address='/pm/quote?id=${pm.id}'/>" class="icon_quote"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
 								</td>
 							</tr>
 							<tr>
@@ -88,7 +88,7 @@
 					<table cellspacing="2" cellpadding="2" width="100%" align="center" border="0">
 						<tbody>
 							<tr>
-								<td><a href="<jforum:url address='/pm/reply/${pm.id}'/>" class="icon_reply"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a></td>
+								<td><a href="<jforum:url address='/pm/reply?id=${pm.id}'/>" class="icon_reply"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a></td>
 							</tr>
 						</tbody>
 					</table>
