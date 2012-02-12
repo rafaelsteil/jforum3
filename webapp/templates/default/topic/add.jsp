@@ -372,10 +372,10 @@ function smiliePopup() {
 					<td class="row1">
 						<c:choose>
 							<c:when test="${isPrivateMessageReply}">
-								<iframe width="100%" height="300" frameborder="0" src="<jforum:url address='/jforum'/>?module=pm&action=review&id=${pm.id}"></iframe>
+								<iframe width="100%" height="300" frameborder="0" src="<jforum:url address='/pm/review'/>?id=${pm.id}"></iframe>
 							</c:when>
 							<c:otherwise>
-								<iframe width="100%" height="300" frameborder="0" src="<jforum:url address='/jforum'/>?module=topics&action=replyReview&topicId=${topic.id}" ></iframe>
+								<iframe width="100%" height="300" frameborder="0" src="<jforum:url address='/topics/replyReview'/>?topicId=${topic.id}" ></iframe>
 							</c:otherwise>
 						</c:choose>
 					</td>

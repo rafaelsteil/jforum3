@@ -52,13 +52,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import br.com.caelum.vraptor.ioc.Component;
-
 /**
  * Parses the bb_config.xml file
  * @author Rafael Steil
  */
-@Component
 public class BBCodeConfigParser extends DefaultHandler {
 	private BBConfigFormatter formatter;
 	private String tagName = "";
@@ -71,10 +68,9 @@ public class BBCodeConfigParser extends DefaultHandler {
 	 */
 	public BBCodeConfigParser(BBConfigFormatter formatter) {
 		this.formatter = formatter;
-		this.parse();
 	}
 
-	private void parse() {
+	public void parse() {
 		try {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			parser.parse(getClass().getResourceAsStream("/bb_config.xml"), this);

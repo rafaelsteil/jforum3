@@ -17,19 +17,23 @@ import net.jforum.util.JForumConfig;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.Container;
 
 /**
  * @author Rafael Steil
  */
 @Component
+@ApplicationScoped
+@FormatAfter(HtmlEntitiesFormatter.class)
 public class SmiliesFormatter implements Formatter {
-	private SmilieRepository repository;
 	private JForumConfig config;
+	private Container container;
 
-	public SmiliesFormatter(SmilieRepository repository, JForumConfig config) {
-		this.repository = repository;
+	public SmiliesFormatter(JForumConfig config, Container container) {
 		this.config = config;
+		this.container = container;
 	}
 
 	/**
@@ -37,8 +41,10 @@ public class SmiliesFormatter implements Formatter {
 	 */
 	@Override
 	public String format(String text, PostOptions postOptions) {
+		SmilieRepository repository = container.instanceFor(SmilieRepository.class);
+
 		if (postOptions.isSmiliesEnabled()) {
-			for (Smilie smilie : this.repository.getAllSmilies()) {
+			for (Smilie smilie : repository.getAllSmilies()) {
 				text = StringUtils.replace(text, smilie.getCode(),
 					this.imageTag(smilie.getDiskName(), postOptions.contextPath()));
 			}

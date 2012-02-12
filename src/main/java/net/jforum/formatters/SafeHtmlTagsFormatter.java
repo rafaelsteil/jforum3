@@ -11,12 +11,14 @@
 package net.jforum.formatters;
 
 import net.jforum.util.SafeHtml;
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
 
 /**
  * @author Rafael Steil
  */
 @Component
+@ApplicationScoped
 public class SafeHtmlTagsFormatter implements Formatter {
 	private SafeHtml safeHtml;
 

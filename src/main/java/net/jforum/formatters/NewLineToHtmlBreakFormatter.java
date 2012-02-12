@@ -12,6 +12,7 @@ package net.jforum.formatters;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
 
 /**
@@ -19,6 +20,8 @@ import br.com.caelum.vraptor.ioc.Component;
  * @author Rafael Steil
  */
 @Component
+@ApplicationScoped
+@FormatAfter(HtmlEntitiesFormatter.class)
 public class NewLineToHtmlBreakFormatter implements Formatter {
 	/**
 	 * @see net.jforum.formatters.Formatter#format(java.lang.String, PostOptions)

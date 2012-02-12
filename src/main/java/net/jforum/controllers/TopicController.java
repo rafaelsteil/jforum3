@@ -144,7 +144,7 @@ public class TopicController {
 		this.result.include("forum", post.getForum());
 		this.result.include("smilies", this.smilieRepository.getAllSmilies());
 
-		this.result.forwardTo(Actions.ADD);
+		this.result.of(this).add(0);
 	}
 
 	public void vote(int topicId, int pollId, int optionId) {

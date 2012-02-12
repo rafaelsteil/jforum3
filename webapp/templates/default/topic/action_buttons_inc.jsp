@@ -12,15 +12,15 @@
 	<div class="subject">&nbsp;&nbsp; &nbsp;<strong><jforum:i18n key='PostShow.subject'/>:</strong> <a name="${post.id}">${fn:escapeXml(post.subject)}</a></div>
 	<div class="action">
 		<c:if test="${!topic.locked && !readonly}">
-			<a href="<jforum:url address='/topics/quote/${post.id}'/>" rel="nofollow" class="icon_quote"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
+			<a href="<jforum:url address='/topics/quote?postId=${post.id}'/>" rel="nofollow" class="icon_quote"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>
 		</c:if>
 
 		<c:if test="${canEditCurrentMessage}">
-			<a href="<jforum:url address='/jforum'/>?module=posts&amp;action=edit&amp;postId=${post.id}" rel="nofollow" class="icon_edit"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>  
+			<a href="<jforum:url address='/posts/edit'/>?postId=${post.id}" rel="nofollow" class="icon_edit"><img src="<c:url value='/images/transp.gif'/>" alt="" /></a>  
 		</c:if>
 
 		<c:if test="${roleManager.canDeletePosts}">
-			<a href="<jforum:url address='/jforum'/>?module=posts&amp;action=delete&amp;postId=${post.id}" id="delete${post.id}" onclick="return confirmDelete(${post.id});"><img src="<jforum:templateResource item='/images/icon_delete.gif'/>" alt="[Delete]" /></a>  
+			<a href="<jforum:url address='/posts/delete/'/>?postId=${post.id}" id="delete${post.id}" onclick="return confirmDelete(${post.id});"><img src="<jforum:templateResource item='/images/icon_delete.gif'/>" alt="[Delete]" /></a>  
 		</c:if>
 
 		<a class="nav" href="#top"><img src="<jforum:templateResource item='/images/icon_up.gif'/>" alt="[Up]" /></a>

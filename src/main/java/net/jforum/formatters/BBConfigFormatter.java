@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
 
 /**
@@ -26,9 +27,16 @@ import br.com.caelum.vraptor.ioc.Component;
  * @author Rafael Steil
  */
 @Component
+@ApplicationScoped
+@FormatAfter(HtmlEntitiesFormatter.class)
 public class BBConfigFormatter implements Formatter {
 	private Map<String, BBCode> bbTags = new LinkedHashMap<String, BBCode>();
 	private Map<String, BBCode> alwaysProcessTags = new LinkedHashMap<String, BBCode>();
+
+	public BBConfigFormatter() {
+		BBCodeConfigParser parser = new BBCodeConfigParser(this);
+		parser.parse();
+	}
 
 	public void addBb(BBCode code) {
 		if (code.alwaysProcess()) {

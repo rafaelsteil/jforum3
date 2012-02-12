@@ -56,6 +56,7 @@ import org.htmlparser.Tag;
 import org.htmlparser.lexer.Lexer;
 import org.htmlparser.nodes.TextNode;
 
+import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
 
 /**
@@ -67,6 +68,7 @@ import br.com.caelum.vraptor.ioc.Component;
  * @author Rafael Steil
  */
 @Component
+@ApplicationScoped
 public class SafeHtml {
 	private Set<String> welcomeTags = new HashSet<String>();
 	private Set<String> welcomeAttributes = new HashSet<String>();
