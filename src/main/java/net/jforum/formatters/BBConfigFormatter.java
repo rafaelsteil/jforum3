@@ -28,7 +28,6 @@ import br.com.caelum.vraptor.ioc.Component;
  */
 @Component
 @ApplicationScoped
-@FormatAfter(HtmlEntitiesFormatter.class)
 public class BBConfigFormatter implements Formatter {
 	private Map<String, BBCode> bbTags = new LinkedHashMap<String, BBCode>();
 	private Map<String, BBCode> alwaysProcessTags = new LinkedHashMap<String, BBCode>();

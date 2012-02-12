@@ -26,7 +26,6 @@ import br.com.caelum.vraptor.ioc.Container;
  */
 @Component
 @ApplicationScoped
-@FormatAfter(HtmlEntitiesFormatter.class)
 public class SmiliesFormatter implements Formatter {
 	private JForumConfig config;
 	private Container container;

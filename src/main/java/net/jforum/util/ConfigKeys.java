@@ -30,6 +30,7 @@ public class ConfigKeys {
 	public static final String FILECHANGES_DELAY = "file.changes.delay";
 	public static final String C3P0_EXTRA_PARAMS = "c3p0.extra.params";
 
+	public static final String MESSAGE_FORMATTERS = "message.formatters";
 	public static final String FORUM_TIME_LIMITED_ENABLE = "forum.time.limited.enable";
 	public static final String AUTHENTICATION_TYPE = "authentication.type";
 	public static final String SSO_IMPLEMENTATION = "sso.implementation";

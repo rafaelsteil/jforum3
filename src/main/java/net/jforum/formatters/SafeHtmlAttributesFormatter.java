@@ -19,7 +19,6 @@ import br.com.caelum.vraptor.ioc.Component;
  */
 @Component
 @ApplicationScoped
-@FormatAfter(HtmlEntitiesFormatter.class)
 public class SafeHtmlAttributesFormatter implements Formatter {
 	private SafeHtml safeHtml;
 

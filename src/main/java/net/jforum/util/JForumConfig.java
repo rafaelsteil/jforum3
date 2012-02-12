@@ -11,6 +11,7 @@
 package net.jforum.util;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -54,6 +55,21 @@ public class JForumConfig extends PropertiesConfiguration {
 		catch (Exception e) {
 			throw new ForumException(e);
 		}
+	}
+
+	public List<String> getValueAsList(String key) {
+		String value = getValue(key);
+		List<String> l = new ArrayList<String>();
+
+		if (value != null) {
+			String[] parts = value.split(",");
+
+			for (String p : parts) {
+				l.add(p.trim());
+			}
+		}
+
+		return l;
 	}
 
 	private void loadProps() throws ConfigurationException, Exception {

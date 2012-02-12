@@ -21,7 +21,6 @@ import br.com.caelum.vraptor.ioc.Component;
  */
 @Component
 @ApplicationScoped
-@FormatAfter(HtmlEntitiesFormatter.class)
 public class NewLineToHtmlBreakFormatter implements Formatter {
 	/**
 	 * @see net.jforum.formatters.Formatter#format(java.lang.String, PostOptions)
