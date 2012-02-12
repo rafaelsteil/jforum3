@@ -41,8 +41,7 @@ public class UserAdminController {
 	private final Result result;
 	private final UserSession userSession;
 
-	public UserAdminController(UserRepository repository,
-			GroupRepository groupRepository, JForumConfig config,
+	public UserAdminController(UserRepository repository, GroupRepository groupRepository, JForumConfig config,
 			UserService userService, Result result, UserSession userSession) {
 		this.userRepository = repository;
 		this.groupRepository = groupRepository;
@@ -55,11 +54,10 @@ public class UserAdminController {
 	/**
 	 * Shows the page to edit an user
 	 *
-	 * @param userId
-	 *            the id of the user to edit
+	 * @param userId the id of the user to edit
 	 */
 	public void edit(int userId) {
-		this.result.forwardTo(UserController.class).edit(userId);
+		this.result.of(UserController.class).edit(0);
 	}
 
 	/**
@@ -67,27 +65,23 @@ public class UserAdminController {
 	 *
 	 * @param userId
 	 */
-	// @InterceptedBy(ExternalUserManagementInterceptor.class)
 	public void groups(int userId) {
 		this.result.include("user", this.userRepository.get(userId));
 		this.result.include("groups", this.groupRepository.getAllGroups());
 	}
 
 	public void lockUnlock(int[] userIds) {
-
+		result.of(this).list(0);
 	}
 
 	/**
 	 * Save the groups
 	 *
-	 * @param userId
-	 *            the user id
-	 * @param groupIds
-	 *            the id of the groups for the user
+	 * @param userId the user id
+	 * @param groupIds the id of the groups for the user
 	 */
 	public void groupsSave(int userId, int... groupIds) {
-		RoleManager roleManager = this.userSession
-				.getRoleManager();
+		RoleManager roleManager = this.userSession.getRoleManager();
 		boolean canSave = roleManager.isAdministrator();
 
 		if (!canSave) {
@@ -102,23 +96,20 @@ public class UserAdminController {
 			this.userService.saveGroups(userId, groupIds);
 		}
 
-		// TODO pass zero?
-		this.result.forwardTo(this).list(0);
+		this.result.redirectTo(this).list(0);
 	}
 
 	/**
 	 * Search for users
 	 *
-	 * @param username
-	 *            the username to search
+	 * @param username the username to search
 	 */
 	public void search(String username) {
 		List<User> users = this.userRepository.findByUserName(username);
 		this.result.include("users", users);
 		this.result.include("username", username);
 
-		// TODO pass zero?
-		this.result.forwardTo(this).list(0);
+		this.result.of(this).list(0);
 	}
 
 	/**
@@ -127,11 +118,9 @@ public class UserAdminController {
 	 * @param page
 	 */
 	public void list(int page) {
-		Pagination pagination = new Pagination(this.config, page)
-				.forUsers(this.userRepository.getTotalUsers());
+		Pagination pagination = new Pagination(this.config, page).forUsers(this.userRepository.getTotalUsers());
 
 		this.result.include("pagination", pagination);
-		this.result.include("users", this.userRepository.getAllUsers(
-				pagination.getStart(), pagination.getRecordsPerPage()));
+		this.result.include("users", this.userRepository.getAllUsers(pagination.getStart(), pagination.getRecordsPerPage()));
 	}
 }

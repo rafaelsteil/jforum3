@@ -18,7 +18,7 @@
 
 	<tr>
 		<td class="gen gensmall" align="center" colspan="6">
-			<form id="formusersearch" action="<jforum:url address='/jforum'/>?module=adminUsers&action=search" accept-charset="${encoding}" method="post">
+			<form id="formusersearch" action="<jforum:url address='/adminUsers/search'/>" accept-charset="${encoding}" method="post">
 				<jforum:i18n key="User.searchByUsername"/>: <input type="text" name="username" value="${username}" />
 				&nbsp;
 				<jforum:i18n key="User.searchByGroup"/>: 
@@ -34,7 +34,7 @@
 		</td>
 	</tr>
   	
-  	<form accept-charset="${encoding}" name="form" action="<jforum:url address='/jforum'/>?module=adminUsers&action=lockUnlock" method="post">
+  	<form accept-charset="${encoding}" name="form" action="<jforum:url address='/adminUsers/lockUnlock'/>" method="post">
 	<input type="hidden" name="page" value="${pagination.thisPage}" />
   
 	<tr>
@@ -53,8 +53,8 @@
 			<td class="row1 gen" align="center">${user.id}</td>
 			<td class="row1 gen">${user.username}</td>
 			<c:if test="${'true' != isExternalUserManagement}">
-				<td class="row1 gen" align="center"><a href="<jforum:url address='/jforum'/>?module=adminUsers&action=edit&userId=${user.id}"><jforum:i18n key="Edit"/></a></td>
-				<td class="row1 gen" align="center"><a href="<jforum:url address='/adminUsers/groups/${user.id}'/>"><jforum:i18n key="User.Groups"/></a></td>
+				<td class="row1 gen" align="center"><a href="<jforum:url address='/adminUsers/edit'/>?userId=${user.id}"><jforum:i18n key="Edit"/></a></td>
+				<td class="row1 gen" align="center"><a href="<jforum:url address='/adminUsers/groups'/>?userId=${user.id}"><jforum:i18n key="User.Groups"/></a></td>
 			</c:if>
 			<c:choose>
 				<c:when test="${user.deleted}">

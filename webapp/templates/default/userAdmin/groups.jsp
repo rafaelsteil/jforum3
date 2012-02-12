@@ -3,7 +3,7 @@
 
 <style type="text/css">@import url( <jforum:templateResource item='/styles/style.css'/> );</style>
 
-<form accept-charset="${encoding}" action="<jforum:url address="/jforum"/>?module=adminUsers&action=groupsSave" method="post">
+<form accept-charset="${encoding}" action="<jforum:url address="/adminUsers/groupsSave"/>" method="post">
 	<input type="hidden" name="userId" value="${user.id}">
 	
 	<table class="forumline" cellspacing="1" cellpadding="3" width="100%">
