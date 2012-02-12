@@ -9,7 +9,7 @@
 	<c:set var="saveAction" value="editSave"/>
 </c:if>
 
-<form accept-charset="${encoding}" name="form" action="<jforum:url address='/jforum'/>?module=adminBadWord&action=${saveAction}" method="post">
+<form accept-charset="${encoding}" name="form" action="<jforum:url address='/adminBadWord/${saveAction}'/>" method="post">
 
 <c:if test="${not empty word}">
   <input type="hidden" name="word.id" value="${word.id}">
