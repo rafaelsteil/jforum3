@@ -12,7 +12,6 @@ package net.jforum.controllers;
 
 import java.util.List;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
@@ -35,36 +34,35 @@ public class RecentTopicsController {
 	private final UserSession userSession;
 	private final Result result;
 
-	public RecentTopicsController(RecentTopicsRepository repository,
-			JForumConfig config, UserSession userSession, Result result) {
+	public RecentTopicsController(RecentTopicsRepository repository, JForumConfig config, UserSession userSession, Result result) {
 		this.repository = repository;
 		this.config = config;
 		this.userSession = userSession;
 		this.result = result;
 	}
 
+	public void list() {
+
+	}
+
 	public void listNew() {
-		this.list(this.repository.getNewTopics(this.config
-				.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsNew");
+		this.list(this.repository.getNewTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsNew");
 	}
 
 	public void listUpdated() {
-		this.list(this.repository.getUpdatedTopics(this.config
-				.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsUpdated");
+		this.list(this.repository.getUpdatedTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsUpdated");
 	}
 
 	public void listHot() {
-		this.list(this.repository.getHotTopics(this.config
-				.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsHot");
+		this.list(this.repository.getHotTopics(this.config.getInt(ConfigKeys.RECENT_TOPICS)), "recentTopicsHot");
 	}
 
 	private void list(List<Topic> topics, String key) {
 		TopicFilter filter = new TopicFilter();
 
-		this.result.include("topics",
-				filter.filter(topics, this.userSession.getRoleManager()));
+		this.result.include("topics", filter.filter(topics, this.userSession.getRoleManager()));
 		this.result.include("recentTopicsSectionKey", key);
 
-		this.result.forwardTo(Actions.LIST);
+		result.of(this).list();
 	}
 }

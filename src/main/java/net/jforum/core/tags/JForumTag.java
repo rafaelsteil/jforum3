@@ -55,8 +55,7 @@ public abstract class JForumTag extends SimpleTagSupport {
 
 	protected <T> T getBean(Class<T> beanId) {
 		if (springContext == null) {
-			springContext = (ApplicationContext)this.pageContext()
-				.getServletContext().getAttribute(ConfigKeys.SPRING_CONTEXT);
+			springContext = (ApplicationContext)this.pageContext().getServletContext().getAttribute(ConfigKeys.SPRING_CONTEXT);
 		}
 
 		return springContext != null
