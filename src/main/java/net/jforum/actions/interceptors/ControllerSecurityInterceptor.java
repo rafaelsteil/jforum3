@@ -33,11 +33,11 @@ public class ControllerSecurityInterceptor extends SecurityInterceptor {
 
 	@Override
 	protected SecurityConstraint getAnnotation(ResourceMethod method) {
-		return method.getResource().getClass().getAnnotation(SecurityConstraint.class);
+		return method.getResource().getType().getAnnotation(SecurityConstraint.class);
 	}
 
 	@Override
 	protected boolean isAnnotationPresent(ResourceMethod method) {
-		return method.getResource().getClass().isAnnotationPresent(SecurityConstraint.class);
+		return method.getResource().getType().isAnnotationPresent(SecurityConstraint.class);
 	}
 }
