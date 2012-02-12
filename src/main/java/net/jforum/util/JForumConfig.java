@@ -24,6 +24,9 @@ import net.jforum.repository.ConfigRepository;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.Component;
@@ -35,32 +38,18 @@ import br.com.caelum.vraptor.ioc.Component;
 @Component
 @ApplicationScoped
 public class JForumConfig extends PropertiesConfiguration {
-	private ConfigRepository configRepository;
+	private static final Logger logger = Logger.getLogger(JForumConfig.class);
+	private final SessionFactory sessionFactory;
 
-	public JForumConfig(ServletContext servletContext /*ConfigRepository configRepository, HibernateAwareTask hibernateTask*/) {
+	public JForumConfig(ServletContext servletContext, SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 		this.setReloadingStrategy(new FileChangedReloadingStrategy());
 		this.setDelimiterParsingDisabled(true);
 
 		try {
 			loadProps();
 			setProperty(ConfigKeys.APPLICATION_PATH, servletContext.getRealPath(""));
-
-			/*
-			//in test environment, hibernateTask could be null
-			if(hibernateTask != null){
-				hibernateTask.execute(new HibernateRunnable() {
-					@Override
-					public void run() {
-						try {
-							loadDatabaseProperties();
-						}
-						catch (Exception e) {
-							throw new ForumException(e);
-						}
-					}
-				});
-			}
-			*/
+			loadDatabaseProperties();
 		}
 		catch (Exception e) {
 			throw new ForumException(e);
@@ -87,14 +76,26 @@ public class JForumConfig extends PropertiesConfiguration {
 		}
 	}
 
-	private void loadDatabaseProperties() throws Exception{
-		if (configRepository != null) {
-			List<Config> databasesProperties = this.configRepository.getAll();
+	private void loadDatabaseProperties() {
+		Session session = null;
+
+		try {
+			session = sessionFactory.openSession();
+
+			ConfigRepository repository = new ConfigRepository(session);
+			List<Config> databasesProperties = repository.getAll();
 
 			for (Config config : databasesProperties) {
 				this.clearProperty(config.getName());
 				this.addProperty(config.getName(), config.getValue());
 			}
+		}
+		catch (Exception e) {
+			logger.error("Error while trying to load custom settings from the database: " + e.getMessage(), e);
+		}
+		finally {
+			try { session.close(); }
+			catch (Exception e) {}
 		}
 	}
 

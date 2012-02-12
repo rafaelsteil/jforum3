@@ -60,13 +60,11 @@
 				</tr>
 
 				<tr>
-					<td class="row1">
-						<p><a id="tags" class="genmed" href="<jforum:url address='/adminTag/list'/>" target="main"><jforum:i18n key="Admin.Tags"/></a></p>
-					</td>
-					</tr>
+					<!-- 
 					<tr>
 						<td class="row1"><p><a id="avatars" class="genmed" href="<jforum:url address='/adminAvatar/list'/>" target="main"><jforum:i18n key="Admin.avatars"/></a></p></td>
 					</tr>
+					 -->
 				
 					<tr>
 						<td class="row1"><p><a id="smilies" class="genmed" href="<jforum:url address='/adminSearchStats/list'/>" target="main"><jforum:i18n key="Admin.search"/></a></p></td>

@@ -48,7 +48,7 @@ function testEmail()
 }
 </script>
 
-<form action="<jforum:url address='/jforum'/>?module=adminConfig&action=save" method="post" name="form" id="form">
+<form action="<jforum:url address='/adminConfig/save'/>" method="post" name="form" id="form">
 
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 <tr>
@@ -129,7 +129,7 @@ function testEmail()
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.htmlTags"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_html.tags.welcome" value="${config.getListAsString$1["html.tags.welcome"]}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_html.tags.welcome" value="${config.getValue$1["html.tags.welcome"]}" /></span></td>
 </tr>
 
 <tr>

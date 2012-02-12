@@ -23,6 +23,7 @@ import br.com.caelum.vraptor.ioc.Component;
 @ApplicationScoped
 public class PostFormatters extends ArrayList<Formatter> {
 	public PostFormatters(List<Formatter> list) {
+		clear();
 		organizeOrder(list);
 	}
 

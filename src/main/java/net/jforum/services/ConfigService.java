@@ -27,8 +27,7 @@ public class ConfigService {
 	}
 
 	public void save(HttpServletRequest request) {
-		for (Enumeration<?> e = request.getParameterNames(); e
-				.hasMoreElements();) {
+		for (Enumeration<?> e = request.getParameterNames(); e.hasMoreElements();) {
 			String key = (String) e.nextElement();
 
 			if (key.startsWith("p_")) {
@@ -51,7 +50,6 @@ public class ConfigService {
 			}
 		}
 
-		this.i18n.changeBoardDefaultLanguage(this.config
-				.getValue(ConfigKeys.I18N_DEFAULT));
+		this.i18n.changeBoardDefaultLanguage(this.config.getValue(ConfigKeys.I18N_DEFAULT));
 	}
 }

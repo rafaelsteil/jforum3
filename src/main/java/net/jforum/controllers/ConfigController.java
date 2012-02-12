@@ -10,8 +10,6 @@
  */
 package net.jforum.controllers;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -21,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.actions.helpers.Domain;
 import net.jforum.core.SecurityConstraint;
-import net.jforum.core.exceptions.ForumException;
 import net.jforum.security.AdministrationRule;
 import net.jforum.services.ConfigService;
 import net.jforum.util.JForumConfig;
@@ -35,7 +32,6 @@ import br.com.caelum.vraptor.Result;
  */
 @Resource
 @Path(Domain.CONFIG_ADMIN)
-// @InterceptedBy(ActionSecurityInterceptor.class)
 @SecurityConstraint(value = AdministrationRule.class, displayLogin = true)
 public class ConfigController {
 	private final ConfigService service;
@@ -43,40 +39,27 @@ public class ConfigController {
 	private final JForumConfig config;
 	private final Result result;
 
-	public ConfigController(ConfigService service, HttpServletRequest request,
-			JForumConfig config, Result result) {
+	public ConfigController(ConfigService service, HttpServletRequest request, JForumConfig config, Result result) {
 		this.service = service;
 		this.request = request;
 		this.config = config;
 		this.result = result;
 	}
 
-	public void list() {
+	public void list() throws Exception {
 		this.result.include("locales", this.loadLocaleNames());
 		this.result.include("config", this.config);
 	}
 
-	public void save() {
+	public void save() throws Exception {
 		this.service.save(this.request);
 		this.result.redirectTo(this).list();
 	}
 
-	private List<String> loadLocaleNames() {
+	private List<String> loadLocaleNames() throws Exception {
 		Properties locales = new Properties();
 
-		FileInputStream fis = null;
-
-		try {
-			locales.load(this.getClass().getResourceAsStream(
-					"/jforumConfig/languages/locales.properties"));
-		} catch (IOException e) {
-			throw new ForumException(e);
-		} finally {
-			if (fis != null) {
-				try { fis.close(); }
-				catch (Exception e) { }
-			}
-		}
+		locales.load(this.getClass().getResourceAsStream("/jforumConfig/languages/locales.properties"));
 
 		List<String> localesList = new ArrayList<String>();
 
