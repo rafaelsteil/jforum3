@@ -18,7 +18,7 @@ function validateForm() {
 //<#include "js/utils.js"/>
 </script>
 
-<form action="<jforum:url address="/jforum"/>?module=user&action=editSave" method="post" enctype="multipart/form-data" name="post" id="post" accept-charset="${encoding}" onsubmit="return validateForm();">
+<form action="<jforum:url address="/user/editSave"/>" method="post" enctype="multipart/form-data" name="post" id="post" accept-charset="${encoding}" onsubmit="return validateForm();">
 <input type="hidden" name="user.id" value="${user.id}" />
 
 <table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">

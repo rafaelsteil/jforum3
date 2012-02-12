@@ -77,10 +77,6 @@ public class UserController {
 		this.request = request;
 	}
 
-	public void x() {
-
-	}
-
 	/**
 	 * Shows the page with all registered users
 	 * @param page the pagination first record to start showing
@@ -183,6 +179,7 @@ public class UserController {
 	 * @param userId the user id
 	 */
 	@SecurityConstraint(EditUserRule.class)
+	@Path("/edit/{userId}")
 	public void edit(int userId) {
 		User userToEdit = this.userRepository.get(userId);
 		this.result.include("user", userToEdit);
@@ -195,8 +192,7 @@ public class UserController {
 	 * @param user the user to update
 	 */
 	@SecurityConstraint(EditUserRule.class)
-	public void editSave(User user, Integer avatarId,
-			UploadedFile image, Integer rankingId) {
+	public void editSave(User user, Integer avatarId, UploadedFile image, Integer rankingId) {
 
 		Avatar avatar = null;
 

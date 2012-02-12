@@ -57,7 +57,7 @@ public class UserAdminController {
 	 * @param userId the id of the user to edit
 	 */
 	public void edit(int userId) {
-		this.result.of(UserController.class).edit(0);
+		result.forwardTo(UserController.class).edit(userId);
 	}
 
 	/**
