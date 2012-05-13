@@ -31,7 +31,7 @@
 	
 	<!-- Cobertura -->
 	<path id="cobertura.classpath">
-		<fileset dir="${cobertura.libs.dir}">
+		<fileset dir="${cobertura.libs.dir}" erroronmissingdir="false">
 			<include name="*.jar"/>
 		</fileset>
 	</path>
@@ -40,16 +40,16 @@
 	
 	<!-- Classpath declaration -->
     <path id="project.classpath">
-        <fileset dir="${project.libs}">
+        <fileset dir="${project.libs}" erroronmissingdir="false">
             <include name="**/*.jar"/>
         </fileset>
     </path>
 
 	<path id="base.path">
-		<fileset dir="${project.libs}">
+		<fileset dir="${project.libs}" erroronmissingdir="false">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${custom.libs}">
+		<fileset dir="${custom.libs}" erroronmissingdir="false">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
