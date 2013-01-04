@@ -40,7 +40,7 @@ public class UserSessionTestCase {
 
 	@Before
 	public void setup() {
-		userSession = new UserSession(null);
+		userSession = new UserSession();
 
 		context.checking(new Expectations() {{
 			allowing(request).getSession(); will(returnValue(httpSession));

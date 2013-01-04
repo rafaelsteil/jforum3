@@ -154,30 +154,33 @@ public class UserControllerTestCase {
 		context.checking(new Expectations() {{
 			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(false));
 			one(mockRequest).getHeader("Referer"); will(returnValue("some referer"));
+			one(mockResult).include("invalidLogin", false);  // TODO: find how to remove it
 			one(mockResult).include("returnPath", "some referer");
 		}});
 
-		userController.login(null);
+		userController.login(null, false);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void loginWithReturnPath() {
 		context.checking(new Expectations() {{
+			one(mockResult).include("invalidLogin", false);  // TODO: find how to remove it
 			one(mockResult).include("returnPath", "some return path");
 		}});
 
-		userController.login("some return path");
+		userController.login("some return path", false);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void loginWithoutReturnPathAndIgnoringReferer() {
 		context.checking(new Expectations() {{
+			one(mockResult).include("invalidLogin", false);  // TODO: find how to remove it
 			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(true));
 		}});
 
-		userController.login(null);
+		userController.login(null, false);
 		context.assertIsSatisfied();
 	}
 
