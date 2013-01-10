@@ -7,16 +7,14 @@
     <display-name>JForum 3 - Powering Communities</display-name>
     <description>Open Source Java Forum Software</description>
     
-	<listener>
+	<!--<listener>
 		<listener-class>beanface.el.functor.InstallFunctorListener</listener-class>
-	</listener>
+	</listener>-->
 
-	<!-- 	
 	<listener>
   		<listener-class>net.jforum.core.UserSessionListener</listener-class>
   	</listener>
-  	 -->
-	
+
 	<context-param>
     	<param-name>br.com.caelum.vraptor.provider</param-name>
     	<param-value>net.jforum.core.VRaptorSpringProvider</param-value>
