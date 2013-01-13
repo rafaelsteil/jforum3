@@ -1,7 +1,5 @@
 target/
 *.class
-webapp/WEB-INF/classes/
-webapp/WEB-INF/lib/
 cobertura.ser
 tmp/
 work/
@@ -12,3 +10,5 @@ out
 webapp/upload/
 src/main/resources/jforumConfig/jforum-custom.properties
 *.DS_Store
+.classpath
+.project
