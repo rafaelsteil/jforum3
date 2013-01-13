@@ -39,7 +39,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void moveTopics() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/moveTopics.sql");
 
 		ForumRepository dao = this.newForumDao();
@@ -57,7 +57,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getNewMessages() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getNewMessages.sql");
 
 		Calendar from = Calendar.getInstance();
@@ -73,7 +73,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getModerators() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getModerators.sql");
 
 		Forum forum = new Forum(); forum.setId(1);
@@ -97,7 +97,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getLastPost() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/topicdao/firstLastPost.sql");
 
 		ForumRepository dao = this.newForumDao();
@@ -110,7 +110,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getLastPostShouldIgnorePendingModerationPost() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getLastPostShouldIgnorePendingModerationPost.sql");
 
 		ForumRepository dao = this.newForumDao();
@@ -124,7 +124,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	public void getTopicsShouldIgnoreModeratedExpectThreeResults() {
 		this.createGetTopicsPosts();
 
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getTopicsShouldIgnoreModeratedExpectThreeResults.sql");
 
 		ForumRepository dao = this.newForumDao();
@@ -180,7 +180,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTotalPosts() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getTotalPosts.sql");
 
 		ForumRepository dao = this.newForumDao();
@@ -193,7 +193,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTopicsShouldFetchFromForumAndFromMovedIdExpectTwoResults() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getTopicsShouldFetchFromForumAndFromMovedIdExpectTwoResults.sql");
 
 		ForumRepository dao = this.newForumDao();
@@ -205,7 +205,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTopicsShouldIgnoreMovedIdExpectOneResult() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getTopicsShouldFetchFromForumAndFromMovedIdExpectTwoResults.sql");
 
 		Mockery mock = TestCaseUtils.newMockery();
@@ -224,7 +224,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTotalTopicsShouldFetchOnlyNonModeratedExpectTwoResults() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getTotalTopics.sql");
 
 		Forum forum = new Forum(this.newForumDao()); forum.setId(1);
@@ -312,7 +312,7 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 
 	@SuppressWarnings("deprecation")
 	private void createGetTopicsPosts() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/forumdao/getTopics.sql");
 
 		// Topic 1

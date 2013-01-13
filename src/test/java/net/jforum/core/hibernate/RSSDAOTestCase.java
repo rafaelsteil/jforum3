@@ -27,7 +27,7 @@ public class RSSDAOTestCase extends AbstractDAOTestCase<Object> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getForumTopics() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/rssdao/getForumTopics.sql");
 
 		RSSRepository dao = this.newDao();

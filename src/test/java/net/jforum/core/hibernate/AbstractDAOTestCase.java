@@ -25,7 +25,8 @@ import org.junit.Before;
  * @author Rafael Steil
  */
 public abstract class AbstractDAOTestCase<T> {
-	protected SessionFactory sessionFactory;
+	private Session session;
+	private SessionFactory sessionFactory;
 
 	/**
 	 * Persists an entity.
@@ -36,8 +37,8 @@ public abstract class AbstractDAOTestCase<T> {
 	 */
 	protected void insert(T entity, HibernateGenericDAO<T> dao) {
 		dao.add(entity);
-		this.commit();
-		this.beginTransaction();
+		commit();
+		beginTransaction();
 	}
 
 	/**
@@ -49,8 +50,8 @@ public abstract class AbstractDAOTestCase<T> {
 	 */
 	protected void update(T entity, HibernateGenericDAO<T> dao) {
 		dao.update(entity);
-		this.commit();
-		this.beginTransaction();
+		commit();
+		beginTransaction();
 	}
 
 	/**
@@ -60,37 +61,41 @@ public abstract class AbstractDAOTestCase<T> {
 	 */
 	protected void delete(T entity, HibernateGenericDAO<T> dao) {
 		dao.remove(entity);
-		this.commit();
-		this.beginTransaction();
+		commit();
+		beginTransaction();
 	}
 
 	protected Session session() {
-		return this.sessionFactory.getCurrentSession();
+		return session;
 	}
 
 	/**
 	 * First commits the transaction, and then clears the session
 	 */
 	protected void commit() {
-		this.sessionFactory.getCurrentSession().getTransaction().commit();
+		session.getTransaction().commit();
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		Configuration config = new AnnotationConfiguration();
 		config.configure("/hibernate-tests.cfg.xml");
-		this.sessionFactory = config.buildSessionFactory();
-		this.beginTransaction();
+		sessionFactory = config.buildSessionFactory();
+		session = sessionFactory.openSession();
+		beginTransaction();
 	}
 
 	protected Transaction beginTransaction() {
-		return this.sessionFactory.getCurrentSession().beginTransaction();
+		return session.beginTransaction();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		if (this.sessionFactory != null) {
-			this.sessionFactory.close();
+		if(session != null) {
+			session.close();
+		}
+		if (sessionFactory != null) {
+			sessionFactory.close();
 		}
 	}
 }

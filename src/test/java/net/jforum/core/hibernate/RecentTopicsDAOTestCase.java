@@ -119,11 +119,11 @@ public class RecentTopicsDAOTestCase extends AbstractDAOTestCase<Topic> {
 
 	@SuppressWarnings("deprecation")
 	private void loadDump(String file) {
-		sessionFactory.getCurrentSession().beginTransaction();
-		JDBCLoader loader = new JDBCLoader(sessionFactory.getCurrentSession().connection());
+		session().beginTransaction();
+		JDBCLoader loader = new JDBCLoader(session().connection());
 		loader.run(file);
-		sessionFactory.getCurrentSession().getTransaction().commit();
-		sessionFactory.getCurrentSession().beginTransaction();
+		session().getTransaction().commit();
+		session().beginTransaction();
 	}
 
 	private RecentTopicsRepository newDao() {
