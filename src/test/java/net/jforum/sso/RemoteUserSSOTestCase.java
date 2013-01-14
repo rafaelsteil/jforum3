@@ -66,6 +66,8 @@ public class RemoteUserSSOTestCase {
 
 	@Before
 	public void setup() {
+		us.setRequest(request);
+		
 		 sso = new RemoteUserSSO();
 		 sso.setConfig(config);
 

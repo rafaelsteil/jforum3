@@ -41,7 +41,8 @@ public class UserSessionTestCase {
 	@Before
 	public void setup() {
 		userSession = new UserSession();
-
+		userSession.setRequest(request);
+		
 		context.checking(new Expectations() {{
 			allowing(request).getSession(); will(returnValue(httpSession));
 			allowing(httpSession).getAttribute(ConfigKeys.LOGGED); will(returnValue("1")); when(state.is("logged"));

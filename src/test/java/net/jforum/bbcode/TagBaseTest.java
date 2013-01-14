@@ -31,9 +31,6 @@ public abstract class TagBaseTest {
 
 	@Before
 	public void setup() {
-		String filePath = TestCaseUtils.getRealFilePath("/jforumConfig/bb_config.xml");
-
-		File file = new File(filePath);
 		BBConfigFormatter customFormatter = new BBConfigFormatter() {
 			@Override
 			public void addBb(BBCode code) {
@@ -41,7 +38,7 @@ public abstract class TagBaseTest {
 			}
 		};
 
-		new BBCodeConfigParser(/*file,*/ customFormatter);
+		new BBCodeConfigParser( customFormatter);
 	}
 
 	protected PostOptions defaultOptions() {

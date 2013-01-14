@@ -35,23 +35,13 @@ public class TestCaseUtils {
 			setImposteriser(ClassImposteriser.INSTANCE);
 		}};
 	}
-
-	/**
-	 * Retrieve the path from a real file in the webapp classpath
-	 * @param file the file wanted, relative to the classpath
-	 * @return the complete file path
-	 */
-	public static String getRealFilePath(String file) {
-		return getApplicationRoot() + "/webapp/WEB-INF/classes" + file;
-	}
-
 	/**
 	 * Retrive the root directory of the application
-	 * @return
+	 * @return The application root
 	 */
 	public static String getApplicationRoot() {
 		String filePath = TestCaseUtils.class.getResource(".").getFile();
-		int index = filePath.indexOf("/target/tests");
+		int index = filePath.indexOf("/target/test");
 		return filePath.substring(0, index);
 	}
 
@@ -97,44 +87,6 @@ public class TestCaseUtils {
 		}
 
 		throw new IllegalArgumentException("Field not found");
-	}
-
-	/**
-	 * Load a Spring configuration file
-	 * @param file the file name, relative to /jforumConfig/ in the webapp classpath
-	 * @return the xml contents, without the namescape
-	 */
-	public static String loadSpringFile(String file) {
-		String filePath = TestCaseUtils.getRealFilePath("/jforumConfig/" + file);
-		BufferedReader reader = null;
-		FileReader fileReader = null;
-
-		try {
-			fileReader = new FileReader(filePath);
-			reader = new BufferedReader(fileReader);
-			int c = 0;
-			char[] ch = new char[4096];
-
-			StringBuilder sb = new StringBuilder();
-
-			while ((c = reader.read(ch, 0, ch.length)) != -1) {
-				sb.append(ch, 0, c);
-			}
-
-			return sb.toString()
-				.replaceAll("(?s)(?i)<beans (.*?)>", "<beans>")
-				.replaceAll("<aop:", "<aop-"); // Remove the namespace
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				fileReader.close();
-				reader.close();
-			}
-			catch (Exception e) {}
-		}
 	}
 
 	public static void copyFile(File in, File out) {
