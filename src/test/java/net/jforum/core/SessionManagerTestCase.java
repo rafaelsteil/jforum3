@@ -53,7 +53,7 @@ public class SessionManagerTestCase {
 	private HttpServletResponse response = context.mock(HttpServletResponse.class);
 	private HttpSession httpSession = context.mock(HttpSession.class);
 	private SessionRepository sessionRepository = context.mock(SessionRepository.class);
-	private SessionManager manager = new SessionManager(config, userRepository, sessionRepository);
+	private SessionManager manager = new SessionManager(config, sessionRepository, userRepository);
 	private States state = context.states("state");
 	private States refreshState = context.states("refresh");
 
@@ -105,7 +105,7 @@ public class SessionManagerTestCase {
 			one(sessionRepository).add(with(aNonNull(Session.class)));
 		}});
 
-		UserSession us = new UserSession(null);
+		UserSession us = new UserSession();
 		us.setSessionId("123");
 		us.getUser().setId(2);
 
@@ -120,7 +120,7 @@ public class SessionManagerTestCase {
 			allowing(httpSession).getId(); will(returnValue("123"));
 		}});
 
-		UserSession us = new UserSession(null);
+		UserSession us = new UserSession();
 		us.setSessionId("123");
 		us.getUser().setId(1);
 
@@ -143,8 +143,11 @@ public class SessionManagerTestCase {
 			one(config).getValue("sso.logout");
 			one(request).setAttribute("ssoLogout", "");
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -160,8 +163,11 @@ public class SessionManagerTestCase {
 			one(httpSession).getAttributeNames();
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -177,8 +183,11 @@ public class SessionManagerTestCase {
 			one(httpSession).getAttributeNames();
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -194,8 +203,11 @@ public class SessionManagerTestCase {
 			one(httpSession).getAttributeNames();
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -210,8 +222,11 @@ public class SessionManagerTestCase {
 			one(httpSession).getAttributeNames();
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -228,8 +243,11 @@ public class SessionManagerTestCase {
 			}));
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -247,8 +265,11 @@ public class SessionManagerTestCase {
 			}));
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -261,8 +282,11 @@ public class SessionManagerTestCase {
 			atLeast(1).of(request).getCookies(); will(returnValue(null));
 			one(userRepository).get(1); will(returnValue(new User()));
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		manager.refreshSession(request, response);
+		manager.refreshSession(userSession);
 		context.assertIsSatisfied();
 	}
 
@@ -279,7 +303,7 @@ public class SessionManagerTestCase {
 		}});
 
 		manager.add(us);
-		manager.refreshSession(request, response);
+		manager.refreshSession(us);
 		Assert.assertNotNull(us.getRoleManager());
 	}
 
@@ -297,8 +321,11 @@ public class SessionManagerTestCase {
 			one(config).getValue(ConfigKeys.SSO_LOGOUT); will(returnValue("x"));
 			one(request).setAttribute("ssoLogout", "x");
 		}});
+		UserSession userSession = new UserSession();
+		userSession.setRequest(request);
+		userSession.setResponse(response);
 
-		UserSession us = manager.refreshSession(request, response);
+		UserSession us = manager.refreshSession(userSession);
 		Assert.assertNotNull(us);
 		Assert.assertEquals(anonymousUser, us.getUser());
 		Assert.assertNotNull(us.getRoleManager());
@@ -463,7 +490,7 @@ public class SessionManagerTestCase {
 
 	@Test
 	public void addBotShouldIgnore() {
-		UserSession us = new UserSession(null) {
+		UserSession us = new UserSession() {
 			@Override
 			public boolean isBot() { return true; }
 
@@ -532,7 +559,7 @@ public class SessionManagerTestCase {
 	}
 
 	private UserSession newUserSession(String sessionId) {
-		UserSession us = new UserSession(null);
+		UserSession us = new UserSession();
 
 		us.setSessionId(sessionId);
 		us.getUser().setId(1);

@@ -49,7 +49,7 @@ public class SmiliesFormatterTestCase {
 				"<img src=\'/smilies/#s1#\' border=\'0\'/>. This one not: :P";
 		PostOptions options = new PostOptions(false, true, false, false, "");
 
-		SmiliesFormatter formatter = new SmiliesFormatter(repository, config);
+		SmiliesFormatter formatter = new SmiliesFormatter(config, null);
 		Assert.assertEquals(expected, formatter.format(input, options));
 
 		mock.assertIsSatisfied();

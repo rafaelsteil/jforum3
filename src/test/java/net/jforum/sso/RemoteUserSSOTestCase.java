@@ -30,7 +30,7 @@ public class RemoteUserSSOTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private JForumConfig config = context.mock(JForumConfig.class);
 	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-	private UserSession us = new UserSession(null);
+	private UserSession us = new UserSession();
 	private SSO sso;
 
 	@Test
@@ -66,6 +66,8 @@ public class RemoteUserSSOTestCase {
 
 	@Before
 	public void setup() {
+		us.setRequest(request);
+		
 		 sso = new RemoteUserSSO();
 		 sso.setConfig(config);
 

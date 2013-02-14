@@ -48,9 +48,9 @@ public class GroupInteractionFilterTestCase {
 			u2.addGroup(g1); u2.addGroup(g2);
 			u3.addGroup(g3);
 
-			final UserSession us1 = new UserSession(null); us1.setSessionId("1"); us1.setUser(u1);
-			final UserSession us2 = new UserSession(null); us2.setSessionId("2"); us2.setUser(u2);
-			final UserSession us3 = new UserSession(null); us3.setSessionId("3"); us3.setUser(u3);
+			final UserSession us1 = new UserSession(); us1.setSessionId("1"); us1.setUser(u1);
+			final UserSession us2 = new UserSession(); us2.setSessionId("2"); us2.setUser(u2);
+			final UserSession us3 = new UserSession(); us3.setSessionId("3"); us3.setUser(u3);
 
 			one(userSession).getUser(); will(returnValue(u1));
 

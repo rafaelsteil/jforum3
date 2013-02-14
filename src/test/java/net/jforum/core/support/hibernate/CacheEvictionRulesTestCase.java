@@ -40,11 +40,13 @@ import org.hibernate.classic.Session;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.junit.Ignore;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
  * @author Rafael Steil
  */
+@Ignore(value="check if this tests are still usefull")
 public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSpringContextTests {
 	private Mockery context = TestCaseUtils.newMockery();
 	private SessionFactoryImplementor sessionFactory = context.mock(SessionFactoryImplementor.class);
@@ -398,6 +400,6 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 	 */
 	@Override
 	protected String[] getConfigLocations() {
-		return new String[]{ "/cache/cache-eviction-rules-test.xml" };
+		return new String[]{ "/cache/cache-eviction-rules-test.xml" };                          
 	}
 }

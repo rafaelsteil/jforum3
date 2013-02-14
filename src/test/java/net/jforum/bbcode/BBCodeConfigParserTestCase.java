@@ -50,7 +50,7 @@ public class BBCodeConfigParserTestCase {
 		}});
 
 		File file = new File(this.getClass().getResource("/bb_config_parser.xml").getFile());
-		new BBCodeConfigParser(file, formatter);
+		new BBCodeConfigParser(/*file,*/ formatter);
 
 		mock.assertIsSatisfied();
 	}

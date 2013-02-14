@@ -122,7 +122,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTotalPostsExpectTwoResults() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/userdao/getTotalPostsExpectTwoResults.sql");
 		User user = new User(); user.setId(1);
 		int total = this.newDao().getTotalPosts(user);
@@ -156,7 +156,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTotalUnreadPrivateMessages() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session().connection())
 			.run("/userdao/getTotalUnreadPrivateMessages.sql");
 		User user = new User(); user.setId(1);
 		Assert.assertEquals(1, this.newDao().getTotalUnreadPrivateMessages(user));
