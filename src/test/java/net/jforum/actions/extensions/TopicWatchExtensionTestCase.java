@@ -72,7 +72,6 @@ public class TopicWatchExtensionTestCase {
 
 	private void afterListExpectations(final boolean isLogged) {
 		context.checking(new Expectations() {{
-			UserSession us = context.mock(UserSession.class);
 			Topic t = new Topic(); t.setId(1);
 
 			if (isLogged) {
@@ -82,8 +81,8 @@ public class TopicWatchExtensionTestCase {
 				one(m).get("topic"); will(returnValue(t));
 			}
 
-			one(us).isLogged(); will(returnValue(isLogged));
-			allowing(us).getUser(); will(returnValue(new User()));
+			one(userSession).isLogged(); will(returnValue(isLogged));
+			allowing(userSession).getUser(); will(returnValue(new User()));
 		}});
 	}
 

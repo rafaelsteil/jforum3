@@ -10,11 +10,9 @@
  */
 package net.jforum.util;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -42,7 +40,7 @@ public class TestCaseUtils {
 	public static String getApplicationRoot() {
 		String filePath = TestCaseUtils.class.getResource(".").getFile();
 		int index = filePath.indexOf("/target/test");
-		return filePath.substring(0, index);
+		return filePath.substring(0, index)+"/src/main";
 	}
 
 	/**

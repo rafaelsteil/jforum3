@@ -10,8 +10,13 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,13 +28,13 @@ import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
+import net.jforum.entities.PollOption;
 import net.jforum.entities.Post;
 import net.jforum.entities.Ranking;
 import net.jforum.entities.Smilie;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
-import net.jforum.entities.util.Pagination;
 import net.jforum.plugins.post.ForumLimitedTimeRepository;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.ForumRepository;
@@ -45,480 +50,422 @@ import net.jforum.services.AttachmentService;
 import net.jforum.services.TopicService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
-@SuppressWarnings("unchecked")
+@RunWith(MockitoJUnitRunner.class)
 public class TopicControllerTestCase {
+	@Spy private MockResult mockResult;
+	@Mock private JForumConfig config;
+	@Mock private TopicService topicService;
+	@Mock private ForumRepository forumRepository;
+	@Mock private SmilieRepository smilieRepository;
+	@Mock private PostRepository postRepository;
+	@Mock private TopicRepository topicRepository;
+	@Mock private CategoryRepository categoryRepository;
+	@Mock private RankingRepository rankingRepository;
+	@Mock private SessionManager sessionManager;
+	@Mock private PollRepository pollRepository;
+	@Mock private ForumLimitedTimeRepository forumLimitedTimeRepository;
+	@Mock private AttachmentService attachmentService;
+	@Mock private HttpServletRequest request;
+	@Mock private UserSession userSession;
+	
+	@InjectMocks private TopicController topicController;
+	
+	@Mock private RoleManager roleManager;
+	@Mock private MessageController mockMessageControllerRedirect;
+	@Spy private Topic topic;
 
-	private Mockery context = TestCaseUtils.newMockery();
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private TopicService topicService = context.mock(TopicService.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
-	private PostRepository postRepository = context.mock(PostRepository.class);
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-	private CategoryRepository categoryRepository = context.mock(CategoryRepository.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private RankingRepository rankingRepository = context.mock(RankingRepository.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private PollRepository pollRepository = context.mock(PollRepository.class);
-	private AttachmentService attachmentService = context.mock(AttachmentService.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-    private ForumLimitedTimeRepository forumLimitedTimeRepository = context.mock(ForumLimitedTimeRepository.class);
-    private Result mockResult = context.mock(MockResult.class);
-    private MessageController mockMessageController = context.mock(MessageController.class);
-	private TopicController topicController;
+	@Before
+	public void setup() {
+		topic = spy(new Topic(topicRepository));
+		when(mockResult.redirectTo(MessageController.class)).thenReturn(mockMessageControllerRedirect);
+	}
 
 	@Test
 	public void replyReview() {
-		context.checking(new Expectations() {{
-			Topic t = new Topic(topicRepository); t.setId(1);
-			one(topicRepository).get(1); will(returnValue(t));
-			allowing(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(topicRepository).getPosts(t, 0, 10); will(returnValue(new ArrayList<Post>()));
-			allowing(topicRepository).getTotalPosts(t); will(returnValue(5));
-			one(mockResult).include("topic", t);
-			one(mockResult).include("posts", new ArrayList<Post>());
-		}});
+		topic.setId(1);
+		
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		when(topicRepository.getPosts(topic, 0, 10)).thenReturn(new ArrayList<Post>());
+		when(topicRepository.getTotalPosts(topic)).thenReturn(5);
+		
 
 		topicController.replyReview(1);
-		context.assertIsSatisfied();
+		
+		assertEquals(topic, mockResult.included("topic"));
+		assertEquals(new ArrayList<Post>(), mockResult.included("posts"));
 	}
 
 	@Test
 	public void listTopicIsWaitingModerationShouldRedirect() {
-		final Topic topic = new Topic(); topic.setId(1); topic.getForum().setId(2); topic.setPendingModeration(true);
-
-		context.checking(new Expectations() {{
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(mockResult).redirectTo(MessageController.class);
-			will(returnValue(mockMessageController));
-			one(mockMessageController).topicWaitingModeration(2);
-		}});
-
+		topic.setId(1);
+		topic.getForum().setId(2);
+		topic.setPendingModeration(true);
+		
+		when(topicRepository.get(1)).thenReturn(topic);
+		
 		topicController.list(1, 0, false);
-		context.assertIsSatisfied();
+		
+		verify(mockMessageControllerRedirect).topicWaitingModeration(2);
+		
 	}
 
 	@Test
 	public void listShouldHaveAccessForumConstraint() throws Exception {
 		Method method = topicController.getClass().getMethod("list", int.class, int.class, boolean.class);
-		Assert.assertNotNull(method);
-		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(AccessForumRule.class, method.getAnnotation(SecurityConstraint.class).value());
-		Assert.assertTrue(method.getAnnotation(SecurityConstraint.class).displayLogin());
+		assertNotNull(method);
+		assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(AccessForumRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		assertTrue(method.getAnnotation(SecurityConstraint.class).displayLogin());
 	}
 
 	@Test
 	public void addShouldHaveCreateNewTopicConstraint() throws Exception {
 		Method method = topicController.getClass().getMethod("add", int.class);
-		Assert.assertNotNull(method);
-		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(CreateNewTopicRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		assertNotNull(method);
+		assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(CreateNewTopicRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void addSaveShouldHaveCreateNewTopicConstraint() throws Exception {
 		Method method = topicController.getClass().getMethod("addSave", Topic.class, Post.class, PostFormOptions.class, List.class);
-		Assert.assertNotNull(method);
-		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(CreateNewTopicRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		assertNotNull(method);
+		assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(CreateNewTopicRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void addSaveRedirectShouldSendToPage3() {
-		final Topic topic = new Topic() {
-			/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public int getTotalPosts() {
-				return 14;
-			}
-		};
-
-		this.addReplyPaginationRedirect(topic, 3);
-
-		context.checking(new Expectations() {{
-			one(forumRepository).get(topic.getForum().getId()); will(returnValue(topic.getForum()));
-			one(mockResult).include("topic", topic);
-		}});
-
+		when(topic.getTotalPosts()).thenReturn(14);
+		setupAddReplyPaginationRedirect(topic);
+		when(forumRepository.get(anyInt())).thenReturn(new Forum());
+		
 		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
-		context.assertIsSatisfied();
+	
+		checkAddReplyPaginationRedirect(topic, 3);
+		assertEquals(topic, mockResult.included("topic"));
+		
 	}
 
 	@Test
 	public void replySaveRedirectShouldSendToPage4() {
-		Topic topic = new Topic() {
-			/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public int getTotalPosts() {
-				return 17;
-			}
-		};
 		topic.setId(10);
-
-		this.addReplyPaginationRedirect(topic, 4);
+		when(topic.getTotalPosts()).thenReturn(17);
+		setupAddReplyPaginationRedirect(topic);
 
 		topicController.replySave(topic, new Post(), new PostFormOptions());
-		context.assertIsSatisfied();
+		
+		checkAddReplyPaginationRedirect(topic, 4);
 	}
 
-	private void addReplyPaginationRedirect(final Topic topic, final int pageExpected) {
-		context.checking(new Expectations() {{
-			if (topic.getId() > 0) {
-				one(topicRepository).get(topic.getId()); will(returnValue(topic));
-			}
+	private void setupAddReplyPaginationRedirect(final Topic topic) {
+		if (topic.getId() > 0) {
+			when(topicRepository.get(topic.getId())).thenReturn(topic);
+		}
+		
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(5);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+	}
 
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			ignoring(roleManager); ignoring(userSession); ignoring(topicService);
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(5));
-
-			String url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
-			one(mockResult).redirectTo(url + "#0");
-		}});
+	private void checkAddReplyPaginationRedirect(final Topic topic, final int pageExpected) {
+		String url = String.format("/%s/%s/%s/%s", Domain.TOPICS, Actions.LIST, pageExpected, topic.getId());
+		verify(mockResult).redirectTo(url + "#0");
+	
 	}
 
 	@Test
 	public void add() {
-		context.checking(new Expectations() {{
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-			one(mockResult).include("forum", new Forum());
-			one(mockResult).include("post", new Post());
-			one(mockResult).include("isNewTopic", true);
-			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(mockResult).include("smilies", new ArrayList<Smilie>());
-		}});
+		ArrayList<Smilie> smilies = new ArrayList<Smilie>();
+		Forum forum = new Forum();
+		
+		when(forumRepository.get(1)).thenReturn(forum);
+		when(smilieRepository.getAllSmilies()).thenReturn(smilies);
+		
 
 		topicController.add(1);
-		context.assertIsSatisfied();
+	
+		assertEquals(forum, mockResult.included("forum"));
+		assertEquals(new Post(), mockResult.included("post"));
+		assertEquals(true, mockResult.included("isNewTopic"));
+		assertEquals(smilies, mockResult.included("smilies"));
 	}
 
 	@Test
 	public void listSmilie() {
-		context.checking(new Expectations() {{
-			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-			one(mockResult).include("smilies", new ArrayList<Smilie>());
-		}});
-
+		ArrayList<Smilie> smilies = new ArrayList<Smilie>();
+		when(smilieRepository.getAllSmilies()).thenReturn(smilies);
+		
 		topicController.listSmilies();
-		context.assertIsSatisfied();
+		
+		assertEquals(smilies, mockResult.included("smilies"));
 	}
 
 	@Test
 	public void addSaveCannotCreateStickyTypeShouldBeNormal() {
-		final Topic topic = new Topic(topicRepository); topic.setType(Topic.TYPE_ANNOUNCE);
-		topic.getForum().setId(3);
-
-		context.checking(new Expectations() {{
-			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(false); }}));
-			ignoring(topicService);
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			ignoring(userSession);
-			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
-			one(roleManager).getCanCreateStickyAnnouncementTopics(); will(returnValue(false));
-			one(roleManager).getCanCreatePolls(); will(returnValue(false));
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(mockResult).include("topic", topic);
-			one(mockResult).redirectTo("/topics/list/0.page#0");
-		}});
-
+		Forum forum = new Forum();
+		forum.setId(3);
+		forum.setModerated(false);
+		
+		topic.setType(Topic.TYPE_ANNOUNCE);
+		topic.setForum(forum);
+		
+		when(forumRepository.get(3)).thenReturn(forum);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAttachmentsAlllowed(3)).thenReturn(false);
+		when(roleManager.getCanCreateStickyAnnouncementTopics()).thenReturn(false);
+		when(roleManager.getCanCreatePolls()).thenReturn(false);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		
 		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
-		context.assertIsSatisfied();
-		Assert.assertEquals(Topic.TYPE_NORMAL, topic.getType());
+		
+		assertEquals(topic, mockResult.included("topic"));
+		verify(mockResult).redirectTo("/topics/list/0#0");
+		assertEquals(Topic.TYPE_NORMAL, topic.getType());
 	}
 
 	@Test
 	public void addSaveForumModeratedIsModeratorTopicStatusShouldNotChange() {
-		final Topic topic = new Topic(topicRepository); topic.setPendingModeration(false);
-		topic.getForum().setId(3);
+		Forum forum = new Forum();
+		forum.setId(3);
+		forum.setModerated(true);
+		
+		topic.setPendingModeration(false);
+		topic.setForum(forum);
 
-		context.checking(new Expectations() {{
-			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(true); }}));
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
-			one(roleManager).isModerator(); will(returnValue(true));
-			one(roleManager).getCanCreatePolls(); will(returnValue(false));
-			ignoring(roleManager).getCanCreateStickyAnnouncementTopics();
-			ignoring(userSession); ignoring(topicService);
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(mockResult).include("topic", topic);
-			one(mockResult).redirectTo("/topics/list/0.page#0");
-		}});
-
+		when(forumRepository.get(3)).thenReturn(forum);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAttachmentsAlllowed(3)).thenReturn(false);
+		when(roleManager.isModerator()).thenReturn(true);
+		when(roleManager.getCanCreatePolls()).thenReturn(false);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		
 		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
-		context.assertIsSatisfied();
-		Assert.assertFalse(topic.isWaitingModeration());
+		
+		assertEquals(topic, mockResult.included("topic"));
+		verify(mockResult).redirectTo("/topics/list/0#0");
+		assertFalse(topic.isWaitingModeration());
 	}
 
 	@Test
 	public void addSaveForumModeratedNotModeratorStatusShouldBePending() {
-		final Topic topic = new Topic(); topic.setPendingModeration(false);
-		topic.getForum().setId(3);
+		Forum forum = new Forum();
+		forum.setId(3);
+		forum.setModerated(true);
+		
+		topic.setPendingModeration(false);
+		topic.setForum(forum);
 
-		context.checking(new Expectations() {{
-			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(true); }}));
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAttachmentsAlllowed(3); will(returnValue(false));
-			one(roleManager).isModerator(); will(returnValue(false));
-			one(roleManager).getCanCreatePolls(); will(returnValue(false));
-			ignoring(roleManager).getCanCreateStickyAnnouncementTopics();
-			ignoring(userSession);
-			ignoring(topicService);
-			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
-			one(mockMessageController).topicWaitingModeration(topic.getForum().getId());
-			one(mockResult).include("topic", topic);
-		}});
+		when(forumRepository.get(3)).thenReturn(forum);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAttachmentsAlllowed(3)).thenReturn(false);
+		when(roleManager.isModerator()).thenReturn(false);
+		when(roleManager.getCanCreatePolls()).thenReturn(false);
 
 		topicController.addSave(topic, new Post(), new PostFormOptions(), null);
-		context.assertIsSatisfied();
-		Assert.assertTrue(topic.isWaitingModeration());
+	
+		verify(mockMessageControllerRedirect).topicWaitingModeration(topic.getForum().getId());
+		assertEquals(topic, mockResult.included("topic"));
+		assertTrue(topic.isWaitingModeration());
 	}
 
 	@Test
 	public void addSave() {
-		final Topic topic = new Topic(topicRepository); topic.getForum().setId(3);
+		Forum forum = new Forum();
+		forum.setId(3);
+		forum.setModerated(false);
+		
+		topic.setForum(forum);
+		
 		Post post = new Post();
 
-		context.checking(new Expectations() {{
-			one(userSession).getUser(); will(returnValue(new User()));
-			one(userSession).getIp(); will(returnValue("123"));
-			one(topicService).addTopic(with(aNonNull(Topic.class)),
-				with(aNull(List.class)), with(aNonNull(List.class)));
-			one(forumRepository).get(3); will(returnValue(new Forum() {{ setId(3); setModerated(false); }}));
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			ignoring(roleManager);
-			String url = "/topics/list/0.page";
-			one(mockResult).redirectTo(url + "#0");
-			one(mockResult).include("topic", topic);
-		}});
-
-		topicController.addSave(topic, post, new PostFormOptions(), null);
-		context.assertIsSatisfied();
-
-		Assert.assertNotNull(topic.getUser());
-		Assert.assertEquals(new User(), topic.getUser());
-		Assert.assertEquals("123", post.getUserIp());
+		when(userSession.getUser()).thenReturn(new User());
+		when(userSession.getIp()).thenReturn("123");
+		when(forumRepository.get(3)).thenReturn(forum);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+			
+		topicController.addSave(topic, post, new PostFormOptions(), Collections.<PollOption>emptyList());
+	
+		String url = "/topics/list/0";
+		verify(mockResult).redirectTo(url + "#0");
+		verify(topicService).addTopic(eq(topic), notNull(List.class), notNull(List.class));
+		
+		assertEquals(topic, mockResult.included("topic"));
+		assertNotNull(topic.getUser());
+		assertEquals(new User(), topic.getUser());
+		assertEquals("123", post.getUserIp());
 	}
 
 	@Test
 	public void list() {
-		context.checking(new Expectations() {{
-			Topic topic = new Topic(topicRepository) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-				@Override
-				public Forum getForum() { return new Forum(); }
-				@Override
-				public int getTotalPosts() { return 10; }
-			};
-
-			one(userSession).isLogged(); will(returnValue(false));
-
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(categoryRepository).getAllCategories(); will(returnValue(new ArrayList<Category>()));
-			one(topicRepository).getPosts(topic, 0, 10); will(returnValue(new ArrayList<Post>()));
-			one(rankingRepository).getAllRankings(); will(returnValue(new ArrayList<Ranking>()));
-			one(userSession).markTopicAsRead(1);
-
-			one(sessionManager).isModeratorOnline(); will(returnValue(true));
-			one(mockResult).include("isModeratorOnline", true);
-			one(mockResult).include("topic", topic);
-			one(mockResult).include("forum", topic.getForum());
-			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
-			one(mockResult).include("categories", new ArrayList<Category>());
-			one(mockResult).include("posts", new ArrayList<Post>());
-			one(mockResult).include("rankings", new ArrayList<Ranking>());
-			one(mockResult).include("canVoteOnPolls", false);
-			one(mockResult).include("viewPollResults", false);
-		}});
+		when(topic.getTotalPosts()).thenReturn(10);
+		ArrayList<Category> categories = new ArrayList<Category>();
+		ArrayList<Post> posts = new ArrayList<Post>();
+		ArrayList<Ranking> rankings = new ArrayList<Ranking>();
+		
+		when(userSession.isLogged()).thenReturn(false);
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		when(categoryRepository.getAllCategories()).thenReturn(categories);
+		when(topicRepository.getPosts(topic, 0, 10)).thenReturn(posts);
+		when(rankingRepository.getAllRankings()).thenReturn(rankings);
+		when(sessionManager.isModeratorOnline()).thenReturn(true);
 
 		topicController.list(1, 0, false);
-		context.assertIsSatisfied();
+		
+		verify(userSession).markTopicAsRead(1);
+		assertEquals(true, mockResult.included("isModeratorOnline"));
+		assertEquals(topic, mockResult.included("topic"));
+		assertEquals(topic.getForum(), mockResult.included("forum"));
+		assertNotNull(mockResult.included("pagination"));
+		assertEquals(categories, mockResult.included("categories"));
+		assertEquals(posts, mockResult.included("posts"));
+		assertEquals(rankings, mockResult.included("rankings"));
+		assertEquals(false, mockResult.included("canVoteOnPolls"));
+		assertEquals(false, mockResult.included("viewPollResults"));
 	}
 
 	@Test
 	public void replySave() {
-		final Topic topic = new Topic(topicRepository) {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }}; topic.getForum().setId(1);
-
-		context.checking(new Expectations() {{
-			one(userSession).getIp(); will(returnValue("123"));
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
-			one(userSession).getUser(); will(returnValue(new User()));
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(topicService).reply(with(aNonNull(Topic.class)),
-				with(aNonNull(Post.class)), with(aNonNull(List.class)));
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-
-			String url = "/topics/list/1.page";
-			one(mockResult).redirectTo(url + "#0");
-		}});
-
+		topic.setId(1);
+		topic.getForum().setId(1);
 		Post post = new Post();
-
+		User user = new User();
+		
+		when(userSession.getIp()).thenReturn("123");
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAttachmentsAlllowed(1)).thenReturn(false);
+		when(userSession.getUser()).thenReturn(user);
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		
 		topicController.replySave(topic, post, new PostFormOptions());
-		context.assertIsSatisfied();
-
-		Assert.assertEquals("123", post.getUserIp());
-		Assert.assertNotNull(post.getUser());
-		Assert.assertEquals(new User(), post.getUser());
+		
+		String url = "/topics/list/1";
+		verify(mockResult).redirectTo(url + "#0");
+		verify(topicService).reply(notNull(Topic.class), notNull(Post.class), notNull(List.class));
+		assertEquals("123", post.getUserIp());
+		assertNotNull(post.getUser());
+		assertEquals(user, post.getUser());
 	}
 
 	@Test
 	public void replySaveForumModeratedIsModeratorShouldPass() {
-		final Topic topic = new Topic(topicRepository); topic.setId(2);
-		topic.getForum().setId(1); topic.getForum().setModerated(true);
-
-		context.checking(new Expectations() {{
-			one(topicRepository).get(2); will(returnValue(topic));
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
-			one(roleManager).isModerator(); will(returnValue(true));
-			ignoring(userSession); ignoring(topicService);
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			String url = "/topics/list/2.page";
-			one(mockResult).redirectTo(url + "#0");
-		}});
-
-		Post post = new Post(); post.setModerate(false);
-
+		topic.setId(2);
+		topic.getForum().setId(1);
+		topic.getForum().setModerated(true);
+		
+		Post post = new Post();
+		post.setModerate(false);
+	
+		when(topicRepository.get(2)).thenReturn(topic);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAttachmentsAlllowed(1)).thenReturn(false);
+		when(roleManager.isModerator()).thenReturn(true);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+	
 		topicController.replySave(topic, post, new PostFormOptions());
-		context.assertIsSatisfied();
-		Assert.assertFalse(post.isWaitingModeration());
+	
+		String url = "/topics/list/2";
+		verify(mockResult).redirectTo(url + "#0");
+		assertFalse(post.isWaitingModeration());
 	}
 
 	@Test
 	public void replySaveForumModeratedPostStatusShouldBePending() {
-		final Topic topic = new Topic(); topic.setId(2);
-		topic.getForum().setId(1); topic.getForum().setModerated(true);
-
-		context.checking(new Expectations() {{
-			one(topicRepository).get(2); will(returnValue(topic));
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAttachmentsAlllowed(1); will(returnValue(false));
-			one(roleManager).isModerator(); will(returnValue(false));
-			ignoring(userSession); ignoring(topicService);
-			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
-			one(mockMessageController).replyWaitingModeration(2);
-		}});
+		topic.setId(2);
+		topic.getForum().setId(1);
+		topic.getForum().setModerated(true);
 
 		Post post = new Post(); post.setModerate(false);
-
+		
+		when(topicRepository.get(2)).thenReturn(topic);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAttachmentsAlllowed(1)).thenReturn(false);
+		when(roleManager.isModerator()).thenReturn(false);
+		
 		topicController.replySave(topic, post, new PostFormOptions());
-		context.assertIsSatisfied();
-		Assert.assertTrue(post.isWaitingModeration());
+		
+		verify(mockMessageControllerRedirect).replyWaitingModeration(2);
+		assertTrue(post.isWaitingModeration());
 	}
 
 	@Test
 	public void replySaveWaitingModerationShouldRedirect() {
-		final Topic topic = new Topic(); topic.setId(1); topic.getForum().setId(1);
+		topic.setId(1);
+		topic.getForum().setId(1);
 
-		context.checking(new Expectations() {{
-			ignoring(userSession); ignoring(topicService);
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
-			one(mockMessageController).replyWaitingModeration(1);
-		}});
-
-		Post post = new Post(); post.setModerate(true);
+		Post post = new Post();
+		post.setModerate(true);
+		
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(topicRepository.get(1)).thenReturn(topic);
 
 		topicController.replySave(topic, post, new PostFormOptions());
-		context.assertIsSatisfied();
+		
+		verify(mockMessageControllerRedirect).replyWaitingModeration(1);
 	}
 
 	@Test
 	public void reply() {
-		context.checking(new Expectations() {{
-			one(topicRepository).get(1); will(returnValue(new Topic() {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public Forum getForum() {
-					return new Forum();
-				}
-			}));
-
-			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-
-			one(mockResult).include("isReply", true);
-			one(mockResult).include("post", new Post());
-			one(mockResult).include("topic", new Topic());
-			one(mockResult).include("forum", new Forum());
-			one(mockResult).include("smilies", new ArrayList<Smilie>());
-			one(mockResult).forwardTo(Actions.ADD);
-		}});
-
+		ArrayList<Smilie> smilies = new ArrayList<Smilie>();
+		
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(smilieRepository.getAllSmilies()).thenReturn(smilies);
+	
 		topicController.reply(1);
-		context.assertIsSatisfied();
+		
+		assertEquals(true, mockResult.included("isReply"));
+		assertEquals(new Post(), mockResult.included("post"));
+		assertEquals(topic, mockResult.included("topic"));
+		assertEquals(new Forum(), mockResult.included("forum"));
+		assertEquals(smilies, mockResult.included("smilies"));
 	}
 
 	@Test
 	public void vote() {
-
+		fail("to implement");
 	}
 
 	@Test
 	public void quote() {
-		final Post post = new Post(); post.setId(1);
-		post.setTopic(new Topic()); post.getTopic().setId(2);
-		post.setForum(new Forum()); post.getForum().setId(3);
-
-		context.checking(new Expectations() {{
-			one(postRepository).get(1); will(returnValue(post));
-
-			one(smilieRepository).getAllSmilies(); will(returnValue(new ArrayList<Smilie>()));
-
-			one(mockResult).include("post", post);
-			one(mockResult).include("isQuote", true);
-			one(mockResult).include("isReply", true);
-			one(mockResult).include("topic", post.getTopic());
-			one(mockResult).include("forum", post.getForum());
-			one(mockResult).include("smilies", new ArrayList<Smilie>());
-
-			one(mockResult).forwardTo(Actions.ADD);
-		}});
+		topic.setId(2);
+		
+		Forum forum = new Forum();
+		forum.setId(3);
+		
+		Post post = new Post();
+		post.setId(1);
+		post.setTopic(topic);
+		post.setForum(forum);
+		
+		ArrayList<Smilie> smilies = new ArrayList<Smilie>();
+		
+		when(postRepository.get(1)).thenReturn(post);
+		when(smilieRepository.getAllSmilies()).thenReturn(smilies);
 
 		topicController.quote(1);
-		context.assertIsSatisfied();
-	}
 
-	@Before
-	public void setup() {
-		topicController = new TopicController(mockResult, config, topicService,
-			forumRepository, smilieRepository, postRepository, topicRepository, categoryRepository,
-			rankingRepository, sessionManager, pollRepository, forumLimitedTimeRepository, attachmentService, request, userSession);
+		assertEquals(post, mockResult.included("post"));
+		assertEquals(true, mockResult.included("isQuote"));
+		assertEquals(true, mockResult.included("isReply"));
+		assertEquals(post.getTopic(), mockResult.included("topic"));
+		assertEquals(post.getForum(), mockResult.included("forum"));
+		assertEquals(smilies, mockResult.included("smilies"));
 	}
 }

@@ -10,21 +10,21 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.jforum.actions.helpers.Actions;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
-import net.jforum.entities.Avatar;
 import net.jforum.entities.Group;
-import net.jforum.entities.Ranking;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
-import net.jforum.entities.util.Pagination;
 import net.jforum.repository.RankingRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.EditUserRule;
@@ -35,460 +35,366 @@ import net.jforum.services.UserService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
-
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class UserControllerTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserRepository userRepository = context.mock(UserRepository.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private UserService userService = context.mock(UserService.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private LostPasswordService lostPasswordService = context.mock(LostPasswordService.class);
-	private AvatarService avatarService = context.mock(AvatarService.class);
+	@Mock private UserRepository userRepository;
+	@Mock private UserSession userSession;
+	@Mock private UserService userService;
+	@Mock private SessionManager sessionManager;
+	@Mock private JForumConfig config;
+	@Mock private RoleManager roleManager;
+	@Mock private LostPasswordService lostPasswordService;
+	@Mock private AvatarService avatarService;
+	@Mock private RankingRepository rankingRepository;
+	@Spy private MockResult mockResult;
+	@Mock private HttpServletRequest mockRequest;
+	
+	@Mock private ForumController mockForumController;
+	@Mock private MessageController mockMessageController;
+	
+	@Mock private UserController mockForwardControler;
+	@Mock private UserController mockRedirectController;
+	
+	@InjectMocks private UserController userController;
+	
 	private User user = new User();
-	private RankingRepository rankingRepository = context.mock(RankingRepository.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-	private UserController mockUserController = context.mock(UserController.class);
-	private ForumController mockForumController = context.mock(ForumController.class);
-	private MessageController mockMessageController = context.mock(MessageController.class);
-	private UserController userController = new UserController(userRepository, userSession, userService, sessionManager,
-		config, lostPasswordService, avatarService, rankingRepository, mockResult, mockRequest);
-
+	private List<User> userList = new ArrayList<User>();
+	
+	@Before 
+	public void setup() {
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(mockResult.forwardTo(userController)).thenReturn(mockForwardControler);
+		when(mockResult.redirectTo(userController)).thenReturn(mockRedirectController);
+	}
+	
 	@Test
 	public void edit() {
-		context.checking(new Expectations() {{
-			User user = new User();
-			one(userRepository).get(1); will(returnValue(user));
-			one(rankingRepository).getAllRankings(); will(returnValue(new ArrayList<Ranking>()));
-			one(avatarService).getAvatarGallery(); will(returnValue(new ArrayList<Avatar>()));
-			one(mockResult).include("user", user);
-			one(mockResult).include("rankings", new ArrayList<Ranking>());
-			one(mockResult).include("avatars", new ArrayList<Avatar>());
-		}});
-
+		when(userRepository.get(1)).thenReturn(user);
+		
 		userController.edit(1);
-		context.assertIsSatisfied();
+
+		assertEquals(user, mockResult.included("user"));
 	}
 
 	@Test
 	public void editSave() {
-		final User user = new User();
 		user.setId(1);
 
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(false));
-			one(userService).update(user, false);
-			one(config).getValue(ConfigKeys.AUTHENTICATION_TYPE);
-			one(mockResult).redirectTo(userController);
-			will(returnValue(mockUserController));
-			one(mockUserController).edit(user.getId());
-		}});
-
 		userController.editSave(user,null, null, null);
-		context.assertIsSatisfied();
+
+		verify(userService).update(user, false);
 	}
 
 	@Test
 	public void recoverPassword() {
-		context.checking(new Expectations() {{
-			one(mockResult).include("hash", "123");
-		}});
-
 		userController.recoverPassword("123");
-		context.assertIsSatisfied();
+		
+		assertEquals("123", mockResult.included("hash"));
 	}
 
 	@Test
 	public void recoverPasswordValidateUsingBadDataExpectFail() {
-		context.checking(new Expectations() {{
-			one(userRepository).validateLostPasswordHash("user", "hash"); will(returnValue(null));
-			one(mockResult).include("error", true);
-			one(mockResult).include("message", "PasswordRecovery.invalidData");
-		}});
-
 		userController.recoverPasswordValidate("hash", "user", "123");
-		context.assertIsSatisfied();
+
+		assertEquals(true, mockResult.included("error"));
+		assertEquals("PasswordRecovery.invalidData", mockResult.included("message"));
 	}
 
 	@Test
 	public void recoverPasswordValidateUsingGoodDataExpectSuccess() {
-		context.checking(new Expectations() {{
-			one(userRepository).validateLostPasswordHash("user", "hash"); will(returnValue(new User()));
-			one(mockResult).include("message", "PasswordRecovery.ok");
-		}});
-
+		when(userRepository.validateLostPasswordHash("user", "hash")).thenReturn(user);
+		
 		userController.recoverPasswordValidate("hash", "user", "123");
-		context.assertIsSatisfied();
+
+		assertEquals("PasswordRecovery.ok", mockResult.included("message"));
 	}
 
 	@Test
 	public void lostPasswordSend() {
-		context.checking(new Expectations() {{
-			one(lostPasswordService).send("username", "email"); will(returnValue(true));
-			one(mockResult).include("success", true);
-		}});
-
+		when(lostPasswordService.send("username", "email")).thenReturn(true);
+		
 		userController.lostPasswordSend("username", "email");
-		context.assertIsSatisfied();
+
+		assertEquals(true, mockResult.included("success"));
 	}
 
 	@Test
 	public void loginWithReferer() {
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(false));
-			one(mockRequest).getHeader("Referer"); will(returnValue("some referer"));
-			one(mockResult).include("invalidLogin", false);  // TODO: find how to remove it
-			one(mockResult).include("returnPath", "some referer");
-		}});
-
+		when(config.getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER)).thenReturn(false);
+		when(mockRequest.getHeader("Referer")).thenReturn("some referer");
+		
 		userController.login(null, false);
-		context.assertIsSatisfied();
+
+		assertEquals("some referer", mockResult.included("returnPath"));
 	}
 
 	@Test
 	public void loginWithReturnPath() {
-		context.checking(new Expectations() {{
-			one(mockResult).include("invalidLogin", false);  // TODO: find how to remove it
-			one(mockResult).include("returnPath", "some return path");
-		}});
-
 		userController.login("some return path", false);
-		context.assertIsSatisfied();
+
+		assertEquals("some return path", mockResult.included("returnPath"));
 	}
 
 	@Test
 	public void loginWithoutReturnPathAndIgnoringReferer() {
-		context.checking(new Expectations() {{
-			one(mockResult).include("invalidLogin", false);  // TODO: find how to remove it
-			one(config).getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER); will(returnValue(true));
-		}});
-
+		when(config.getBoolean(ConfigKeys.LOGIN_IGNORE_REFERER)).thenReturn(true);
+		when(mockRequest.getHeader("Referer")).thenReturn("some referer");
+		
 		userController.login(null, false);
-		context.assertIsSatisfied();
+		
+		assertNull(mockResult.included("returnPath"));
 	}
 
 	@Test
 	public void editShouldHaveEditUserRule() throws Exception {
 		Method method = userController.getClass().getMethod("edit", int.class);
-		Assert.assertNotNull(method);
-		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(EditUserRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		
+		assertNotNull(method);
+		assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(EditUserRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void editSaveShouldHaveEditUserRule() throws Exception {
 		Method method = userController.getClass().getMethod("editSave", User.class, Integer.class,
 			UploadedFile.class, Integer.class);
-		Assert.assertNotNull(method);
-		Assert.assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(EditUserRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		
+		assertNotNull(method);
+		assertTrue(method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(EditUserRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void listUsingListingIsDisabledShouldForceEmptyList() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isUserListingEnabled(); will(returnValue(false));
-			one(mockResult).include("users", new ArrayList<User>());
-		}});
+		when(roleManager.isUserListingEnabled()).thenReturn(false);
 
 		userController.list(0);
-		context.assertIsSatisfied();
+	
+		assertEquals(userList, mockResult.included("users"));
 	}
 
 	@Test
 	public void listCanInteractWithOtherGroups() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-
-			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(true));
-
-			one(roleManager).isUserListingEnabled(); will(returnValue(true));
-			one(userRepository).getTotalUsers(); will(returnValue(100));
-			one(config).getInt(ConfigKeys.USERS_PER_PAGE); will(returnValue(10));
-			one(userRepository).getAllUsers(0, 10); will(returnValue(new ArrayList<User>()));
-			one(mockResult).include("users", new ArrayList<User>());
-			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
-		}});
-
+		when(roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)).thenReturn(true);
+		when(roleManager.isUserListingEnabled()).thenReturn(true);
+		
 		userController.list(0);
-		context.assertIsSatisfied();
+		
+		verify(userRepository).getAllUsers(0, 0);
 	}
 
 	@Test
 	public void listCannotInteractWithOtherGroups() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-
-			one(roleManager).roleExists(SecurityConstants.INTERACT_OTHER_GROUPS); will(returnValue(false));
-
-			User user = new User();
-			one(userSession).getUser(); will(returnValue(user));
-
-			one(roleManager).isUserListingEnabled(); will(returnValue(true));
-			one(userRepository).getTotalUsers(); will(returnValue(100));
-			one(config).getInt(ConfigKeys.USERS_PER_PAGE); will(returnValue(10));
-			one(userRepository).getAllUsers(0, 10, user.getGroups()); will(returnValue(new ArrayList<User>()));
-			one(mockResult).include("users", new ArrayList<User>());
-			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
-		}});
-
+		when(roleManager.roleExists(SecurityConstants.INTERACT_OTHER_GROUPS)).thenReturn(false);
+		when(roleManager.isUserListingEnabled()).thenReturn(true);
+		when(userSession.getUser()).thenReturn(user);
+		
 		userController.list(0);
-		context.assertIsSatisfied();
+		
+		verify(userRepository, never()).getAllUsers(0, 0);
 	}
 
 	@Test
 	public void logout() {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.ANONYMOUS_USER_ID); will(returnValue(1));
-			one(userSession).becomeAnonymous(1);
-			allowing(userSession).getSessionId(); will(returnValue("123"));
-			one(sessionManager).storeSession("123");
-			one(sessionManager).remove("123");
-			one(sessionManager).add(with(aNonNull(UserSession.class)));
-			one(config).getValue(ConfigKeys.COOKIE_AUTO_LOGIN); will(returnValue("x"));
-			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
-			one(userSession).removeCookie("x");
-			one(userSession).removeCookie("y");
-
-			one(mockResult).redirectTo(ForumController.class);
-			will(returnValue(mockForumController));
-			one(mockForumController).list();
-		}});
-
+		when(config.getInt(ConfigKeys.ANONYMOUS_USER_ID)).thenReturn(1);
+		when(config.getValue(ConfigKeys.COOKIE_AUTO_LOGIN)).thenReturn("x");
+		when(config.getValue(ConfigKeys.COOKIE_USER_HASH)).thenReturn("y");
+		
 		userController.logout();
-		context.assertIsSatisfied();
+		
+		verify(userSession).becomeAnonymous(1);
+		verify(userSession).removeCookie("x");
+		verify(userSession).removeCookie("y");
 	}
 
 	@Test
-	public void authenticateUserUsingInvalidCredentialsExpectsInvalidLogin() {
-		context.checking(new Expectations() {{
-			one(userService).validateLogin("user", "passwd"); will(returnValue(null));
-			one(mockResult).include("invalidLogin", true);
-			one(mockResult).forwardTo(Actions.LOGIN);
-		}});
+	public void authenticateUserUsingInvalidCredentialsExpectsInvalidLogin() {		
+		when(userService.validateLogin("user", "passwd")).thenReturn(null);
 
 		userController.authenticateUser("user", "passwd", false, null);
-		context.assertIsSatisfied();
+	
+		verify(mockRedirectController).login(anyString(), anyBoolean());
 	}
 
 	@Test
 	public void authenticateUserUsingGoodCredentialsAndAutoLoginEnabledExpectsSuccess() {
-		final User user = new User(); user.setId(1);
-
-		context.checking(new Expectations() {{
-			one(userService).validateLogin("user", "passwd"); will(returnValue(user));
-			one(userSession).setUser(user);
-			one(userSession).becomeLogged();
-			one(userService).generateAutoLoginSecurityHash(user.getId()); will(returnValue("456"));
-			one(userService).generateAutoLoginUserHash("456"); will(returnValue("789"));
-			one(config).getValue(ConfigKeys.COOKIE_AUTO_LOGIN); will(returnValue("x"));
-			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
-			one(userSession).addCookie("x", "1");
-			one(userSession).addCookie("y", "789");
-			one(config).getValue(ConfigKeys.COOKIE_USER_ID); will(returnValue("z"));
-			one(userSession).addCookie("z", Integer.toString(user.getId()));
-			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(ForumController.class);
-			will(returnValue(mockForumController));
-			one(mockForumController).list();
-		}});
-
+		user.setId(26);
+		when(userService.validateLogin("user", "passwd")).thenReturn(user);
+		when(config.getValue(ConfigKeys.COOKIE_AUTO_LOGIN)).thenReturn("x");
+		when(config.getValue(ConfigKeys.COOKIE_USER_HASH)).thenReturn("y");
+		when(config.getValue(ConfigKeys.COOKIE_USER_ID)).thenReturn("z");
+		when(userService.generateAutoLoginSecurityHash(26)).thenReturn("456");
+		when(userService.generateAutoLoginUserHash("456")).thenReturn("789");
+		
 		userController.authenticateUser("user", "passwd", true, null);
-		context.assertIsSatisfied();
+
+		verify(userSession).becomeLogged();
+		verify(userSession).addCookie("x", "1");
+		verify(userSession).addCookie("y", "789");
+		verify(userSession).addCookie("z", "26");
 		Assert.assertEquals("456", user.getSecurityHash());
 	}
 
 	@Test
 	public void authenticateUserUsingGoodCredentialsWithoutAutoLoginExpectsSuccess() {
-		final User user = new User(); user.setId(1);
-
-		context.checking(new Expectations() {{
-			one(userService).validateLogin("user", "passwd"); will(returnValue(user));
-			one(userSession).setUser(user);
-			one(userSession).becomeLogged();
-			one(config).getValue(ConfigKeys.COOKIE_AUTO_LOGIN); will(returnValue("x"));
-			one(config).getValue(ConfigKeys.COOKIE_USER_HASH); will(returnValue("y"));
-			one(userSession).removeCookie("x");
-			one(userSession).removeCookie("y");
-			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(ForumController.class);
-			will(returnValue(mockForumController));
-			one(mockForumController).list();
-		}});
-
+		when(userService.validateLogin("user", "passwd")).thenReturn(user);
+		
 		userController.authenticateUser("user", "passwd", false, null);
-		context.assertIsSatisfied();
+
+		verify(userSession).becomeLogged();
+		verify(userSession, never()).addCookie(anyString(), anyString());
 	}
 
 	@Test
 	public void authenticateUserWithReturnPath() {
-		context.checking(new Expectations() {{
-			one(userService).validateLogin("user1", "pass1"); will(returnValue(new User()));
-			ignoring(userSession); ignoring(config); ignoring(sessionManager);
-			one(mockResult).redirectTo("return path");
-		}});
-
+		when(userService.validateLogin("user1", "pass1")).thenReturn(user);
+		
 		userController.authenticateUser("user1", "pass1", false, "return path");
-		context.assertIsSatisfied();
+	
+		verify(mockResult).redirectTo("return path");
 	}
 
 	@Test
 	public void registrationCompletedWithAnonymousUserExpectRedirect() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(false));
-			one(mockResult).redirectTo(userController);
-			will(returnValue(mockUserController));
-			one(mockUserController).insert();
-		}});
-
+		when(userSession.isLogged()).thenReturn(false);
+		
 		userController.registrationCompleted();
-		context.assertIsSatisfied();
+		
+		verify(mockRedirectController).insert();
 	}
 
 	@Test
 	public void registrationCompletedWithValidUserExpectsPropertyBagWithUser() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-			one(userSession).getUser(); will(returnValue(new User()));
-			one(mockResult).include("user", new User());
-		}});
-
+		when(userSession.isLogged()).thenReturn(true);
+		when(userSession.getUser()).thenReturn(user);
+		
 		userController.registrationCompleted();
-		context.assertIsSatisfied();
+		
+		assertEquals(user, mockResult.included("user"));
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void insertSaveUsernameTooBig() {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(1));
-			one(mockResult).include("error", "User.usernameTooBig");
-			one(mockResult).forwardTo(userController);
-			will(returnValue(mockUserController));
-			one(mockUserController).insert();
-		}});
-
-		userController.insertSave(new User() {{ setUsername("username1"); }});
-		context.assertIsSatisfied();
+		when(config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)).thenReturn(1);
+		user.setUsername("username1");
+		
+		userController.insertSave(user);
+		
+		assertEquals("User.usernameTooBig", mockResult.included("error"));
+		verify(mockForwardControler).insert();
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void insertSaveUsernameContainsInvalidChars() {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
-			one(mockResult).include("error", "User.usernameInvalidChars");
-			one(mockResult).forwardTo(userController); will(returnValue(mockUserController));
-			one(mockUserController).insert();
-		}});
-
-		userController.insertSave(new User() {{ setUsername("<username"); }});
-		context.assertIsSatisfied();
+		when(config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)).thenReturn(20);
+		user.setUsername("<username");
+		
+		userController.insertSave(user);
+		
+		assertEquals("User.usernameInvalidChars", mockResult.included("error"));
+		verify(mockForwardControler).insert();
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void insertSaveUsernameContainsInvalidChars2() {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
-			one(mockResult).include("error", "User.usernameInvalidChars");
-			one(mockResult).forwardTo(userController); will(returnValue(mockUserController));
-			one(mockUserController).insert();
-		}});
-
-		userController.insertSave(new User() {{ setUsername(">username"); }});
-		context.assertIsSatisfied();
+		when(config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)).thenReturn(20);
+		user.setUsername(">username");
+		
+		userController.insertSave(user);
+		
+		assertEquals("User.usernameInvalidChars", mockResult.included("error"));
+		verify(mockForwardControler).insert();
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void insertSaveUsernameNotAvailable() {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
-			one(userRepository).isUsernameAvailable("username", null); will(returnValue(false));
-			one(mockResult).include("error", "User.usernameNotAvailable");
-			one(mockResult).forwardTo(userController); will(returnValue(mockUserController));
-			one(mockUserController).insert();
-		}});
-
-		userController.insertSave(new User() {{ setUsername("username"); }});
-		context.assertIsSatisfied();
-	}
-
-	@SuppressWarnings("serial")
-	@Test
-	public void insertSave() {
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.USERNAME_MAX_LENGTH); will(returnValue(20));
-			one(userService).add(with(aNonNull(User.class)));
-			one(userSession).setUser(with(aNonNull(User.class)));
-			one(userRepository).isUsernameAvailable("username", null); will(returnValue(true));
-			one(userSession).becomeLogged();
-			one(sessionManager).add(userSession);
-			one(mockResult).redirectTo(userController);
-			will(returnValue(mockUserController));
-			one(mockUserController).registrationCompleted();
-		}});
-
-		userController.insertSave(new User() {{ setId(1); setUsername("username"); }});
-
-		context.assertIsSatisfied();
+		when(config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)).thenReturn(20);
+		when(userRepository.isUsernameAvailable("username", null)).thenReturn(false);
+		user.setUsername("username");
+		
+		userController.insertSave(user);
+		
+		assertEquals("User.usernameNotAvailable", mockResult.included("error"));
+		verify(mockForwardControler).insert();
 	}
 
 	@Test
-	public void profileHasAccessRightsShouldAllow() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager); will(returnValue(true));
+	public void insertSaveUser() {
+		when(config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)).thenReturn(20);
+		when(userRepository.isUsernameAvailable("username", null)).thenReturn(true);
+		user.setUsername("username");
+		
+		userController.insertSave(user);
+		
+		verify(userService).add(user);
+		verify(mockRedirectController).registrationCompleted();
+	}
 
-			List<Ranking> rankings = new ArrayList<Ranking>();
+	@Test
+	public void insertLoginUser() {
+		when(config.getInt(ConfigKeys.USERNAME_MAX_LENGTH)).thenReturn(20);
+		when(userRepository.isUsernameAvailable("username", null)).thenReturn(true);
+		user.setUsername("username");
+		
+		userController.insertSave(user);
+		
+		verify(userSession).becomeLogged();
+	}
 
-			one(rankingRepository).getAllRankings(); will(returnValue(rankings));
-			one(userRepository).get(1); will(returnValue(new User()));
-			one(mockResult).include("user", new User());
-			one(userRepository).getTotalTopics(1); will(returnValue(0));
-			one(mockResult).include("userTotalTopics", 0);
-			one(mockResult).include("rankings", rankings);
-			one(config).getInt("anonymousUserId"); will(returnValue(0));
-			one(mockResult).include("isAnonymousUser", false);
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(userSession).getUser(); will(returnValue(user));
-			one(roleManager).getCanEditUser(user, new ArrayList<Group>()); will(returnValue(true));
-			one(mockResult).include("canEdit", true);
-		}});
-
+	@Test
+	public void profileHasReadAccessRightsShouldAllowViewProfile() {
+		when(roleManager.getCanViewProfile()).thenReturn(true);
+		when(userSession.getUser()).thenReturn(user);
+		
 		userController.profile(1);
-		context.assertIsSatisfied();
+		
+		verify(userRepository).get(1);
 	}
 
 	@Test
-	public void profileDoesNotHaveAccessRightShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager); will(returnValue(false));
-			one(mockResult).redirectTo(MessageController.class); will(returnValue(mockMessageController));
-			one(mockMessageController).accessDenied();
-		}});
-
+	public void profileHasWriteAccessRightsShouldAllowEditProfile() {
+		when(roleManager.getCanViewProfile()).thenReturn(true);
+		when(roleManager.getCanEditUser(any(User.class), anyListOf(Group.class))).thenReturn(true);
+		when(userSession.getUser()).thenReturn(user);
+		
 		userController.profile(1);
-		context.assertIsSatisfied();
+		
+		assertEquals(true, mockResult.included("canEdit"));
+	}
+
+	@Test
+	public void profileDoesNotHaveReadAccessRightShouldDenyViewProfile() {
+		when(roleManager.getCanViewProfile()).thenReturn(false);
+		when(mockResult.redirectTo(MessageController.class)).thenReturn(mockMessageController);
+		
+		userController.profile(1);
+		
+		verify(mockMessageController).accessDenied();
+	}
+
+	@Test
+	public void profileDoesNotHaveWriteAccessRightShouldDenyEditProfile() {
+		when(roleManager.getCanViewProfile()).thenReturn(true);
+		when(roleManager.getCanEditUser(any(User.class), anyListOf(Group.class))).thenReturn(false);
+		when(userSession.getUser()).thenReturn(user);
+		
+		userController.profile(1);
+		
+		assertEquals(false, mockResult.included("canEdit"));
 	}
 }

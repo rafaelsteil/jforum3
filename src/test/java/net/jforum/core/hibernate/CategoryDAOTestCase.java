@@ -85,9 +85,10 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 		CategoryRepository dao = this.newDao();
 		Category c = this.newCategory("c1", false);
 		this.insert(c, dao);
-
+		this.commit();
+		
 		int id = c.getId();
-
+		
 		Category c2 = new Category();
 		c2.setId(id);
 		c2.setName("c2");
