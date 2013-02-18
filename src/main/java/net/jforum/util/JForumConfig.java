@@ -49,7 +49,9 @@ public class JForumConfig extends PropertiesConfiguration {
 
 		try {
 			loadProps();
-			setProperty(ConfigKeys.APPLICATION_PATH, servletContext.getRealPath(""));
+			if (servletContext != null) {
+				setProperty(ConfigKeys.APPLICATION_PATH, servletContext.getRealPath(""));
+			}
 			loadDatabaseProperties();
 			normalizeTemplateDirectory();
 		}

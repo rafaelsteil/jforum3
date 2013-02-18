@@ -46,7 +46,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 /**
  * @author Rafael Steil
  */
-@Ignore(value="check if this tests are still usefull")
+@Ignore("check if this tests are still usefull")
 public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSpringContextTests {
 	private Mockery context = TestCaseUtils.newMockery();
 	private SessionFactoryImplementor sessionFactory = context.mock(SessionFactoryImplementor.class);

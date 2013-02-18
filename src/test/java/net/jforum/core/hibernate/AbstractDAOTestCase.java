@@ -70,7 +70,7 @@ public abstract class AbstractDAOTestCase<T> {
 	}
 
 	/**
-	 * First commits the transaction, and then clears the session
+	 * First commits the transaction
 	 */
 	protected void commit() {
 		session.getTransaction().commit();

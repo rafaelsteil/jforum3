@@ -10,90 +10,87 @@
  */
 package net.jforum.util;
 
-import java.io.File;
-import java.net.URL;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class I18nTestCase {
+	@Mock private JForumConfig config;
 	private I18n i18n;
-	private JForumConfig config;
 
 	@Before
 	public void setUp() throws Exception {
-		String configFileName = "/jforum-test.properties";
-		URL configFileUrl = this.getClass().getResource(configFileName);
-		Assert.assertNotNull("Could not load expected test file " + configFileName, configFileUrl);
-		String applicationPath = new File(configFileUrl.getFile()).getParent();
+		String applicationPath = TestCaseUtils.getApplicationRoot();
 
-		config = new JForumConfig(null, null);
-		config.load(configFileUrl);
-
-		config.setProperty(ConfigKeys.APPLICATION_PATH, applicationPath);
-		config.setProperty(ConfigKeys.I18N_DEFAULT_ADMIN, "default");
-		config.setProperty(ConfigKeys.I18N_DEFAULT, "default");
-
+		when(config.getApplicationPath()).thenReturn(applicationPath);
+		when(config.getValue(ConfigKeys.I18N_DEFAULT_ADMIN)).thenReturn("default");
+		when(config.getValue(ConfigKeys.I18N_DEFAULT)).thenReturn("default");
+		
 		i18n = new I18n(config);
 	}
 
 	@Test
 	public void loadExpectDefaultLanguageToBeLoaded() throws Exception {
-		Assert.assertTrue(i18n.isLanguageLoaded("default"));
+		assertTrue(i18n.isLanguageLoaded("default"));
 	}
 
 	@Test
 	public void allDefaultKeysShouldBeCorrectlyLoadedAndRetrieved() {
-		Assert.assertEquals("default value 1", i18n.getMessage("defaultKey1"));
-		Assert.assertEquals("default value 2", i18n.getMessage("defaultKey2"));
-		Assert.assertEquals("default value 3", i18n.getMessage("defaultKey3"));
-		Assert.assertEquals("default value 4", i18n.getMessage("defaultKey4"));
-		Assert.assertEquals("default value 5", i18n.getMessage("defaultKey5"));
+		assertEquals("default value 1", i18n.getMessage("defaultKey1"));
+		assertEquals("default value 2", i18n.getMessage("defaultKey2"));
+		assertEquals("default value 3", i18n.getMessage("defaultKey3"));
+		assertEquals("default value 4", i18n.getMessage("defaultKey4"));
+		assertEquals("default value 5", i18n.getMessage("defaultKey5"));
 	}
 
 	@Test
 	public void loadCheeseLanguageExpectSuccess() throws Exception {
-		Assert.assertFalse(i18n.isLanguageLoaded("cheese"));
+		assertFalse(i18n.isLanguageLoaded("cheese"));
 		i18n.load("cheese");
-		Assert.assertTrue(i18n.isLanguageLoaded("cheese"));
+		assertTrue(i18n.isLanguageLoaded("cheese"));
 	}
 
 	@Test
 	public void retrieveCheeseKeysExpectSuccessAndKey5ShouldBeDefault() {
-		Assert.assertEquals("default cheese 1", i18n.getMessage("defaultKey1", "cheese"));
-		Assert.assertEquals("default cheese 2", i18n.getMessage("defaultKey2", "cheese"));
-		Assert.assertEquals("default cheese 3", i18n.getMessage("defaultKey3", "cheese"));
-		Assert.assertEquals("default cheese 4", i18n.getMessage("defaultKey4", "cheese"));
-		Assert.assertEquals("default value 5", i18n.getMessage("defaultKey5", "cheese"));
+		assertEquals("default cheese 1", i18n.getMessage("defaultKey1", "cheese"));
+		assertEquals("default cheese 2", i18n.getMessage("defaultKey2", "cheese"));
+		assertEquals("default cheese 3", i18n.getMessage("defaultKey3", "cheese"));
+		assertEquals("default cheese 4", i18n.getMessage("defaultKey4", "cheese"));
+		assertEquals("default value 5", i18n.getMessage("defaultKey5", "cheese"));
 	}
 
 	@Test
 	public void loadOrangeLanguageExpectSuccess() throws Exception {
-		Assert.assertFalse(i18n.isLanguageLoaded("orange"));
+		assertFalse(i18n.isLanguageLoaded("orange"));
 		i18n.load("orange");
-		Assert.assertTrue(i18n.isLanguageLoaded("orange"));
+		assertTrue(i18n.isLanguageLoaded("orange"));
 	}
 
 	@Test
 	public void retrieveOrangeKeysExpectSuccessAndTwoDefaultValuesAndOneExtraOrangeKey() {
-		Assert.assertEquals("default orange 1", i18n.getMessage("defaultKey1", "orange"));
-		Assert.assertEquals("default orange 2", i18n.getMessage("defaultKey2", "orange"));
-		Assert.assertEquals("default orange 3", i18n.getMessage("defaultKey3", "orange"));
-		Assert.assertEquals("default value 4", i18n.getMessage("defaultKey4", "orange"));
-		Assert.assertEquals("default value 5", i18n.getMessage("defaultKey5", "orange"));
-		Assert.assertEquals("orange is not cheese", i18n.getMessage("orange", "orange"));
+		assertEquals("default orange 1", i18n.getMessage("defaultKey1", "orange"));
+		assertEquals("default orange 2", i18n.getMessage("defaultKey2", "orange"));
+		assertEquals("default orange 3", i18n.getMessage("defaultKey3", "orange"));
+		assertEquals("default value 4", i18n.getMessage("defaultKey4", "orange"));
+		assertEquals("default value 5", i18n.getMessage("defaultKey5", "orange"));
+		assertEquals("orange is not cheese", i18n.getMessage("orange", "orange"));
 	}
 
 	@Test
 	public void orangeIsDefault() {
-		Assert.assertFalse(i18n.isLanguageLoaded("orange"));
+		assertFalse(i18n.isLanguageLoaded("orange"));
 		i18n.changeBoardDefaultLanguage("orange");
-		Assert.assertTrue(i18n.isLanguageLoaded("default"));
-		Assert.assertTrue(i18n.isLanguageLoaded("orange"));
+		assertTrue(i18n.isLanguageLoaded("default"));
+		assertTrue(i18n.isLanguageLoaded("orange"));
 		this.retrieveOrangeKeysExpectSuccessAndTwoDefaultValuesAndOneExtraOrangeKey();
 	}
 }

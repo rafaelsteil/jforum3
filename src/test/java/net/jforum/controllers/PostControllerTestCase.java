@@ -10,7 +10,12 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.AttachedFile;
@@ -26,36 +31,69 @@ import net.jforum.entities.UserSession;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.repository.TopicRepository;
+import net.jforum.security.RoleManager;
+import net.jforum.services.AttachmentService;
 import net.jforum.services.PostService;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PostControllerTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private PostRepository postRepository = context.mock(PostRepository.class);
-	private SmilieRepository smilieRepository = context.mock(SmilieRepository.class);
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-	private PostService postService = context.mock(PostService.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private TopicController mockTopicController = context.mock(TopicController.class);
-	private ForumController mockForumController = context.mock(ForumController.class);
+	@Mock private PostRepository postRepository;
+	@Mock private SmilieRepository smilieRepository;
+	@Mock private TopicRepository topicRepository;
+	@Mock private PostService postService;
+	@Mock private JForumConfig config;
+	@Mock private UserSession userSession;
+	@Mock private AttachmentService attachmentService;
+	@Mock private HttpServletRequest mockResquest;
+	@Spy private MockResult mockResult;
+	
+	@Mock private RoleManager roleManager;
+	@Mock private TopicController mockTopicControllerRedirect;
+	@Mock private TopicController mockTopicControllerForward;
+	@Mock private ForumController mockForumControllerRedirect;
+	@Mock private ForumController mockForumControllerForward;
 
-	private PostController controller = new PostController(postRepository,
-		smilieRepository, postService, config, userSession, null, null, mockResult);
+	@InjectMocks private PostController controller;
+	
 	private ModerationLog moderationLog = new ModerationLog();
+	private Post post;
+	private Forum forum;
+	private Topic topic;
+	
+	@Before
+	public void setup() {
+		forum = new Forum();
+		forum.setId(3);
+		
+		topic = new Topic(topicRepository);
+		topic.setForum(forum);
+		
+		post = new Post();
+		post.setId(2);
+		post.setTopic(topic);
+		post.setForum(forum);
+		
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumControllerRedirect);
+		when(mockResult.forwardTo(ForumController.class)).thenReturn(mockForumControllerForward);
+		when(mockResult.redirectTo(TopicController.class)).thenReturn(mockTopicControllerRedirect);
+		when(mockResult.forwardTo(TopicController.class)).thenReturn(mockTopicControllerForward);
+	}
 
 	@Test
 	public void deleteHasMorePostsShouldRedirectToTopicListing() {
@@ -67,9 +105,52 @@ public class PostControllerTestCase {
 		this.deleteRedirect(14, 3);
 	}
 
+	@Test
+	public void deleteLastMessageShouldRedirectToForum() {
+		when(postRepository.get(2)).thenReturn(post);
+		post.getTopic().decrementTotalReplies(); // we simulate the event dispatch
+
+		controller.delete(2);
+		
+		verify(postService).delete(post);
+		verify(mockForumControllerRedirect).show(post.getTopic().getForum().getId(), 0);
+		
+	}
+
+	@Test
+	public void editSave() {
+		PostFormOptions options = new PostFormOptions();
+		
+		when(postRepository.get(2)).thenReturn(post);
+
+		controller.editSave(post, options, null, moderationLog);
+
+		verify(postService).update(post, false, new ArrayList<PollOption>(),
+				new ArrayList<AttachedFile>(), moderationLog);
+		verify(mockTopicControllerRedirect).list(post.getTopic().getId(), 0, true);
+
+	}
+
+	@Test
+	public void edit() {
+		ArrayList<Smilie> smilies = new ArrayList<Smilie>();
+		
+		when(postRepository.get(1)).thenReturn(post);
+		when(smilieRepository.getAllSmilies()).thenReturn(smilies);
+
+		controller.edit(1);
+		
+		assertEquals(post, mockResult.included("post"));
+		assertEquals(true, mockResult.included("isEdit"));
+		assertEquals(new Topic(), mockResult.included("topic"));
+		assertEquals(forum, mockResult.included("forum"));
+		assertEquals(smilies, mockResult.included("smilies"));
+
+		verify(mockTopicControllerForward).add(0);
+
+	}
+
 	private void deleteRedirect(final int totalPosts, final int expectedPage) {
-		final Post post = new Post();
-		post.setId(2);
 		post.setTopic(new Topic() {
 			@Override
 			public int getTotalPosts() {
@@ -77,133 +158,26 @@ public class PostControllerTestCase {
 			}
 		});
 		post.getTopic().setId(7);
-
-		context.checking(new Expectations() {
-			{
-				one(postRepository).get(2); will(returnValue(post));
-				one(postService).delete(post);
-			}
-		});
-
+	
+		when(postRepository.get(2)).thenReturn(post);
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(5);
+	
+		controller.delete(2);
+		
 		this.redirectToPage(post.getTopic(), expectedPage);
-
-		controller.delete(2);
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void deleteLastMessageShouldRedirectToForum() {
-		final Post post = new Post();
-		post.setId(2);
-		post.setTopic(new Topic(topicRepository));
-		post.getTopic().getForum().setId(3);
-
-		context.checking(new Expectations() {
-			{
-				one(postRepository).get(2);
-				will(returnValue(post));
-				one(postService).delete(post);
-				post.getTopic().decrementTotalReplies(); // we simulate the
-															// event dispatch
-
-				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-				one(mockForumController).show(
-						post.getTopic().getForum().getId(), 0);
-			}
-		});
-
-		controller.delete(2);
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void editSave() {
-		final Post post = new Post();
-		post.setTopic(new Topic());
-		post.setForum(new Forum());
-		final PostFormOptions options = new PostFormOptions();
-
-		context.checking(new Expectations() {
-			{
-				ignoring(userSession);
-				one(postRepository).get(0);
-				will(returnValue(post));
-				one(postService).update(post, false,
-						new ArrayList<PollOption>(),
-						new ArrayList<AttachedFile>(), moderationLog);
-
-				// TODO pass zero and true?
-				one(mockResult).redirectTo(TopicController.class);
-				will(returnValue(mockTopicController));
-				one(mockTopicController).list(post.getTopic().getId(), 0, true);
-
-			}
-		});
-
-		controller.editSave(post, options, null, moderationLog);
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void edit() {
-		final Post post = new Post() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Topic getTopic() {
-				return new Topic() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Forum getForum() {
-						return new Forum();
-					}
-				};
-			}
-		};
-
-		context.checking(new Expectations() {
-			{
-				one(postRepository).get(1);
-				will(returnValue(post));
-				one(smilieRepository).getAllSmilies();
-				will(returnValue(new ArrayList<Smilie>()));
-				one(mockResult).include("post", post);
-				one(mockResult).include("isEdit", true);
-				one(mockResult).include("topic", new Topic());
-				one(mockResult).include("forum", new Forum());
-				one(mockResult).include("smilies", new ArrayList<Smilie>());
-
-				// TODO pass zero?
-				one(mockResult).forwardTo(TopicController.class);
-				will(returnValue(mockTopicController));
-				one(mockTopicController).add(0);
-			}
-		});
-
-		controller.edit(1);
-		context.assertIsSatisfied();
+		verify(postService).delete(post);
 	}
 
 	private void redirectToPage(final Topic topic, final int expectedPage) {
-		context.checking(new Expectations() {
-			{
-				one(config).getInt(ConfigKeys.POSTS_PER_PAGE);
-				will(returnValue(5));
+		String url;
+		
 
-				String url;
+		if (expectedPage > 0) {
+			url = String.format("/%s/%s/%s/%s", Domain.TOPICS, Actions.LIST, expectedPage, topic.getId());
+		} else {
+			url = String.format("/%s/%s/%s", Domain.TOPICS, Actions.LIST, topic.getId());
+		}
 
-				if (expectedPage > 0) {
-					url = String.format("/%s/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, expectedPage, topic.getId());
-				}
-				else {
-					url = String.format("/%s/%s/%s.page", Domain.TOPICS, Actions.LIST, topic.getId());
-				}
-
-				one(mockResult).redirectTo(url);
-			}
-		});
+		verify(mockResult).redirectTo(url);
 	}
 }
