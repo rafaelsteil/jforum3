@@ -11,6 +11,7 @@
 package net.jforum.entities;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Date;
@@ -36,7 +37,9 @@ import br.com.caelum.vraptor.ioc.SessionScoped;
  */
 @Component
 @SessionScoped
-public class UserSession  {
+public class UserSession implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private static final Logger logger = Logger.getLogger(UserSession.class);
 	private User user = new User(null);
 	private RoleManager roleManager;
