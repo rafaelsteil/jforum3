@@ -15,8 +15,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.core.SessionManager;
+import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostRepository;
 import net.jforum.util.TestCaseUtils;

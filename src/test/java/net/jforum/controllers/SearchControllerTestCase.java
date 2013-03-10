@@ -15,7 +15,6 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 import net.jforum.actions.helpers.Actions;
-import net.jforum.controllers.SearchController;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;

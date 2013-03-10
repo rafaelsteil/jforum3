@@ -12,7 +12,6 @@ package net.jforum.repository;
 
 import java.lang.reflect.ParameterizedType;
 
-
 import org.hibernate.Session;
 
 /**
