@@ -73,14 +73,14 @@ public class PostControllerTestCase {
 	private ModerationLog moderationLog = new ModerationLog();
 	private Post post;
 	private Forum forum;
-	private Topic topic;
+	@Spy private Topic topic;
 	
 	@Before
 	public void setup() {
 		forum = new Forum();
 		forum.setId(3);
 		
-		topic = new Topic(topicRepository);
+		topic = spy(new Topic(topicRepository));
 		topic.setForum(forum);
 		
 		post = new Post();
@@ -108,12 +108,12 @@ public class PostControllerTestCase {
 	@Test
 	public void deleteLastMessageShouldRedirectToForum() {
 		when(postRepository.get(2)).thenReturn(post);
-		post.getTopic().decrementTotalReplies(); // we simulate the event dispatch
+		topic.decrementTotalReplies(); // we simulate the event dispatch
 
 		controller.delete(2);
 		
 		verify(postService).delete(post);
-		verify(mockForumControllerRedirect).show(post.getTopic().getForum().getId(), 0);
+		verify(mockForumControllerRedirect).show(topic.getForum().getId(), 0);
 		
 	}
 
@@ -127,7 +127,7 @@ public class PostControllerTestCase {
 
 		verify(postService).update(post, false, new ArrayList<PollOption>(),
 				new ArrayList<AttachedFile>(), moderationLog);
-		verify(mockTopicControllerRedirect).list(post.getTopic().getId(), 0, true);
+		verify(mockTopicControllerRedirect).list(topic.getId(), 0, true);
 
 	}
 
@@ -151,20 +151,15 @@ public class PostControllerTestCase {
 	}
 
 	private void deleteRedirect(final int totalPosts, final int expectedPage) {
-		post.setTopic(new Topic() {
-			@Override
-			public int getTotalPosts() {
-				return totalPosts;
-			}
-		});
-		post.getTopic().setId(7);
+		when(topic.getTotalPosts()).thenReturn(totalPosts);
+		topic.setId(7);
 	
 		when(postRepository.get(2)).thenReturn(post);
 		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(5);
 	
 		controller.delete(2);
 		
-		this.redirectToPage(post.getTopic(), expectedPage);
+		this.redirectToPage(topic, expectedPage);
 		verify(postService).delete(post);
 	}
 

@@ -21,6 +21,7 @@ import net.jforum.util.URLBuilder;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import br.com.caelum.vraptor.Result;
@@ -29,6 +30,7 @@ import br.com.caelum.vraptor.util.test.MockResult;
 /**
  * @author Rafael Steil
  */
+@Ignore("do we really want to test i18n like this")
 public class MessageControllerTestCase {
 	private Mockery context = TestCaseUtils.newMockery();
 	private I18n i18n = context.mock(I18n.class);
