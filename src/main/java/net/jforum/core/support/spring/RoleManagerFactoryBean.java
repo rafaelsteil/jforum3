@@ -20,7 +20,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 /**
  * @author Rafael Steil
  */
-public class RoleManagerFactoryBean implements FactoryBean {
+public class RoleManagerFactoryBean implements FactoryBean<RoleManager> {
 	private SessionManager sessionManager;
 
 	public RoleManagerFactoryBean(SessionManager sessionManager) {
@@ -30,7 +30,7 @@ public class RoleManagerFactoryBean implements FactoryBean {
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
-	public Object getObject() throws Exception {
+	public RoleManager getObject() throws Exception {
 		String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
 		UserSession userSession = this.sessionManager.getUserSession(sessionId);
 		return userSession != null ? userSession.getRoleManager() : null;

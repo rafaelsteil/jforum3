@@ -110,7 +110,7 @@ public class ForumAdminTestCase {
 			forum.setId(1);
 
 			one(roleManager).isAdministrator(); will(returnValue(true));
-			Map m = new HashMap();
+			Map<String, Object> m = new HashMap<String, Object>();
 			m.put("forum", forum);
 			one(mockResult).included();
 			will(returnValue(m));
