@@ -1,13 +1,15 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-
-
 repositories {
     mavenCentral()
     maven {
         url "http://www.cs.drexel.edu/~zl25/maven2/repo"
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion="1.5"
 }
 
 dependencies {
