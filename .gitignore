@@ -12,4 +12,5 @@ src/main/resources/jforumConfig/jforum-custom.properties
 *.DS_Store
 .classpath
 .project
+.gradle
 bin/
