@@ -66,8 +66,8 @@ public class SearchResult extends PaginatedResult<Post> {
 	 */
 	@SuppressWarnings("unchecked")
 	public SearchResult filter(RoleManager roleManager) {
-		for (Iterator iter = this.getResults().iterator(); iter.hasNext(); ) {
-			Post post = (Post)iter.next();
+		for (Iterator<Post> iter = this.getResults().iterator(); iter.hasNext(); ) {
+			Post post = iter.next();
 
 			if (!roleManager.isForumAllowed(post.getForum().getId())) {
 				iter.remove();

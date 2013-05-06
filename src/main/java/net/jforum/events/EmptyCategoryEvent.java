@@ -11,7 +11,6 @@
 package net.jforum.events;
 
 import net.jforum.entities.Category;
-import net.jforum.entities.Topic;
 
 /**
  * Default implementation of an {@link Event}, for {@link Topic}.

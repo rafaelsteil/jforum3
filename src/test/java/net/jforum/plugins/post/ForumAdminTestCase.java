@@ -11,9 +11,7 @@
 package net.jforum.plugins.post;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -112,7 +110,7 @@ public class ForumAdminTestCase {
 			forum.setId(1);
 
 			one(roleManager).isAdministrator(); will(returnValue(true));
-			Map m = new HashMap();
+			Map<String, Object> m = new HashMap<String, Object>();
 			m.put("forum", forum);
 			one(mockResult).included();
 			will(returnValue(m));

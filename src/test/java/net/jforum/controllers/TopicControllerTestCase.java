@@ -52,6 +52,7 @@ import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -438,6 +439,7 @@ public class TopicControllerTestCase {
 	}
 
 	@Test
+	@Ignore("to implement")
 	public void vote() {
 		fail("to implement");
 	}

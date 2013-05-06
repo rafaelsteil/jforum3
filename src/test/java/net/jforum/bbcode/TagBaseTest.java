@@ -10,7 +10,6 @@
  */
 package net.jforum.bbcode;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import net.jforum.formatters.BBCode;
 import net.jforum.formatters.BBCodeConfigParser;
 import net.jforum.formatters.BBConfigFormatter;
 import net.jforum.formatters.PostOptions;
-import net.jforum.util.TestCaseUtils;
 
 import org.junit.Before;
 

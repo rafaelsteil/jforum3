@@ -24,10 +24,10 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 
+import net.jforum.util.ConfigKeys;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.taglibs.standard.tag.common.core.NullAttributeException;
-
-import net.jforum.util.ConfigKeys;
 
 /**
  * @author Bill

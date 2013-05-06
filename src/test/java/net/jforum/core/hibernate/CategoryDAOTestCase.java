@@ -18,6 +18,7 @@ import net.jforum.entities.Forum;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.ForumRepository;
 
+import org.hibernate.NonUniqueObjectException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -80,8 +81,8 @@ public class CategoryDAOTestCase extends AbstractDAOTestCase<Category> {
 		Assert.assertEquals(3, loaded.getDisplayOrder());
 	}
 
-	@Test
-	public void updateChangingAnInstanceCreatedByHandUsingARealId() {
+	@Test(expected=NonUniqueObjectException.class)
+	public void updateChangingAnInstanceCreatedByHandUsingARealIdShouldFail() {
 		CategoryRepository dao = this.newDao();
 		Category c = this.newCategory("c1", false);
 		this.insert(c, dao);

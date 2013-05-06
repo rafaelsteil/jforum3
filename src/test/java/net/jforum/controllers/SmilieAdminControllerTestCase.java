@@ -12,7 +12,6 @@ package net.jforum.controllers;
 
 import java.util.ArrayList;
 
-import net.jforum.controllers.SmilieAdminController;
 import net.jforum.entities.Smilie;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.services.SmilieService;

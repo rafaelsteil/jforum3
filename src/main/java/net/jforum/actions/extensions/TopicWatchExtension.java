@@ -12,7 +12,6 @@ package net.jforum.actions.extensions;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
-import net.jforum.controllers.TopicController;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
