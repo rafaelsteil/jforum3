@@ -13,4 +13,5 @@ src/main/resources/jforumConfig/jforum-custom.properties
 .classpath
 .project
 .gradle
+build
 bin/
