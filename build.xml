@@ -1,0 +1,187 @@
+<!-- ************************************* -->
+<!-- Ant build script for JForum 3 -->
+<!-- ************************************* -->
+<project name="JForum3" default="test" basedir=".">
+	<description>JForum 3</description>
+
+	<property name="build.compiler" value="javac1.5" />
+
+	<property name="project.name" value="JForum3" />
+	<property name="author" value="JForum Team - http://www.jforum.net/team.jsp" />
+	<property name="copyright" value="(c) JForum Team" />
+	<property name="version" value="3.0" />
+	<property name="filename" value="jforum-${version}" />
+	<property name="warfile" value="${filename}.war" />
+	<property name="custom.libs" location="compile-lib" />
+	<property name="srcfile" value="${filename}-src.zip"/>
+	<property name="cobertura.libs.dir" value="${custom.libs}/cobertura"/>
+	<property name="instrumentation.dir" value="target/tests"/>
+	<property name="build.dir" location="target" />
+	<property name="project.libs" location="lib" />
+	<property name="src.dir" value="src/main/java" />
+	<property name="resources.dir" value="src/main/resources"/>
+	<property name="tests.dir" value="src/test/java" />
+	<property name="tests.resources.dir" value="src/test/resources"/>
+	<property name="classes.dir" value="${build.dir}/WEB-INF/classes" />
+	<property name="tests.classes.dir" value="tmp/tests" />
+	<property name="web.dir" value="src/main/webapp" />
+	<property name="build.style" value="${cobertura.libs.dir}/style"/>
+	<property name="hsqldb.test.dir" value="${java.io.tmpdir}/jforum-test-database"/>
+	<property name="artifacts.dir" value="tmp/artifacts"/>
+	
+	<!-- Cobertura -->
+	<path id="cobertura.classpath">
+		<fileset dir="${cobertura.libs.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+	
+	<!-- Classpath declaration -->
+    <path id="project.classpath">
+        <fileset dir="${project.libs}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+	<path id="base.path">
+		<fileset dir="${project.libs}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${custom.libs}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- Init -->
+	<target name="init">
+		<tstamp>
+			<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${instrumentation.dir}" />
+		<mkdir dir="${tests.classes.dir}"/>
+		<mkdir dir="${artifacts.dir}"/>
+		<mkdir dir="${artifacts.dir}/junit-output"/>
+	</target>
+
+	<!-- Clean -->
+	<target name="clean" description="clean-up">
+		<delete dir="${classes.dir}" />
+		<delete dir="${instrumentation.dir}"/>
+		<delete dir="tmp"/>
+	</target>
+
+	<!-- Compile -->
+	<target name="compile" depends="init" description="Compiles the source code">
+		<!-- Main code -->
+		<javac fork="true" debug="true" optimize="false" deprecation="false" source="1.5" target="1.5" srcdir="${src.dir}" destdir="${classes.dir}">
+			<classpath>
+				<path refid="base.path" />
+			</classpath>
+		</javac>
+		
+		<copy todir="${classes.dir}">
+			<fileset dir="${resources.dir}"/>
+		</copy>
+		
+		<!-- Tests -->
+		<javac fork="true" debug="true" optimize="false" deprecation="false" source="1.5" target="1.5" srcdir="${tests.dir}" destdir="${tests.classes.dir}">
+			<classpath>
+				<path refid="base.path" />
+				<pathelement path="${classes.dir}"/>
+			</classpath>
+		</javac>
+		
+		<copy todir="${tests.classes.dir}">
+			<fileset dir="${tests.resources.dir}"/>
+		</copy>
+	</target>
+	
+	<!-- Test -->
+	<target name="test" depends="compile">
+		<fileset dir="${tests.classes.dir}" id="unittests.fileset">
+			<include name="**/*TestCase.class" />
+			<exclude name="**/AbstractDAOTestCase.class" />
+			<exclude name="**/AdminTestCase.class" />
+			<exclude name="**/MailTestCase.class" />
+		</fileset>
+
+		<delete file="cobertura.ser" verbose="false" />
+
+		<cobertura-instrument todir="${instrumentation.dir}">
+			<fileset dir="${classes.dir}" >
+				<include name="**/*.class" /> 
+				<exclude name="**/support/spring/*" />
+				<exclude name="**/support/vraptor/*" />
+				<exclude name="**/util/JForumConfig.class" />
+				<exclude name="**/util/ConfigKeys.class" />
+				<exclude name="**/util/mail/EmailSenderTask.class" />
+				<exclude name="**/util/mail/IdentifiableMimeMessage.class" />
+				<exclude name="**/util/mail/SpammerTaskExecutor.class" />
+				<exclude name="**/support/hibernate/OpenSessionInViewFilter.class" />
+				<exclude name="**/JForumServlet.class" />
+			</fileset>
+		</cobertura-instrument>
+
+		<echo message="Running unit tests..." />
+		<junit fork="yes" forkmode="once" haltonfailure="no" printsummary="false" showoutput="true" failureproperty="failed-test">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="cobertura.ser" />
+
+			<classpath>
+				<pathelement path="${instrumentation.dir}" />
+				<pathelement path="${tests.classes.dir}" />
+				<pathelement path="${classes.dir}" />
+			</classpath>
+			<classpath refid="base.path" />
+
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${artifacts.dir}/junit-output">
+				<fileset refid="unittests.fileset" />
+			</batchtest>
+		</junit>
+		
+		<antcall target="cobertura-report" />
+		<antcall target="test-report" />
+	</target>
+	
+	<target name="test-report">
+		<junitreport todir="${artifacts.dir}/">
+			<fileset dir="${artifacts.dir}/junit-output">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report styledir="${build.style}" format="frames" todir="${artifacts.dir}/junit" />
+		</junitreport>
+		<fail if="failed-test" message="Unit test with problems!" />
+	</target>
+
+	<target name="cobertura-report">
+		<cobertura-report format="html" destdir="${artifacts.dir}/cobertura">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+				<exclude name="**/*TestCase.java" />
+				<exclude name="**/util/JForumConfig.java" />
+				<exclude name="**/util/ConfigKeys.java" />
+				<exclude name="**/util/mail/EmailSenderTask.java" />
+				<exclude name="**/util/mail/IdentifiableMimeMessage.java" />
+				<exclude name="**/util/mail/SpammerTaskExecutor.java" />
+				<exclude name="**/JForumServlet.java" />
+			</fileset>
+		</cobertura-report>
+	</target>
+	
+	<!-- Start the HSQL DB server -->
+    <target name="startHsqldb" description="Run HSQL database server with clean DB">
+        <!-- Delete database files -->
+        <delete dir="${database.dir}"/>
+        <java classname="org.hsqldb.Server"
+              fork="yes"
+              classpathref="project.classpath"
+              failonerror="true">
+            <arg value="-database.0"/>
+            <arg value="file:${hsqldb.test.dir}/db"/>
+        </java>
+    </target>
+</project>
