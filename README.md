@@ -5,7 +5,7 @@ JForum
 
 Right now project is in terrible condition. Do not use it on you site. It's not ready.
 
-To build jforum jusr run `mvn package`
+To build jforum just run `mvn package`
 
 You can find database initialization scripts in `src/main/resources/jforumConfig/database` folder.
 
