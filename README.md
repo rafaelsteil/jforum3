@@ -9,8 +9,6 @@ To build jforum just run `mvn package`
 
 You can find database initialization scripts in `src/main/resources/jforumConfig/database` folder.
 
-Sample forum you can find here http://zgis.org/
-
 original :  https://github.com/rafaelsteil/jforum3
 
 
