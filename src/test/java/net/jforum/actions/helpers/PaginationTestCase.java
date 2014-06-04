@@ -10,23 +10,24 @@
  */
 package net.jforum.actions.helpers;
 
+import static org.mockito.Mockito.*;
 import junit.framework.Assert;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 import net.jforum.entities.util.Pagination;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PaginationTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
+	
 
 	@Test
 	public void pagination1() {
@@ -92,18 +93,14 @@ public class PaginationTestCase {
 
 	@Test
 	public void forForum() {
-		final Forum forum = context.mock(Forum.class);
-		final JForumConfig config = context.mock(JForumConfig.class);
+		final Forum forum = mock(Forum.class);
+		final JForumConfig config = mock(JForumConfig.class);
 
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.TOPICS_PER_PAGE); will(returnValue(10));
-			one(forum).getTotalTopics(); will(returnValue(50));
-			one(forum).getId(); will(returnValue(1));
-		}});
+		when(config.getInt(ConfigKeys.TOPICS_PER_PAGE)).thenReturn(10);
+		when(forum.getTotalTopics()).thenReturn(50);
+		when(forum.getId()).thenReturn(1);
 
 		Pagination p = new Pagination(config, 3).forForum(forum);
-
-		context.assertIsSatisfied();
 
 		Assert.assertEquals(10, p.getRecordsPerPage());
 		Assert.assertEquals(50, p.getTotalRecords());
@@ -115,18 +112,14 @@ public class PaginationTestCase {
 
 	@Test
 	public void forTopic() {
-		final Topic topic = context.mock(Topic.class);
-		final JForumConfig config = context.mock(JForumConfig.class);
+		final Topic topic = mock(Topic.class);
+		final JForumConfig config = mock(JForumConfig.class);
 
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			one(topic).getTotalPosts(); will(returnValue(50));
-			one(topic).getId(); will(returnValue(1));
-		}});
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		when(topic.getTotalPosts()).thenReturn(50);
+		when(topic.getId()).thenReturn(1);
 
 		Pagination p = new Pagination(config, 3).forTopic(topic);
-
-		context.assertIsSatisfied();
 
 		Assert.assertEquals(10, p.getRecordsPerPage());
 		Assert.assertEquals(50, p.getTotalRecords());

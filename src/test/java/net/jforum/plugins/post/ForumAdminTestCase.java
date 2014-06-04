@@ -10,8 +10,9 @@
  */
 package net.jforum.plugins.post;
 
-
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -28,124 +29,109 @@ import net.jforum.extensions.Extends;
 import net.jforum.repository.ForumRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumAdminTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
+	
 
-	private ForumLimitedTimeRepository repository = context.mock(ForumLimitedTimeRepository.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private Result mockResult = context.mock(Result.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private ForumAdminExtension extension = new ForumAdminExtension(config, forumRepository, repository, mockResult, userSession);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-
+	@Mock private ForumLimitedTimeRepository repository;
+	@Mock private JForumConfig config;
+	@Mock private ForumRepository forumRepository;
+	@Spy private MockResult mockResult;
+	@Mock private UserSession userSession;
+	@InjectMocks private ForumAdminExtension extension;
+	@Mock private RoleManager roleManager;
+ 
 	@Test
 	@SuppressWarnings("serial")
 	public void edit() {
 		final int forumId = 1;
 
-		context.checking(new Expectations() {{
-			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-
-			one(forumRepository).get(forumId); will(returnValue(new Forum(){{setId(1);}}));
-			one(repository).getLimitedTime(with(any(Forum.class))); will(returnValue(0L));
-			one(mockResult).include("forumTimeLimitedEnable", true);
-			one(mockResult).include("forumLimitedTime", 0L);
-		}});
+		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
+		when(forumRepository.get(forumId)).thenReturn(new Forum(){{setId(1);}});
+		when(repository.getLimitedTime(any(Forum.class))).thenReturn(0L);
 
 		extension.edit(forumId);
-		context.assertIsSatisfied();
+
+		assertEquals(true, mockResult.included("forumTimeLimitedEnable"));
+		assertEquals(0L, mockResult.included("forumLimitedTime"));
+
 	}
 
 	@Test
 	public void add() {
-		context.checking(new Expectations() {{
-			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-			one(mockResult).include("fourmTimeLimitedEnable", true);
-			one(mockResult).include("fourmLimitedTime", 0);
-		}});
+		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
 
 		extension.add();
-		context.assertIsSatisfied();
+
+		assertEquals(true, mockResult.included("fourmTimeLimitedEnable"));
+		assertEquals(0, mockResult.included("fourmLimitedTime"));
 	}
 
 	@Test
 	public void editSave() {
 		this.securityChecking();
-
 		final Forum forum = new Forum();
-        forum.setCategory(new Category());
+		forum.setCategory(new Category());
 		final ForumLimitedTime forumLimitedTime = new ForumLimitedTime();
-		context.checking(new Expectations() {{
-			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-			one(roleManager).isAdministrator(); will(returnValue(true));
-			one(repository).getForumLimitedTime(forum); will(returnValue(forumLimitedTime));
-			one(repository).saveOrUpdate(forumLimitedTime);
-		}});
+
+		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(repository.getForumLimitedTime(forum)).thenReturn(forumLimitedTime);
 
 		extension.editSave(forum, 23);
-		context.assertIsSatisfied();
+
+		verify(repository).saveOrUpdate(forumLimitedTime);
 	}
 
 	@Test
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void addSave() {
 		this.securityChecking();
+		final Forum forum = new Forum();
+		forum.setId(1);
+		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("forum", forum);
 
-		context.checking(new Expectations() {{
-			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-
-			final Forum forum = new Forum();
-			forum.setId(1);
-
-			one(roleManager).isAdministrator(); will(returnValue(true));
-			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("forum", forum);
-			one(mockResult).included();
-			will(returnValue(m));
-			one(repository).add(with(any(ForumLimitedTime.class)));
-		}});
+		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(mockResult.included()).thenReturn(m);
 
 		extension.addSave(23);
-		context.assertIsSatisfied();
+
+		verify(repository).add(any(ForumLimitedTime.class));
 	}
 
 	@SuppressWarnings("serial")
 	@Test
 	public void delete() {
 		this.securityChecking();
-
 		final Forum forum = new Forum(23);
-
-		context.checking(new Expectations() {{
-			ForumLimitedTime forumLimitedTime = new ForumLimitedTime(){{setId(1);}};
-
-			one(config).getBoolean("forum.time.limited.enable", false); will(returnValue(true));
-			one(roleManager).isAdministrator(); will(returnValue(true));
-			one(repository).getForumLimitedTime(forum); will(returnValue(forumLimitedTime));
-			one(repository).remove(with(forumLimitedTime));
-		}});
+		ForumLimitedTime forumLimitedTime = new ForumLimitedTime(){{setId(1);}};
+		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(repository.getForumLimitedTime(forum)).thenReturn(forumLimitedTime);
 
 		extension.delete(23);
-		context.assertIsSatisfied();
+
+		verify(repository).remove(forumLimitedTime);
 	}
 
 	private void securityChecking() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			allowing(userSession).getUser(); will(returnValue(new User()));
-		}});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(userSession.getUser()).thenReturn(new User());
 	}
 
 	@Test

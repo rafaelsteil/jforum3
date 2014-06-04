@@ -10,6 +10,8 @@
  */
 package net.jforum.core.events.category;
 
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 
 import net.jforum.entities.Category;
@@ -20,49 +22,46 @@ import net.jforum.entities.UserSession;
 import net.jforum.repository.GroupRepository;
 import net.jforum.services.GroupService;
 import net.jforum.util.SecurityConstants;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class NewCategoryGroupPermissionsEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private GroupRepository groupRepository = context.mock(GroupRepository.class);
-	private GroupService groupService = context.mock(GroupService.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private NewCategoryGroupPermissionsEvent event = new NewCategoryGroupPermissionsEvent(groupRepository, groupService, userSession);
+	
+	@Mock private GroupRepository groupRepository;
+	@Mock private GroupService groupService;
+	@Mock private UserSession userSession;
+	@InjectMocks private NewCategoryGroupPermissionsEvent event;
 
 	@Test
 	public void added() {
-		context.checking(new Expectations() {{
-			Group group1 = createGroupWithRole(1, SecurityConstants.ADMINISTRATOR, SecurityConstants.APPROVE_MESSAGES);
-			Group group2 = createGroupWithRole(2, SecurityConstants.CO_ADMINISTRATOR);
-			Group group3 = createGroupWithRole(3, SecurityConstants.CATEGORY);
-			Group group4 = createGroupWithRole(4, SecurityConstants.CATEGORY);
+		Group group1 = createGroupWithRole(1, SecurityConstants.ADMINISTRATOR, SecurityConstants.APPROVE_MESSAGES);
+		Group group2 = createGroupWithRole(2, SecurityConstants.CO_ADMINISTRATOR);
+		Group group3 = createGroupWithRole(3, SecurityConstants.CATEGORY);
+		Group group4 = createGroupWithRole(4, SecurityConstants.CATEGORY);
 
-			one(groupRepository).getAllGroups();will(returnValue(
-				Arrays.asList(group1, group2, group3, group4)));
+		when(groupRepository.getAllGroups()).thenReturn(Arrays.asList(group1, group2, group3, group4));
 
-			User user = new User();
-			user.getGroups().add(group2);
-			user.getGroups().add(group4);
+		User user = new User();
+		user.getGroups().add(group2);
+		user.getGroups().add(group4);
 
-			one(userSession).getUser(); will(returnValue(user));
-
-			one(groupService).appendRole(group1, SecurityConstants.CATEGORY, 1);
-			one(groupService).appendRole(group2, SecurityConstants.CATEGORY, 1);
-		}});
+		when(userSession.getUser()).thenReturn(user);
 
 		Category c = new Category();
 		c.setId(1);
 
 		event.added(c);
 
-		context.assertIsSatisfied();
+		verify(groupService).appendRole(group1, SecurityConstants.CATEGORY, 1);
+		verify(groupService).appendRole(group2, SecurityConstants.CATEGORY, 1);
 	}
 
 	private Group createGroupWithRole(int groupId, String... roleNames) {
