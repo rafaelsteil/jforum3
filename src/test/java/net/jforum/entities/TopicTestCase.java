@@ -10,46 +10,36 @@
  */
 package net.jforum.entities;
 
+import static org.mockito.Mockito.*;
 import junit.framework.Assert;
 import net.jforum.repository.TopicRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicRepository repository = context.mock(TopicRepository.class);
+
+	@Mock private TopicRepository repository;
 
 	@Test
 	public void getPosts() {
 		final Topic topic = new Topic(repository);
 
-		context.checking(new Expectations() {{
-			one(repository).getPosts(topic, 0, 10);
-		}});
-
 		topic.getPosts(0, 10);
-		context.assertIsSatisfied();
+
+		verify(repository).getPosts(topic, 0, 10);
 	}
 
 	@Test
 	public void getTotalPosts() {
-		final Topic topic = new Topic() {
-			/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public int getTotalReplies() {
-				return 1;
-			}
-		};
+		final Topic topic = new Topic();
+		topic.incrementTotalReplies();
 
 		Assert.assertEquals(2, topic.getTotalPosts());
 	}

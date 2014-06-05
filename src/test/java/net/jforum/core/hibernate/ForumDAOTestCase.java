@@ -10,6 +10,8 @@
  */
 package net.jforum.core.hibernate;
 
+import static org.mockito.Mockito.*;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -25,16 +27,16 @@ import net.jforum.repository.PostRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JDBCLoader;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 	@Test
 	@SuppressWarnings("deprecation")
@@ -208,12 +210,10 @@ public class ForumDAOTestCase extends AbstractDAOTestCase<Forum> {
 		new JDBCLoader(session().connection())
 			.run("/forumdao/getTopicsShouldFetchFromForumAndFromMovedIdExpectTwoResults.sql");
 
-		Mockery mock = TestCaseUtils.newMockery();
-		final JForumConfig config = mock.mock(JForumConfig.class);
-		mock.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.QUERY_IGNORE_TOPIC_MOVED); will(returnValue(true));
-		}});
-
+		final JForumConfig config = mock(JForumConfig.class);
+		
+		when(config.getBoolean(ConfigKeys.QUERY_IGNORE_TOPIC_MOVED)).thenReturn(true);
+		
 		ForumRepository dao = this.newForumDao();
 		dao.setJforumConfig(config);
 		Forum forum = new Forum(); forum.setId(1);

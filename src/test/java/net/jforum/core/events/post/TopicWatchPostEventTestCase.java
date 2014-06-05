@@ -10,52 +10,43 @@
  */
 package net.jforum.core.events.post;
 
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.services.TopicWatchService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicWatchPostEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicWatchService service = context.mock(TopicWatchService.class);
-	private TopicWatchPostEvent event = new TopicWatchPostEvent(service);
+	
+	@Mock private TopicWatchService service;
+	@InjectMocks private TopicWatchPostEvent event;
 
 	@Test
 	public void addedPostNotifyEnabledExpectWatch() {
 		final Post post = new Post(); post.setNotifyReplies(true);
-		post.setTopic(new Topic() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
-		post.setUser(new User() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(2); }});
-
-		context.checking(new Expectations() {{
-			one(service).watch(post.getTopic(), post.getUser());
-		}});
-
+		post.setTopic(new Topic(1));
+		User user = new User();
+		user.setId(2);
+		post.setUser(user);
+		
 		event.added(post);
-		context.assertIsSatisfied();
+		
+		verify(service).watch(post.getTopic(), post.getUser());
 	}
 
 	@Test
 	public void addedPostNotifyDisabledShouldDoNothing() {
 		Post post = new Post(); post.setNotifyReplies(false);
 		event.added(post);
-		context.assertIsSatisfied();
 	}
 }

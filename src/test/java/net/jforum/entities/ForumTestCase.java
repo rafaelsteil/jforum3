@@ -10,36 +10,37 @@
  */
 package net.jforum.entities;
 
+import static org.mockito.Mockito.*;
 import junit.framework.Assert;
 import net.jforum.repository.ForumRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ForumRepository repository = context.mock(ForumRepository.class);
+
+	@Mock
+	private ForumRepository repository;
 
 	@Test
 	public void getTotalTopics() {
 		final Forum forum = new Forum(repository);
 
-		context.checking(new Expectations() {{
-			one(repository).getTotalTopics(forum);
-		}});
-
 		forum.getTotalTopics();
-		context.assertIsSatisfied();
+
+		verify(repository).getTotalTopics(forum);
 	}
 
 	@Test
 	public void getTopicsPendingModerationForumIsNotModeratedShouldReturnEmptyList() {
-		Forum forum = new Forum(); forum.setModerated(false);
+		Forum forum = new Forum();
+		forum.setModerated(false);
 		Assert.assertEquals(0, forum.getTopicsPendingModeration().size());
 	}
 
@@ -48,36 +49,27 @@ public class ForumTestCase {
 		final Forum forum = new Forum(repository);
 		forum.setModerated(true);
 
-		context.checking(new Expectations() {{
-			one(repository).getTopicsPendingModeration(forum);
-		}});
-
 		forum.getTopicsPendingModeration();
-		context.assertIsSatisfied();
+
+		verify(repository).getTopicsPendingModeration(forum);
 	}
 
 	@Test
 	public void getTopics() {
 		final Forum forum = new Forum(repository);
 
-		context.checking(new Expectations() {{
-			one(repository).getTopics(forum, 0, 10);
-		}});
-
 		forum.getTopics(0, 10);
-		context.assertIsSatisfied();
+
+		verify(repository).getTopics(forum, 0, 10);
 	}
 
 	@Test
 	public void getTotalPosts() {
 		final Forum forum = new Forum(repository);
 
-		context.checking(new Expectations() {{
-			one(repository).getTotalPosts(forum);
-		}});
-
 		forum.getTotalPosts();
-		context.assertIsSatisfied();
+
+		verify(repository).getTotalPosts(forum);
 	}
 
 	@Test
@@ -92,12 +84,9 @@ public class ForumTestCase {
 		final Forum forum = new Forum(repository);
 		forum.setModerated(true);
 
-		context.checking(new Expectations() {{
-			one(repository).getModerators(forum);
-		}});
-
 		forum.getModerators();
-		context.assertIsSatisfied();
+
+		verify(repository).getModerators(forum);
 	}
 
 	@Test(expected = IllegalStateException.class)

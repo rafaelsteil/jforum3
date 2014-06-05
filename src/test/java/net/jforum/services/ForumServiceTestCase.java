@@ -10,49 +10,47 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
-import java.util.List;
 
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.repository.ForumRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ForumRepository repository = context.mock(ForumRepository.class);
-	private ForumService service = new ForumService(repository);
+	
+	@Mock private ForumRepository repository;
+	@InjectMocks private ForumService service;
 
 	@Test
 	public void deleteUsingNullIdsShouldIgnore() {
-		context.checking(new Expectations() {{
-
-		}});
-
 		service.delete(null);
-		context.assertIsSatisfied();
+
+		verifyZeroInteractions(repository);
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(new Forum()));
-			one(repository).get(2); will(returnValue(new Forum()));
-
-			exactly(2).of(repository).remove(with(aNonNull(Forum.class)));
-		}});
+		when(repository.get(1)).thenReturn(new Forum());
+		when(repository.get(2)).thenReturn(new Forum());
 
 		service.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(repository, times(2)).remove(notNull(Forum.class));
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -64,12 +62,9 @@ public class ForumServiceTestCase {
 	public void updateUsingForumIdZeroExpectsValidationException() {
 		Forum f = new Forum();
 		f.setName("f1");
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 		f.setId(0);
 
 		service.update(f);
@@ -90,12 +85,9 @@ public class ForumServiceTestCase {
 		Forum f = new Forum();
 		f.setName("f1");
 		f.setId(1);
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(0); }});
+		Category category = new Category();
+		category.setId(0);
+		f.setCategory(category);
 
 		service.update(f);
 	}
@@ -105,12 +97,9 @@ public class ForumServiceTestCase {
 		Forum f = new Forum();
 		f.setName("");
 		f.setId(1);
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 
 		service.update(f);
 	}
@@ -120,12 +109,9 @@ public class ForumServiceTestCase {
 		Forum f = new Forum();
 		f.setName(null);
 		f.setId(1);
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 
 		service.update(f);
 	}
@@ -134,30 +120,21 @@ public class ForumServiceTestCase {
 	public void addExpectSuccess() {
 		final Forum f = new Forum();
 		f.setName("f1");
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
-
-		context.checking(new Expectations() {{
-			one(repository).add(f);
-		}});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 
 		service.add(f);
-		context.assertIsSatisfied();
+
+		verify(repository).add(f);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void addUsingForumIdBiggerThanZeroExpectValidationException() {
 		Forum f = new Forum();
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 		f.setName("f1");
 		f.setId(1);
 
@@ -173,12 +150,9 @@ public class ForumServiceTestCase {
 	public void addForumWithoutNameExpectValidationException() {
 		Forum f = new Forum();
 		f.setName(null);
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 		service.add(f);
 	}
 
@@ -186,87 +160,70 @@ public class ForumServiceTestCase {
 	public void addForumWithEmptyNameExpectValidationException() {
 		Forum f = new Forum();
 		f.setName("");
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(1); }});
+		Category category = new Category();
+		category.setId(1);
+		f.setCategory(category);
 		service.add(f);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void addForumWithNullCategoryExpectValidationException() {
-		Forum f = new Forum(); f.setName("f1");
+		Forum f = new Forum();
+		f.setName("f1");
 		f.setCategory(null);
 		service.add(f);
 	}
 
 	@Test(expected = ValidationException.class)
 	public void addForumUsingCategoryWithoutIdExpectValidationException() {
-		Forum f = new Forum(); f.setName("f1");
-		f.setCategory(new Category() {/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
-
-		{ setId(0); }});
+		Forum f = new Forum();
+		f.setName("f1");
+		Category category = new Category();
+		category.setId(0);
+		f.setCategory(category);
 		service.add(f);
 	}
 
 	@Test
 	public void upCategoryOrderExpectToBeInFirstPosition() {
 		final Forum forumToChange = newForumWithOrder(1, 2, newForumWithOrder(2, 1), newForumWithOrder(1, 2));
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(forumToChange));
-			exactly(2).of(repository).update(with(aNonNull(Forum.class)));
-		}});
+		when(repository.get(1)).thenReturn(forumToChange);
 
 		service.upForumOrder(1);
 
-		context.assertIsSatisfied();
+		verify(repository, times(2)).update(notNull(Forum.class));
 		Assert.assertEquals(1, forumToChange.getDisplayOrder());
 	}
 
 	@Test
 	public void downCategoryOrderExpectToBeInLastPosition() {
 		final Forum forumToChange = newForumWithOrder(1, 1, newForumWithOrder(1, 1), newForumWithOrder(2, 2));
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(forumToChange));
-			exactly(2).of(repository).update(with(aNonNull(Forum.class)));
-		}});
+		when(repository.get(1)).thenReturn(forumToChange);
 
 		service.downForumOrder(1);
-		context.assertIsSatisfied();
+
+		verify(repository, times(2)).update(notNull(Forum.class));
 		Assert.assertEquals(2, forumToChange.getDisplayOrder());
 	}
 
 	@Test
 	public void upCategoryOrderCategoryAlreadyFistShouldIgnore() {
 		final Forum forumToChange = newForumWithOrder(1, 1, newForumWithOrder(1, 1), newForumWithOrder(2, 2));
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(forumToChange));
-			exactly(0).of(repository).update(with(aNonNull(Forum.class)));
-		}});
+		when(repository.get(1)).thenReturn(forumToChange);
 
 		service.upForumOrder(1);
-		context.assertIsSatisfied();
+
+		verify(repository, never()).update(notNull(Forum.class));
 	}
 
 	@Test
 	public void downCategoryOrderCategoryAlredyLastShouldIgnore() {
 		final Forum categoryToChange = newForumWithOrder(2, 2, newForumWithOrder(1, 1), newForumWithOrder(2, 2));
-
-		context.checking(new Expectations() {{
-			one(repository).get(2); will(returnValue(categoryToChange));
-			exactly(0).of(repository).update(with(aNonNull(Forum.class)));
-		}});
+		when(repository.get(2)).thenReturn(categoryToChange);
 
 		service.downForumOrder(2);
-		context.assertIsSatisfied();
+
+		verify(repository, never()).update(notNull(Forum.class));
 	}
 
 	private Forum newForumWithOrder(int forumId, int order, final Forum... categoryForums) {
@@ -274,17 +231,10 @@ public class ForumServiceTestCase {
 
 		f.setId(forumId);
 		f.setDisplayOrder(order);
-		f.setCategory(new Category() {
-			/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
+		Category category = mock(Category.class);
+		when(category.getForums()).thenReturn(Arrays.asList(categoryForums));
 
-			@Override
-			public List<Forum> getForums() {
-				return Arrays.asList(categoryForums);
-			}
-		});
+		f.setCategory(category);
 
 		return f;
 	}

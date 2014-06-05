@@ -10,6 +10,9 @@
  */
 package net.jforum.util.mail;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,33 +21,32 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.repository.TopicRepository;
 import net.jforum.util.ConfigKeys;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicReplySpammerTestCase extends MailTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicRepository repository = context.mock(TopicRepository.class);
+	
+	@Mock private TopicRepository repository;
 
 	@Test
 	public void send() {
-		context.checking(new Expectations() {{
-			allowing(repository).getTotalPosts(with(aNonNull(Topic.class))); will(returnValue(10));
-		}});
-
+		when(repository.getTotalPosts(notNull(Topic.class))).thenReturn(10);
+		
 		TopicReplySpammer spammer = new TopicReplySpammer(config);
 		List<User> users = new ArrayList<User>();
 
-		User u1 = new User(); u1.setEmail("email@addres.one");
+		User u1 = new User(); u1.setEmail("email@addres.verify");
 		User u2 = new User(); u2.setEmail("email@addres.two");
 
 		users.add(u1); users.add(u2);

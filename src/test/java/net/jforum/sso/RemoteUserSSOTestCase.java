@@ -10,34 +10,35 @@
  */
 package net.jforum.sso;
 
+import static org.mockito.Mockito.*;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.entities.UserSession;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RemoteUserSSOTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
+	
+	@Mock private JForumConfig config;
+	@Mock private HttpServletRequest request;
 	private UserSession us = new UserSession();
 	private SSO sso;
 
 	@Test
 	public void remoteUserNotNullSessionUserNameDoesNotMatchExpectFalse() {
-		context.checking(new Expectations() {{
-			one(request).getRemoteUser(); will(returnValue("user"));
-		}});
+		when(request.getRemoteUser()).thenReturn("user");
 
 		us.getUser().setUsername("another user");
 
@@ -46,9 +47,7 @@ public class RemoteUserSSOTestCase {
 
 	@Test
 	public void remoteUserNotNullAnonymousUserExpectFalse() {
-		context.checking(new Expectations() {{
-			one(request).getRemoteUser(); will(returnValue("user"));
-		}});
+		when(request.getRemoteUser()).thenReturn("user");
 
 		us.getUser().setId(1);
 
@@ -57,9 +56,7 @@ public class RemoteUserSSOTestCase {
 
 	@Test
 	public void remoteUserNullExpectFalse() {
-		context.checking(new Expectations() {{
-			one(request).getRemoteUser(); will(returnValue(null));
-		}});
+		when(request.getRemoteUser()).thenReturn(null);
 
 		Assert.assertFalse(sso.isSessionValid(us));
 	}
@@ -67,12 +64,10 @@ public class RemoteUserSSOTestCase {
 	@Before
 	public void setup() {
 		us.setRequest(request);
-		
-		 sso = new RemoteUserSSO();
-		 sso.setConfig(config);
 
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.ANONYMOUS_USER_ID); will(returnValue(1));
-		}});
+		sso = new RemoteUserSSO();
+		sso.setConfig(config);
+
+		when(config.getInt(ConfigKeys.ANONYMOUS_USER_ID)).thenReturn(1);
 	}
 }
