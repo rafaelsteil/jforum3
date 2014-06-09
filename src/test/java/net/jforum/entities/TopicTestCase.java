@@ -10,8 +10,8 @@
  */
 package net.jforum.entities;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import junit.framework.Assert;
 import net.jforum.repository.TopicRepository;
 
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TopicTestCase {
 		final Topic topic = new Topic();
 		topic.incrementTotalReplies();
 
-		Assert.assertEquals(2, topic.getTotalPosts());
+		assertEquals(2, topic.getTotalPosts());
 	}
 
 	@Test(expected = IllegalStateException.class)

@@ -17,7 +17,6 @@ import static org.mockito.Mockito.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import junit.framework.Assert;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
@@ -79,9 +78,9 @@ public class PostReportControllerTestCase {
 
 	private void assertMethodModerationRule(String methodName, Class<?>... argumentTypes) throws Exception {
 		Method method = controller.getClass().getMethod(methodName, argumentTypes);
-		Assert.assertNotNull(methodName, method);
-		Assert.assertTrue(methodName, method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(methodName, ModerationRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		assertNotNull(methodName, method);
+		assertTrue(methodName, method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(methodName, ModerationRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test

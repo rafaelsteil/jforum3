@@ -10,12 +10,12 @@
  */
 package net.jforum.services;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Date;
 
-import junit.framework.Assert;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
@@ -63,12 +63,12 @@ public class RSSServiceTestCase {
 		XpathEngine xpath = XMLUnit.newXpathEngine();
 		Document document = XMLUnit.buildControlDocument(result);
 
-		Assert.assertEquals("forum description", xpath.evaluate("//channel/description", document));
-		Assert.assertEquals("http://site.link/forums/show/1.page", xpath.evaluate("//channel/link", document));
-		Assert.assertEquals("channel title", xpath.evaluate("//channel/title", document));
-		Assert.assertEquals("post text 1", xpath.evaluate("//channel/item/description", document));
-		Assert.assertEquals("http://site.link/topics/preList/1/1.page", xpath.evaluate("//channel/item/link", document));
-		Assert.assertEquals("topic 1", xpath.evaluate("//channel/item/title", document));
+		assertEquals("forum description", xpath.evaluate("//channel/description", document));
+		assertEquals("http://site.link/forums/show/1.page", xpath.evaluate("//channel/link", document));
+		assertEquals("channel title", xpath.evaluate("//channel/title", document));
+		assertEquals("post text 1", xpath.evaluate("//channel/item/description", document));
+		assertEquals("http://site.link/topics/preList/1/1.page", xpath.evaluate("//channel/item/link", document));
+		assertEquals("topic 1", xpath.evaluate("//channel/item/title", document));
 	}
 
 	@Before

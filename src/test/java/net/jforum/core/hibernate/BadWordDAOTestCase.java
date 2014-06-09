@@ -10,9 +10,10 @@
  */
 package net.jforum.core.hibernate;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
-import junit.framework.Assert;
 import net.jforum.entities.BadWord;
 import net.jforum.repository.BadWordRepository;
 
@@ -33,7 +34,7 @@ public class BadWordDAOTestCase extends AbstractDAOTestCase<BadWord> {
 		this.insert(w2, dao);
 
 		List<BadWord> words = dao.getAll();
-		Assert.assertEquals(2, words.size());
+		assertEquals(2, words.size());
 	}
 
 	private BadWordRepository newDao() {

@@ -10,11 +10,11 @@
  */
 package net.jforum.core.events.post;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
-import junit.framework.Assert;
 import net.jforum.entities.BadWord;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
@@ -49,7 +49,7 @@ public class BadWordEventTestCase {
 
 		event.beforeAdd(p);
 		
-		Assert.assertEquals("some content wordABCeditor more content", p.getText());
+		assertEquals("some content wordABCeditor more content", p.getText());
 	}
 
 	@Test
@@ -67,6 +67,6 @@ public class BadWordEventTestCase {
 
 		event.beforeAdd(p);
 		
-		Assert.assertEquals("some content of post 1. This is replacement1, and this is replacement2. End", p.getText());
+		assertEquals("some content of post 1. This is replacement1, and this is replacement2. End", p.getText());
 	}
 }

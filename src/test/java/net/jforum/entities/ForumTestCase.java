@@ -10,8 +10,8 @@
  */
 package net.jforum.entities;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import junit.framework.Assert;
 import net.jforum.repository.ForumRepository;
 
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class ForumTestCase {
 	public void getTopicsPendingModerationForumIsNotModeratedShouldReturnEmptyList() {
 		Forum forum = new Forum();
 		forum.setModerated(false);
-		Assert.assertEquals(0, forum.getTopicsPendingModeration().size());
+		assertEquals(0, forum.getTopicsPendingModeration().size());
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class ForumTestCase {
 	public void getModeratorsForumIsNotModeratedExpectEmptyList() {
 		Forum forum = new Forum();
 		forum.setModerated(false);
-		Assert.assertEquals(0, forum.getModerators().size());
+		assertEquals(0, forum.getModerators().size());
 	}
 
 	@Test

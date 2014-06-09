@@ -11,14 +11,11 @@
 package net.jforum.controllers;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import junit.framework.Assert;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
@@ -32,10 +29,7 @@ import net.jforum.repository.SearchRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -43,7 +37,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
@@ -89,11 +82,11 @@ public class SearchControllerTestCase {
 		assertEquals(params, mockResult.included("searchParams"));
 		assertEquals(new Pagination(config, 0), mockResult.included("pagination"));
 		assertEquals(new ArrayList<Category>(), mockResult.included("categories"));
-		Assert.assertEquals(2, result.getTotalRecords());
-		Assert.assertEquals(2, result.getResults().size());
+		assertEquals(2, result.getTotalRecords());
+		assertEquals(2, result.getResults().size());
 		Post post = new Post();
 		post.setId(3);
-		Assert.assertFalse(result.getResults().contains(post));
+		assertFalse(result.getResults().contains(post));
 	}
 
 	@Test

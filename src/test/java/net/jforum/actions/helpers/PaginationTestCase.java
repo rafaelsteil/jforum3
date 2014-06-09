@@ -10,8 +10,8 @@
  */
 package net.jforum.actions.helpers;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import junit.framework.Assert;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 import net.jforum.entities.util.Pagination;
@@ -33,62 +33,62 @@ public class PaginationTestCase {
 	public void pagination1() {
 		Pagination p = this.newPagination(5, 20, 0);
 
-		Assert.assertEquals(1, p.getThisPage());
-		Assert.assertEquals(4, p.getTotalPages());
+		assertEquals(1, p.getThisPage());
+		assertEquals(4, p.getTotalPages());
 	}
 
 	@Test
 	public void pagination2() {
 		Pagination p = this.newPagination(5, 19, 0);
-		Assert.assertEquals(4, p.getTotalPages());
+		assertEquals(4, p.getTotalPages());
 	}
 
 	@Test
 	public void pagination3() {
 		Pagination p = this.newPagination(3, 30, 0);
-		Assert.assertEquals(10, p.getTotalPages());
+		assertEquals(10, p.getTotalPages());
 	}
 
 	@Test
 	public void pagination4() {
 		Pagination p = this.newPagination(3, 31, 0);
-		Assert.assertEquals(11, p.getTotalPages());
+		assertEquals(11, p.getTotalPages());
 	}
 
 	@Test
 	public void pagination5() {
 		Pagination p = this.newPagination(7, 543, 0);
-		Assert.assertEquals(78, p.getTotalPages());
+		assertEquals(78, p.getTotalPages());
 	}
 
 	@Test
 	public void pageShouldNotBeBiggerThanTotalPages() {
 		Pagination p = this.newPagination(10, 50, 100);
-		Assert.assertEquals(p.getTotalPages(), p.getThisPage());
+		assertEquals(p.getTotalPages(), p.getThisPage());
 	}
 
 	@Test
 	public void pageZeroThisPageShouldBeOne() {
 		Pagination p = this.newPagination(30, 100, 0);
-		Assert.assertEquals(1, p.getThisPage());
+		assertEquals(1, p.getThisPage());
 	}
 
 	@Test
 	public void pageZeroStartShouldBeZero() {
 		Pagination p = this.newPagination(30, 100, 0);
-		Assert.assertEquals(0, p.getStart());
+		assertEquals(0, p.getStart());
 	}
 
 	@Test
 	public void pageOneStartShouldBeZero() {
 		Pagination p = this.newPagination(30, 100, 1);
-		Assert.assertEquals(0, p.getStart());
+		assertEquals(0, p.getStart());
 	}
 
 	@Test
 	public void pageTwoStartShouldBeProportional() {
 		Pagination p = this.newPagination(30, 100, 2);
-		Assert.assertEquals(30, p.getStart());
+		assertEquals(30, p.getStart());
 	}
 
 	@Test
@@ -102,12 +102,12 @@ public class PaginationTestCase {
 
 		Pagination p = new Pagination(config, 3).forForum(forum);
 
-		Assert.assertEquals(10, p.getRecordsPerPage());
-		Assert.assertEquals(50, p.getTotalRecords());
-		Assert.assertEquals(5, p.getTotalPages());
-		Assert.assertEquals(3, p.getThisPage());
-		Assert.assertEquals(20, p.getStart());
-		Assert.assertEquals(String.format("/%s/%s", Domain.FORUMS, Actions.SHOW), p.getBaseUrl());
+		assertEquals(10, p.getRecordsPerPage());
+		assertEquals(50, p.getTotalRecords());
+		assertEquals(5, p.getTotalPages());
+		assertEquals(3, p.getThisPage());
+		assertEquals(20, p.getStart());
+		assertEquals(String.format("/%s/%s", Domain.FORUMS, Actions.SHOW), p.getBaseUrl());
 	}
 
 	@Test
@@ -121,12 +121,12 @@ public class PaginationTestCase {
 
 		Pagination p = new Pagination(config, 3).forTopic(topic);
 
-		Assert.assertEquals(10, p.getRecordsPerPage());
-		Assert.assertEquals(50, p.getTotalRecords());
-		Assert.assertEquals(5, p.getTotalPages());
-		Assert.assertEquals(3, p.getThisPage());
-		Assert.assertEquals(20, p.getStart());
-		Assert.assertEquals(String.format("/%s/%s", Domain.TOPICS, Actions.LIST), p.getBaseUrl());
+		assertEquals(10, p.getRecordsPerPage());
+		assertEquals(50, p.getTotalRecords());
+		assertEquals(5, p.getTotalPages());
+		assertEquals(3, p.getThisPage());
+		assertEquals(20, p.getStart());
+		assertEquals(String.format("/%s/%s", Domain.TOPICS, Actions.LIST), p.getBaseUrl());
 	}
 
 	private Pagination newPagination(int recordsPerPage, int totalRecords, int page) {
