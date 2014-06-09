@@ -10,6 +10,11 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,74 +37,58 @@ import net.jforum.util.TestCaseUtils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SearchControllerTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private CategoryRepository categoryRepository = context
-			.mock(CategoryRepository.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private SearchRepository searchRepository = context
-			.mock(SearchRepository.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private SearchController controller = new SearchController(categoryRepository,
-			config, searchRepository, userSession, mockResult);
+	
+	@Mock private CategoryRepository categoryRepository;
+	@Mock private JForumConfig config;
+	@Mock private SearchRepository searchRepository;
+	@Mock private UserSession userSession;
+	@Mock private RoleManager roleManager;
+	@Spy private MockResult mockResult;
+	@InjectMocks private SearchController controller;
 
 	@Test
 	public void executeWithEmptyQueryShouldRedirectToFilters() {
-		context.checking(new Expectations() {
-			{
-				one(mockResult).redirectTo(Actions.FILTERS);
-			}
-		});
-
 		SearchParams params = new SearchParams();
 		params.setQuery("");
+		
 		controller.execute(params);
+		
+		verify(mockResult).redirectTo(Actions.FILTERS);
 	}
 
 	@Test
-	public void executeFindThreeRecordsOneIsNotAllowedShouldRemoveExpectTwoRecords()
-			throws Exception {
-		final SearchResult result = new SearchResult(new ArrayList<Post>(
-				Arrays.asList(this.newPost(1, 1), this.newPost(2, 1),
-						this.newPost(3, 2))), 3);
+	public void executeFindThreeRecordsOneIsNotAllowedShouldRemoveExpectTwoRecords() throws Exception {
+		final SearchResult result = new SearchResult(new ArrayList<Post>(Arrays.asList(this.newPost(1, 1), this.newPost(2, 1), this.newPost(3, 2))), 3);
 		final SearchParams params = new SearchParams();
 		params.setQuery("abc");
 
-		context.checking(new Expectations() {
-			{
-				allowing(config).getInt(ConfigKeys.TOPICS_PER_PAGE);
-				will(returnValue(30));
-				allowing(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(searchRepository).search(params);
-				will(returnValue(result));
-				allowing(roleManager).isForumAllowed(1);
-				will(returnValue(true));
-				allowing(roleManager).isForumAllowed(2);
-				will(returnValue(false));
-				one(categoryRepository).getAllCategories();
-				will(returnValue(new ArrayList<Category>()));
-
-				one(mockResult).include("results", result.getResults());
-				one(mockResult).include("searchParams", params);
-				one(mockResult)
-						.include("pagination", new Pagination(config, 0));
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
-			}
-		});
-
+		when(config.getInt(ConfigKeys.TOPICS_PER_PAGE)).thenReturn(30);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(searchRepository.search(params)).thenReturn(result);
+		when(roleManager.isForumAllowed(1)).thenReturn(true);
+		when(roleManager.isForumAllowed(2)).thenReturn(false);
+		when(categoryRepository.getAllCategories()).thenReturn(new ArrayList<Category>());
+			
 		controller.execute(params);
-		context.assertIsSatisfied();
+		
+		assertEquals(result.getResults(), mockResult.included("results"));
+		assertEquals(params, mockResult.included("searchParams"));
+		assertEquals(new Pagination(config, 0), mockResult.included("pagination"));
+		assertEquals(new ArrayList<Category>(), mockResult.included("categories"));
 		Assert.assertEquals(2, result.getTotalRecords());
 		Assert.assertEquals(2, result.getResults().size());
 		Post post = new Post();
@@ -109,17 +98,11 @@ public class SearchControllerTestCase {
 
 	@Test
 	public void filter() {
-		context.checking(new Expectations() {
-			{
-				one(categoryRepository).getAllCategories();
-				will(returnValue(new ArrayList<Category>()));
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
-			}
-		});
-
+		when(categoryRepository.getAllCategories()).thenReturn(new ArrayList<Category>());
+	
 		controller.filters();
-		context.assertIsSatisfied();
+		
+		assertEquals(new ArrayList<Category>(), mockResult.included("categories"));
 	}
 
 	private Post newPost(int postId, int forumId) {

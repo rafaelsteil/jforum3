@@ -10,8 +10,8 @@
  */
 package net.jforum.services;
 
-//import net.jforum.actions.helpers.PermissionOptions;
-import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Group;
@@ -19,54 +19,52 @@ import net.jforum.entities.UserSession;
 import net.jforum.repository.GroupRepository;
 import net.jforum.repository.UserRepository;
 import net.jforum.security.RoleManager;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+//import net.jforum.actions.helpers.PermissionOptions;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class GroupServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private GroupRepository repository = context.mock(GroupRepository.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private UserRepository userRepository = context.mock(UserRepository.class);
-	private GroupService service = new GroupService(repository, userRepository, userSession, sessionManager);
+
+	@Mock private GroupRepository repository;
+	@Mock private SessionManager sessionManager;
+	@Mock private UserSession userSession;
+	@Mock private RoleManager roleManager;
+	@Mock private UserRepository userRepository;
+	@InjectMocks private GroupService service;
 
 	@Test
 	@Ignore("test must be fixed, permission problem")
 	public void savePermissions() {
-		fail("test must be fixed, permission problem");
 		final Group group = new Group();
 
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(userRepository).changeAllowAvatarState(false, group);
-			one(sessionManager).computeAllOnlineModerators();
-			one(repository).get(1); will(returnValue(new Group()));
-			one(repository).update(group);
-		}});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(repository.get(1)).thenReturn(new Group());
 
-//TODO: service.savePermissions(1, new PermissionOptions());
-		context.assertIsSatisfied();
+		//TODO: service.savePermissions(1, new PermissionOptions());
+
+		verify(userRepository).changeAllowAvatarState(false, group);
+		verify(sessionManager).computeAllOnlineModerators();
+		verify(repository).update(group);
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(new Group()));
-			one(repository).get(2); will(returnValue(new Group()));
-			exactly(2).of(repository).remove(with(aNonNull(Group.class)));
-		}});
+		when(repository.get(1)).thenReturn(new Group());
+		when(repository.get(2)).thenReturn(new Group());
 
 		service.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(repository, times(2)).remove(notNull(Group.class));
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -107,12 +105,9 @@ public class GroupServiceTestCase {
 		g.setName("g1");
 		g.setId(2);
 
-		context.checking(new Expectations() {{
-			one(repository).update(with(aNonNull(Group.class)));
-		}});
-
 		service.update(g);
-		context.assertIsSatisfied();
+
+		verify(repository).update(notNull(Group.class));
 	}
 
 	@Test
@@ -120,12 +115,9 @@ public class GroupServiceTestCase {
 		Group g = new Group();
 		g.setName("g1");
 
-		context.checking(new Expectations() {{
-			one(repository).add(with(aNonNull(Group.class)));
-		}});
-
 		service.add(g);
-		context.assertIsSatisfied();
+
+		verify(repository).add(notNull(Group.class));
 	}
 
 	@Test(expected = NullPointerException.class)

@@ -10,6 +10,9 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,59 +28,75 @@ import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.States;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ModerationServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private PostRepository postRepository = context.mock(PostRepository.class);
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-    private JForumConfig config = context.mock(JForumConfig.class);
-    private ModerationLog moderationLog = new ModerationLog();
-    private ModerationLogRepository moderationLogRepository = context.mock(ModerationLogRepository.class);
-    private ModerationLogService moderationLogService = new ModerationLogService(config, moderationLogRepository, topicRepository);
-	private ModerationService service = new ModerationService(postRepository, forumRepository, topicRepository, moderationLogService);
-	private States state = context.states("state");
+
+	@Mock private ForumRepository forumRepository;
+	@Mock private PostRepository postRepository;
+	@Mock private TopicRepository topicRepository;
+	@Mock private JForumConfig config;
+	private ModerationLog moderationLog = new ModerationLog();
+	@Mock private ModerationLogRepository moderationLogRepository;
+	private ModerationLogService moderationLogService;
+	private ModerationService service;
+	//private States state = context.states("state");
+	private Post post1 = new Post();
+	private Post post2 = new Post();
+	private Post post5 = new Post();
+	private Post post6 = new Post();
+
+	@Before
+	public void setup() {
+		moderationLogService = new ModerationLogService(config, moderationLogRepository, topicRepository);
+		service = new ModerationService(postRepository, forumRepository, topicRepository, moderationLogService);
+		
+		post1.setId(1);
+		post2.setId(2);
+		post5.setId(5);
+		post6.setId(6);
+		
+		when(forumRepository.get(1)).thenReturn(new Forum()); //when(state.isNot("move");
+	//	allowing(forumRepository); when(state.isNot("move"));
+	}
 
 	@Test
 	public void moveTopics() {
-		state.become("move");
+	//	state.become("move");
 
 		final Forum oldForum = new Forum(); oldForum.setId(1); oldForum.setLastPost(null);
 		final Forum targetForum = new Forum(); targetForum.setId(2); targetForum.setLastPost(null);
 		final Topic topic = new Topic(); topic.setId(3); topic.setMovedId(0); topic.setForum(oldForum);
 
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED); will(returnValue(true));
-			one(forumRepository).get(2); will(returnValue(targetForum));
-			allowing(topicRepository).get(3); will(returnValue(topic));
-			one(forumRepository).moveTopics(targetForum, topic.getId());
-			one(forumRepository).getLastPost(oldForum); will(returnValue(new Post() {{ setId(5); }}));
-			one(forumRepository).getLastPost(targetForum); will(returnValue(new Post() {{ setId(6); }}));
-			one(moderationLogRepository).add(with(any(ModerationLog.class)));
-		}});
+		when(config.getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED)).thenReturn(true);
+		when(forumRepository.get(2)).thenReturn(targetForum);
+		when(topicRepository.get(3)).thenReturn(topic);
+		when(forumRepository.getLastPost(oldForum)).thenReturn(post5);
+		when(forumRepository.getLastPost(targetForum)).thenReturn(post6);
 
 		service.moveTopics(2, moderationLog, 3);
-		context.assertIsSatisfied();
 
-		Assert.assertEquals(targetForum.getLastPost(), new Post() {{ setId(6); }});
-		Assert.assertEquals(oldForum.getLastPost(), new Post() {{ setId(5); }});
+		verify(moderationLogRepository).add(any(ModerationLog.class));
+		verify(forumRepository).moveTopics(targetForum, topic.getId());
+		assertEquals(targetForum.getLastPost(), post6); 
+		assertEquals(oldForum.getLastPost(), post5); 
 	}
 
 	@Test
 	public void moveTopicsEmptyListShouldIgnore() {
-		state.become("move");
 		service.moveTopics(1, null);
+		
+		verifyZeroInteractions(forumRepository);
 	}
 
 	@Test
@@ -85,17 +104,17 @@ public class ModerationServiceTestCase {
 		final Topic lockedTopic = new Topic(); lockedTopic.lock();
 		final Topic unlockedTopic = new Topic(); unlockedTopic.unlock();
 
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED); will(returnValue(false));
-			one(topicRepository).get(1); will(returnValue(lockedTopic));
-			one(topicRepository).get(2); will(returnValue(unlockedTopic));
-		}});
 
-        int[] ids = {1, 2};
+		when(config.getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED)).thenReturn(false);
+		when(topicRepository.get(1)).thenReturn(lockedTopic);
+		when(topicRepository.get(2)).thenReturn(unlockedTopic);
+
+
+		int[] ids = {1, 2};
 		service.lockUnlock(ids, moderationLog);
-		context.assertIsSatisfied();
-		Assert.assertFalse(lockedTopic.isLocked());
-		Assert.assertTrue(unlockedTopic.isLocked());
+
+		assertFalse(lockedTopic.isLocked());
+		assertTrue(unlockedTopic.isLocked());
 	}
 
 	@Test
@@ -107,28 +126,23 @@ public class ModerationServiceTestCase {
 	public void deleteTopics() {
 		final Topic topic = new Topic(); topic.setId(1);
 
-		context.checking(new Expectations() {{
-			one(config).getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED); will(returnValue(false));
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(topicRepository).remove(topic);
-		}});
+		when(config.getBoolean(ConfigKeys.MODERATION_LOGGING_ENABLED)).thenReturn(false);
+		when(topicRepository.get(1)).thenReturn(topic);
 
 		service.deleteTopics(Arrays.asList(topic), moderationLog);
-		context.assertIsSatisfied();
+		
+		verify(topicRepository).remove(topic);
 	}
 
 	@Test
 	public void reject() {
-		context.checking(new Expectations() {{
-			Post post = new Post() {{ setId(1); }};
-			one(postRepository).get(1); will(returnValue(post));
-			one(postRepository).remove(post);
-		}});
+		when(postRepository.get(1)).thenReturn(post1);
 
 		ApproveInfo info = new ApproveInfo();
 		info.setPostId(1); info.setStatus(ApproveInfo.REJECT);
 		service.doApproval(1, this.asList(info));
-		context.assertIsSatisfied();
+
+		verify(postRepository).remove(post1);
 	}
 
 	@Test
@@ -137,42 +151,38 @@ public class ModerationServiceTestCase {
 		Topic topic = new Topic(); topic.setPendingModeration(true); topic.setLastPost(null);
 		post.setTopic(topic);
 
-		context.checking(new Expectations() {{
-			one(postRepository).get(1); will(returnValue(post));
-			one(topicRepository).getLastPost(post.getTopic()); will(returnValue(post));
-		}});
+		when(postRepository.get(1)).thenReturn(post);
+		when(topicRepository.getLastPost(post.getTopic())).thenReturn(post);
 
 		ApproveInfo info = new ApproveInfo();
 		info.setPostId(1); info.setStatus(ApproveInfo.APPROVE);
 		service.doApproval(1, this.asList(info));
-		context.assertIsSatisfied();
-		Assert.assertEquals(1, post.getUser().getTotalPosts());
-		Assert.assertFalse(topic.isWaitingModeration());
-		Assert.assertFalse(post.isWaitingModeration());
-		Assert.assertEquals(0, topic.getTotalReplies());
-		Assert.assertEquals(post, topic.getLastPost());
+
+		assertEquals(1, post.getUser().getTotalPosts());
+		assertFalse(topic.isWaitingModeration());
+		assertFalse(post.isWaitingModeration());
+		assertEquals(0, topic.getTotalReplies());
+		assertEquals(post, topic.getLastPost());
 	}
 
 	@Test
 	public void approvePostInExistingTopicShouldIncrementTotalRepliesAndTotalUserPosts() {
-		Topic topic = new Topic(); topic.setPendingModeration(false); topic.setLastPost(new Post() {{ setId(2); }});
+		Topic topic = new Topic(); topic.setPendingModeration(false); topic.setLastPost(post2); 
 
 		final Post post = new Post(); post.setId(1); post.setModerate(true);
 		post.setTopic(topic); post.setUser(new User());
 
-		context.checking(new Expectations() {{
-			one(postRepository).get(1); will(returnValue(post));
-			one(topicRepository).getLastPost(post.getTopic()); will(returnValue(post));
-		}});
+		when(postRepository.get(1)).thenReturn(post);
+		when(topicRepository.getLastPost(post.getTopic())).thenReturn(post);
 
 		ApproveInfo info = new ApproveInfo();
 		info.setPostId(1); info.setStatus(ApproveInfo.APPROVE);
 		service.doApproval(1, this.asList(info));
-		context.assertIsSatisfied();
-		Assert.assertEquals(1, post.getUser().getTotalPosts());
-		Assert.assertFalse(post.isWaitingModeration());
-		Assert.assertEquals(1, topic.getTotalReplies());
-		Assert.assertEquals(post, topic.getLastPost());
+
+		assertEquals(1, post.getUser().getTotalPosts());
+		assertFalse(post.isWaitingModeration());
+		assertEquals(1, topic.getTotalReplies());
+		assertEquals(post, topic.getLastPost());
 	}
 
 	@Test
@@ -185,14 +195,6 @@ public class ModerationServiceTestCase {
 	@Test
 	public void approveNullInfoShouldIgnore() {
 		service.doApproval(1, null);
-	}
-
-	@Before
-	public void setup() {
-		context.checking(new Expectations() {{
-			allowing(forumRepository).get(1); will(returnValue(new Forum())); when(state.isNot("move"));
-			allowing(forumRepository); when(state.isNot("move"));
-		}});
 	}
 
 	private List<ApproveInfo> asList(ApproveInfo info) {

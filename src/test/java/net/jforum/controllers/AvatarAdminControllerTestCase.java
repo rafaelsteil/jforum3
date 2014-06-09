@@ -10,31 +10,38 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 
 import net.jforum.actions.helpers.Actions;
 import net.jforum.entities.Avatar;
 import net.jforum.repository.AvatarRepository;
 import net.jforum.services.AvatarService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
 
+/**
+ * @author Rafael Steil, Jonatan Cloutier
+ */
+@RunWith(MockitoJUnitRunner.class)
 public class AvatarAdminControllerTestCase extends AdminTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private AvatarRepository repository = context.mock(AvatarRepository.class);
-	private AvatarService service = context.mock(AvatarService.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private AvatarAdminController mockAdminController = context
-			.mock(AvatarAdminController.class);
-	private AvatarAdminController avatarAction = new AvatarAdminController(
-			mockResult, repository, service);
+	
+	@Mock private AvatarRepository repository;
+	@Mock private AvatarService service;
+	@Spy private MockResult mockResult;
+	@Mock private AvatarAdminController mockAdminController;
+	@InjectMocks private AvatarAdminController avatarAction;
 
 	public AvatarAdminControllerTestCase() {
 		super(SmilieAdminController.class);
@@ -42,92 +49,55 @@ public class AvatarAdminControllerTestCase extends AdminTestCase {
 
 	@Test
 	public void edit() {
-		context.checking(new Expectations() {
-			{
-				one(repository).get(1);
-				will(returnValue(new Avatar()));
-				one(mockResult).include("avatar", new Avatar());
-				one(mockResult).forwardTo(Actions.ADD);
-			}
-		});
-
+		when(repository.get(1)).thenReturn(new Avatar());
+			
 		avatarAction.edit(1);
-		context.assertIsSatisfied();
+
+		assertEquals(new Avatar(), mockResult.included("avatar"));
+		verify(mockResult).forwardTo(Actions.ADD);
 	}
 
 	@Test
 	public void editSave() {
-		context.checking(new Expectations() {
-			{
-				one(service).update(with(aNonNull(Avatar.class)),
-						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(avatarAction);
-				will(returnValue(mockAdminController));
-				one(mockAdminController).list();
-			}
-		});
+		when(mockResult.redirectTo(avatarAction)).thenReturn(mockAdminController);
 
 		avatarAction.editSave(new Avatar(), null);
-		context.assertIsSatisfied();
+
+		verify(service).update(notNull(Avatar.class), isNull(UploadedFile.class));
+		verify(mockAdminController).list();
 	}
 
 	@Test
 	public void delete() {
 		final Avatar avatar = new Avatar();
-
-		context.checking(new Expectations() {
-			{
-
-				one(repository).get(1);
-				will(returnValue(avatar));
-				one(repository).remove(avatar);
-				one(repository).get(2);
-				will(returnValue(avatar));
-				one(repository).remove(avatar);
-				one(repository).get(3);
-				will(returnValue(avatar));
-				one(repository).remove(avatar);
-				one(mockResult).redirectTo(avatarAction);
-				will(returnValue(mockAdminController));
-				one(mockAdminController).list();
-
-			}
-		});
+		
+		when(repository.get(1)).thenReturn(avatar);
+		when(repository.get(2)).thenReturn(avatar);
+		when(repository.get(3)).thenReturn(avatar);
+		when(mockResult.redirectTo(avatarAction)).thenReturn(mockAdminController);
 
 		avatarAction.delete(1, 2, 3);
-		context.assertIsSatisfied();
+
+		verify(repository, times(3)).remove(avatar);
+		verify(mockAdminController).list();
 	}
 
 	@Test
 	public void listExpectOneRecord() {
-		context.checking(new Expectations() {
-			{
-				one(repository).getGalleryAvatar();
-				will(returnValue(new ArrayList<Avatar>()));
-				one(repository).getUploadedAvatar();
-				will(returnValue(new ArrayList<Avatar>()));
-				one(mockResult).include("GalleryAvatars",
-						new ArrayList<Avatar>());
-				one(mockResult).include("UploadedAvatars",
-						new ArrayList<Avatar>());
-			}
-		});
-
+		when(repository.getGalleryAvatar()).thenReturn(new ArrayList<Avatar>());
+		when(repository.getUploadedAvatar()).thenReturn(new ArrayList<Avatar>());
+	
 		avatarAction.list();
-		context.assertIsSatisfied();
+
+		assertEquals(new ArrayList<Avatar>(), mockResult.included("GalleryAvatars"));
+		assertEquals(new ArrayList<Avatar>(), mockResult.included("UploadedAvatars"));
 	}
 
 	@Test
 	public void addSave() {
-		context.checking(new Expectations() {
-			{
-				one(service).add(with(aNonNull(Avatar.class)),
-						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(Actions.LIST);
-			}
-		});
-
 		avatarAction.addSave(new Avatar(), null);
-		context.assertIsSatisfied();
+		
+		verify(service).add(notNull(Avatar.class), isNull(UploadedFile.class));
+		verify(mockResult).redirectTo(Actions.LIST);
 	}
 }

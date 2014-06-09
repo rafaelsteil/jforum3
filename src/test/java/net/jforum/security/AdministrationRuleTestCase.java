@@ -10,76 +10,66 @@
  */
 package net.jforum.security;
 
+import static org.mockito.Mockito.*;
+import static junit.framework.Assert.*;
+
 import javax.servlet.http.HttpServletRequest;
 
-import junit.framework.Assert;
 import net.jforum.entities.UserSession;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AdministrationRuleTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserSession userSession = context.mock(UserSession.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
+
+	@Mock private UserSession userSession;
+	@Mock private HttpServletRequest request;
+	@Mock private RoleManager roleManager;
 	private AdministrationRule rule = new AdministrationRule();
 
 	@Test
 	public void loggedIsAdministratorShouldAccept() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isAdministrator(); will(returnValue(true));
-		}});
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isAdministrator()).thenReturn(true);
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertTrue(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void loggedIsCoAdministratorShouldAccept() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(true));
-		}});
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isCoAdministrator()).thenReturn(true);
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+
+		assertTrue(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void notAdministratorShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(false));
-		}});
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isCoAdministrator()).thenReturn(false);
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void notLoggedShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(false));
-		}});
+		when(userSession.isLogged()).thenReturn(false);
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
 	}
 
 	@Before
 	public void setup() {
-		context.checking(new Expectations() {{
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-		}});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
 	}
 }

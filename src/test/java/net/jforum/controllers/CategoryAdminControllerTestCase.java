@@ -10,34 +10,36 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 
 import net.jforum.entities.Category;
 import net.jforum.repository.CategoryRepository;
 import net.jforum.services.CategoryService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CategoryAdminControllerTestCase extends AdminTestCase {
 
-	private Mockery context = TestCaseUtils.newMockery();
+	
 	private CategoryAdminController action;
-	private final CategoryRepository repository = context
-			.mock(CategoryRepository.class);
-	private final CategoryService service = context.mock(CategoryService.class);
-	private CategoryAdminController mockCategoryAdminController = context
-			.mock(CategoryAdminController.class);
-	private Result mockResult = context.mock(MockResult.class);
+	@Mock private CategoryRepository repository;
+	@Mock private CategoryService service;
+	@Mock private CategoryAdminController mockCategoryAdminController;
+	@Spy private MockResult mockResult;
 
 	public CategoryAdminControllerTestCase() {
 		super(CategoryAdminController.class);
@@ -45,17 +47,12 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {
-			{
-				one(service).delete(1, 2);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockCategoryAdminController));
-				one(mockCategoryAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(action)).thenReturn(mockCategoryAdminController);
+			
 		action.delete(1, 2);
-		context.assertIsSatisfied();
+		
+		verify(mockCategoryAdminController).list();
+		verify(service).delete(1, 2);
 	}
 
 	@Test
@@ -65,53 +62,37 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 		c.setName("c1");
 		c.setModerated(false);
 		c.setDisplayOrder(1);
-
-		context.checking(new Expectations() {
-			{
-				one(service).add(c);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockCategoryAdminController));
-				one(mockCategoryAdminController).list();
-			}
-		});
-
+		
+		when(mockResult.redirectTo(action)).thenReturn(mockCategoryAdminController);
+			
 		action.addSave(c);
-		context.assertIsSatisfied();
+		
+		verify(mockCategoryAdminController).list();
+		verify(service).add(c);
 	}
 
 	@Test
 	public void editExpectACategory() {
-		context.checking(new Expectations() {
-			{
-				one(repository).get(5);
-				will(returnValue(new Category()));
-				one(mockResult).include("category", new Category());
-				one(mockResult).forwardTo(action);
-				will(returnValue(mockCategoryAdminController));
-				one(mockCategoryAdminController).add();
-			}
-		});
-
+		when(repository.get(5)).thenReturn(new Category());
+		when(mockResult.forwardTo(action)).thenReturn(mockCategoryAdminController);
+		
 		action.edit(5);
-		context.assertIsSatisfied();
+		
+		assertEquals(new Category(), mockResult.included("category"));
+		verify(mockCategoryAdminController).add();
 	}
 
 	@Test
 	public void editSave() {
 		final Category c = new Category();
 		c.setId(2);
-
-		context.checking(new Expectations() {
-			{
-				one(service).update(c);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockCategoryAdminController));
-				one(mockCategoryAdminController).list();
-			}
-		});
-
+		
+		when(mockResult.redirectTo(action)).thenReturn(mockCategoryAdminController);
+			
 		action.editSave(c);
-		context.assertIsSatisfied();
+		
+		verify(service).update(c);
+		verify(mockCategoryAdminController).list();
 	}
 
 	/**
@@ -120,17 +101,11 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 	 */
 	@Test
 	public void list() {
-		context.checking(new Expectations() {
-			{
-				one(repository).getAllCategories();
-				will(returnValue(new ArrayList<Category>()));
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
-			}
-		});
-
+		when(repository.getAllCategories()).thenReturn(new ArrayList<Category>());
+			
 		action.list();
-		context.assertIsSatisfied();
+		
+		assertEquals(new ArrayList<Category>(), mockResult.included("categories"));
 	}
 
 	/**
@@ -140,17 +115,12 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 	 */
 	@Test
 	public void up() {
-		context.checking(new Expectations() {
-			{
-				one(service).upCategoryOrder(1);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockCategoryAdminController));
-				one(mockCategoryAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(action)).thenReturn(mockCategoryAdminController);
+			
 		action.up(1);
-		context.assertIsSatisfied();
+		
+		verify(service).upCategoryOrder(1);
+		verify(mockCategoryAdminController).list();
 	}
 
 	/**
@@ -160,17 +130,13 @@ public class CategoryAdminControllerTestCase extends AdminTestCase {
 	 */
 	@Test
 	public void down() {
-		context.checking(new Expectations() {
-			{
-				one(service).downCategoryOrder(2);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockCategoryAdminController));
-				one(mockCategoryAdminController).list();
-			}
-		});
+		when(mockResult.redirectTo(action)).thenReturn(mockCategoryAdminController);
+			
 
 		action.down(2);
-		context.assertIsSatisfied();
+		
+		verify(service).downCategoryOrder(2);
+		verify(mockCategoryAdminController).list();
 	}
 
 	@Before

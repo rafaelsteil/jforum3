@@ -10,33 +10,35 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import net.jforum.entities.BadWord;
 import net.jforum.repository.BadWordRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BadWordControllerActionsTestCase extends AdminTestCase {
 
-	private Mockery context = TestCaseUtils.newMockery();
-	private BadWordRepository repository = context
-			.mock(BadWordRepository.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private BadWordAdminController mockBadWordAdminController = context
-			.mock(BadWordAdminController.class);
-	private BadWordAdminController action = new BadWordAdminController(
-			mockResult, repository);
+	
+	@Mock private BadWordRepository repository;
+	@Spy private MockResult mockResult;
+	@Mock private BadWordAdminController mockBadWordAdminController;
+	@InjectMocks private BadWordAdminController action;
 
 	public BadWordControllerActionsTestCase() {
 		super(BadWordAdminController.class);
@@ -44,108 +46,71 @@ public class BadWordControllerActionsTestCase extends AdminTestCase {
 
 	@Test
 	public void deleteUsingNullShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockBadWordAdminController));
-				one(mockBadWordAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(action)).thenReturn(mockBadWordAdminController);
+	
 		action.delete(null);
-		context.assertIsSatisfied();
+
+		verify(mockBadWordAdminController).list();
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {
-			{
-				BadWord w1 = new BadWord();
-				BadWord w2 = new BadWord();
+		BadWord w1 = new BadWord();
+		BadWord w2 = new BadWord();
 
-				one(repository).get(1);
-				will(returnValue(w1));
-				one(repository).get(2);
-				will(returnValue(w2));
-
-				one(repository).remove(w1);
-				one(repository).remove(w2);
-
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockBadWordAdminController));
-				one(mockBadWordAdminController).list();
-			}
-		});
-
+		when(repository.get(1)).thenReturn(w1);
+		when(repository.get(2)).thenReturn(w2);
+		when(mockResult.redirectTo(action)).thenReturn(mockBadWordAdminController);
+			
 		action.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(repository).remove(w1);
+		verify(repository).remove(w2);
+		verify(mockBadWordAdminController).list();
 	}
 
 	@Test
 	public void list() {
-		context.checking(new Expectations() {
-			{
-				List<BadWord> list = new ArrayList<BadWord>();
-				one(repository).getAll();
-				will(returnValue(list));
-				one(mockResult).include("words", list);
-			}
-		});
-
+		List<BadWord> list = new ArrayList<BadWord>();
+		when(repository.getAll()).thenReturn(list);
+			
 		action.list();
-		context.assertIsSatisfied();
+
+		assertEquals(list, mockResult.included("words"));
 	}
 
 	@Test
 	public void addSave() {
 		final BadWord word = new BadWord();
-
-		context.checking(new Expectations() {
-			{
-				one(repository).add(word);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockBadWordAdminController));
-				one(mockBadWordAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(action)).thenReturn(mockBadWordAdminController);
+	
 		action.addSave(word);
-		context.assertIsSatisfied();
+
+		verify(repository).add(word);
+		verify(mockBadWordAdminController).list();
 	}
 
 	@Test
 	public void edit() {
 		final BadWord word = new BadWord();
-
-		context.checking(new Expectations() {
-			{
-				one(repository).get(1);
-				will(returnValue(word));
-				one(mockResult).include("word", word);
-				one(mockResult).forwardTo(action);
-				will(returnValue(mockBadWordAdminController));
-				one(mockBadWordAdminController).add();
-			}
-		});
-
+		
+		when(repository.get(1)).thenReturn(word);
+		when(mockResult.forwardTo(action)).thenReturn(mockBadWordAdminController);
+			
 		action.edit(1);
-		context.assertIsSatisfied();
+		
+		assertEquals(word, mockResult.included("word"));
+		verify(mockBadWordAdminController).add();
 	}
 
 	@Test
 	public void editSave() {
 		final BadWord word = new BadWord();
-
-		context.checking(new Expectations() {
-			{
-				one(repository).update(word);
-				one(mockResult).redirectTo(action);
-				will(returnValue(mockBadWordAdminController));
-				one(mockBadWordAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(action)).thenReturn(mockBadWordAdminController);
+			
 		action.editSave(word);
-		context.assertIsSatisfied();
+		
+		verify(repository).update(word);
+		verify(mockBadWordAdminController).list();
 	}
 }

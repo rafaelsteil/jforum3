@@ -10,6 +10,10 @@
  */
 package net.jforum.security;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,88 +23,75 @@ import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.TopicRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AccessForumRuleTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserSession userSession = context.mock(UserSession.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-	private AccessForumRule rule = new AccessForumRule(topicRepository);
-	private Map<String, String> parameterMap = new HashMap<String, String>() {/**
-		 *
-		 */
-		private static final long serialVersionUID = 1L;
-
-	{ put("topicId", "1"); }};
+	
+	@Mock private UserSession userSession;
+	@Mock private HttpServletRequest request;
+	@Mock private RoleManager roleManager;
+	@Mock private TopicRepository topicRepository;
+	@InjectMocks private AccessForumRule rule;
+	private Map<String, String[]> parameterMap;
+	
+	@Before
+	public void setup() {
+		parameterMap = new HashMap<String, String[]>();
+		parameterMap.put("topicId", Arrays.asList("1").toArray(new String[1]));
+		when(request.getParameterMap()).thenReturn(parameterMap);
+	}
 
 	@Test(expected = AccessRuleException.class)
 	public void forumIdNotFoundExpectsException() {
 		parameterMap.clear();
-
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			ignoring(userSession); ignoring(roleManager);
-		}});
-
-
+		
+			
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	public void forumIdInForumIdParameter() {
-		parameterMap.clear(); parameterMap.put("forumId", "1");
+		parameterMap.clear(); parameterMap.put("forumId", Arrays.asList("1").toArray(new String[1]));
 
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("forumId"); will(returnValue("1"));
-			ignoring(userSession); ignoring(roleManager);
-		}});
-
+		when(request.getParameter("forumId")).thenReturn("1");
+			
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void forumIsAllowedShouldProceed() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topicId"); will(returnValue("1"));
+		when(request.getParameter("topicId")).thenReturn("1");
 
-			Topic topic = new Topic(); topic.getForum().setId(7);
+		Topic topic = new Topic(); topic.getForum().setId(7);
 
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isForumAllowed(7); will(returnValue(true));
-		}});
-
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isForumAllowed(7)).thenReturn(true);
+	
+		assertTrue(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void forumIsBlockedShouldNotProceed() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topicId"); will(returnValue("1"));
+		when(request.getParameter("topicId")).thenReturn("1");
 
-			Topic topic = new Topic(); topic.getForum().setId(7);
+		Topic topic = new Topic(); topic.getForum().setId(7);
 
-			one(topicRepository).get(1); will(returnValue(topic));
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isForumAllowed(7); will(returnValue(false));
-		}});
-
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isForumAllowed(7)).thenReturn(false);
+	
 		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		
 	}
 }

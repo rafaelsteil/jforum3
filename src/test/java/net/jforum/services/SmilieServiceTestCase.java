@@ -10,6 +10,8 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Mockito.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,22 +23,25 @@ import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import br.com.caelum.vraptor.interceptor.multipart.DefaultUploadedFile;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SmilieServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private SmilieRepository repository = context.mock(SmilieRepository.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private SmilieService service = new SmilieService(repository, config);
+
+	@Mock private SmilieRepository repository;
+	@Mock private JForumConfig config;
+	@InjectMocks private SmilieService service;
 
 	@Test(expected = NullPointerException.class)
 	public void addNullExpectException() {
@@ -80,25 +85,19 @@ public class SmilieServiceTestCase {
 		tempFile.deleteOnExit();
 		final String tempDir = tempFile.getParent();
 
-		File file = new File(this.getClass().getResource("/smilies/smilie.gif")
-				.getFile());
+		File file = new File(this.getClass().getResource("/smilies/smilie.gif").getFile());
 		TestCaseUtils.copyFile(file, tempFile);
 
 		UploadedFile uploadedFile = new DefaultUploadedFile(
 				new FileInputStream(file), file.getAbsolutePath(), "");
 
-		context.checking(new Expectations() {
-			{
-				one(config).getApplicationPath();
-				will(returnValue(tempDir));
-				one(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR);
-				will(returnValue(""));
-				one(repository).add(smilie);
-			}
-		});
+		when(config.getApplicationPath()).thenReturn(tempDir);
+		when(config.getValue(ConfigKeys.SMILIE_IMAGE_DIR)).thenReturn("");
+
 
 		service.add(smilie, uploadedFile);
-		context.assertIsSatisfied();
+
+		verify(repository).add(smilie);
 		Assert.assertNotNull(smilie.getDiskName());
 
 		File expectedFile = new File(String.format("%s/%s/%s", tempDir, "",
@@ -141,23 +140,14 @@ public class SmilieServiceTestCase {
 	public void updateAllPropertiesShouldDeleteOldImage() throws IOException {
 		final File currentFile = File.createTempFile("jforum", "tests");
 		currentFile.deleteOnExit();
-
 		final Smilie currentSmilie = new Smilie();
 		currentSmilie.setId(1);
 		currentSmilie.setCode(":)");
 		currentSmilie.setDiskName(currentFile.getName());
 
-		context.checking(new Expectations() {
-			{
-				one(repository).get(1);
-				will(returnValue(currentSmilie));
-				atLeast(1).of(config).getApplicationPath();
-				will(returnValue(currentFile.getParent()));
-				atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR);
-				will(returnValue(""));
-				one(repository).update(currentSmilie);
-			}
-		});
+		when(repository.get(1)).thenReturn(currentSmilie);
+		when(config.getApplicationPath()).thenReturn(currentFile.getParent());
+		when(config.getValue(ConfigKeys.SMILIE_IMAGE_DIR)).thenReturn("");
 
 		File newFile = File.createTempFile("jforum", "tests");
 		newFile.deleteOnExit();
@@ -171,8 +161,8 @@ public class SmilieServiceTestCase {
 		newSmilie.setId(1);
 		newSmilie.setCode(":D");
 		service.update(newSmilie, uploadedFile);
-		context.assertIsSatisfied();
 
+		verify(repository).update(currentSmilie);
 		Assert.assertEquals(newSmilie.getCode(), currentSmilie.getCode());
 		Assert.assertFalse(currentFile.exists());
 		Assert.assertFalse(currentSmilie.getDiskName().equals(oldDiskName));
@@ -186,63 +176,42 @@ public class SmilieServiceTestCase {
 		final Smilie currentSmilie = new Smilie();
 		currentSmilie.setCode(":)");
 		currentSmilie.setId(1);
-
-		context.checking(new Expectations() {
-			{
-				one(repository).get(1);
-				will(returnValue(currentSmilie));
-				one(repository).update(currentSmilie);
-			}
-		});
-
+		when(repository.get(1)).thenReturn(currentSmilie);
 		Smilie newSmilie = new Smilie();
 		newSmilie.setId(1);
 		newSmilie.setCode(":D");
 		service.update(newSmilie, null);
-		context.assertIsSatisfied();
+
 		Assert.assertEquals(newSmilie.getCode(), currentSmilie.getCode());
+		
+		verify(repository).update(currentSmilie);
 	}
 
 	@Test
 	public void deleteUsingNullShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-			}
-		});
 		service.delete(null);
+		
+		verifyZeroInteractions(repository);
 	}
 
 	@Test
 	public void deleteExpectSuccess() {
-		context.checking(new Expectations() {
-			{
-				Smilie s1 = new Smilie();
-				s1.setId(1);
-				s1.setDiskName(Long.toString(System.currentTimeMillis()));
-				Smilie s2 = new Smilie();
-				s2.setId(2);
-				s2.setDiskName(Long.toString(System.currentTimeMillis()));
-
-				String applicationPath = new File(this.getClass()
-						.getResource("").getFile()).getParent();
-
-				atLeast(1).of(config).getApplicationPath();
-				will(returnValue(applicationPath));
-				atLeast(1).of(config).getValue(ConfigKeys.SMILIE_IMAGE_DIR);
-				will(returnValue(""));
-
-				one(repository).get(1);
-				will(returnValue(s1));
-				one(repository).remove(s1);
-
-				one(repository).get(2);
-				will(returnValue(s2));
-				one(repository).remove(s2);
-
-			}
-		});
+		Smilie s1 = new Smilie();
+		s1.setId(1);
+		s1.setDiskName(Long.toString(System.currentTimeMillis()));
+		Smilie s2 = new Smilie();
+		s2.setId(2);
+		s2.setDiskName(Long.toString(System.currentTimeMillis()));
+		String applicationPath = new File(this.getClass()
+				.getResource("").getFile()).getParent();
+		when(config.getApplicationPath()).thenReturn(applicationPath);
+		when(config.getValue(ConfigKeys.SMILIE_IMAGE_DIR)).thenReturn("");
+		when(repository.get(1)).thenReturn(s1);
+		when(repository.get(2)).thenReturn(s2);
 
 		service.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(repository).remove(s1);
+		verify(repository).remove(s2);
 	}
 }

@@ -10,6 +10,7 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Mockito.*;
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Group;
 import net.jforum.entities.User;
@@ -19,24 +20,30 @@ import net.jforum.sso.DefaultLoginAuthenticator;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.MD5;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserRepository repository = context.mock(UserRepository.class);
-	private GroupRepository groupRepository = context.mock(GroupRepository.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private AvatarService avatarService = context.mock(AvatarService.class);
-	private UserService service = new UserService(repository, groupRepository, config,
-		new DefaultLoginAuthenticator(repository), avatarService);
+
+	@Mock private UserRepository repository;
+	@Mock private GroupRepository groupRepository;
+	@Mock private JForumConfig config;
+	@Mock private AvatarService avatarService;
+	private UserService service;
+
+	@Before
+	public void setup() {
+		service = new UserService(repository, groupRepository, config, new DefaultLoginAuthenticator(repository), avatarService);
+	}
 
 	@Test(expected = NullPointerException.class)
 	public void updateNullUserExpectsException() {
@@ -53,11 +60,7 @@ public class UserServiceTestCase {
 	public void updateShouldChangeUsername() {
 		final User current = new User();
 		current.setUsername("old");
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(current));
-			allowing(repository);
-		}});
+		when(repository.get(1)).thenReturn(current);
 
 		User newUser = new User();
 		newUser.setId(1);
@@ -94,10 +97,7 @@ public class UserServiceTestCase {
 		current.setSmiliesEnabled(false);
 		current.setNotifyText(false);
 
-		context.checking(new Expectations() {{
-			one(repository).get(user.getId()); will(returnValue(current));
-			one(repository).update(current);
-		}});
+		when(repository.get(user.getId())).thenReturn(current);
 
 		user.setAim("aim");
 		user.setAttachSignature(true);
@@ -121,8 +121,8 @@ public class UserServiceTestCase {
 		user.setNotifyText(true);
 
 		service.update(user, false);
-		context.assertIsSatisfied();
 
+		verify(repository).update(current);
 		Assert.assertEquals(user.getAim(), current.getAim());
 		Assert.assertEquals(user.getAttachSignature(), current.getAttachSignature());
 		Assert.assertEquals(user.isBbCodeEnabled(), current.isBbCodeEnabled());
@@ -146,61 +146,39 @@ public class UserServiceTestCase {
 
 	@Test
 	public void saveGroupsUsingNullIdsShouldDoNothing() {
-		context.checking(new Expectations() {{
-
-		}});
-
 		service.saveGroups(1, null);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void saveGroupsUsingZeroLengthArrayShouldDoNothing() {
-		context.checking(new Expectations() {{
-
-		}});
-
 		service.saveGroups(1, new int[0]);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void saveGroupsExpectSuccess() {
 		Group g1 = new Group(); g1.setId(1);
-		final User user = new User(); user.addGroup(g1);
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(user));
-
-			Group g5 = new Group(); g5.setId(5);
-			Group g6 = new Group(); g6.setId(6);
-
-			one(groupRepository).get(5); will(returnValue(g5));
-			one(groupRepository).get(6); will(returnValue(g6));
-
-			one(repository).update(user);
-		}});
-
-		service.saveGroups(1, 5, 6);
-		context.assertIsSatisfied();
-
-		Assert.assertFalse(user.getGroups().contains(g1));
-
 		Group g5 = new Group(); g5.setId(5);
 		Group g6 = new Group(); g6.setId(6);
+		final User user = new User(); user.addGroup(g1);
 
+		when(repository.get(1)).thenReturn(user);
+		when(groupRepository.get(5)).thenReturn(g5);
+		when(groupRepository.get(6)).thenReturn(g6);
+
+		service.saveGroups(1, 5, 6);
+
+		verify(repository).update(user);
+		Assert.assertFalse(user.getGroups().contains(g1));
 		Assert.assertTrue(user.getGroups().contains(g5));
 		Assert.assertTrue(user.getGroups().contains(g6));
 	}
 
 	@Test
 	public void validateLogin() {
-		context.checking(new Expectations() {{
-			one(repository).validateLogin("user", MD5.hash("passwd")); will(returnValue(new User()));
-		}});
+		when(repository.validateLogin("user", MD5.hash("passwd"))).thenReturn(new User());
 
 		User user = service.validateLogin("user", "passwd");
-		context.assertIsSatisfied();
+
 		Assert.assertNotNull(user);
 	}
 
@@ -209,10 +187,6 @@ public class UserServiceTestCase {
 		User user = new User(); user.setUsername("u1"); user.setPassword("pwd1"); user.setEmail("email");
 		user.setRegistrationDate(null);
 		user.addGroup(new Group());
-
-		context.checking(new Expectations() {{
-			ignoring(repository);
-		}});
 
 		service.add(user);
 
@@ -301,14 +275,12 @@ public class UserServiceTestCase {
 		user.setEmail("email");
 		user.getGroups().clear();
 
-		context.checking(new Expectations() {{
-			one(config).getInt(ConfigKeys.DEFAULT_USER_GROUP); will(returnValue(1));
-			one(groupRepository).get(1); will(returnValue(new Group()));
-			one(repository).add(user);
-		}});
+		when(config.getInt(ConfigKeys.DEFAULT_USER_GROUP)).thenReturn(1);
+		when(groupRepository.get(1)).thenReturn(new Group());
 
 		service.add(user);
-		context.assertIsSatisfied();
+
+		verify(repository).add(user);
 		Assert.assertTrue(user.getGroups().size() > 0);
 	}
 
@@ -320,12 +292,8 @@ public class UserServiceTestCase {
 		user.setEmail("email");
 		user.addGroup(new Group());
 
-		context.checking(new Expectations() {{
-			one(repository).add(user);
-		}});
-
 		service.add(user);
 
-		context.assertIsSatisfied();
+		verify(repository).add(user);
 	}
 }

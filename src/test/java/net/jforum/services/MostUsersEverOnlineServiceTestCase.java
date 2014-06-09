@@ -10,70 +10,63 @@
  */
 package net.jforum.services;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Config;
 import net.jforum.entities.MostUsersEverOnline;
 import net.jforum.repository.ConfigRepository;
 import net.jforum.util.ConfigKeys;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class MostUsersEverOnlineServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ConfigRepository repository = context.mock(ConfigRepository.class);
-	private MostUsersEverOnlineService service = new MostUsersEverOnlineService(repository);
+
+	@Mock private ConfigRepository repository;
+	@InjectMocks private MostUsersEverOnlineService service;
 
 	@Test
 	public void currenTotalIsBiggerExpectsNewTotalAndNewTime() {
 		final long time = System.currentTimeMillis();
-
-		context.checking(new Expectations() {{
-			Config c = new Config(); c.setName(ConfigKeys.MOST_USERS_EVER_ONLINE); c.setValue(Long.toString(time - 100) + "/10");
-			one(repository).getByName(ConfigKeys.MOST_USERS_EVER_ONLINE); will(returnValue(c));
-			one(repository).update(with(aNonNull(Config.class)));
-		}});
+		Config c = new Config(); c.setName(ConfigKeys.MOST_USERS_EVER_ONLINE); c.setValue(Long.toString(time - 100) + "/10");
+		when(repository.getByName(ConfigKeys.MOST_USERS_EVER_ONLINE)).thenReturn(c);
 
 		MostUsersEverOnline most = service.getMostRecentData(20);
-		context.assertIsSatisfied();
 
-		Assert.assertEquals(20, most.getTotal());
-		Assert.assertTrue(most.getDate().getTime() >= time);
+		verify(repository).update(notNull(Config.class));
+		assertEquals(20, most.getTotal());
+		assertTrue(most.getDate().getTime() >= time);
 	}
 
 	@Test
 	public void currentTotalIsSmallerExpectsStoredTotal() {
 		final long time = System.currentTimeMillis();
-
-		context.checking(new Expectations() {{
-			Config c = new Config(); c.setValue(Long.toString(time) + "/10");
-			one(repository).getByName(ConfigKeys.MOST_USERS_EVER_ONLINE); will(returnValue(c));
-		}});
+		Config c = new Config(); c.setValue(Long.toString(time) + "/10");
+		when(repository.getByName(ConfigKeys.MOST_USERS_EVER_ONLINE)).thenReturn(c);
 
 		MostUsersEverOnline most = service.getMostRecentData(5);
-		context.assertIsSatisfied();
 
-		Assert.assertEquals(time, most.getDate().getTime());
-		Assert.assertEquals(10, most.getTotal());
+		assertEquals(time, most.getDate().getTime());
+		assertEquals(10, most.getTotal());
 	}
 
 	@Test
 	public void expectsEmptyShouldCreateNew() {
-		context.checking(new Expectations() { {
-			one(repository).getByName(ConfigKeys.MOST_USERS_EVER_ONLINE); will(returnValue(null));
-			one(repository).add(with(aNonNull(Config.class)));
-		}});
+		when(repository.getByName(ConfigKeys.MOST_USERS_EVER_ONLINE)).thenReturn(null);
 
 		MostUsersEverOnline most = service.getMostRecentData(2);
-		context.assertIsSatisfied();
 
-		Assert.assertEquals(2, most.getTotal());
-		Assert.assertTrue(System.currentTimeMillis() >= most.getDate().getTime());
+		verify(repository).add(notNull(Config.class));
+		assertEquals(2, most.getTotal());
+		assertTrue(System.currentTimeMillis() >= most.getDate().getTime());
 	}
 }

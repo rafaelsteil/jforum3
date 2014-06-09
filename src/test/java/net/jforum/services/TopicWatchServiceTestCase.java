@@ -10,49 +10,47 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Topic;
 import net.jforum.entities.TopicWatch;
 import net.jforum.entities.User;
 import net.jforum.repository.TopicWatchRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicWatchServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicWatchRepository repository = context.mock(TopicWatchRepository.class);
-	private TopicWatchService service = new TopicWatchService(repository);
+
+	@Mock private TopicWatchRepository repository;
+	@InjectMocks private TopicWatchService service;
 
 	@Test
 	public void unwatch() {
 		final Topic topic = new Topic(); topic.setId(1);
 		final User user = new User(); user.setId(2);
 
-		context.checking(new Expectations() {{
-			one(repository).removeSubscription(topic, user);
-		}});
-
 		service.unwatch(topic, user);
-		context.assertIsSatisfied();
+
+		verify(repository).removeSubscription(topic, user);
 	}
 
 	@Test
 	public void watchUserNotSubscribedShouldAdd() {
 		final Topic topic = new Topic(); topic.setId(1);
 		final User user = new User(); user.setId(2);
-
-		context.checking(new Expectations() {{
-			one(repository).getSubscription(topic, user); will(returnValue(null));
-			one(repository).add(with(aNonNull(TopicWatch.class)));
-		}});
+		when(repository.getSubscription(topic, user)).thenReturn(null);
 
 		service.watch(topic, user);
-		context.assertIsSatisfied();
+
+		verify(repository).add(notNull(TopicWatch.class));
 	}
 
 	@Test
@@ -60,11 +58,10 @@ public class TopicWatchServiceTestCase {
 		final Topic topic = new Topic(); topic.setId(1);
 		final User user = new User(); user.setId(2);
 
-		context.checking(new Expectations() {{
-			one(repository).getSubscription(topic, user); will(returnValue(new TopicWatch()));
-		}});
+		when(repository.getSubscription(topic, user)).thenReturn(new TopicWatch());
 
 		service.watch(topic, user);
-		context.assertIsSatisfied();
+		
+		verify(repository,never()).add(any(TopicWatch.class));
 	}
 }

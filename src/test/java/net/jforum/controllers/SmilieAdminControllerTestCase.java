@@ -10,32 +10,37 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 
 import net.jforum.entities.Smilie;
 import net.jforum.repository.SmilieRepository;
 import net.jforum.services.SmilieService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SmilieAdminControllerTestCase extends AdminTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private SmilieRepository repository = context.mock(SmilieRepository.class);
-	private SmilieService service = context.mock(SmilieService.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private SmilieAdminController controller = new SmilieAdminController(service,
-			repository, mockResult);
-	private SmilieAdminController mockSmilieAdminController = context.mock(SmilieAdminController.class);
+	
+	@Mock private SmilieRepository repository;
+	@Mock private SmilieService service;
+	@Spy private MockResult mockResult;
+	@Mock private SmilieAdminController mockSmilieAdminController;
+	@InjectMocks private SmilieAdminController controller;
 
 	public SmilieAdminControllerTestCase() {
 		super(SmilieAdminController.class);
@@ -43,79 +48,51 @@ public class SmilieAdminControllerTestCase extends AdminTestCase {
 
 	@Test
 	public void edit() {
-		context.checking(new Expectations() {
-			{
-				one(repository).get(1);
-				will(returnValue(new Smilie()));
-				one(mockResult).include("smilie", new Smilie());
-				one(mockResult).forwardTo(controller);
-				will(returnValue(mockSmilieAdminController));
-				one(mockSmilieAdminController).add();
-			}
-		});
-
+		when(repository.get(1)).thenReturn(new Smilie());
+		when(mockResult.forwardTo(controller)).thenReturn(mockSmilieAdminController);
+			
 		controller.edit(1);
-		context.assertIsSatisfied();
+		
+		assertEquals(new Smilie(), mockResult.included("smilie"));
+		verify(mockSmilieAdminController).add();
 	}
 
 	@Test
 	public void editSave() {
-		context.checking(new Expectations() {
-			{
-				one(service).update(with(aNonNull(Smilie.class)),
-						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockSmilieAdminController));
-				one(mockSmilieAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(controller)).thenReturn(mockSmilieAdminController);
+			
 		controller.editSave(new Smilie(), null);
-		context.assertIsSatisfied();
+		
+		verify(service).update(notNull(Smilie.class), isNull(UploadedFile.class));
+		verify(mockSmilieAdminController).list();
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {
-			{
-				one(service).delete(1, 2, 3);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockSmilieAdminController ));
-				one(mockSmilieAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(controller)).thenReturn(mockSmilieAdminController );
+			
 		controller.delete(1, 2, 3);
-		context.assertIsSatisfied();
+		
+		verify(service).delete(1, 2, 3);
+		verify(mockSmilieAdminController).list();
 	}
 
 	@Test
 	public void listExpectOneRecord() {
-		context.checking(new Expectations() {
-			{
-				one(repository).getAllSmilies();
-				will(returnValue(new ArrayList<Smilie>()));
-				one(mockResult).include("smilies", new ArrayList<Smilie>());
-			}
-		});
-
+		when(repository.getAllSmilies()).thenReturn(new ArrayList<Smilie>());
+			
 		controller.list();
-		context.assertIsSatisfied();
+		
+		assertEquals(new ArrayList<Smilie>(), mockResult.included("smilies"));
 	}
 
 	@Test
 	public void addSave() {
-		context.checking(new Expectations() {
-			{
-				one(service).add(with(aNonNull(Smilie.class)),
-						with(aNull(UploadedFile.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockSmilieAdminController));
-				one(mockSmilieAdminController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(controller)).thenReturn(mockSmilieAdminController);
+			
 		controller.addSave(new Smilie(), null);
-		context.assertIsSatisfied();
+		
+		verify(service).add(notNull(Smilie.class), isNull(UploadedFile.class));
+		verify(mockSmilieAdminController).list();
 	}
 }
