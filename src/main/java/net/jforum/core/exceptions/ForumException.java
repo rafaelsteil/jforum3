@@ -14,6 +14,8 @@ package net.jforum.core.exceptions;
  * @author Rafael Steil
  */
 public class ForumException extends RuntimeException {
+	private static final long serialVersionUID = 4284828474973959205L;
+
 	public ForumException(String message) {
 		super(message);
 	}

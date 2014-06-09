@@ -526,14 +526,10 @@ public class SessionManagerTestCase {
 
 	@Test
 	public void addBotShouldIgnore() {
-		UserSession us = new UserSession() {
-			@Override
-			public boolean isBot() { return true; }
-	
-			@Override
-			public String getSessionId() { return "123"; }
-		};
-
+		UserSession us = mock(UserSession.class);
+		when(us.isBot()).thenReturn(true);
+		when(us.getSessionId()).thenReturn("123");
+		
 		assertEquals(0, manager.getTotalUsers());
 		manager.add(us);
 		assertEquals(0, manager.getTotalUsers());

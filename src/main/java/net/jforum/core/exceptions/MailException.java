@@ -46,6 +46,8 @@ package net.jforum.core.exceptions;
  * @author Rafael Steil
  */
 public class MailException extends RuntimeException {
+	private static final long serialVersionUID = 9027532170532585348L;
+
 	public MailException(Throwable t) {
 		super(t);
 		this.setStackTrace(t.getStackTrace());

@@ -136,9 +136,14 @@ public class TopicServiceTestCase {
 	public void replyModeratedPostShouldNotUpdateSomeProperties() {
 		final Topic topic = this.newTopic();
 		int currentTotalReplies = topic.getTotalReplies();
-		topic.setLastPost(new Post() {{ setId(2); }});
-		Forum forum = new Forum() {{ setId(1);
-		setLastPost(new Post() {{ setId(5); }}); }};
+		Post post2 = new Post();
+		post2.setId(2);
+		Post post5 = new Post();
+		post5.setId(5);
+		
+		topic.setLastPost(post2);
+		Forum forum = new Forum(1);
+		forum.setLastPost(post5);
 
 		context.checking(new Expectations() {{
 			one(topicRepository).get(topic.getId()); will(returnValue(topic));
@@ -163,7 +168,7 @@ public class TopicServiceTestCase {
 	public void addModeratedTopicShouldNotUpdateForumLastPost() {
 		final Topic topic = this.newTopic();
 		topic.setPendingModeration(true);
-		final Forum forum = new Forum() {{ setId(1); }};
+		final Forum forum = new Forum(1);
 
 		context.checking(new Expectations() {{
 			ignoring(topicRepository);
@@ -262,7 +267,7 @@ public class TopicServiceTestCase {
 	public void addNewTopicShouldSaveFirstPostAndAllRelatedObjecUpdates() {
 		final Topic topic = this.newTopic();
 
-		final Forum forum = new Forum() {{ setId(1); }};
+		final Forum forum = new Forum(1);
 
 		context.checking(new Expectations() {{
 			one(forumRepository).get(1); will(returnValue(forum));
@@ -291,10 +296,12 @@ public class TopicServiceTestCase {
 
 	private Topic newTopic() {
 		Topic topic = new Topic();
-
+		User user = new User();
+		user.setId(1);
+		
 		topic.setSubject("topic 1");
 		topic.getForum().setId(1);
-		topic.setUser(new User() {{ setId(1); }});
+		topic.setUser(user);
 		topic.setFirstPost(new Post());
 		topic.getFirstPost().setSubject("123");
 		topic.getFirstPost().setText("some message");

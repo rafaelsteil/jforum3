@@ -14,6 +14,8 @@ package net.jforum.core.exceptions;
  * @author Rafael Steil
  */
 public class AccessRuleException extends RuntimeException {
+	private static final long serialVersionUID = -8835746830789016185L;
+
 	public AccessRuleException(String message) {
 		super(message);
 	}

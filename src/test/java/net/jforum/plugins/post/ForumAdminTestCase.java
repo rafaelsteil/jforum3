@@ -60,7 +60,7 @@ public class ForumAdminTestCase {
 		final int forumId = 1;
 
 		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
-		when(forumRepository.get(forumId)).thenReturn(new Forum(){{setId(1);}});
+		when(forumRepository.get(forumId)).thenReturn(new Forum(1));
 		when(repository.getLimitedTime(any(Forum.class))).thenReturn(0L);
 
 		extension.edit(forumId);
@@ -119,7 +119,8 @@ public class ForumAdminTestCase {
 	public void delete() {
 		this.securityChecking();
 		final Forum forum = new Forum(23);
-		ForumLimitedTime forumLimitedTime = new ForumLimitedTime(){{setId(1);}};
+		ForumLimitedTime forumLimitedTime = new ForumLimitedTime();
+		forumLimitedTime.setId(1);
 		when(config.getBoolean("forum.time.limited.enable", false)).thenReturn(true);
 		when(roleManager.isAdministrator()).thenReturn(true);
 		when(repository.getForumLimitedTime(forum)).thenReturn(forumLimitedTime);
