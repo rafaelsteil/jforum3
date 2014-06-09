@@ -21,7 +21,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getFourmLimitedTime() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/posteditlimited/dump.sql");
 
 		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
@@ -37,7 +37,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getFourmLimitedTimeReturnNullIfNotFound() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/posteditlimited/dump.sql");
 
 		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
@@ -52,7 +52,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getLimitedTime() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 		.run("/posteditlimited/dump.sql");
 
 		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();
@@ -67,7 +67,7 @@ public class FourmLimitedTimeDAOTestCase extends AbstractDAOTestCase<ForumLimite
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getLimitedTimeReturn0IfNotFound() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 		.run("/posteditlimited/dump.sql");
 
 		ForumLimitedTimeRepository dao = this.newFourmLimitedTimeDAO();

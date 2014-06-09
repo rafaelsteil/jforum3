@@ -33,7 +33,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void countPendingReportsShouldFilterByForum() {
-		new JDBCLoader(this.session().connection()).run("/postreport/countPendingReports.sql");
+		new JDBCLoader(this.session()).run("/postreport/countPendingReports.sql");
 		PostReportRepository dao = this.newDAO();
 		assertEquals(1, dao.countPendingReports(1));
 	}
@@ -41,7 +41,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void countPendingReportsWithoutFilteringShouldReturnAllResultsExceptResolved() {
-		new JDBCLoader(this.session().connection()).run("/postreport/countPendingReports.sql");
+		new JDBCLoader(this.session()).run("/postreport/countPendingReports.sql");
 		PostReportRepository dao = this.newDAO();
 		assertEquals(2, dao.countPendingReports());
 	}
@@ -49,7 +49,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getAllShouldFilterByForumExpectOneResult() {
-		new JDBCLoader(this.session().connection()).run("/postreport/getAll.sql");
+		new JDBCLoader(this.session()).run("/postreport/getAll.sql");
 		PostReport report = this.createPostReport(1, 1, PostReportStatus.UNRESOLVED);
 		this.createPostReport(2, 2, PostReportStatus.UNRESOLVED);
 
@@ -61,7 +61,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getAllResolvedReports() {
-		new JDBCLoader(this.session().connection()).run("/postreport/getAll.sql");
+		new JDBCLoader(this.session()).run("/postreport/getAll.sql");
 		this.createPostReport(1, 1, PostReportStatus.UNRESOLVED);
 		PostReport report1 = this.createPostReport(2, 2, PostReportStatus.RESOLVED);
 		PostReport report2 = this.createPostReport(2, 2, PostReportStatus.RESOLVED);
@@ -78,7 +78,7 @@ public class PostReportDAOTestCase extends AbstractDAOTestCase<PostReport> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getAllWithoutFilterShouldReturnAllReults() {
-		new JDBCLoader(this.session().connection()).run("/postreport/getAll.sql");
+		new JDBCLoader(this.session()).run("/postreport/getAll.sql");
 		PostReport report = this.createPostReport(1, 1, PostReportStatus.UNRESOLVED);
 		PostReport report2 = this.createPostReport(1, 2, PostReportStatus.UNRESOLVED);
 

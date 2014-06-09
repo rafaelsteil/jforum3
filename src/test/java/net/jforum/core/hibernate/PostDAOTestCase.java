@@ -26,7 +26,7 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void countPreviousPostsShouldReturn6() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/postdao/countPreviousPosts.sql");
 		this.commit();
 		this.beginTransaction();
@@ -39,7 +39,7 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void countPreviousPostsShouldReturn3() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/postdao/countPreviousPosts.sql");
 		this.commit();
 		this.beginTransaction();
@@ -52,7 +52,7 @@ public class PostDAOTestCase extends AbstractDAOTestCase<Post> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void add() {
-		new JDBCLoader(session().connection()) .run("/postdao/dump.sql");
+		new JDBCLoader(session()) .run("/postdao/dump.sql");
 
 		PostRepository dao = this.newDao();
 		Post post = this.newPost();

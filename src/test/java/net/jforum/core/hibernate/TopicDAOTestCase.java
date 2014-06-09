@@ -58,7 +58,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void removeShouldDeletePostsAndUpdateUserTotalMessages() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/topicdao/removeShouldDeletePostsAndUpdateUserTotalMessages.sql");
 
 		TopicRepository dao = this.newTopicDao();
@@ -77,7 +77,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getPostsShouldNotFetchModeratedExpectTwoResults() {
-		new JDBCLoader(session().connection()) .run("/postdao/dump.sql");
+		new JDBCLoader(session()) .run("/postdao/dump.sql");
 
 		PostRepository postDao = this.newPostDao();
 		Post post1 = this.newPost(); postDao.add(post1);
@@ -96,7 +96,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void totalPostsExpectTwoResults() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/topicdao/totalPostsExpectTwoResults.sql");
 
 		TopicRepository dao = this.newTopicDao();
@@ -107,7 +107,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void lastPost() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/topicdao/firstLastPost.sql");
 
 		TopicRepository dao = this.newTopicDao();
@@ -120,7 +120,7 @@ public class TopicDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void firstPost() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/topicdao/firstLastPost.sql");
 
 		TopicRepository dao = this.newTopicDao();

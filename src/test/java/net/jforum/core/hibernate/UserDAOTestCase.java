@@ -11,7 +11,7 @@
 package net.jforum.core.hibernate;
 
 import java.util.Arrays;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import net.jforum.entities.Group;
@@ -32,7 +32,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@SuppressWarnings("deprecation")
 	@Ignore("seam to be a problem with hsqldb commit, work fine with other connector")
 	public void changeAllowAvatarState() {
-		new JDBCLoader(this.session().connection()).run("/userdao/changeAllowAvatarState.sql");
+		new JDBCLoader(this.session()).run("/userdao/changeAllowAvatarState.sql");
 
 		GroupRepository groupDao = this.newGroupDao();
 		UserRepository dao = this.newDao();
@@ -59,7 +59,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void findByUsernameFilteringByGroup() {
-		new JDBCLoader(this.session().connection()).run("/userdao/findByUsernameFilteringByGroup.sql");
+		new JDBCLoader(this.session()).run("/userdao/findByUsernameFilteringByGroup.sql");
 
 		UserRepository dao = this.newDao();
 		User user = dao.get(1);
@@ -74,7 +74,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getAllUsersFilteringByGroup() {
-		new JDBCLoader(this.session().connection()).run("/userdao/getAllUsersFilteringByGroup.sql");
+		new JDBCLoader(this.session()).run("/userdao/getAllUsersFilteringByGroup.sql");
 
 		UserRepository dao = this.newDao();
 		User user = dao.get(1);
@@ -124,7 +124,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTotalPostsExpectTwoResults() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/userdao/getTotalPostsExpectTwoResults.sql");
 		User user = new User(); user.setId(1);
 		int total = this.newDao().getTotalPosts(user);
@@ -158,7 +158,7 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getTotalUnreadPrivateMessages() {
-		new JDBCLoader(session().connection())
+		new JDBCLoader(session())
 			.run("/userdao/getTotalUnreadPrivateMessages.sql");
 		User user = new User(); user.setId(1);
 		Assert.assertEquals(1, this.newDao().getTotalUnreadPrivateMessages(user));
@@ -311,8 +311,8 @@ public class UserDAOTestCase extends AbstractDAOTestCase<User> {
 	@SuppressWarnings("deprecation")
 	public void getLastRegisteredUser() {
 		UserRepository dao = this.newDao();
-		User u1 = new User(); u1.setUsername("u1"); u1.setRegistrationDate(new Date(2008, 3, 19, 20, 03, 10)); this.insert(u1, dao);
-		User u2 = new User(); u2.setUsername("u2"); u2.setRegistrationDate(new Date(2008, 3, 5, 7, 19, 10)); this.insert(u2, dao);
+		User u1 = new User(); u1.setUsername("u1"); u1.setRegistrationDate(new GregorianCalendar(2008, 3, 19, 20, 03, 10).getTime()); this.insert(u1, dao);
+		User u2 = new User(); u2.setUsername("u2"); u2.setRegistrationDate(new GregorianCalendar(2008, 3, 5, 7, 19, 10).getTime()); this.insert(u2, dao);
 
 		User lastRegisteredUser = dao.getLastRegisteredUser();
 

@@ -120,7 +120,7 @@ public class RecentTopicsDAOTestCase extends AbstractDAOTestCase<Topic> {
 	@SuppressWarnings("deprecation")
 	private void loadDump(String file) {
 		session().beginTransaction();
-		JDBCLoader loader = new JDBCLoader(session().connection());
+		JDBCLoader loader = new JDBCLoader(session());
 		loader.run(file);
 		session().getTransaction().commit();
 		session().beginTransaction();
