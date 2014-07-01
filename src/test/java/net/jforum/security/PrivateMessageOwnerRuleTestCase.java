@@ -46,7 +46,7 @@ public class PrivateMessageOwnerRuleTestCase {
 	
 	@Before
 	public void setup() {
-		parameters = new HashMap<>();
+		parameters = new HashMap<String, String[]>();
 		parameters.put("id", Arrays.asList("1").toArray(new String[1]));
 		when(request.getParameterMap()).thenReturn(parameters);
 		when(request.getParameter("id")).thenReturn("1");

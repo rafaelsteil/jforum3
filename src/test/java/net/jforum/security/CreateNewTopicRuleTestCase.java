@@ -46,7 +46,7 @@ public class CreateNewTopicRuleTestCase {
 
 	@Before
 	public void setup() {
-		parameterMap = new HashMap<>();
+		parameterMap = new HashMap<String, String[]>();
 		parameterMap.put("forumId", Arrays.asList("1").toArray(new String[1]));
 		when(request.getParameterMap()).thenReturn(parameterMap);
 		when(userSession.getRoleManager()).thenReturn(roleManager);

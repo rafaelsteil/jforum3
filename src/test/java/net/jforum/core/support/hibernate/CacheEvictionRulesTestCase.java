@@ -10,6 +10,8 @@
  */
 package net.jforum.core.support.hibernate;
 
+import static org.mockito.Mockito.*;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,23 +35,24 @@ import net.jforum.services.GroupService;
 import net.jforum.services.ModerationService;
 import net.jforum.services.PostService;
 import net.jforum.services.TopicService;
-import net.jforum.util.TestCaseUtils;
 
 import org.hibernate.cache.Cache;
 import org.hibernate.classic.Session;
 import org.hibernate.engine.SessionFactoryImplementor;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
 @Ignore("check if this tests are still usefull")
+@RunWith(MockitoJUnitRunner.class)
 public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSpringContextTests {
-	private Mockery context = TestCaseUtils.newMockery();
-	private SessionFactoryImplementor sessionFactory = context.mock(SessionFactoryImplementor.class);
+	
+	@Mock private SessionFactoryImplementor sessionFactory;
 
 	/*
 	 * ****************
@@ -59,7 +62,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 	public void testPermissionsChaged() throws Exception {
 		this.expectQueryCacheEviction("forumDAO.getModerators");
 		this.executeTargetMethod(GroupService.class, "savePermissions", 0, null);
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -82,7 +85,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 	private void runRankingRepository(String methodName) throws Exception {
 		this.expectQueryCacheEviction("rankingDAO");
 		this.executeTargetMethod(RankingRepository.class, methodName);
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -105,7 +108,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 	private void runSmilieRepository(String methodName) throws Exception {
 		this.expectQueryCacheEviction("smilieDAO");
 		this.executeTargetMethod(SmilieRepository.class, methodName);
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -119,7 +122,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 
 		this.executeTargetMethod(UserRepository.class, "add");
 
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -138,7 +141,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 	private void runConfigRepositoryAddOrUpdate(String methodName) throws Exception {
 		this.expectQueryCacheEviction("configDAO");
 		this.executeTargetMethod(ConfigRepository.class, methodName);
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -170,7 +173,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 		this.expectQueryCacheEviction("categoryDAO.getForums");
 		this.expect2ndLevelCacheEviction("net.jforum.entities.Forum");
 		this.executeTargetMethod(ForumService.class, methodName);
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -191,7 +194,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 
 		this.executeTargetMethod(PostService.class, "delete", post);
 
-		context.assertIsSatisfied();
+		
 	}
 
 	public void testTopicDeleted() throws Exception {
@@ -209,7 +212,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 
 		this.executeVerySpecificTargetMethod(ModerationService.class, "deleteTopics", List.class, topics);
 
-		context.assertIsSatisfied();
+		
 	}
 
 	public void testModerationApprovedPost() throws Exception {
@@ -221,7 +224,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 
 		this.executeTargetMethod(ModerationService.class, "approvePost", post);
 
-		context.assertIsSatisfied();
+		
 	}
 
 	public void testModerationTopicMoved() throws Exception {
@@ -229,23 +232,20 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 		this.expectQueryCacheEviction("forumDAO.getTotalPosts#2");
 		this.expectQueryCacheEviction("forumDAO.getTotalTopics#1");
 		this.expectQueryCacheEviction("forumDAO.getTotalTopics#2");
+		
+		Session session = mock(Session.class);
+		when(sessionFactory.getCurrentSession()).thenReturn(session);
 
-		context.checking(new Expectations() {{
-			Session session = context.mock(Session.class);
-			one(sessionFactory).getCurrentSession(); will(returnValue(session));
+		Topic topic = new Topic(); topic.getForum().setId(2);
+		when(session.get(Topic.class, 5)).thenReturn(topic);
 
-			Topic topic = new Topic(); topic.getForum().setId(2);
-			one(session).get(Topic.class, 5); will(returnValue(topic));
-
-			Cache cache = context.mock(Cache.class);
-			allowing(sessionFactory).getSecondLevelCacheRegion("net.jforum.entities.Forum"); will(returnValue(cache));
-			one(cache).remove("net.jforum.entities.Forum#1");
-			one(cache).remove("net.jforum.entities.Forum#2");
-		}});
-
+		Cache cache = mock(Cache.class);
+		when(sessionFactory.getSecondLevelCacheRegion("net.jforum.entities.Forum")).thenReturn(cache);
+		
 		this.executeTargetMethod(ModerationService.class, "moveTopics", 1, new int[] { 5 });
-
-		context.assertIsSatisfied();
+		
+		verify(cache).remove("net.jforum.entities.Forum#1");
+		verify(cache).remove("net.jforum.entities.Forum#2");
 	}
 
 	public void testTopicServiceAdd() throws Exception {
@@ -269,7 +269,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 			this.executeTargetMethod(TopicService.class, methodName, topic, new Post(), new ArrayList<AttachedFile>());
 		}
 
-		context.assertIsSatisfied();
+		
 	}
 
 	private void newTopicOrPostCommonAssertions() {
@@ -311,7 +311,7 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 
 		this.executeTargetMethod(CategoryService.class, methodName);
 
-		context.assertIsSatisfied();
+		
 	}
 
 	/*
@@ -358,19 +358,15 @@ public class CacheEvictionRulesTestCase extends AbstractDependencyInjectionSprin
 	}
 
 	private void expectQueryCacheEviction(final String regionName) {
-		context.checking(new Expectations() {{
-			org.hibernate.cache.QueryCache cache = context.mock(org.hibernate.cache.QueryCache.class, regionName);
-			one(sessionFactory).getQueryCache(regionName); will(returnValue(cache));
-			one(cache).clear();
-		}});
+		org.hibernate.cache.QueryCache cache = mock(org.hibernate.cache.QueryCache.class, regionName);
+		when(sessionFactory.getQueryCache(regionName)).thenReturn(cache);
+		verify(cache).clear();
 	}
 
 	private void expect2ndLevelCacheEviction(final String regionName) {
-		context.checking(new Expectations() {{
-			Cache secondLevelCache = context.mock(Cache.class, regionName);
-			one(sessionFactory).getSecondLevelCacheRegion(regionName); will(returnValue(secondLevelCache));
-			one(secondLevelCache).clear();
-		}});
+		Cache secondLevelCache = mock(Cache.class, regionName);
+		when(sessionFactory.getSecondLevelCacheRegion(regionName)).thenReturn(secondLevelCache);
+		verify(secondLevelCache).clear();
 	}
 
 	/**

@@ -10,88 +10,67 @@
  */
 package net.jforum.controllers;
 
-import javax.servlet.http.HttpServletRequest;
-
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import net.jforum.actions.helpers.Actions;
 import net.jforum.actions.helpers.Domain;
 import net.jforum.util.I18n;
-import net.jforum.util.TestCaseUtils;
 import net.jforum.util.URLBuilder;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
-@Ignore("do we really want to test i18n like this")
+@RunWith(MockitoJUnitRunner.class)
 public class MessageControllerTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private I18n i18n = context.mock(I18n.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private MessageController controller = new MessageController(i18n, mockResult);
+
+	@Mock private I18n i18n;
+	@Mock private MessageController mockMessageController;
+	@Spy private MockResult mockResult;
+	@InjectMocks private MessageController controller;
 
 	@Test
 	public void replyWaitingModeration() {
-		context.checking(new Expectations() {
-			{
-				one(i18n).getFormattedMessage("PostShow.waitingModeration",
-					URLBuilder.build(Domain.TOPICS, Actions.LIST, 1));
-				will(returnValue("msg moderation 1"));
-
-				one(mockResult).include("message", "msg moderation 1");
-				one(mockResult).forwardTo(Actions.MESSAGE);
-			}
-		});
-
+		when(i18n.getFormattedMessage("PostShow.waitingModeration", URLBuilder.build(Domain.TOPICS, Actions.LIST, 1))).thenReturn("msg moderation 1");
+		
+		
 		controller.replyWaitingModeration(1);
-		context.assertIsSatisfied();
+		
+		assertEquals("msg moderation 1", mockResult.included("message"));
+		verify(mockMessageController).message();;
 	}
 
 	@Test
 	public void topicWaitingModeration() {
-		context.checking(new Expectations() {
-			{
-				one(i18n).getFormattedMessage("PostShow.waitingModeration",
-					URLBuilder.build(Domain.FORUMS, Actions.SHOW, 1));
-				will(returnValue("msg moderation 1"));
-				one(mockResult).include("message", "msg moderation 1");
-				one(mockResult).forwardTo(Actions.MESSAGE);
-			}
-		});
+		when(i18n.getFormattedMessage("PostShow.waitingModeration", URLBuilder.build(Domain.FORUMS, Actions.SHOW, 1))).thenReturn("msg moderation 1");
 
 		controller.topicWaitingModeration(1);
-		context.assertIsSatisfied();
+		
+		assertEquals("msg moderation 1", mockResult.included("message"));
+		verify(mockMessageController).message();;
 	}
 
 	@Test
 	public void accessDenied() {
-		context.checking(new Expectations() {
-			{
-				one(i18n).getMessage("Message.accessDenied");
-				will(returnValue("msg denied"));
-				one(mockResult).include("message", "msg denied");
-				one(mockResult).forwardTo(Actions.MESSAGE);
-			}
-		});
-
+		when(i18n.getMessage("Message.accessDenied")).thenReturn("msg denied");
+		
 		controller.accessDenied();
-		context.assertIsSatisfied();
-	}
 
+		assertEquals("msg denied", mockResult.included("message"));
+		verify(mockMessageController).message();;
+	}
+	
 	@Before
 	public void setup() {
-		context.checking(new Expectations() {
-			{
-				HttpServletRequest request = context.mock(HttpServletRequest.class);
-				allowing(request).getContextPath();
-			}
-		});
+		when(mockResult.of(controller)).thenReturn(mockMessageController);
 	}
 }

@@ -76,7 +76,7 @@ public class TopicWatchExtensionTestCase {
 		t.setId(1);
 
 		if (isLogged) {
-			Map<String, Object> m = new HashMap<>();
+			Map<String, Object> m = new HashMap<String, Object>();
 			m.put("topic", t);
 			when(mockResult.included()).thenReturn(m);
 		}

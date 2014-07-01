@@ -16,23 +16,11 @@ import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
-
 /**
  * @author Rafael Steil
  * @version $Id: $
  */
 public class TestCaseUtils {
-	/**
-	 * Create a new mockery using ClassImposteriser.INSTANCE
-	 * @return the mockery instance
-	 */
-	public static Mockery newMockery() {
-		return new Mockery() {{
-			setImposteriser(ClassImposteriser.INSTANCE);
-		}};
-	}
 	/**
 	 * Retrive the root directory of the application
 	 * @return The application root

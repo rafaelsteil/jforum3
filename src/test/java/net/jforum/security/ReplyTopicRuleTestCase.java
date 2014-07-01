@@ -54,7 +54,7 @@ public class ReplyTopicRuleTestCase {
 
 	@Before
 	public void setup() {
-		parameterMap = new HashMap<>();
+		parameterMap = new HashMap<String, String[]>();
 		parameterMap.put("topic.forum.id", Arrays.asList("1").toArray(new String[1]));
 		when(request.getParameterMap()).thenReturn(parameterMap);
 		when(userSession.getRoleManager()).thenReturn(roleManager);
