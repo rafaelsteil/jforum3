@@ -26,7 +26,7 @@ function turnSpecial() {
 
 <form accept-charset="${encoding}" name="form" action="<jforum:url address="/adminRankings/${action}"/>" method="post">
 	<c:if test="${not empty ranking}">
-		<input type="hidden" name="ranking.id" value="${ranking.id}">
+		<input type="hidden" name="ranking.id" value="${ranking.id}"/>
 	</c:if>
 
 	<table class="forumline" cellspacing="1" cellpadding="3" width="100%">
@@ -36,7 +36,7 @@ function turnSpecial() {
 
 		<tr>
 			<td class="row1 gen"><jforum:i18n key='Rank.Form.RankName'/></td>
-			<td class="row2"><input name="ranking.title" type="text" value="${ranking.title}"></td>
+			<td class="row2"><input name="ranking.title" type="text" value="${ranking.title}"/></td>
 		</tr>
 		
 		<tr>
@@ -46,12 +46,12 @@ function turnSpecial() {
 	
 		<tr>
 			<td class="row1 gen" width="38%"><jforum:i18n key='Rank.Form.MinValue'/></td>
-			<td class="row2"><input name="ranking.min" id="rank_min" type="text" value="${ranking.min}" size="6" maxlength="5"></td>
+			<td class="row2"><input name="ranking.min" id="rank_min" type="text" value="${ranking.min}" size="6" maxlength="5"/></td>
 		</tr>
 	
 		<tr align="center">
 			<td class="catbottom" colspan="2">
-				<input class="mainoption" type="submit" value="<jforum:i18n key='Rank.Form.ClickToUpdate'/>">
+				<input class="mainoption" type="submit" value="<jforum:i18n key='Rank.Form.ClickToUpdate'/>"/>
 			</td>
 		</tr>
 	</table>

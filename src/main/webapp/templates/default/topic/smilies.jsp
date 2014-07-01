@@ -11,7 +11,7 @@
 					<c:forEach items="${smilies}" var="smilie" varStatus="loop">
 						<c:if test="${loop.count <= 20}">
 							<td>
-								<a href="javascript:emoticon('${smilie.code}');"><img src="<c:url value='/images/smilies/${smilie.diskName}'/>"></a>
+								<a href="javascript:emoticon('${smilie.code}');"><img src="<c:url value='/images/smilies/${smilie.diskName}'/>"/></a>
 							</td>
 							
 							<c:if test="${loop.count % 4 == 0}">

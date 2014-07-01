@@ -104,7 +104,7 @@ function checkInput() {
 					<tr>
 						<td class="gensmall"><b><jforum:i18n key='Forums.Form.RestrictHtmlToGroup'/></b></td>
 						<td><@lib.selectFieldGroups "groupsHtml", groups, 0, true, selectedList/></td>
-					</td>
+					</tr>
 				</table>
 			</td>
 		</tr>

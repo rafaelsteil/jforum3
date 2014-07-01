@@ -84,8 +84,8 @@ function confirmCancel(f) {
 			<td class="row3"><strong><jforum:i18n key='SearchStats.isPostIndexed'/></strong> </td>
 			<td class="gensmall row3">
 				<jforum:i18n key='SearchStats.enterPostId'/>: 
-				<input type="text" id="checkPostId">
-				<input type="button" value="<jforum:i18n key='SearchStats.check'/>" onClick="checkIfPostExists();">
+				<input type="text" id="checkPostId"/>
+				<input type="button" value="<jforum:i18n key='SearchStats.check'/>" onClick="checkIfPostExists();"/>
 			</td>
 		</tr>
 	</c:if>
@@ -104,8 +104,8 @@ function confirmCancel(f) {
 	</c:choose>
 
 	<form action="<jforum:url address="/jforum"/>">
-	<input type="hidden" name="module" value="adminSearchStats">
-	<input type="hidden" name="action" value="${action}">
+	<input type="hidden" name="module" value="adminSearchStats"/>
+	<input type="hidden" name="action" value="${action}"/>
 
 	<table border="0" class="forumline gen" width="100%">
 		<tr>

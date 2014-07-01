@@ -4,7 +4,7 @@
 <style type="text/css">@import url( <jforum:templateResource item='/styles/style.css'/> );</style>
 
 <form accept-charset="${encoding}" action="<jforum:url address="/adminUsers/groupsSave"/>" method="post">
-	<input type="hidden" name="userId" value="${user.id}">
+	<input type="hidden" name="userId" value="${user.id}"/>
 	
 	<table class="forumline" cellspacing="1" cellpadding="3" width="100%">
 		<tr>
@@ -16,7 +16,7 @@
 			<td class="row2 gen">
 				<c:forEach items="${groups}" var="group">
 					<c:if test="${userSession.roleManager.administrator || userSession.roleManager.isGroupManager$1[group.id]}">
-						<input  type="checkbox" name="groupIds" id="group_${group.id}" value="${group.id}" <c:if test="${jforum:contains(user.groups, group)}">checked</c:if>>&nbsp;<label for="group_${group.id}">${group.name}</label><br>
+						<input  type="checkbox" name="groupIds" id="group_${group.id}" value="${group.id}" <c:if test="${jforum:contains(user.groups, group)}">checked</c:if>/>&nbsp;<label for="group_${group.id}">${group.name}</label><br/>
 					</c:if>
 				</c:forEach>
 			</td>
@@ -24,7 +24,7 @@
 	
 		<tr align="center">
 			<td class="catbottom" colspan="2" height="28">
-				<input class="mainoption" type="submit" value="<jforum:i18n key='Groups.Form.ClickToUpdate'/>">
+				<input class="mainoption" type="submit" value="<jforum:i18n key='Groups.Form.ClickToUpdate'/>"/>
 			</td>
 		</tr>
 	</table>

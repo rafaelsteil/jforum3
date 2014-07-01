@@ -61,37 +61,37 @@ function testEmail()
 </tr>
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.ForumURL"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.link" value="${config.getValue("forum.link")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.link" value='${config.getValue("forum.link")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.SiteURL"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_homepage.link" value="${config.getValue("homepage.link")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_homepage.link" value='${config.getValue("homepage.link")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.forumName"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.name" value="${config.getValue("forum.name")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.name" value='${config.getValue("forum.name")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.ForumPageTitle"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.page.title" value="${config.getValue("forum.page.title")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.page.title" value='${config.getValue("forum.page.title")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.MetaTag.description"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.page.metatag.description" value="${config.getValue("forum.page.metatag.description")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.page.metatag.description" value='${config.getValue("forum.page.metatag.description")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.MetaTag.keywords"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.page.metatag.keywords" value="${config.getValue("forum.page.metatag.keywords")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_forum.page.metatag.keywords" value='${config.getValue("forum.page.metatag.keywords")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.encoding"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_encoding" value="${config.getValue("encoding")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_encoding" value='${config.getValue("encoding")}' /></span></td>
 </tr>
 
 <tr>
@@ -109,27 +109,27 @@ function testEmail()
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.TopicsPerPage"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_topicsPerPage" value="${config.getValue("topicsPerPage")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_topicsPerPage" value='${config.getValue("topicsPerPage")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.PostsPerPage"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="10" name="p_postsPerPage" value="${config.getValue("postsPerPage")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="10" name="p_postsPerPage" value='${config.getValue("postsPerPage")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.UsersPerPage"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_usersPerPage" value="${config.getValue("usersPerPage")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_usersPerPage" value='${config.getValue("usersPerPage")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.postsNewDelay"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_posts.new.delay" value="${config.getValue("posts.new.delay")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_posts.new.delay" value='${config.getValue("posts.new.delay")}' /></span></td>
 </tr>
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.htmlTags"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_html.tags.welcome" value="${config.getValue("html.tags.welcome")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="50" name="p_html.tags.welcome" value='${config.getValue("html.tags.welcome")}' /></span></td>
 </tr>
 
 <tr>
@@ -175,21 +175,21 @@ function testEmail()
 
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.avatarSize"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="10" name="p_avatarMaxKbSize" value="${config.getValue("avatarMaxKbSize")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="10" name="p_avatarMaxKbSize" value='${config.getValue("avatarMaxKbSize")}' /></span></td>
 </tr>
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.avatarMaxWidth"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="10"name="p_avatar.maxWidth" value="${config.getValue("avatar.maxWidth")}" onchange="changeValue('thumbW', this.value)"/></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="10"name="p_avatar.maxWidth" value='${config.getValue("avatar.maxWidth")}' onchange="changeValue('thumbW', this.value)"/></span></td>
 </tr>
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.avatarMaxHeight"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="10"name="p_avatar.maxHeight" value="${config.getValue("avatar.maxHeight")}" onchange="changeValue('thumbH', this.value)"/></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="10"name="p_avatar.maxHeight" value='${config.getValue("avatar.maxHeight")}' onchange="changeValue('thumbH', this.value)"/></span></td>
 </tr>
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.avatarPreview"/></span></td>
 	<td class="row2" width="38%">
-		<input type="hidden" name="thumbH" value="${config.getValue("avatar.maxHeight")}">	
-		<input type="hidden" name="thumbW" value="${config.getValue("avatar.maxWidth")}">
+		<input type="hidden" name="thumbH" value='${config.getValue("avatar.maxHeight")}'/>	
+		<input type="hidden" name="thumbW" value='${config.getValue("avatar.maxWidth")}'/>
 		<div id="avatarPreview" style="align:center; border:1px solid orange;">&nbsp;</div>
 	</td>
 </tr>
@@ -201,19 +201,19 @@ function testEmail()
 
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.Charset"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_mail.charset" value="${config.getValue("mail.charset")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" size="10" name="p_mail.charset" value='${config.getValue("mail.charset")}' /></span></td>
 </tr>
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.Sender"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_mail.sender" id="sender" value="${config.getValue("mail.sender")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_mail.sender" id="sender" value='${config.getValue("mail.sender")}' /></span></td>
 </tr>
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.MailHost"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_mail.smtp.host" id="host" value="${config.getValue("mail.smtp.host")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_mail.smtp.host" id="host" value='${config.getValue("mail.smtp.host")}' /></span></td>
 </tr>
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.MailPort"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="10" name="p_mail.smtp.port" id="port" value="${config.getValue("mail.smtp.port")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="10" name="p_mail.smtp.port" id="port" value='${config.getValue("mail.smtp.port")}' /></span></td>
 </tr>
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.SmtpAuth"/></span></td>
@@ -235,17 +235,17 @@ function testEmail()
 </tr>
 <tr>
 	<td class="row2" width="38%"><span class="gen"><jforum:i18n key="Config.Form.SmtpUsername"/></span></td>
-	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_mail.smtp.username" id="username" value="${config.getValue("mail.smtp.username")}" /></span></td>
+	<td class="row2" width="38%"><span class="gen"><input type="text" size="50" name="p_mail.smtp.username" id="username" value='${config.getValue("mail.smtp.username")}' /></span></td>
 </tr>
 <tr>
 	<td class="row1" width="38%"><span class="gen"><jforum:i18n key="Config.Form.SmtpPassword"/></span></td>
-	<td class="row1" width="38%"><span class="gen"><input type="text" name="p_mail.smtp.password" id="password" value="${config.getValue("mail.smtp.password")}" /></span></td>
+	<td class="row1" width="38%"><span class="gen"><input type="text" name="p_mail.smtp.password" id="password" value='${config.getValue("mail.smtp.password")}' /></span></td>
 </tr>
 <tr>
 	<td class="row1" width="38%"><span class="gen"><font color="green"><jforum:i18n key="Config.Form.SmtpTest"/></font></span></td>
 	<td class="row1" width="38%">
-		<span class="gen">E-mail: </span> <input type="text" id="address">&nbsp;
-		<input type="button" value="<jforum:i18n key="Config.Form.SmtpTest"/>" class="mainoption" id="mailButton" onClick="testEmail();">
+		<span class="gen">E-mail: </span> <input type="text" id="address"/>&nbsp;
+		<input type="button" value="<jforum:i18n key="Config.Form.SmtpTest"/>" class="mainoption" id="mailButton" onClick="testEmail();"/>
 	</td>
 </tr>
 

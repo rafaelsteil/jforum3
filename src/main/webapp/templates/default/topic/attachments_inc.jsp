@@ -6,7 +6,7 @@
 			<tr>
 				<td width="100%" colspan="3" align="center" class="attachrow">
 					<#if !thumbShowBox>
-						<a href="${JForumContext.encodeURL("/posts/downloadAttach/${a.id}")}">
+						<a href='${JForumContext.encodeURL("/posts/downloadAttach/${a.id}")}'>
 					</#if>
 					<img src="${contextPath}/${a.thumbPath()}"" alt="[Thumb - ${a.info.realFilename}]" border="0"/>
 					<#if !thumbShowBox></a></#if>
@@ -21,7 +21,7 @@
 				
 				<td rowspan="4" align="center">
 					<img src="${contextPath}/templates/${templateName}/images/icon_disk.gif" alt="[Disk]" />
-					<a href="${JForumContext.encodeURL("/posts/downloadAttach/${a.id}")}" class="gensmall"><b>${I18n.getMessage("Attachments.download")}</b></a>
+					<a href='${JForumContext.encodeURL("/posts/downloadAttach/${a.id}")}' class="gensmall"><b>${I18n.getMessage("Attachments.download")}</b></a>
 				</td>
 			</tr>
 

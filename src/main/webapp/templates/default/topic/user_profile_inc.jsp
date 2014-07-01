@@ -1,3 +1,5 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 	<td valign="middle" nowrap="nowrap"> 

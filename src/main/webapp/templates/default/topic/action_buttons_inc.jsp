@@ -1,5 +1,6 @@
 <%@taglib prefix="jforum" uri="http://www.jforum.net/tags"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div class="postinfo">
 	<div class="date">

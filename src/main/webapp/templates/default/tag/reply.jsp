@@ -63,7 +63,7 @@ function validatePostForm(f) {
 		<tr>
 			<td align="center" height="28" colspan="2" class="catbottom">
 				<input class="mainoption" id="btnSubmit" accesskey="s" tabindex="6" type="submit" value="<jforum:i18n key='PostForm.submit'/>"/>
-				<img src="<c:url value='/images/transp.gif'/>" id="icon_saving">
+				<img src="<c:url value='/images/transp.gif'/>" id="icon_saving"/>
 			</td>
 		</tr>
 	</table>

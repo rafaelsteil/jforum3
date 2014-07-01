@@ -56,7 +56,7 @@
 										<a id="myprofile" href="<jforum:url address='/user/edit/${userSession.user.id}'/>"><img src="<jforum:templateResource item='/images/icon_mini_profile.gif'/>" border="0" alt="[Profile]" /><jforum:i18n key="ForumBase.profile"/></a>&nbsp;
 										
 										<c:if test="${userSession.roleManager.moderator}">
-											<img src="<jforum:templateResource item='/images/icon_mini_message.gif'/>">
+											<img src="<jforum:templateResource item='/images/icon_mini_message.gif'/>"/>
 											<a href="<jforum:url address="/postReport/list"/>" <c:if test="${totalPostReports > 0}">style="color: #FF0000; font-weight: bold;"</c:if>><jforum:i18n key="PostReport.menuLink" total="${totalPostReports}"/></a>&nbsp;
 										</c:if>
 

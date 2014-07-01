@@ -29,14 +29,14 @@
 				<td class="row2" align="center" width="10%">
 					&nbsp;
 					<c:if test="${forumCounter > 1}">
-						<input type="button" value="<jforum:i18n key="up"/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminForums/up/${forum.id}'/>';">
+						<input type="button" value="<jforum:i18n key="up"/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminForums/up/${forum.id}'/>';"/>
 					</c:if>
 				</td>
 				
 				<td class="row2" align="center" width="10%">
 					&nbsp;
 					<c:if test="${forumCounter < category.forums.size$0}">
-						<input type="button" value="<jforum:i18n key="down"/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminForums/down/${forum.id}'/>';">
+						<input type="button" value="<jforum:i18n key="down"/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminForums/down/${forum.id}'/>';"/>
 					</c:if>
 				</td>
 			</tr>

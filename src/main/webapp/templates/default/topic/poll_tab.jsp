@@ -23,7 +23,7 @@
 	<tr>
 		<td><jforum:i18n key="PostForm.pollRunFor"/></td>
 		<td>
-			<input type="text" name="${topicPrefix}topic.poll.length" id="pollLength" maxlength="5" size="4" value="<c:if test="${not empty topic.poll}">${topic.poll.length}</c:if>">&nbsp;<jforum:i18n key="PostForm.pollDays"/>
+			<input type="text" name="${topicPrefix}topic.poll.length" id="pollLength" maxlength="5" size="4" value="<c:if test="${not empty topic.poll}">${topic.poll.length}</c:if>"/>&nbsp;<jforum:i18n key="PostForm.pollDays"/>
 			<span class="gensmall"><jforum:i18n key="PostForm.pollDaysDescription"/></span>
 		</td>
 	</tr>

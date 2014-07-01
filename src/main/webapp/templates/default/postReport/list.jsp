@@ -52,7 +52,7 @@ function changePaginationLinks() {
 				<!-- Unresolved reports -->
 				<tr>
 					<td>
-						<h3><img src="<jforum:templateResource item="/images/shield_red.png"/>"/> <span style="color: red"><jforum:i18n key="PostReport.unresolvedReports"/><span></h3>
+						<h3><img src="<jforum:templateResource item="/images/shield_red.png"/>"/> <span style="color: red"><jforum:i18n key="PostReport.unresolvedReports"/></span></h3>
 					</td>
 				</tr>
 				
@@ -80,7 +80,7 @@ function changePaginationLinks() {
 				<!-- Resolved reports -->
 				<tr>
 					<td>
-						<h3><img src="<jforum:templateResource item="/images/shield_green.png"/>"/> <span style="color: red"><jforum:i18n key="PostReport.resolvedReports"/><span></h3>
+						<h3><img src="<jforum:templateResource item="/images/shield_green.png"/>"/> <span style="color: red"><jforum:i18n key="PostReport.resolvedReports"/></span></h3>
 					</td>
 				</tr>
 				
@@ -89,7 +89,7 @@ function changePaginationLinks() {
 						<table class="forumline" cellspacing="1" cellpadding="2" width="100%" border="0">
 							<tr id="loadResolvedReportsMessage">
 								<td colspan="6" align="center" id="loadingCell">
-									<a href="javascript:loadResolvedReports();" class="gen"><img src="<jforum:templateResource item="/images/arrow_right_green.png"/>"> <jforum:i18n key="PostReport.clickToLoadResolved"/></a>
+									<a href="javascript:loadResolvedReports();" class="gen"><img src="<jforum:templateResource item="/images/arrow_right_green.png"/>"/> <jforum:i18n key="PostReport.clickToLoadResolved"/></a>
 								</td>
 							</tr>
 							

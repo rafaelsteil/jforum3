@@ -103,9 +103,9 @@
 			<div id="goToBox">
 				<div class="title"><jforum:i18n key='goToPage'/>...</div>
 				<div class="form">
-					<input type="text" style="width: 50px;" id="pageToGo">
-					<input type="button" value=" <jforum:i18n key='ForumIndex.goToGo'/> " onClick="goToAnotherPage(${totalPages}, ${recordsPerPage}, '${contextPath}', '${moduleName}', '${action}', ${id}, '${extension}');">
-					<input type="button" value="<jforum:i18n key='cancel'/>" onClick="document.getElementById('goToBox').style.display = 'none';">
+					<input type="text" style="width: 50px;" id="pageToGo"/>
+					<input type="button" value=" <jforum:i18n key='ForumIndex.goToGo'/> " onClick="goToAnotherPage(${totalPages}, ${recordsPerPage}, '${contextPath}', '${moduleName}', '${action}', ${id}, '${extension}');"/>
+					<input type="button" value="<jforum:i18n key='cancel'/>" onClick="document.getElementById('goToBox').style.display = 'none';"/>
 				</div>
 			</div>
 		</c:if>

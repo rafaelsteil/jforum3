@@ -13,7 +13,7 @@
 	<c:if test="${errormessage}">
 		<tr>
 			<td class="row2 nav" colspan="4" align="center">
-				<font color="#ff0000"><b>${errorMessage}</b>
+				<font color="#ff0000"><b>${errorMessage}</b></font>
 			</td>
 		</tr>
 	</c:if>
@@ -40,7 +40,7 @@
 					<td class="row1 gen" align="center"><a href="<jforum:url address='/adminGroups/edit/${group.id}'/>"><jforum:i18n key="Groups.List.Edit"/></a></td>
 					
 					<c:if test="${userSession.roleManager.administrator}">
-						<td class="row1" align="center"><input type="checkbox" name="groupId" value="${group.id}"></td>
+						<td class="row1" align="center"><input type="checkbox" name="groupId" value="${group.id}"/></td>
 					</c:if>
 				</c:if>				
 				<td class="row1 gen" align="center"><a href="<jforum:url address='/adminGroups/permissions/${group.id}'/>"><jforum:i18n key="Permissions"/></a></td>
@@ -51,9 +51,9 @@
 	<c:if test="${'true' != isExternalUserManagement && userSession.roleManager.administrator}">
 		<tr align="center">
 			<td class="catbottom" colspan="4" height="28">
-				<input class="mainoption" type="button" value="<jforum:i18n key='Groups.List.ClickToNew'/>" onClick="document.location = '<jforum:url address='/adminGroups/add'/>';">
+				<input class="mainoption" type="button" value="<jforum:i18n key='Groups.List.ClickToNew'/>" onClick="document.location = '<jforum:url address='/adminGroups/add'/>';"/>
 				&nbsp;&nbsp;
-				<input class="mainoption" type="submit" value="<jforum:i18n key='Groups.List.ClickToDelete'/>">
+				<input class="mainoption" type="submit" value="<jforum:i18n key='Groups.List.ClickToDelete'/>"/>
 			</td>
 		</tr>
 	</c:if>

@@ -1,5 +1,6 @@
 <%@taglib prefix="jforum" uri="http://www.jforum.net/tags"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <span class="genmed"><strong>${fn:escapeXml(post.user.username)}</strong></span>
 <br />

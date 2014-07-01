@@ -74,7 +74,7 @@
 	
 		<!-- Submit -->
 		<tr>
-			<td colspan="2" align="center"><input type="submit" class="mainoption" value="<jforum:i18n key='Moderation.Admin.submit'/>" /></td></tr>
+			<td colspan="2" align="center"><input type="submit" class="mainoption" value="<jforum:i18n key='Moderation.Admin.submit'/>" /></td>
 		</tr>
 	</table>
 	</form>

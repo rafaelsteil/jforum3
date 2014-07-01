@@ -43,7 +43,7 @@
 					
 					<tr>
 						<td class="row2" valign="middle" align="center"><a class="postdetails" href="<jforum:url address='/forums/show/${topic.forum.id}'/>">${topic.forum.name}</a></td>
-						<td class="row1" valign="middle" align="center" width="20"><%@include file="../forums/topic_folder_images.jsp"%></td>
+						<td class="row1" valign="middle" align="center" width="20"><%@include file="../forum/topic_folder_images.jsp"%></td>
 						<td class="row1" width="80%">
 							<span class="topictitle">
 							<a href="<jforum:url address='/topics/list/${topic.id}'/>">${topic.subject}</a>

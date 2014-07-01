@@ -16,7 +16,7 @@ div.scroll {
 <c:set var="isAdministrator" value="${userSession.roleManager.administrator}"/>
 
 <form accept-charset="${encoding}" id="formPermissions" action="<jforum:url address="/adminGroups/permissionsSave"/>" method="post">
-<input type="hidden" name="groupId" value="${group.id}">
+<input type="hidden" name="groupId" value="${group.id}"/>
 
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 	<tr>
@@ -383,7 +383,7 @@ div.scroll {
 	</tr>
 
 	<tr align="center">
-		<td class="catbottom" colspan="3" height="28"><input class="mainoption" type="submit" value="<jforum:i18n key='PermissionControl.save'/>"></td>
+		<td class="catbottom" colspan="3" height="28"><input class="mainoption" type="submit" value="<jforum:i18n key='PermissionControl.save'/>"/></td>
 	</tr>
 </table>
 

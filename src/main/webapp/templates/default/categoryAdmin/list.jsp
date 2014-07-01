@@ -23,13 +23,13 @@
 			
 			<td class="catleft" align="center" width="10%">
 				<c:if test="${!status.first}">
-					<input type="button" value="<jforum:i18n key='up'/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminCategories/up/${category.id}'/>';">
+					<input type="button" value="<jforum:i18n key='up'/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminCategories/up/${category.id}'/>';"/>
 				</c:if>
 			</td>
 
 			<td class="catleft" align="center" width="10%">
 				<c:if test="${!status.last}">
-					<input type="button" value="<jforum:i18n key='down'/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminCategories/down/${category.id}'/>';">
+					<input type="button" value="<jforum:i18n key='down'/>" class="mainoption" onClick="document.location = '<jforum:url address='/adminCategories/down/${category.id}'/>';"/>
 				</c:if>
 			</td>
 		</tr>

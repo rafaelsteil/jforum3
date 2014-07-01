@@ -16,7 +16,7 @@
 				</tr>
 
 				<tr><td class="row1"><a id="forumIndex" class="genmed" target='_top' href="<jforum:url address='/forums/list'/>"><jforum:i18n key="Admin.forumIndex"/></a></td></tr>
-				<tr><td class="row1"><a id="forumIndex" class="genmed" target='main' href="<jforum:url address='/admin/main'/>"><jforum:i18n key="Admin.adminIndex"/></a></td>
+				<tr><td class="row1"><a id="forumIndex" class="genmed" target='main' href="<jforum:url address='/admin/main'/>"><jforum:i18n key="Admin.adminIndex"/></a></td></tr>
 				<tr>
 					<td class="catsides" height="28"><span class="cattitle"><jforum:i18n key="Admin.forumAdmin"/></span></td>
 				</tr>
@@ -57,9 +57,8 @@
 			
 					<tr>
 						<td class="row1"><p><a id="smilies" class="genmed" href="<jforum:url address='/adminSmilies/list'/>" target="main"><jforum:i18n key="Admin.smilies"/></a></p></td>
-				</tr>
+					</tr>
 
-				<tr>
 					<!-- 
 					<tr>
 						<td class="row1"><p><a id="avatars" class="genmed" href="<jforum:url address='/adminAvatar/list'/>" target="main"><jforum:i18n key="Admin.avatars"/></a></p></td>
@@ -118,7 +117,7 @@
 	</tr>
 </table>
 
-<div align="center"><span class="copyright">Powered by <a class="copyright" href="http://www.jforum.net/" target="_blank">JForum</a></div>
+<div align="center"><span class="copyright">Powered by <a class="copyright" href="http://www.jforum.net/" target="_blank">JForum</a></span></div>
 <br />
 
 <iframe src="<c:url value='/ping_session.jsp'/>" height="0" width="0" frameborder="0" scrolling="no"></iframe>

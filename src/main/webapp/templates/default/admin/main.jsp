@@ -72,7 +72,7 @@
 		    </c:forEach>
 		
 		  <tr>
-			<td colspan="5" height="1" class="row3"><img src="../templates/subSilver/images/spacer.gif" width="1" height="1" alt="."></td>
+			<td colspan="5" height="1" class="row3"><img src="../templates/subSilver/images/spacer.gif" width="1" height="1" alt="."/></td>
 		  </tr>
 		</table>
 	</div>

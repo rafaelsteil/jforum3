@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="0;url=forums/list">
+<meta http-equiv="refresh" content="0;url=forums/list"/>
 </head>
 <body>
 Redirecting...

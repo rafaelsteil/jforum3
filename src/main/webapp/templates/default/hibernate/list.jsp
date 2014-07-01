@@ -224,7 +224,7 @@ for (String regionName : regionNames) {
 	SecondLevelCacheStatistics secondLevelStats = stats.getSecondLevelCacheStatistics(regionName);
 	
 	%>
-	<br>
+	<br/>
 	
 	<table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 		<tr>
@@ -283,12 +283,12 @@ for (String regionName : regionNames) {
  %>
 
 
-<br>
+<br/>
 
 <!-- Entity statitics -->
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 	<tr>
-		<th class="thhead" valign="middle" colspan="2" height="25">Entity Statistics</i></th>
+		<th class="thhead" valign="middle" colspan="2" height="25"><i>Entity Statistics</i></th>
 	</tr>
 	
 	<% 

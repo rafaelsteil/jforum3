@@ -13,7 +13,7 @@
 <form accept-charset="${encoding}" name="form" action="<jforum:url address='/jforum'/>?module=adminTag&action=${saveAction}" method="post">
 
 <c:if test="${not empty name}">
-  <input type="hidden" name="oldTag" value="${name}">
+  <input type="hidden" name="oldTag" value="${name}"/>
 </c:if>
 
 
@@ -24,11 +24,11 @@
         
 	<tr>
 		<td class="row1 gen" width="38%"><jforum:i18n key='Tag.Form.Name'/></td>
-		<td class="row2"><input type="text" name="newTag" value="${name}"></td>
+		<td class="row2"><input type="text" name="newTag" value="${name}"/></td>
 	</tr>
 	
 	<tr>
-		<td class="catbottom" colspan="2" height="28"><input class="mainoption" type="submit" value="<jforum:i18n key='Tag.Form.Save'/>"></td>
+		<td class="catbottom" colspan="2" height="28"><input class="mainoption" type="submit" value="<jforum:i18n key='Tag.Form.Save'/>"/></td>
 	</tr>
 </table>
 </form>

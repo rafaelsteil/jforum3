@@ -51,7 +51,7 @@
 
 				<c:if test="${autoLoginEnabled}">
 					<tr align="center">
-						<td colspan="2"><span class="gen"><label for="autologin"><jforum:i18n key='Login.autoLogon'/>: </a><input type="checkbox" id="autologin" name="autoLogin" value="true" /></span></td>
+						<td colspan="2"><span class="gen"><label for="autologin"><jforum:i18n key='Login.autoLogon'/>: </label><input type="checkbox" id="autologin" name="autoLogin" value="true" /></span></td>
 					</tr>
 				</c:if>
 

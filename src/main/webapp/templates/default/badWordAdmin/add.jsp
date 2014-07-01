@@ -12,7 +12,7 @@
 <form accept-charset="${encoding}" name="form" action="<jforum:url address='/adminBadWord/${saveAction}'/>" method="post">
 
 <c:if test="${not empty word}">
-  <input type="hidden" name="word.id" value="${word.id}">
+  <input type="hidden" name="word.id" value="${word.id}"/>
 </c:if>
 
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%">
@@ -22,16 +22,16 @@
         
 	<tr>
 		<td class="row1 gen" width="38%"><jforum:i18n key='BadWord.Form.Word'/></td>
-		<td class="row2"><input type="text" name="word.word" value="${word.word}"></td>
+		<td class="row2"><input type="text" name="word.word" value="${word.word}"/></td>
 	</tr>
 	
 	<tr>
 		<td class="row1 gen"><jforum:i18n key='BadWord.Form.Replacement'/></td>
-		<td class="row2"><input type="text" name="word.replacement" value="${word.replacement}"></td>
+		<td class="row2"><input type="text" name="word.replacement" value="${word.replacement}"/></td>
 	</tr>
 	
 	<tr>
-		<td class="catbottom" colspan="2" height="28"><input class="mainoption" type="submit" value="<jforum:i18n key='BadWord.Form.Save'/>"></td>
+		<td class="catbottom" colspan="2" height="28"><input class="mainoption" type="submit" value="<jforum:i18n key='BadWord.Form.Save'/>"/></td>
 	</tr>
 </table>
 </form>

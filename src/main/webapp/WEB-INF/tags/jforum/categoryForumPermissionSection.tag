@@ -9,8 +9,8 @@
 
 <c:forEach items="${categories}" var="category">
 	<c:if test="${userSession.roleManager.administrator || userSession.roleManager.isCategoryAllowed$1[category.id]}">
-		<b>${category.name}</b><br>
+		<b>${category.name}</b><br/>
 		<jforum:choicePermissionSection roleName="forum" items="${category.forums}" name="${name}" selected="${selected}"/>
-		<br>
+		<br/>
 	</c:if>
 </c:forEach>

@@ -377,7 +377,7 @@ function validateForm() {
 							</h3>
 							
 							<div id="gallery" style="max-height:250px;overflow-y:scroll;">
-								<input type="radio" name="avatarId" value="" id="noAvatar"> <labele for="noAvatar"><jforum:i18n key="User.noAvatar"/></label>
+								<input type="radio" name="avatarId" value="" id="noAvatar"/> <label for="noAvatar"><jforum:i18n key="User.noAvatar"/></label>
 								
 								<c:forEach items="${avatars}" var="avatar" varStatus="status">
 									<label for="av-${status.count}" ${(status.count>cols && status.count%cols == 1 )?"style='clear:left'":"" }>

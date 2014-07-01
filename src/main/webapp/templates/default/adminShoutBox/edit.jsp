@@ -20,17 +20,17 @@
 	<tr>
 		<td class="row1 gen" width="38%"><jforum:i18n key="ShoutBox.Form.IsAllowAnonymous"/></td>
 		<td class="row2 gensmall">
-			<input class="post" type="radio" name="shoutbox.allowAnonymous" value="false" ${shoutbox.allowAnonymous?"":"checked=\"checked\""}>&nbsp;<jforum:i18n key="User.no"/>
+			<input class="post" type="radio" name="shoutbox.allowAnonymous" value="false" ${shoutbox.allowAnonymous?"":"checked=\"checked\""}/>&nbsp;<jforum:i18n key="User.no"/>
 			&nbsp;&nbsp;
-			<input class="post" type="radio" name="shoutbox.allowAnonymous" value="true" ${shoutbox.allowAnonymous?"checked=\"checked\"":""}>&nbsp;<jforum:i18n key="User.yes"/>
+			<input class="post" type="radio" name="shoutbox.allowAnonymous" value="true" ${shoutbox.allowAnonymous?"checked=\"checked\"":""}/>&nbsp;<jforum:i18n key="User.yes"/>
 		</td>
 	</tr>
 	<tr>
 		<td class="row1 gen" width="38%"><jforum:i18n key="ShoutBox.Form.IsDisabled"/></td>
 		<td class="row2 gensmall">
-			<input class="post" type="radio" name="shoutbox.disabled" value="false" ${shoutbox.disabled?"":"checked=\"checked\""}>&nbsp;<jforum:i18n key="User.no"/>
+			<input class="post" type="radio" name="shoutbox.disabled" value="false" ${shoutbox.disabled?"":"checked=\"checked\""}/>&nbsp;<jforum:i18n key="User.no"/>
 			&nbsp;&nbsp;
-			<input class="post" type="radio" name="shoutbox.disabled" value="true" ${shoutbox.disabled?"checked=\"checked\"":""}>&nbsp;<jforum:i18n key="User.yes"/>
+			<input class="post" type="radio" name="shoutbox.disabled" value="true" ${shoutbox.disabled?"checked=\"checked\"":""}/>&nbsp;<jforum:i18n key="User.yes"/>
 		</td>
 	</tr>
 	

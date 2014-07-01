@@ -339,7 +339,7 @@
 								<input type="hidden" name="topic.id" value="${topic.id}" />
 								<input type="hidden" name="postOptions.disableHtml" value="true" />
 								
-								<c:set var="replySubject"><jforum:i18n key="Message.replyPrefix"/> ${fn:replace(topic.subject, "\"", "")}</c:set>
+								<c:set var="replySubject"><jforum:i18n key="Message.replyPrefix"/> ${fn:replace(topic.subject, '"', '')} </c:set>
 								<input type="hidden" name="post.subject" value="${replySubject}"/>
 								
 								<c:if test="${userSession.logged}">

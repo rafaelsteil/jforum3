@@ -23,7 +23,7 @@
 				<tr>
 					<td style="line-height: 27px;" valign="top" align="left" width="300px">
 						<c:forEach items="${smilies}" var="s">
-							<a href="#" onclick="opener.emoticon('${s.code}'); window.focus();"><img src="${smiliesDir}/${s.diskName}"></a>&nbsp;&nbsp;
+							<a href="#" onclick="opener.emoticon('${s.code}'); window.focus();"><img src="${smiliesDir}/${s.diskName}"/></a>&nbsp;&nbsp;
 						</c:forEach>
 					</td>
 				</tr>

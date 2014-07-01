@@ -40,9 +40,9 @@ function checkGroups()  {
 	<tr>
 		<td class="row1 gen" width="38%"><jforum:i18n key="Category.Form.Moderate"/></td>
 		<td class="row2 gensmall">
-			<input class="post" type="radio" name="category.moderated" value="false" <c:if test="${!category.moderated}">checked="checked"</c:if>>&nbsp;<jforum:i18n key="User.no"/>
+			<input class="post" type="radio" name="category.moderated" value="false" <c:if test="${!category.moderated}">checked="checked"</c:if>/>&nbsp;<jforum:i18n key="User.no"/>
 			&nbsp;&nbsp;
-			<input class="post" type="radio" name="category.moderated" value="true" <c:if test="${category.moderated}">checked="checked"</c:if>>&nbsp;<jforum:i18n key="User.yes"/>
+			<input class="post" type="radio" name="category.moderated" value="true" <c:if test="${category.moderated}">checked="checked"</c:if>/>&nbsp;<jforum:i18n key="User.yes"/>
 		</td>
 	</tr>
 	

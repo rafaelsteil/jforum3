@@ -7,7 +7,7 @@
 <input type="hidden" name="returnUrl" value="${returnUrl}" />
 
 <c:forEach items="${topicIds}" var="topicId">
-	<input type="hidden" name="topicIds" value="${topicId}">
+	<input type="hidden" name="topicIds" value="${topicId}"/>
 </c:forEach>
 
 <table width="100%" cellspacing="0" cellpadding="10" border="0" align="center">

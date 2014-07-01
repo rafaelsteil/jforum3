@@ -10,6 +10,6 @@
 
 <c:forEach items="${items}" var="item">
 	<c:if test="${empty roleName || userSession.roleManager.administrator || userSession.roleManager.roleExists$2[roleName][item.id]}">
-		<input type="checkbox" name="${name}" value="${item.id}" id="${name}_${item.id}" <c:if test="${jforum:contains(selected, item.id)}">checked</c:if>>&nbsp;<label for="${name}_${item.id}">${item.name}</label><br>
+		<input type="checkbox" name="${name}" value="${item.id}" id="${name}_${item.id}" <c:if test="${jforum:contains(selected, item.id)}">checked</c:if>/>&nbsp;<label for="${name}_${item.id}">${item.name}</label><br/>
 	</c:if>
 </c:forEach>
