@@ -16,7 +16,7 @@
 	<property name="srcfile" value="${filename}-src.zip"/>
 	<property name="cobertura.libs.dir" value="${custom.libs}/cobertura"/>
 	<property name="instrumentation.dir" value="target/tests"/>
-	<property name="build.dir" location="webapp" />
+	<property name="build.dir" location="target" />
 	<property name="project.libs" location="lib" />
 	<property name="src.dir" value="src/main/java" />
 	<property name="resources.dir" value="src/main/resources"/>
@@ -24,7 +24,7 @@
 	<property name="tests.resources.dir" value="src/test/resources"/>
 	<property name="classes.dir" value="${build.dir}/WEB-INF/classes" />
 	<property name="tests.classes.dir" value="tmp/tests" />
-	<property name="web.dir" value="webapp" />
+	<property name="web.dir" value="src/main/webapp" />
 	<property name="build.style" value="${cobertura.libs.dir}/style"/>
 	<property name="hsqldb.test.dir" value="${java.io.tmpdir}/jforum-test-database"/>
 	<property name="artifacts.dir" value="tmp/artifacts"/>

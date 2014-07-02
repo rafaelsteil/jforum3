@@ -10,10 +10,12 @@
  */
 package net.jforum.services;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 import java.util.Date;
 
-import junit.framework.Assert;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
@@ -22,63 +24,56 @@ import net.jforum.repository.RSSRepository;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.I18n;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.XpathEngine;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RSSServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private RSSRepository rssRepository = context.mock(RSSRepository.class);
-	private I18n i18n = context.mock(I18n.class);
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private RSSService service = new RSSService(config, rssRepository, i18n, forumRepository);
+
+	@Mock private JForumConfig config;
+	@Mock private RSSRepository rssRepository;
+	@Mock private I18n i18n;
+	@Mock private ForumRepository forumRepository;
+	@InjectMocks private RSSService service;
 
 	@Test
 	public void forTopics() throws Exception {
-		context.checking(new Expectations() {{
-			Forum forum = new Forum(); forum.setId(1); forum.setName("forum x"); forum.setDescription("forum description");
+		Forum forum = new Forum(); forum.setId(1); forum.setName("forum x"); forum.setDescription("forum description");
 
-			one(forumRepository).get(forum.getId()); will(returnValue(forum));
-			one(config).getInt(ConfigKeys.TOPICS_PER_PAGE); will(returnValue(10));
-			one(rssRepository).getForumTopics(forum, 10); will((returnValue(Arrays.asList(
-				newTopic(1, "topic 1", 1, "post text 1")))));
-			one(i18n).params("forum x"); will(returnValue(new Object[] { "forum x" }));
-			one(i18n).getFormattedMessage("RSS.ForumTopics.title", new Object[] { "forum x" }); will(returnValue("channel title"));
-			one(config).getValue(ConfigKeys.RSS_DATE_TIME_FORMAT); will(returnValue("EEE, d MMM yyyy HH:mm:ss"));
-			allowing(config).getString(ConfigKeys.FORUM_LINK); will(returnValue("http://site.link/"));
-		}});
-
+		when(forumRepository.get(forum.getId())).thenReturn(forum);
+		when(config.getInt(ConfigKeys.TOPICS_PER_PAGE)).thenReturn(10);
+		when(rssRepository.getForumTopics(forum, 10)).thenReturn(Arrays.asList(newTopic(1, "topic 1", 1, "post text 1")));
+		when(i18n.params("forum x")).thenReturn(new Object[] { "forum x" });
+		when(i18n.getFormattedMessage("RSS.ForumTopics.title", new Object[] { "forum x" })).thenReturn("channel title");
+		when(config.getValue(ConfigKeys.RSS_DATE_TIME_FORMAT)).thenReturn("EEE, d MMM yyyy HH:mm:ss");
+		when(config.getString(ConfigKeys.FORUM_LINK)).thenReturn("http://site.link/");
 		String result = service.forForum(1);
-		context.assertIsSatisfied();
-
-		System.out.println(result);
 
 		XpathEngine xpath = XMLUnit.newXpathEngine();
 		Document document = XMLUnit.buildControlDocument(result);
 
-		Assert.assertEquals("forum description", xpath.evaluate("//channel/description", document));
-		Assert.assertEquals("http://site.link/forums/show/1.page", xpath.evaluate("//channel/link", document));
-		Assert.assertEquals("channel title", xpath.evaluate("//channel/title", document));
-		Assert.assertEquals("post text 1", xpath.evaluate("//channel/item/description", document));
-		Assert.assertEquals("http://site.link/topics/preList/1/1.page", xpath.evaluate("//channel/item/link", document));
-		Assert.assertEquals("topic 1", xpath.evaluate("//channel/item/title", document));
+		assertEquals("forum description", xpath.evaluate("//channel/description", document));
+		assertEquals("http://site.link/forums/show/1.page", xpath.evaluate("//channel/link", document));
+		assertEquals("channel title", xpath.evaluate("//channel/title", document));
+		assertEquals("post text 1", xpath.evaluate("//channel/item/description", document));
+		assertEquals("http://site.link/topics/preList/1/1.page", xpath.evaluate("//channel/item/link", document));
+		assertEquals("topic 1", xpath.evaluate("//channel/item/title", document));
 	}
 
 	@Before
 	public void setup() {
-		context.checking(new Expectations() {{
-			allowing(config).getValue(ConfigKeys.SERVLET_EXTENSION); will(returnValue(".page"));
-		}});
+		when(config.getValue(ConfigKeys.SERVLET_EXTENSION)).thenReturn(".page");
 	}
 
 	private Topic newTopic(int id, String subject, int postId, String postText) {

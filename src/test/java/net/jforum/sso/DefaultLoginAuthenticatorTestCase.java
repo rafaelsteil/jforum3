@@ -10,73 +10,68 @@
  */
 package net.jforum.sso;
 
+import static org.mockito.Mockito.*;
 import net.jforum.entities.User;
 import net.jforum.repository.UserRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultLoginAuthenticatorTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserRepository repository = context.mock(UserRepository.class);
-	private DefaultLoginAuthenticator authenticator = new DefaultLoginAuthenticator(repository);
+	
+	@Mock private UserRepository repository;
+	@InjectMocks private DefaultLoginAuthenticator authenticator;
 
 	@Test
 	public void userHasActivationKeyButNotActiveExpectFail() {
-		context.checking(new Expectations() {{
-			User user = new User();
-			user.setDeleted(false);
-			user.setActivationKey("some key");
-			user.setActive(false);
+		User user = new User();
+		user.setDeleted(false);
+		user.setActivationKey("some key");
+		user.setActive(false);
 
-			one(repository).validateLogin("user", "passwd"); will(returnValue(user));
-		}});
+		when(repository.validateLogin("user", "passwd")).thenReturn(user);
 
-		User user = authenticator.validateLogin("user", "passwd", null);
-		Assert.assertNull(user);
+		User userValidated = authenticator.validateLogin("user", "passwd", null);
+		Assert.assertNull(userValidated);
 	}
 
 	@Test
 	public void activationKeyNotNullNotActiveExpectFail() {
-		context.checking(new Expectations() {{
-			User user = new User();
-			user.setDeleted(false);
-			user.setActive(false);
-			user.setActivationKey("some key");
+		User user = new User();
+		user.setDeleted(false);
+		user.setActive(false);
+		user.setActivationKey("some key");
 
-			one(repository).validateLogin("user", "passwd"); will(returnValue(user));
-		}});
+		when(repository.validateLogin("user", "passwd")).thenReturn(user);
 
-		User user = authenticator.validateLogin("user", "passwd", null);
-		Assert.assertNull(user);
+		User userValidated = authenticator.validateLogin("user", "passwd", null);
+		Assert.assertNull(userValidated);
 	}
 
 	@Test
 	public void userDeletedExpectFail() {
-		context.checking(new Expectations() {{
-			User user = new User();
-			user.setDeleted(true);
+		User user = new User();
+		user.setDeleted(true);
 
-			one(repository).validateLogin("user", "passwd"); will(returnValue(user));
-		}});
+		when(repository.validateLogin("user", "passwd")).thenReturn(user);
 
-		User user = authenticator.validateLogin("user", "passwd", null);
-		Assert.assertNull(user);
+		User userValidated = authenticator.validateLogin("user", "passwd", null);
+		Assert.assertNull(userValidated);
 	}
 
 	@Test
 	public void invalidLoginFail() {
-		context.checking(new Expectations() {{
-			one(repository).validateLogin("user", "passwd"); will(returnValue(null));
-		}});
+		when(repository.validateLogin("user", "passwd")).thenReturn(null);
 
-		User user = authenticator.validateLogin("user", "passwd", null);
-		Assert.assertNull(user);
+		User userValidated = authenticator.validateLogin("user", "passwd", null);
+		Assert.assertNull(userValidated);
 	}
 }

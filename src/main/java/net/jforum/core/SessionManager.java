@@ -10,7 +10,6 @@
  */
 package net.jforum.core;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -71,7 +70,7 @@ public class SessionManager {
 			this.preventDuplicates(userSession);
 
 			if (userSession.getUser().getId() == this.config.getInt(ConfigKeys.ANONYMOUS_USER_ID)) {
-				this.anonymousSessions.put(userSession.getSessionId(), userSession);
+				anonymousSessions.put(userSession.getSessionId(), userSession);
 			}
 			else {
 				UserSession existing = this.isUserInSession(userSession.getUser().getId());
@@ -90,7 +89,7 @@ public class SessionManager {
 
 				this.checkIfIsModerator(userSession);
 
-				this.loggedSessions.put(userSession.getSessionId(), userSession);
+				loggedSessions.put(userSession.getSessionId(), userSession);
 			}
 		}
 	}
@@ -106,7 +105,7 @@ public class SessionManager {
 
 	public void computeAllOnlineModerators() {
 		this.moderatorsOnline = 0;
-		Collection<UserSession> sessions = this.loggedSessions.values();
+		Collection<UserSession> sessions = loggedSessions.values();
 
 		for (UserSession session : sessions) {
 			this.checkIfIsModerator(session);
@@ -133,7 +132,7 @@ public class SessionManager {
 	 * @param sessionId The session id to remove
 	 */
 	public synchronized void remove(String sessionId) {
-		if (this.loggedSessions.containsKey(sessionId)) {
+		if (loggedSessions.containsKey(sessionId)) {
 			UserSession userSession = this.getUserSession(sessionId);
 
 			if (userSession.getRoleManager() != null
@@ -141,10 +140,10 @@ public class SessionManager {
 				this.moderatorsOnline--;
 			}
 
-			this.loggedSessions.remove(sessionId);
+			loggedSessions.remove(sessionId);
 		}
 		else {
-			this.anonymousSessions.remove(sessionId);
+			anonymousSessions.remove(sessionId);
 		}
 	}
 
@@ -154,8 +153,8 @@ public class SessionManager {
 	 * @return <code>ArrayList</code> with the sessions. Each entry is an <code>UserSession</code> object.
 	 */
 	public List<UserSession> getAllSessions() {
-		List<UserSession> list = new ArrayList<UserSession>(this.loggedSessions.values());
-		list.addAll(this.anonymousSessions.values());
+		List<UserSession> list = new ArrayList<UserSession>(loggedSessions.values());
+		list.addAll(anonymousSessions.values());
 
 		return list;
 	}
@@ -166,7 +165,7 @@ public class SessionManager {
 	 * @return A list with the user sessions
 	 */
 	public Collection<UserSession> getLoggedSessions() {
-		return this.loggedSessions.values();
+		return loggedSessions.values();
 	}
 
 	/**
@@ -175,16 +174,16 @@ public class SessionManager {
 	 * @return the number of logged users
 	 */
 	public int getTotalLoggedUsers() {
-		return this.loggedSessions.size();
+		return loggedSessions.size();
 	}
 
 	/**
 	 * Get the number of anonymous users
 	 *
-	 * @return the nuber of anonymous users
+	 * @return the number of anonymous users
 	 */
 	public int getTotalAnonymousUsers() {
-		return this.anonymousSessions.size();
+		return anonymousSessions.size();
 	}
 
 	/**
@@ -194,8 +193,8 @@ public class SessionManager {
 	 * @return the user session
 	 */
 	public UserSession getUserSession(String sessionId) {
-		UserSession us = this.anonymousSessions.get(sessionId);
-		return us != null ? us : this.loggedSessions.get(sessionId);
+		UserSession us = anonymousSessions.get(sessionId);
+		return us != null ? us : loggedSessions.get(sessionId);
 	}
 
 	/**
@@ -204,7 +203,7 @@ public class SessionManager {
 	 * @return The number of session elements currently online (without bots)
 	 */
 	public int getTotalUsers() {
-		return this.anonymousSessions.size() + this.loggedSessions.size();
+		return anonymousSessions.size() + loggedSessions.size();
 	}
 
 	/**
@@ -214,7 +213,7 @@ public class SessionManager {
 	 * @return The respective {@link UserSession} if the user is already registered, or <code>null</code> otherwise.
 	 */
 	public UserSession isUserInSession(int userId) {
-		for (UserSession us : this.loggedSessions.values()) {
+		for (UserSession us : loggedSessions.values()) {
 			if (us.getUser().getId() == userId) {
 				return us;
 			}
@@ -423,5 +422,10 @@ public class SessionManager {
 			e.printStackTrace();
 			throw new ForumException("Error while executing SSO actions: " + e, e);
 		}
+	}
+	
+	protected void reinitialiseAllSessions() {
+		loggedSessions = new HashMap<String, UserSession>();
+		anonymousSessions = new HashMap<String, UserSession>();
 	}
 }

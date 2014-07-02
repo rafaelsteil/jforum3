@@ -10,42 +10,39 @@
  */
 package net.jforum.security;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.jforum.entities.UserSession;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AuthenticatedRuleTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserSession userSession = context.mock(UserSession.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
+
+	@Mock private UserSession userSession;
+	@Mock private HttpServletRequest request;
 	private AuthenticatedRule rule = new AuthenticatedRule();
 
 	@Test
 	public void notLoggedShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(false));
-		}});
+		when(userSession.isLogged()).thenReturn(false);
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void loggedShouldProceed() {
-		context.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-		}});
+		when(userSession.isLogged()).thenReturn(true);
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertTrue(rule.shouldProceed(userSession, request));
 	}
 }

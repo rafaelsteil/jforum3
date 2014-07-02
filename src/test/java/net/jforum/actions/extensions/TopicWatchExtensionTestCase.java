@@ -10,7 +10,11 @@
  */
 package net.jforum.actions.extensions;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.jforum.actions.helpers.Actions;
@@ -24,67 +28,61 @@ import net.jforum.extensions.ActionExtension;
 import net.jforum.extensions.Extends;
 import net.jforum.security.AuthenticatedRule;
 import net.jforum.services.TopicWatchService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicWatchExtensionTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicWatchService service = context.mock(TopicWatchService.class);
-	private Result mockResult = context.mock(Result.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private TopicWatchExtension extension = new TopicWatchExtension(service, mockResult, userSession);
+	
+	@Mock private TopicWatchService service;
+	@Spy private MockResult mockResult;
+	@Mock private UserSession userSession;
+	@InjectMocks private TopicWatchExtension extension;
 
 	@Test
 	public void afterListNogLoggedWatchingShouldBeFalse() {
 		this.afterListExpectations(false);
 
-		context.checking(new Expectations() {{
-			one(mockResult).include("isUserWatchingTopic", false);
-		}});
-
 		extension.afterList();
-		context.assertIsSatisfied();
+
+		assertEquals(false, mockResult.included("isUserWatchingTopic"));
 	}
 
 	@Test
 	public void afterListLoggedWatchingShouldBeTrue() {
 		this.afterListExpectations(true);
-
-		context.checking(new Expectations() {{
-			Topic t = new Topic();
-			t.setId(1);
-			one(service).getSubscription(t, new User()); will(returnValue(new TopicWatch()));
-			one(mockResult).include("isUserWatchingTopic", true);
-		}});
+		Topic t = new Topic();
+		t.setId(1);
+		when(service.getSubscription(t, new User())).thenReturn(new TopicWatch());
 
 		extension.afterList();
-		context.assertIsSatisfied();
+
+		assertEquals(true, mockResult.included("isUserWatchingTopic"));
 	}
 
 	private void afterListExpectations(final boolean isLogged) {
-		context.checking(new Expectations() {{
-			UserSession us = context.mock(UserSession.class);
-			Topic t = new Topic(); t.setId(1);
+		Topic t = new Topic();
+		t.setId(1);
 
-			if (isLogged) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> m = context.mock(Map.class);
-				one(mockResult).included(); will(returnValue(m));
-				one(m).get("topic"); will(returnValue(t));
-			}
+		if (isLogged) {
+			Map<String, Object> m = new HashMap<String, Object>();
+			m.put("topic", t);
+			when(mockResult.included()).thenReturn(m);
+		}
 
-			one(us).isLogged(); will(returnValue(isLogged));
-			allowing(us).getUser(); will(returnValue(new User()));
-		}});
+		when(userSession.isLogged()).thenReturn(isLogged);
+		when(userSession.getUser()).thenReturn(new User());
 	}
 
 	@Test

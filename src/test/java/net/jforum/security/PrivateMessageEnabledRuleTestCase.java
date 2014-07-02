@@ -10,31 +10,30 @@
  */
 package net.jforum.security;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import net.jforum.entities.UserSession;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PrivateMessageEnabledRuleTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserSession userSession = context.mock(UserSession.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
+
+	@Mock private UserSession userSession;
+	@Mock private RoleManager roleManager;
 	private PrivateMessageEnabledRule rule = new PrivateMessageEnabledRule();
 
 	@Test
 	public void shouldProceed() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isPrivateMessageEnabled(); will(returnValue(true));
-		}});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isPrivateMessageEnabled()).thenReturn(true);
 
-		Assert.assertTrue(rule.shouldProceed(userSession, null));
-		context.assertIsSatisfied();
+		assertTrue(rule.shouldProceed(userSession, null));
 	}
 }

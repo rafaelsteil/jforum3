@@ -12,12 +12,12 @@ package net.jforum.util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 /**
  * Runs a batch of sql statements
@@ -25,10 +25,10 @@ import org.apache.log4j.Logger;
  */
 public class JDBCLoader {
 	private static final Logger logger = Logger.getLogger(JDBCLoader.class);
-	private Connection connection;
+	private Session session;
 
-	public JDBCLoader(Connection connection) {
-		this.connection = connection;
+	public JDBCLoader(Session session) {
+		this.session = session;
 	}
 
 	/**
@@ -69,8 +69,7 @@ public class JDBCLoader {
 	}
 
 	private void runStatement(String sql) throws SQLException {
-		Statement s = connection.createStatement();
-		s.executeUpdate(sql);
-		s.close();
+		SQLQuery query = session.createSQLQuery(sql);
+		query.executeUpdate();
 	}
 }

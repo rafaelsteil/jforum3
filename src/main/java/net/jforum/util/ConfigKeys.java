@@ -51,6 +51,7 @@ public class ConfigKeys {
 
 	public static final String TEMPLATES_MAPPING = "templates.mapping";
 	public static final String TEMPLATE_DIRECTORY = "template.directory";
+	public static final String TEMPLATE_NAME = "template.name";
 	public static final String ENCODING = "encoding";
 	public static final String DEFAULT_CONTAINER_ENCODING = "default.container.encoding";
 	public static final String SERVLET_NAME = "servlet.name";

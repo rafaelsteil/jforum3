@@ -10,10 +10,13 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import junit.framework.Assert;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
@@ -29,42 +32,40 @@ import net.jforum.security.RoleManager;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.SecurityConstants;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PostReportControllerTestCase {
-	private Mockery mockery = TestCaseUtils.newMockery();
-	private UserSession userSession = mockery.mock(UserSession.class);
-	private RoleManager roleManager = mockery.mock(RoleManager.class);
-	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
-	private JForumConfig config = mockery.mock(JForumConfig.class);
-	private Result mockResult = mockery.mock(MockResult.class);
-	private PostReportController mockPostReportController = mockery.mock(PostReportController.class);
-	private PostReportController controller = new PostReportController(repository, config, mockResult, userSession);
+	
+	@Mock private UserSession userSession;
+	@Mock private RoleManager roleManager;
+	@Mock private PostReportRepository repository;
+	@Mock private JForumConfig config;
+	@Spy private MockResult mockResult;
+	@Mock private PostReportController mockPostReportController;
+	@InjectMocks private PostReportController controller;
 
 	@Test
 	public void listResolved() {
-		mockery.checking(new Expectations() {{
-			ignoring(roleManager);
-			allowing(config).getInt(ConfigKeys.TOPICS_PER_PAGE); will(returnValue(10));
-			one(repository).getPaginated(0, 10, PostReportStatus.RESOLVED, new int[] {});
-				will(returnValue(new PaginatedResult<PostReport>(new ArrayList<PostReport>(), 10)));
-			one(mockResult).include("pagination", new Pagination(0, 0, 0, "", 0));
-			one(mockResult).include("reports", new ArrayList<PostReport>());
-		}});
-
+		when(config.getInt(ConfigKeys.TOPICS_PER_PAGE)).thenReturn(10);
+		when(repository.getPaginated(0, 10, PostReportStatus.RESOLVED, new int[] {})).thenReturn(new PaginatedResult<PostReport>(new ArrayList<PostReport>(), 10));
+		
 		controller.listResolved(0);
-		mockery.assertIsSatisfied();
+		
+		assertEquals(new Pagination(0, 0, 0, "", 0), mockResult.included("pagination"));
+		assertEquals(new ArrayList<PostReport>(), mockResult.included("reports"));
 	}
 
 	@Test
@@ -77,135 +78,110 @@ public class PostReportControllerTestCase {
 
 	private void assertMethodModerationRule(String methodName, Class<?>... argumentTypes) throws Exception {
 		Method method = controller.getClass().getMethod(methodName, argumentTypes);
-		Assert.assertNotNull(methodName, method);
-		Assert.assertTrue(methodName, method.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(methodName, ModerationRule.class, method.getAnnotation(SecurityConstraint.class).value());
+		assertNotNull(methodName, method);
+		assertTrue(methodName, method.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(methodName, ModerationRule.class, method.getAnnotation(SecurityConstraint.class).value());
 	}
 
 	@Test
 	public void reportNotLoggedShouldIgnore() {
-		mockery.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(false));
-		}});
-
+		when(userSession.isLogged()).thenReturn(false);
+		
 		controller.report(1, "x");
-		mockery.assertIsSatisfied();
+		
+		verifyZeroInteractions(repository);
 	}
 
 	@Test
 	public void reportLoggedShouldSucceed() {
-		mockery.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-			one(userSession).getUser(); will(returnValue(new User()));
-			one(repository).add(with(any(PostReport.class)));
-		}});
-
+		when(userSession.isLogged()).thenReturn(true);
+		when(userSession.getUser()).thenReturn(new User());
+		
 		controller.report(1, "x");
-		mockery.assertIsSatisfied();
+
+		verify(repository).add(any(PostReport.class));
 	}
 
 	@Test
 	public void deleteNotForumModeratorShouldIgnore() {
-		mockery.checking(new Expectations() {{
-			int[] forumIds = new int[] {1};
+		int[] forumIds = new int[] {1};
 
-			one(roleManager).getRoleValues(SecurityConstants.FORUM); will(returnValue(forumIds));
-
-			PostReport report = new PostReport();
-			report.setPost(new Post());
-			report.getPost().setForum(new Forum());
-			report.getPost().getForum().setId(2);
-
-			one(repository).get(1); will(returnValue(report));
-
-			one(mockResult).redirectTo(controller);
-			will(returnValue(mockPostReportController));
-			one(mockPostReportController).list();
-		}});
-
+		when(roleManager.getRoleValues(SecurityConstants.FORUM)).thenReturn(forumIds);
+		PostReport report = new PostReport();
+		report.setPost(new Post());
+		report.getPost().setForum(new Forum());
+		report.getPost().getForum().setId(2);
+		when(repository.get(1)).thenReturn(report);
+		when(mockResult.redirectTo(controller)).thenReturn(mockPostReportController);
+		
 		controller.delete(1);
-		mockery.assertIsSatisfied();
+		
+		verify(mockPostReportController).list();
 	}
 
 	@Test
 	public void deleteShouldSucceed() {
-		mockery.checking(new Expectations() {{
-			int[] forumIds = new int[] {1};
+		int[] forumIds = new int[] {1};
 
-			one(roleManager).getRoleValues(SecurityConstants.FORUM); will(returnValue(forumIds));
-
-			PostReport report = new PostReport();
-			report.setPost(new Post());
-			report.getPost().setForum(new Forum());
-			report.getPost().getForum().setId(1);
-
-			one(repository).get(1); will(returnValue(report));
-			one(repository).remove(report);
-			one(mockResult).redirectTo(controller);
-			will(returnValue(mockPostReportController));
-			one(mockPostReportController).list();
-		}});
-
+		when(roleManager.getRoleValues(SecurityConstants.FORUM)).thenReturn(forumIds);
+		PostReport report = new PostReport();
+		report.setPost(new Post());
+		report.getPost().setForum(new Forum());
+		report.getPost().getForum().setId(1);
+		when(repository.get(1)).thenReturn(report);
+		when(mockResult.redirectTo(controller)).thenReturn(mockPostReportController);
+	
 		controller.delete(1);
-		mockery.assertIsSatisfied();
+		
+		verify(repository).remove(report);
+		verify(mockPostReportController).list();
 	}
 
 	@Test
 	public void listNotAdministratorShouldFilterByForum() {
-		mockery.checking(new Expectations() {{
-			int[] forumIds = new int[] {1, 2};
+		int[] forumIds = new int[] {1, 2};
 
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(false));
-			one(roleManager).getRoleValues(SecurityConstants.FORUM); will(returnValue(forumIds));
-			one(repository).getAll(PostReportStatus.UNRESOLVED, forumIds); will(returnValue(new ArrayList<PostReport>()));
-			one(mockResult).include("reports", new ArrayList<PostReport>());
-		}});
-
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isCoAdministrator()).thenReturn(false);
+		when(roleManager.getRoleValues(SecurityConstants.FORUM)).thenReturn(forumIds);
+		when(repository.getAll(PostReportStatus.UNRESOLVED, forumIds)).thenReturn(new ArrayList<PostReport>());
+		
 		controller.list();
-		mockery.assertIsSatisfied();
+		
+		assertEquals(new ArrayList<PostReport>(), mockResult.included("reports"));
 	}
 
 	@Test
 	public void listNullStatusDefaultShouldBeUnresolved() {
-		mockery.checking(new Expectations() {{
-			ignoring(roleManager); ignoring(mockResult);
-			one(repository).getAll(PostReportStatus.UNRESOLVED, new int[] {});
-		}});
-
 		controller.list();
-		mockery.assertIsSatisfied();
+		
+		verify(repository).getAll(PostReportStatus.UNRESOLVED, new int[] {});
 	}
 
 	@Test
 	public void listIsAdministratorShouldNotFilterByForum() {
-		mockery.checking(new Expectations() {{
-			one(roleManager).isAdministrator(); will(returnValue(true));
-			one(repository).getAll(PostReportStatus.UNRESOLVED, null); will(returnValue(new ArrayList<PostReport>()));
-			one(mockResult).include("reports", new ArrayList<PostReport>());
-		}});
-
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(repository.getAll(PostReportStatus.UNRESOLVED, null)).thenReturn(new ArrayList<PostReport>());
+		
 		controller.list();
-		mockery.assertIsSatisfied();
+		
+		assertEquals(new ArrayList<PostReport>(), mockResult.included("reports"));
 	}
 
 	@Test
 	public void listIsCoAdministratorShouldNotFilterByForum() {
-		mockery.checking(new Expectations() {{
-			one(roleManager).isAdministrator(); will(returnValue(false));
-			one(roleManager).isCoAdministrator(); will(returnValue(true));
-			one(repository).getAll(PostReportStatus.UNRESOLVED, null); will(returnValue(new ArrayList<PostReport>()));
-			one(mockResult).include("reports", new ArrayList<PostReport>());
-		}});
-
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isCoAdministrator()).thenReturn(true);
+		when(repository.getAll(PostReportStatus.UNRESOLVED, null)).thenReturn(new ArrayList<PostReport>());
+		
 		controller.list();
-		mockery.assertIsSatisfied();
+		
+		assertEquals(new ArrayList<PostReport>(), mockResult.included("reports"));
 	}
 
 	@Before
 	public void setup() {
-		mockery.checking(new Expectations() {{
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-		}});
+		when(roleManager.getRoleValues(SecurityConstants.FORUM)).thenReturn(new int[] {});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
 	}
 }

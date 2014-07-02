@@ -10,7 +10,7 @@
  */
 package net.jforum.controllers;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 import net.jforum.core.SecurityConstraint;
 import net.jforum.security.AdministrationRule;
 
@@ -28,8 +28,8 @@ public abstract class AdminTestCase {
 
 	@Test
 	public void shouldHaveAdministrationRule() throws Exception {
-		Assert.assertTrue(type.isAnnotationPresent(SecurityConstraint.class));
-		Assert.assertEquals(AdministrationRule.class, type.getAnnotation(SecurityConstraint.class).value());
-		Assert.assertTrue(type.getAnnotation(SecurityConstraint.class).displayLogin());
+		assertTrue(type.isAnnotationPresent(SecurityConstraint.class));
+		assertEquals(AdministrationRule.class, type.getAnnotation(SecurityConstraint.class).value());
+		assertTrue(type.getAnnotation(SecurityConstraint.class).displayLogin());
 	}
 }

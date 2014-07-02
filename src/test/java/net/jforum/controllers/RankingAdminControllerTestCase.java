@@ -10,123 +10,96 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 
 import net.jforum.entities.Ranking;
 import net.jforum.repository.RankingRepository;
 import net.jforum.services.RankingService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RankingAdminControllerTestCase extends AdminTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private RankingAdminController controller;
-	private RankingRepository repository = context.mock(RankingRepository.class);
-	private RankingService service = context.mock(RankingService.class);
-	private RankingAdminController mockController = context.mock(RankingAdminController.class);
-	private Result mockResult = context.mock(MockResult.class);
+	
+	@InjectMocks private RankingAdminController controller;
+	@Mock private RankingRepository repository;
+	@Mock private RankingService service;
+	@Mock private RankingAdminController mockController;
+	@Spy private MockResult mockResult;
 
 	public RankingAdminControllerTestCase() {
 		super(RankingAdminController.class);
 	}
 
 	@Test
+	@Ignore("is that suposed to test something")
 	public void add() {
-		context.checking(new Expectations() {
-			{
-			}
-		});
-		context.assertIsSatisfied();
+		
 	}
 
 	@Test
 	public void addSave() {
-		context.checking(new Expectations() {
-			{
-				one(service).add(with(aNonNull(Ranking.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockController));
-				one(mockController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(controller)).thenReturn(mockController);
+	
 		controller.addSave(new Ranking());
-		context.assertIsSatisfied();
+		
+		verify(service).add(notNull(Ranking.class));
+		verify(mockController).list();
 	}
 
 	@Test
 	public void edit() {
-		context.checking(new Expectations() {
-			{
-				Ranking ranking = new Ranking();
-				one(repository).get(1); will(returnValue(ranking));
-				one(mockResult).include("ranking", ranking);
-				one(mockResult).forwardTo(controller); will(returnValue(mockController));
-				one(mockController).add();
-			}
-		});
-
+		Ranking ranking = new Ranking();
+		when(repository.get(1)).thenReturn(ranking);
+		when(mockResult.forwardTo(controller)).thenReturn(mockController);
+			
 		controller.edit(1);
-		context.assertIsSatisfied();
+		
+		assertEquals(ranking, mockResult.included("ranking"));
+		verify(mockController).add();
 	}
 
 	@Test
 	public void editSave() {
-		context.checking(new Expectations() {
-			{
-				one(service).update(with(aNonNull(Ranking.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockController));
-				one(mockController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(controller)).thenReturn(mockController);
+		
 		controller.editSave(new Ranking());
-		context.assertIsSatisfied();
+		
+		verify(service).update(notNull(Ranking.class));
+		verify(mockController).list();
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {
-			{
-				one(service).delete(1, 2, 3, 4);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockController));
-				one(mockController).list();
-			}
-		});
-
+		when(mockResult.redirectTo(controller)).thenReturn(mockController);
+			
 		controller.delete(1, 2, 3, 4);
-		context.assertIsSatisfied();
+		
+		verify(service).delete(1, 2, 3, 4);
+		verify(mockController).list();
 	}
 
 	@Test
 	public void listExpectOneRecord() {
-		context.checking(new Expectations() {
-			{
-				one(repository).getAllRankings();
-				will(returnValue(Arrays.asList(new Ranking())));
-				one(mockResult).include("rankings",
-						Arrays.asList(new Ranking()));
-			}
-		});
-
+		when(repository.getAllRankings()).thenReturn(Arrays.asList(new Ranking()));
+	
 		controller.list();
-		context.assertIsSatisfied();
-	}
-
-	@Before
-	public void setup() {
-		controller = new RankingAdminController(repository, service, mockResult);
+		
+		assertEquals(Arrays.asList(new Ranking()), mockResult.included("rankings"));
 	}
 }

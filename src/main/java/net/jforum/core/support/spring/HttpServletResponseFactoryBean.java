@@ -21,13 +21,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 /**
  * @author Rafael Steil
  */
-public class HttpServletResponseFactoryBean implements FactoryBean {
+public class HttpServletResponseFactoryBean implements FactoryBean<HttpServletResponse> {
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
-	public Object getObject() throws Exception {
+	public HttpServletResponse getObject() throws Exception {
 		RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
-		return attributes.getAttribute(ConfigKeys.HTTP_SERVLET_RESPONSE, RequestAttributes.SCOPE_REQUEST);
+		return (HttpServletResponse) attributes.getAttribute(ConfigKeys.HTTP_SERVLET_RESPONSE, RequestAttributes.SCOPE_REQUEST);
 	}
 
 	/**

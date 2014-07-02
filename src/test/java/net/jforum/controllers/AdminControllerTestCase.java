@@ -10,7 +10,6 @@
  */
 package net.jforum.controllers;
 
-import net.jforum.controllers.AdminController;
 
 
 /**

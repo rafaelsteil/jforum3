@@ -10,49 +10,48 @@
  */
 package net.jforum.core.events.post;
 
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.repository.ForumRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumPostEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ForumRepository repository = context.mock(ForumRepository.class);
-	private ForumPostEvent event = new ForumPostEvent(repository);
+	
+	@Mock private ForumRepository repository;
+	@InjectMocks private ForumPostEvent event;
 
 	@Test
 	public void deleteLastPostExpectUpdate() {
 		final Post post = this.newPost();
 		post.setId(2);
-
-		context.checking(new Expectations() {{
-			Post newLastPost = new Post(); newLastPost.setId(13);
-			one(repository).getLastPost(post.getForum()); will(returnValue(newLastPost));
-		}});
-
+	
+		Post newLastPost = new Post(); newLastPost.setId(13);
+		when(repository.getLastPost(post.getForum())).thenReturn(newLastPost);
+	
 		event.deleted(post);
-		context.assertIsSatisfied();
-
+		
 		Post expected = new Post(); expected.setId(13);
 		Assert.assertEquals(expected, post.getForum().getLastPost());
 	}
 
 	@Test
 	public void deleteOrdinaryPostShouldDoNothing() {
-		context.checking(new Expectations() {{ }});
 		Post post = this.newPost();
 		post.setId(10);
 		event.deleted(post);
-		context.assertIsSatisfied();
+		
 	}
 
 	private Post newPost() {

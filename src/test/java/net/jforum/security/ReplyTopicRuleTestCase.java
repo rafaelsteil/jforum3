@@ -10,6 +10,10 @@
  */
 package net.jforum.security;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,193 +28,146 @@ import net.jforum.entities.UserSession;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ReplyTopicRuleTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserSession userSession = context.mock(UserSession.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private Map<String, String> parameterMap = new HashMap<String, String>() {/**
-		 *
-		 */
-		private static final long serialVersionUID = 1L;
 
-	{ put("topic.forum.id", "1"); }};
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-	private PostRepository postRepository = context.mock(PostRepository.class);
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private SessionManager sessionManager = context.mock(SessionManager.class);
-	private ReplyTopicRule rule = new ReplyTopicRule(topicRepository, postRepository, forumRepository, sessionManager);
+	@Mock private UserSession userSession;
+	@Mock private HttpServletRequest request;
+	@Mock private RoleManager roleManager;
+	private Map<String, String[]> parameterMap;
+	@Mock private TopicRepository topicRepository;
+	@Mock private PostRepository postRepository;
+	@Mock private ForumRepository forumRepository;
+	@Mock private SessionManager sessionManager;
+	@InjectMocks private ReplyTopicRule rule;
+
+	@Before
+	public void setup() {
+		parameterMap = new HashMap<String, String[]>();
+		parameterMap.put("topic.forum.id", Arrays.asList("1").toArray(new String[1]));
+		when(request.getParameterMap()).thenReturn(parameterMap);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+	}
 
 	@Test(expected = AccessRuleException.class)
 	public void forumIdNotFoundExpectsException() {
 		parameterMap.clear();
 
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			ignoring(userSession); ignoring(roleManager);
-		}});
-
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void forumIdFromPostId() {
-		parameterMap.clear(); parameterMap.put("postId", "2");
-
-		context.checking(new Expectations() {{
-			ignoring(userSession); ignoring(roleManager);
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("postId"); will(returnValue("2"));
-
-			one(forumRepository).get(0); will(returnValue(new Forum()));
-
-			Post post = new Post(); post.setForum(new Forum());
-			one(postRepository).get(2); will(returnValue(post));
-		}});
+		parameterMap.clear(); parameterMap.put("postId", Arrays.asList("2").toArray(new String[1]));
+		when(request.getParameter("postId")).thenReturn("2");
+		when(forumRepository.get(0)).thenReturn(new Forum());
+		Post post = new Post(); post.setForum(new Forum());
+		when(postRepository.get(2)).thenReturn(post);
 
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void forumIdFromTopicId() {
-		parameterMap.clear(); parameterMap.put("topicId", "2");
-
-		context.checking(new Expectations() {{
-			ignoring(userSession); ignoring(roleManager);
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topicId"); will(returnValue("2"));
-			one(topicRepository).get(2); will(returnValue(new Topic()));
-			one(forumRepository).get(0); will(returnValue(new Forum()));
-		}});
+		parameterMap.clear(); parameterMap.put("topicId", Arrays.asList("2").toArray(new String[1]));
+		when(request.getParameter("topicId")).thenReturn("2");
+		when(topicRepository.get(2)).thenReturn(new Topic());
+		when(forumRepository.get(0)).thenReturn(new Forum());
 
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void forumIdFromTopicForumId() {
-		context.checking(new Expectations() {{
-			ignoring(userSession); ignoring(roleManager);
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-		}});
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(forumRepository.get(1)).thenReturn(new Forum());
 
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void loggedNotReadOnlyForumAllowedShouldAccept() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isForumAllowed(1); will(returnValue(true));
-			one(roleManager).isForumReadOnly(1); will(returnValue(false));
-			one(roleManager).getPostOnlyWithModeratorOnline(); will(returnValue(false));
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-		}});
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isForumAllowed(1)).thenReturn(true);
+		when(roleManager.isForumReadOnly(1)).thenReturn(false);
+		when(roleManager.getPostOnlyWithModeratorOnline()).thenReturn(false);
+		when(forumRepository.get(1)).thenReturn(new Forum());
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertTrue(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void postOnlyWithModeratorOnlineModeratorIsOfflineShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isForumAllowed(1); will(returnValue(true));
-			one(roleManager).isForumReadOnly(1); will(returnValue(false));
-			exactly(2).of(roleManager).getPostOnlyWithModeratorOnline(); will(returnValue(true));
-			one(sessionManager).isModeratorOnline(); will(returnValue(false));
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-		}});
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isForumAllowed(1)).thenReturn(true);
+		when(roleManager.isForumReadOnly(1)).thenReturn(false);
+		when(roleManager.getPostOnlyWithModeratorOnline()).thenReturn(true);
+		when(sessionManager.isModeratorOnline()).thenReturn(false);
+		when(forumRepository.get(1)).thenReturn(new Forum());
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
+
 	}
 
 	@Test
 	public void postOnlyWithModeratorOnlineModeratorIsOnlineShouldAccept() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isForumAllowed(1); will(returnValue(true));
-			one(roleManager).isForumReadOnly(1); will(returnValue(false));
-			exactly(2).of(roleManager).getPostOnlyWithModeratorOnline(); will(returnValue(true));
-			one(sessionManager).isModeratorOnline(); will(returnValue(true));
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-		}});
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isForumAllowed(1)).thenReturn(true);
+		when(roleManager.isForumReadOnly(1)).thenReturn(false);
+		when(roleManager.getPostOnlyWithModeratorOnline()).thenReturn(true);
+		when(sessionManager.isModeratorOnline()).thenReturn(true);
+		when(forumRepository.get(1)).thenReturn(new Forum());
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertTrue(rule.shouldProceed(userSession, request));
+
 	}
 
 	@Test
 	public void anonymousPostsNotAllowedShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(false));
-			one(roleManager).isForumAllowed(1); will(returnValue(true));
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(false);
+		when(roleManager.isForumAllowed(1)).thenReturn(true);
+		Forum forum = new Forum();
+		forum.setAllowAnonymousPosts(false);
 
-			Forum forum = new Forum();
-			forum.setAllowAnonymousPosts(false);
+		when(forumRepository.get(1)).thenReturn(forum);
 
-			one(forumRepository).get(1); will(returnValue(forum));
-		}});
-
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void forumNotAllowedShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(roleManager).isForumAllowed(1); will(returnValue(false));
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-		}});
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(roleManager.isForumAllowed(1)).thenReturn(false);
+		when(forumRepository.get(1)).thenReturn(new Forum());
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void forumReadOnlyShouldDeny() {
-		context.checking(new Expectations() {{
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("topic.forum.id"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
-			one(roleManager).isForumAllowed(1); will(returnValue(true));
-			one(roleManager).isForumReadOnly(1); will(returnValue(true));
-			one(forumRepository).get(1); will(returnValue(new Forum()));
-		}});
+		when(request.getParameterMap()).thenReturn(parameterMap);
+		when(request.getParameter("topic.forum.id")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(true);
+		when(roleManager.isForumAllowed(1)).thenReturn(true);
+		when(roleManager.isForumReadOnly(1)).thenReturn(true);
+		when(forumRepository.get(1)).thenReturn(new Forum());
 
-		Assert.assertFalse(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertFalse(rule.shouldProceed(userSession, request));
+
 	}
 }

@@ -25,7 +25,6 @@ import br.com.caelum.vraptor.ioc.Container;
 @Component
 @ApplicationScoped
 public class PostFormatters extends ArrayList<Formatter> {
-	@SuppressWarnings({ "unchecked" })
 	public PostFormatters(JForumConfig config, Container container) throws Exception {
 
 		List<String> formatters = config.getValueAsList(ConfigKeys.MESSAGE_FORMATTERS);

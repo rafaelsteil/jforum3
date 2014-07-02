@@ -10,10 +10,11 @@
  */
 package net.jforum.services;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
 import net.jforum.entities.Poll;
 import net.jforum.entities.PollOption;
 
@@ -35,11 +36,11 @@ public class PollServiceTestCase {
 		PollService service = new PollService();
 		service.processChanges(poll, allOptions);
 
-		Assert.assertEquals(3, poll.getOptions().size());
-		Assert.assertFalse(poll.getOptions().contains(this.createOption(2, "B")));
-		Assert.assertFalse(poll.getOptions().contains(this.createOption(3, "c")));
-		Assert.assertTrue(poll.getOptions().contains(this.createOption(0, "E")));
-		Assert.assertEquals("A changed", poll.getOptions().get(0).getText());
+		assertEquals(3, poll.getOptions().size());
+		assertFalse(poll.getOptions().contains(this.createOption(2, "B")));
+		assertFalse(poll.getOptions().contains(this.createOption(3, "c")));
+		assertTrue(poll.getOptions().contains(this.createOption(0, "E")));
+		assertEquals("A changed", poll.getOptions().get(0).getText());
 	}
 
 	private Poll createPoll() {

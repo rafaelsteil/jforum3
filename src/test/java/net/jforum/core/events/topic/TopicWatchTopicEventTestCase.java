@@ -10,31 +10,31 @@
  */
 package net.jforum.core.events.topic;
 
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Topic;
 import net.jforum.repository.TopicWatchRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicWatchTopicEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicWatchRepository repository = context.mock(TopicWatchRepository.class);
-	private TopicWatchTopicEvent event = new TopicWatchTopicEvent(repository);
+	
+	@Mock private TopicWatchRepository repository;
+	@InjectMocks private TopicWatchTopicEvent event = new TopicWatchTopicEvent(repository);
 
 	@Test
 	public void deleted() {
 		final Topic topic = new Topic(); topic.setId(2);
-
-		context.checking(new Expectations() {{
-			one(repository).removeSubscription(topic);
-		}});
-
+		
 		event.deleted(topic);
-		context.assertIsSatisfied();
+
+		verify(repository).removeSubscription(topic);
 	}
 }

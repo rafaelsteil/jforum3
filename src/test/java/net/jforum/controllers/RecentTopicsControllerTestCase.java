@@ -10,96 +10,60 @@
  */
 package net.jforum.controllers;
 
-import java.util.ArrayList;
+import static org.junit.Assert.*;
 
-import net.jforum.controllers.RecentTopicsController;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.jforum.entities.Topic;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.RecentTopicsRepository;
-import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RecentTopicsControllerTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private RecentTopicsRepository repository = context
-			.mock(RecentTopicsRepository.class);
-	private JForumConfig config = context.mock(JForumConfig.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private RecentTopicsController component = new RecentTopicsController(repository,
-			config, userSession, mockResult);
+	@Mock private RecentTopicsRepository repository;
+	@Mock private JForumConfig config;
+	@Mock private UserSession userSession;
+	@Spy private MockResult mockResult;
+	
+	@InjectMocks private RecentTopicsController component;
 
+	List<Topic> topicList = new ArrayList<Topic>();
+	
 	@Test
 	public void listNew() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(null));
-				one(repository).getNewTopics(10);
-				will(returnValue(new ArrayList<Topic>()));
-				one(config).getInt(ConfigKeys.RECENT_TOPICS);
-				will(returnValue(10));
-				one(mockResult).include("topics", new ArrayList<Topic>());
-				one(mockResult).include("recentTopicsSectionKey",
-						"recentTopicsNew");
-				one(mockResult).forwardTo("list");
-			}
-		});
-
 		component.listNew();
-		context.assertIsSatisfied();
+
+		assertEquals("recentTopicsNew", mockResult.included("recentTopicsSectionKey"));
+		assertEquals(topicList, mockResult.included("topics"));
 	}
 
 	@Test
 	public void listUpdated() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(null));
-				one(repository).getUpdatedTopics(10);
-				will(returnValue(new ArrayList<Topic>()));
-				one(config).getInt(ConfigKeys.RECENT_TOPICS);
-				will(returnValue(10));
-				one(mockResult).include("topics", new ArrayList<Topic>());
-				one(mockResult).include("recentTopicsSectionKey",
-						"recentTopicsUpdated");
-				one(mockResult).forwardTo("list");
-			}
-		});
-
 		component.listUpdated();
-		context.assertIsSatisfied();
+
+		assertEquals("recentTopicsUpdated", mockResult.included("recentTopicsSectionKey"));
+		assertEquals(topicList, mockResult.included("topics"));
 	}
 
 	@Test
 	public void listHot() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(null));
-				one(repository).getHotTopics(10);
-				will(returnValue(new ArrayList<Topic>()));
-				one(config).getInt(ConfigKeys.RECENT_TOPICS);
-				will(returnValue(10));
-				one(mockResult).include("topics", new ArrayList<Topic>());
-				one(mockResult).include("recentTopicsSectionKey",
-						"recentTopicsHot");
-				one(mockResult).forwardTo("list");
-			}
-		});
-
 		component.listHot();
-		context.assertIsSatisfied();
+
+		assertEquals("recentTopicsHot", mockResult.included("recentTopicsSectionKey"));
+		assertEquals(topicList, mockResult.included("topics"));
 	}
 }

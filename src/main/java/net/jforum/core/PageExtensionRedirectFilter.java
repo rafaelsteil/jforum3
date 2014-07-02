@@ -18,7 +18,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 public class PageExtensionRedirectFilter implements Filter {
 	@Override
@@ -27,8 +26,6 @@ public class PageExtensionRedirectFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest)req;
-		HttpServletRequest response = (HttpServletRequest)res;
 	}
 
 	@Override

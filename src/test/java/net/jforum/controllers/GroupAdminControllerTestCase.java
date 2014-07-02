@@ -10,9 +10,15 @@
  */
 package net.jforum.controllers;
 
-import java.util.ArrayList;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
-import net.jforum.actions.helpers.PermissionOptions;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import javax.servlet.http.HttpServletRequest;
+
 import net.jforum.entities.Category;
 import net.jforum.entities.Group;
 import net.jforum.entities.UserSession;
@@ -20,277 +26,180 @@ import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.GroupRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.services.GroupService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
+//import net.jforum.actions.helpers.PermissionOptions;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class GroupAdminControllerTestCase extends AdminTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private GroupAdminController controller;
-	private GroupRepository repository = context.mock(GroupRepository.class);
-	private GroupService service = context.mock(GroupService.class);
-	private CategoryRepository categoryRepository = context.mock(CategoryRepository.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private Result mockResult = context.mock(MockResult.class);
-	private GroupAdminController mockGroupAdminController = context.mock(GroupAdminController.class);
+	@Mock private GroupService service;
+	@Mock private GroupRepository repository;
+	@Mock private CategoryRepository categoryRepository;
+	@Spy private MockResult mockResult;
+	@Mock private UserSession userSession;
+	@Mock private HttpServletRequest mockRequest;
+
+	@Mock private RoleManager roleManager;
+	@Mock private GroupAdminController mockGroupAdminControllerForward;
+	@Mock private GroupAdminController mockGroupAdminControllerRedirect;
+
+	@InjectMocks private GroupAdminController controller;
+	
+	private Group group = new Group();
 
 	public GroupAdminControllerTestCase() {
 		super(GroupAdminController.class);
 	}
 
+	@Before
+	public void setup() {
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(mockResult.redirectTo(controller)).thenReturn(mockGroupAdminControllerRedirect);
+		when(mockResult.forwardTo(controller)).thenReturn(mockGroupAdminControllerForward);
+	}
+
 	@Test
 	public void permissions() {
-		context.checking(new Expectations() {
-			{
-				one(repository).get(1);
-				will(returnValue(new Group()));
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(categoryRepository).getAllCategories();
-				will(returnValue(new ArrayList<Category>()));
-				one(repository).getAllGroups();
-				will(returnValue(new ArrayList<Group>()));
-
-				one(mockResult).include("group", new Group());
-				one(mockResult).include("groups", new ArrayList<Group>());
-				one(mockResult).include("categories", new ArrayList<Category>());
-				one(mockResult).include("permissions", new PermissionOptions());
-			}
-		});
+		when(repository.get(1)).thenReturn(new Group());
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(categoryRepository.getAllCategories()).thenReturn(new ArrayList<Category>());
+		when(repository.getAllGroups()).thenReturn(new ArrayList<Group>());
 
 		controller.permissions(1);
-		context.assertIsSatisfied();
+
+		verify(mockResult).include("group", new Group());
+		verify(mockResult).include("groups", new ArrayList<Group>());
+		verify(mockResult).include("categories", new ArrayList<Category>());
 	}
 
 	@Test
 	public void permissionsSave() {
-		final PermissionOptions permissions = new PermissionOptions();
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(mockRequest.getParameterNames()).thenReturn(Collections.enumeration(Collections.<String>emptyList()));
+		
+		controller.permissionsSave(1);
 
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(service).savePermissions(1, permissions);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
-
-		controller.permissionsSave(1, permissions);
-		context.assertIsSatisfied();
+		verify(service).savePermissions(eq(1), anyMap());
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void deleteIsFullAdministratorShouldAllow() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(service).delete(1, 2);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(true);
 
 		controller.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(service).delete(1, 2);
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void deleteIsNotFullAdministratorShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(false);
 
 		controller.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void list() {
-		context.checking(new Expectations() {
-			{
-				one(repository).getAllGroups();
-				will(returnValue(new ArrayList<Group>()));
-				one(mockResult).include("groups", new ArrayList<Group>());
-			}
-		});
+		ArrayList<Group> groups = new ArrayList<Group>();
+
+		when(repository.getAllGroups()).thenReturn(groups);
 
 		controller.list();
-		context.assertIsSatisfied();
+
+		assertEquals(groups, mockResult.included("groups"));
 	}
 
 	@Test
 	public void editExpectsAGroup() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(repository).get(2);
-				will(returnValue(new Group()));
-				one(mockResult).include("group", new Group());
-				one(mockResult).forwardTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).add();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(repository.get(2)).thenReturn(group);
 
 		controller.edit(2);
-		context.assertIsSatisfied();
+
+		verify(mockResult).include("group", group);
+		verify(mockGroupAdminControllerForward).add();
 	}
 
 	@Test
 	public void editSaveIsFullAdministratorExpectsSuccess() {
-		final Group group = new Group();
-
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-
-				one(service).update(group);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(true);
 
 		controller.editSave(group);
-		context.assertIsSatisfied();
+
+		verify(service).update(group);
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void editSaveIsGroupManagerExpectsSuccess() {
-		final Group group = new Group();
-
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(roleManager).isGroupManager(group.getId());
-				will(returnValue(true));
-
-				one(service).update(group);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isGroupManager(group.getId())).thenReturn(true);
 
 		controller.editSave(group);
-		context.assertIsSatisfied();
+
+		verify(service).update(group);
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void editSaveIsNotFullAdministratorAndNotGroupManagerShouldIgnore() {
-		final Group group = new Group();
-
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(roleManager).isGroupManager(group.getId());
-				will(returnValue(false));
-
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isGroupManager(group.getId())).thenReturn(false);
 
 		controller.editSave(group);
-		context.assertIsSatisfied();
+
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void addSaveIsFullAdministratorShouldAllow() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(service).add(with(aNonNull(Group.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(true);
 
 		controller.addSave(new Group());
-		context.assertIsSatisfied();
+
+		verify(service).add(notNull(Group.class));
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void addSaveIsNotFullAdministratorShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(false);
 
 		controller.addSave(new Group());
-		context.assertIsSatisfied();
+
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void addIsNotFullAdministratorShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockGroupAdminController));
-				one(mockGroupAdminController).list();
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(false);
 
 		controller.add();
-		context.assertIsSatisfied();
+
+		verify(mockGroupAdminControllerRedirect).list();
 	}
 
 	@Test
 	public void addIsFullAdministratorShouldAllow() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-			}
-		});
+		when(roleManager.isAdministrator()).thenReturn(true);
 
 		controller.add();
-		context.assertIsSatisfied();
-	}
 
-	@Before
-	public void setup() {
-		controller = new GroupAdminController(service, repository, categoryRepository, mockResult, userSession);
-
-		context.checking(new Expectations() {
-			{
-				allowing(userSession).getRoleManager();
-				will(returnValue(roleManager));
-			}
-		});
+		verify(mockGroupAdminControllerRedirect,never()).list();
 	}
 }

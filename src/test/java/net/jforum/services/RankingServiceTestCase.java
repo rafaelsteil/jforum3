@@ -10,33 +10,35 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Ranking;
 import net.jforum.repository.RankingRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RankingServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private RankingRepository repository = context.mock(RankingRepository.class);
-	private RankingService service = new RankingService(repository);
+
+	@Mock private RankingRepository repository;
+	@InjectMocks private RankingService service;
 
 	@Test
 	public void specialRankingShouldNotHaveMinPass10ShouldForceToZero() {
-		context.checking(new Expectations() {{
-			one(repository).add(with(aNonNull(Ranking.class)));
-		}});
-
 		Ranking r = new Ranking(); r.setTitle("r1"); r.setSpecial(true); r.setMin(10);
+		
 		service.add(r);
-		context.assertIsSatisfied();
+
+		verify(repository).add(notNull(Ranking.class));
 		Assert.assertEquals(0, r.getMin());
 	}
 
@@ -48,38 +50,28 @@ public class RankingServiceTestCase {
 
 	@Test
 	public void deleteUsingNullIdsShouldIgnore() {
-		context.checking(new Expectations() {{
-
-		}});
-
 		service.delete(null);
-		context.assertIsSatisfied();
+
+		verifyZeroInteractions(repository);
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(new Ranking()));
-			one(repository).get(2); will(returnValue(new Ranking()));
-
-			exactly(2).of(repository).remove(with(aNonNull(Ranking.class)));
-		}});
+		when(repository.get(1)).thenReturn(new Ranking());
+		when(repository.get(2)).thenReturn(new Ranking());
 
 		service.delete(1, 2);
-		context.assertIsSatisfied();
+
+		verify(repository, times(2)).remove(notNull(Ranking.class));
 	}
 
 	@Test
 	public void addExpectSuccess() {
-		context.checking(new Expectations() {{
-			one(repository).add(with(aNonNull(Ranking.class)));
-		}});
-
 		Ranking r = new Ranking(); r.setTitle("r1"); r.setMin(1);
 
 		service.add(r);
 
-		context.assertIsSatisfied();
+		verify(repository).add(notNull(Ranking.class));
 	}
 
 	@Test(expected = ValidationException.class)
@@ -96,15 +88,11 @@ public class RankingServiceTestCase {
 
 	@Test
 	public void updateExpectSuccess() {
-		context.checking(new Expectations() {{
-			one(repository).update(with(aNonNull(Ranking.class)));
-		}});
-
 		Ranking r = new Ranking(); r.setId(1); r.setTitle("r1"); r.setMin(1);
 
 		service.update(r);
 
-		context.assertIsSatisfied();
+		verify(repository).update(notNull(Ranking.class));
 	}
 
 	@Test(expected = NullPointerException.class)

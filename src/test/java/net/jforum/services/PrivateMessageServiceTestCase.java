@@ -10,71 +10,68 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.PrivateMessage;
 import net.jforum.entities.PrivateMessageType;
 import net.jforum.entities.User;
 import net.jforum.repository.PrivateMessageRepository;
-import net.jforum.util.TestCaseUtils;
+import static org.junit.Assert.*;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.States;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PrivateMessageServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private PrivateMessageRepository repository = context.mock(PrivateMessageRepository.class);
-	private PrivateMessageService service = new PrivateMessageService(repository);
-	private States state = context.states("state");
+
+	@Mock private PrivateMessageRepository repository;
+	@InjectMocks private PrivateMessageService service;
 	private PrivateMessage pm = new PrivateMessage();
 
 	@Test
 	public void deleteIsSenderTypeSentShouldAccept() {
-		state.become("delete");
+		when(repository.get(1)).thenReturn(pm);
 		pm.setToUser(this.newUser(3)); pm.setFromUser(this.newUser(2)); pm.setType(PrivateMessageType.SENT);
 
-		context.checking(new Expectations() {{
-			one(repository).remove(pm);
-		}});
-
 		service.delete(this.newUser(2), 1);
+
+		verify(repository).remove(pm);
 	}
 
 	@Test
 	public void deleteIsRecipientTypeNotSentShouldAccept() {
-		state.become("delete");
+		when(repository.get(1)).thenReturn(pm);
 		pm.setToUser(this.newUser(3)); pm.setFromUser(this.newUser(2)); pm.setType(PrivateMessageType.READ);
 
-		context.checking(new Expectations() {{
-			one(repository).remove(pm);
-		}});
-
 		service.delete(this.newUser(3), 1);
+
+		verify(repository).remove(pm);
 	}
 
 	@Test
 	public void deleteIsSenderTypeNotSentShouldIgnore() {
-		state.become("delete");
+		when(repository.get(1)).thenReturn(pm);
 		pm.setToUser(this.newUser(3)); pm.setFromUser(this.newUser(2)); pm.setType(PrivateMessageType.NEW);
 		service.delete(this.newUser(2), 1);
 	}
 
 	@Test
 	public void deleteIsRecipientTypeSentShouldIgnore() {
-		state.become("delete");
+		when(repository.get(1)).thenReturn(pm);
 		pm.setToUser(this.newUser(3)); pm.setFromUser(this.newUser(2)); pm.setType(PrivateMessageType.SENT);
 		service.delete(this.newUser(3), 1);
 	}
 
 	@Test
 	public void deleteNotRecipientNotSenderShouldIgnore() {
-		state.become("delete");
+		when(repository.get(1)).thenReturn(pm);
 		pm.setToUser(this.newUser(2)); pm.setFromUser(this.newUser(3));
 		service.delete(this.newUser(1), 1);
 	}
@@ -86,10 +83,6 @@ public class PrivateMessageServiceTestCase {
 
 	@Test
 	public void sendWithNullDateShouldForceAValue() {
-		context.checking(new Expectations() {{
-			ignoring(repository);
-		}});
-
 		PrivateMessage pm = new PrivateMessage();
 		pm.setFromUser(new User());
 		pm.setToUser(new User());
@@ -98,17 +91,12 @@ public class PrivateMessageServiceTestCase {
 		pm.setDate(null);
 
 		service.send(pm);
-		context.assertIsSatisfied();
 
-		Assert.assertNotNull(pm.getDate());
+		assertNotNull(pm.getDate());
 	}
 
 	@Test
 	public void sendExpectSuccess() {
-		context.checking(new Expectations() {{
-			one(repository).add(with(aNonNull(PrivateMessage.class)));
-		}});
-
 		PrivateMessage pm = new PrivateMessage();
 		pm.setFromUser(new User());
 		pm.setToUser(new User());
@@ -116,7 +104,8 @@ public class PrivateMessageServiceTestCase {
 		pm.setSubject("subject");
 
 		service.send(pm);
-		context.assertIsSatisfied();
+		
+		verify(repository).add(notNull(PrivateMessage.class));
 	}
 
 	@Test(expected = ValidationException.class)
@@ -183,13 +172,6 @@ public class PrivateMessageServiceTestCase {
 		pm.setSubject("subject");
 
 		service.send(pm);
-	}
-
-	@Before
-	public void setup() {
-		context.checking(new Expectations() {{
-			allowing(repository).get(1); will(returnValue(pm)); when(state.is("delete"));
-		}});
 	}
 
 	private User newUser(int id) {

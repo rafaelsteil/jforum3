@@ -10,6 +10,9 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,219 +28,145 @@ import net.jforum.repository.TopicRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.services.ModerationService;
 import net.jforum.util.JForumConfig;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ModerationControllerTestCase {
 
-	private Mockery context = TestCaseUtils.newMockery();
-	private JForumConfig jForumConfig = context.mock(JForumConfig.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private ModerationService service = context.mock(ModerationService.class);
+	
+	@Mock private JForumConfig jForumConfig;
+	@Mock private RoleManager roleManager;
+	@Mock private ModerationService service;
 	private ModerationLog moderationLog = new ModerationLog();
-	private CategoryRepository categoryRepository = context
-			.mock(CategoryRepository.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private TopicRepository topicRepository = context
-			.mock(TopicRepository.class);
-	private ModerationLogRepository moderationLogRepository = context
-			.mock(ModerationLogRepository.class);
+	@Mock private CategoryRepository categoryRepository;
+	@Mock private UserSession userSession;
+	@Mock private TopicRepository topicRepository;
+	@Mock private ModerationLogRepository moderationLogRepository;
 	private User user = new User();
-	private Result mockResult = context.mock(MockResult.class);
-	private ForumController mockForumController = context
-			.mock(ForumController.class);
-	private ModerationController controller = new ModerationController(
-			mockResult, roleManager, service, categoryRepository,
-			topicRepository, jForumConfig, moderationLogRepository, userSession);
+	@Spy private MockResult mockResult;
+	@Mock private ForumController mockForumController;
+	@InjectMocks private ModerationController controller;
 
 	@Test
 	public void moveTopics() {
-
-		context.checking(new Expectations() {
-			{
-				one(userSession).getUser();
-				will(returnValue(user));
-				one(roleManager).getCanMoveTopics();
-				will(returnValue(true));
-				one(service).moveTopics(1, moderationLog, 2, 3, 4);
-				one(mockResult).redirectTo("return path");
-			}
-		});
-
+		when(userSession.getUser()).thenReturn(user);
+		when(roleManager.getCanMoveTopics()).thenReturn(true);
+			
 		controller.moveTopics(1, "return path", moderationLog, 2, 3, 4);
-		context.assertIsSatisfied();
+		
+		verify(service).moveTopics(1, moderationLog, 2, 3, 4);
+		verify(mockResult).redirectTo("return path");
 	}
 
 	@Test
 	public void moveTopicsDoesNotHaveRoleShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanMoveTopics();
-				will(returnValue(false));
-				one(mockResult).redirectTo("return path");
-			}
-		});
-
+		when(roleManager.getCanMoveTopics()).thenReturn(false);
+			
 		controller.moveTopics(1, "return path", moderationLog, 1, 2);
-		context.assertIsSatisfied();
+		
+		verify(mockResult).redirectTo("return path");
 	}
 
 	@Test
 	public void askMoveDestination() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanMoveTopics();
-				will(returnValue(true));
-				one(categoryRepository).getAllCategories();
-				will(returnValue(new ArrayList<Category>()));
-				one(mockResult).include("topicIds", new int[] { 1, 2, 3 });
-				one(mockResult).include("fromForumId", 10);
-				one(mockResult).include("returnUrl", "return path");
-				one(mockResult)
-						.include("categories", new ArrayList<Category>());
-			}
-		});
-
+		when(roleManager.getCanMoveTopics()).thenReturn(true);
+		when(categoryRepository.getAllCategories()).thenReturn(new ArrayList<Category>());
+			
 		controller.askMoveDestination("return path", 10, 1, 2, 3);
-		context.assertIsSatisfied();
+		
+		assertArrayEquals(new int[] { 1, 2, 3 }, (int[])mockResult.included("topicIds"));
+		assertEquals(10, mockResult.included("fromForumId"));
+		assertEquals("return path", mockResult.included("returnUrl"));
+		assertEquals(new ArrayList<Category>(), mockResult.included("categories"));
 	}
 
 	@Test
 	public void askMoveDestinationDoesNotHaveRoleShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanMoveTopics();
-				will(returnValue(false));
-				one(mockResult).redirectTo("return path");
-			}
-		});
-
+		when(roleManager.getCanMoveTopics()).thenReturn(false);
+			
 		controller.askMoveDestination("return path", 1, 2, 3);
-		context.assertIsSatisfied();
+		
+		verify(mockResult).redirectTo("return path");
 	}
 
 	@Test
 	public void lockUnlock() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getUser();
-				will(returnValue(user));
-				one(roleManager).getCanLockUnlockTopics();
-				will(returnValue(true));
-				one(service).lockUnlock(new int[] { 1, 2, 3 }, moderationLog);
-				// ignoring(mockResult);
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-				one(mockForumController).show(1, 0);
-			}
-		});
-
+		when(userSession.getUser()).thenReturn(user);
+		when(roleManager.getCanLockUnlockTopics()).thenReturn(true);
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumController);
+	
 		controller.lockUnlock(1, null, moderationLog, new int[] { 1, 2, 3 });
-		context.assertIsSatisfied();
+
+		verify(service).lockUnlock(new int[] { 1, 2, 3 }, moderationLog);
+		verify(mockForumController).show(1, 0);
 	}
 
 	@Test
 	public void lockUnlockDoesNotHaveRoleShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanLockUnlockTopics();
-				will(returnValue(false));
-				// ignoring(mockResult);
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-				one(mockForumController).show(1, 0);
-			}
-		});
-
+		when(roleManager.getCanLockUnlockTopics()).thenReturn(false);
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumController);
+			
 		controller.lockUnlock(1, null, moderationLog, new int[] { 1 });
-		context.assertIsSatisfied();
+		
+		verify(mockForumController).show(1, 0);
 	}
 
 	@Test
 	public void deleteTopicsExpectSuccess() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getUser();
-				will(returnValue(user));
-				one(roleManager).getCanDeletePosts();
-				will(returnValue(true));
-				one(topicRepository).get(4);
-				will(returnValue(new Topic()));
-				one(topicRepository).get(5);
-				will(returnValue(new Topic()));
-				one(service).deleteTopics(
-						Arrays.asList(new Topic(), new Topic()), moderationLog);
-
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-
-				// TODO pass zero?
-				one(mockForumController).show(1, 0);
-			}
-		});
+		when(userSession.getUser()).thenReturn(user);
+		when(roleManager.getCanDeletePosts()).thenReturn(true);
+		when(topicRepository.get(4)).thenReturn(new Topic());
+		when(topicRepository.get(5)).thenReturn(new Topic());
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumController);
 
 		controller.deleteTopics(1, null, new int[] { 4, 5 }, moderationLog);
-		context.assertIsSatisfied();
+		
+		verify(service).deleteTopics(Arrays.asList(new Topic(), new Topic()), moderationLog);
+		// TODO pass zero?
+		verify(mockForumController).show(1, 0);
 	}
 
 	@Test
 	public void deleteTopicsDoesNotHaveRoleShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanDeletePosts();
-				will(returnValue(false));
-
-				// TODO pass zero?
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-				one(mockForumController).show(1, 0);
-			}
-		});
-
+		when(roleManager.getCanDeletePosts()).thenReturn(false);
+		// TODO pass zero?
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumController);
+			
 		controller.deleteTopics(1, null, new int[] { 4 }, moderationLog);
-		context.assertIsSatisfied();
+		
+		verify(mockForumController).show(1, 0);
 	}
 
 	@Test
 	public void approveExpectSuccess() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanApproveMessages();
-				will(returnValue(true));
-				one(service).doApproval(1, Arrays.asList(new ApproveInfo[0]));
-
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-				// TODO pass zero?
-				one(mockForumController).show(1, 0);
-			}
-		});
-
+		when(roleManager.getCanApproveMessages()).thenReturn(true);
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumController);
+			
 		controller.approve(1, Arrays.asList(new ApproveInfo[0]));
+		
+		verify(service).doApproval(1, Arrays.asList(new ApproveInfo[0]));
+		// TODO pass zero?
+		verify(mockForumController).show(1, 0);
 	}
 
 	@Test
 	public void approveDoesNotHaveRequiredRoleShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(roleManager).getCanApproveMessages();
-				will(returnValue(false));
-
-				one(mockResult).redirectTo(ForumController.class);
-				will(returnValue(mockForumController));
-				one(mockForumController).show(1, 0);
-			}
-		});
-
+		when(roleManager.getCanApproveMessages()).thenReturn(false);
+		when(mockResult.redirectTo(ForumController.class)).thenReturn(mockForumController);
+			
 		controller.approve(1, Arrays.asList(new ApproveInfo[0]));
+		
+		verify(mockForumController).show(1, 0);
 	}
 }

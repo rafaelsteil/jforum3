@@ -90,13 +90,13 @@ public class GroupAdminController {
 		RoleManager roleManager = this.userSession.getRoleManager();
 
 		if (roleManager.isAdministrator() || roleManager.isGroupManager(groupId)) {
-			this.service.savePermissions(groupId, extractPermissiosnFromRequest());
+			this.service.savePermissions(groupId, extractPermissionsFromRequest());
 		}
 
 		this.result.redirectTo(this).list();
 	}
 
-	private Map<String, Map<String, List<?>>> extractPermissiosnFromRequest() {
+	private Map<String, Map<String, List<?>>> extractPermissionsFromRequest() {
 		Map<String, Map<String, List<?>>> m = new HashMap<String, Map<String,List<?>>>();
 		m.put("boolean", new HashMap<String, List<?>>());
 		m.put("multiple", new HashMap<String, List<?>>());

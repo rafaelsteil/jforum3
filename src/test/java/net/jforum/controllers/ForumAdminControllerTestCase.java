@@ -10,6 +10,10 @@
  */
 package net.jforum.controllers;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 
 import net.jforum.entities.Category;
@@ -19,29 +23,30 @@ import net.jforum.repository.CategoryRepository;
 import net.jforum.repository.ForumRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.services.ForumService;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumAdminControllerTestCase extends AdminTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ForumAdminController controller;
-	private CategoryRepository categoryRepository = context.mock(CategoryRepository.class);
-	private ForumService service = context.mock(ForumService.class);
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private UserSession userSession = context.mock(UserSession.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-	private ForumAdminController mockForumAdminController = context.mock(ForumAdminController.class);
-	private Result mockResult = context.mock(MockResult.class);
+	
+	@InjectMocks private ForumAdminController controller;
+	@Mock private CategoryRepository categoryRepository;
+	@Mock private ForumService service;
+	@Mock private ForumRepository forumRepository;
+	@Mock private UserSession userSession;
+	@Mock private RoleManager roleManager;
+	@Mock private ForumAdminController mockForumAdminController;
+	@Spy private MockResult mockResult;
 
 	public ForumAdminControllerTestCase() {
 		super(ForumAdminController.class);
@@ -49,139 +54,89 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 
 	@Test
 	public void deleteIsFullAdministratorShouldAllow() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(service).delete(1, 2);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.delete(1, 2);
-		context.assertIsSatisfied();
+		
+		verify(service).delete(1, 2);
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
 	public void deleteIsNotFullAdministratorShouldIgnore() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.delete(1, 2);
-		context.assertIsSatisfied();
+		
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
 	public void list() {
 		final Category category = new Category(categoryRepository);
 
-		context.checking(new Expectations() {
-			{
-				one(categoryRepository).getAllCategories();
-				will(returnValue(Arrays.asList(category)));
-				one(mockResult).include("categories", Arrays.asList(category));
-			}
-		});
-
+		when(categoryRepository.getAllCategories()).thenReturn(Arrays.asList(category));
+			
 		controller.list();
-		context.assertIsSatisfied();
+		
+		assertEquals(Arrays.asList(category), mockResult.included("categories"));
 	}
 
 	@Test
 	public void addExpectCategories() {
-		context.checking(new Expectations() {
-			{
-				one(categoryRepository).getAllCategories();
-				will(returnValue(Arrays.asList(new Category())));
-				one(mockResult).include("categories",
-						Arrays.asList(new Category()));
-			}
-		});
-
+		when(categoryRepository.getAllCategories()).thenReturn(Arrays.asList(new Category()));
+			
 		controller.add();
-		context.assertIsSatisfied();
+		
+		assertEquals(Arrays.asList(new Category()), mockResult.included("categories"));
 	}
 
 	@Test
 	public void editExpectForumAndCategories() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).getCanModerateForum(3);
-				will(returnValue(true));
-				one(forumRepository).get(3);
-				will(returnValue(new Forum()));
-				one(categoryRepository).getAllCategories();
-				will(returnValue(Arrays.asList(new Category())));
-				one(mockResult).include("forum", new Forum());
-				one(mockResult).include("categories",
-						Arrays.asList(new Category()));
-				one(mockResult).forwardTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).add();
-			}
-		});
-
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.getCanModerateForum(3)).thenReturn(true);
+		when(forumRepository.get(3)).thenReturn(new Forum());
+		when(categoryRepository.getAllCategories()).thenReturn(Arrays.asList(new Category()));
+		when(mockResult.forwardTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.edit(3);
-		context.assertIsSatisfied();
+		
+		assertEquals(new Forum(), mockResult.included("forum"));
+		assertEquals(Arrays.asList(new Category()), mockResult.included("categories"));
+		verify(mockForumAdminController).add();
 	}
 
 	@Test
 	public void editSaveIsSuperAdministratorExpectsSuccess() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(service).update(with(aNonNull(Forum.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.editSave(new Forum());
-		context.assertIsSatisfied();
+		
+		verify(service).update(notNull(Forum.class));
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
 	public void editSaveIsCategoryAllowedExpectsSuccess() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(roleManager).getCanModerateForum(0);
-				will(returnValue(true));
-				one(service).update(with(aNonNull(Forum.class)));
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.getCanModerateForum(0)).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+	
 		Forum forum = new Forum();
 		forum.setCategory(new Category());
 		forum.getCategory().setId(1);
 
 		controller.editSave(forum);
-		context.assertIsSatisfied();
+		
+		verify(service).update(notNull(Forum.class));
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
@@ -189,47 +144,32 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 		final Forum forum = new Forum();
 		forum.setCategory(new Category());
 		forum.getCategory().setId(1);
-
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(roleManager).getCanModerateForum(0);
-				will(returnValue(true));
-				one(service).update(forum);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.getCanModerateForum(0)).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.editSave(forum);
-		context.assertIsSatisfied();
+		
+		verify(service).update(forum);
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
 	public void addSaveIsSuperAdministratorExpectSuccess() {
 		final Forum f = new Forum();
 		f.setName("f1");
-
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(true));
-				one(mockResult).include("forum", f);
-				one(service).add(f);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.addSave(f);
-		context.assertIsSatisfied();
+		
+		assertEquals(f, mockResult.included("forum"));
+		verify(service).add(f);
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
@@ -238,25 +178,17 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 		f.setName("f1");
 		f.setCategory(new Category());
 		f.getCategory().setId(1);
-
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(roleManager).isCategoryAllowed(1);
-				will(returnValue(true));
-				one(mockResult).include("forum", f);
-				one(service).add(f);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isCategoryAllowed(1)).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.addSave(f);
-		context.assertIsSatisfied();
+		
+		assertEquals(f, mockResult.included("forum"));
+		verify(service).add(f);
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
@@ -265,68 +197,41 @@ public class ForumAdminControllerTestCase extends AdminTestCase {
 		forum.setName("f1");
 		forum.setCategory(new Category());
 		forum.getCategory().setId(1);
-
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).isAdministrator();
-				will(returnValue(false));
-				one(roleManager).isCategoryAllowed(1);
-				will(returnValue(true));
-				one(service).add(forum);
-				one(mockResult).include("forum", forum);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isAdministrator()).thenReturn(false);
+		when(roleManager.isCategoryAllowed(1)).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.addSave(forum);
-		context.assertIsSatisfied();
+		
+		verify(service).add(forum);
+		assertEquals(forum, mockResult.included("forum"));
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
 	public void up() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).getCanModerateForum(1);
-				will(returnValue(true));
-				one(service).upForumOrder(1);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
-
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.getCanModerateForum(1)).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 		controller.up(1);
-		context.assertIsSatisfied();
+		
+		verify(service).upForumOrder(1);
+		verify(mockForumAdminController).list();
 	}
 
 	@Test
 	public void down() {
-		context.checking(new Expectations() {
-			{
-				one(userSession).getRoleManager();
-				will(returnValue(roleManager));
-				one(roleManager).getCanModerateForum(2);
-				will(returnValue(true));
-				one(service).downForumOrder(2);
-				one(mockResult).redirectTo(controller);
-				will(returnValue(mockForumAdminController));
-				one(mockForumAdminController).list();
-			}
-		});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.getCanModerateForum(2)).thenReturn(true);
+		when(mockResult.redirectTo(controller)).thenReturn(mockForumAdminController);
+			
 
 		controller.down(2);
-		context.assertIsSatisfied();
-	}
-
-	@Before
-	public void setup() {
-		controller = new ForumAdminController(service, forumRepository,
-				categoryRepository, mockResult, userSession);
+		
+		verify(service).downForumOrder(2);
+		verify(mockForumAdminController).list();
 	}
 }

@@ -15,6 +15,8 @@ package net.jforum.core.exceptions;
  * @version $Id: DatabaseException.java,v 1.1.2.1 2007/02/25 18:52:28 rafaelsteil Exp $
  */
 public class DatabaseException extends RuntimeException {
+	private static final long serialVersionUID = 5979182004250721653L;
+
 	public DatabaseException(String message) {
 		super(message);
 	}

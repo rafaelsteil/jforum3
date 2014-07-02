@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+	
+    <display-name>JForum 3 - Powering Communities</display-name>
+    <description>Open Source Java Forum Software</description>
+    
+	<!-- 	
+	<listener>
+		<listener-class>beanface.el.functor.InstallFunctorListener</listener-class>
+	</listener>
+  	 -->
+  	 
+	<!-- 	
+	<listener>
+  		<listener-class>net.jforum.core.UserSessionListener</listener-class>
+  	</listener>
+  	 -->
+	
+	<context-param>
+    	<param-name>br.com.caelum.vraptor.provider</param-name>
+    	<param-value>net.jforum.core.VRaptorSpringProvider</param-value>
+	</context-param>
+
+	<!-- JForum2 URL Compatibility. Uncoment if necessary -->
+	<!-- For more information, check http://code.google.com/p/urlrewritefilter -->
+	<!-- 
+	<filter>
+		<filter-name>JForum2_UrlRewriteFilter</filter-name>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+		
+		<init-param>
+			<param-name>statusEnabled</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>JForum2_UrlRewriteFilter</filter-name>
+		<url-pattern>/posts/list/*</url-pattern>
+	</filter-mapping>
+	 -->
+	
+	<!-- Clickstream -->
+	<!--
+	<filter>
+		<filter-name>clickstream-jforum</filter-name>
+		<filter-class>net.jforum.util.legacy.clickstream.ClickstreamFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>clickstream-jforum</filter-name>
+		<url-pattern>*.page</url-pattern>
+	</filter-mapping>
+	-->
+	
+	<!-- VRaptor 3.4.0 -->
+	<filter>
+	    <filter-name>vraptor</filter-name>
+	    <filter-class>br.com.caelum.vraptor.VRaptor</filter-class>
+	</filter>
+
+	<filter-mapping>
+	    <filter-name>vraptor</filter-name>
+	    <url-pattern>/*</url-pattern>
+	    <dispatcher>FORWARD</dispatcher>
+	    <dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+
+	<!--     
+    <error-page>
+    	<exception-type>java.lang.Exception</exception-type>
+    	<location>/templates/default/error.jsp</location>
+    </error-page>
+    -->
+    
+    <session-config>
+    	<session-timeout>10</session-timeout>
+    </session-config>
+    
+    <context-param>
+    	<param-name>br.com.caelum.vraptor.encoding</param-name>
+    	<param-value>UTF-8</param-value>
+	</context-param>
+    
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

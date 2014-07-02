@@ -12,7 +12,6 @@ package net.jforum.security;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.jforum.core.SecurityConstraint;
 import net.jforum.core.SessionManager;
 import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.Forum;

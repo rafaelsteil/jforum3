@@ -10,67 +10,66 @@
  */
 package net.jforum.extensions;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.PostReportRepository;
 import net.jforum.security.RoleManager;
 import net.jforum.util.SecurityConstants;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.util.test.MockResult;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PostReportCounterOperationTestCase {
-	private Mockery mockery = TestCaseUtils.newMockery();
-	private PostReportRepository repository = mockery.mock(PostReportRepository.class);
-	private UserSession userSession = mockery.mock(UserSession.class);
-	private RoleManager roleManager = mockery.mock(RoleManager.class);
-	private Result mockResult = mockery.mock(Result.class);
-	private PostReportCounterOperation operation = new PostReportCounterOperation(repository, mockResult, userSession);
+
+	@Mock private PostReportRepository repository;
+	@Mock private UserSession userSession;
+	@Mock private RoleManager roleManager;
+	@Spy private MockResult mockResult;
+	@InjectMocks private PostReportCounterOperation operation;
 
 	@Test
 	public void notLoggedExpectZero() {
-		mockery.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(false));
-			one(mockResult).include("totalPostReports", 0);
-		}});
+		when(userSession.isLogged()).thenReturn(false);
 
 		operation.execute();
-		mockery.assertIsSatisfied();
+		
+		assertEquals(0, mockResult.included("totalPostReports"));
 	}
 
 	@Test
 	public void notModeratorExpectZero() {
-		mockery.checking(new Expectations() {{
-			one(userSession).isLogged(); will(returnValue(true));
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isModerator(); will(returnValue(false));
-			one(mockResult).include("totalPostReports", 0);
-		}});
+		when(userSession.isLogged()).thenReturn(true);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isModerator()).thenReturn(false);
 
 		operation.execute();
-		mockery.assertIsSatisfied();
+		
+		assertEquals(0, mockResult.included("totalPostReports"));
 	}
 
 	@Test
 	public void moderatorExpect10() {
-		mockery.checking(new Expectations() {{
-			int[] forumIds = { 1, 2 };
+		int[] forumIds = { 1, 2 };
 
-			one(userSession).isLogged(); will(returnValue(true));
-			allowing(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).isModerator(); will(returnValue(true));
-			one(roleManager).getRoleValues(SecurityConstants.FORUM); will(returnValue(forumIds));
-			one(repository).countPendingReports(forumIds); will(returnValue(10));
-			one(mockResult).include("totalPostReports", 10);
-		}});
+		when(userSession.isLogged()).thenReturn(true);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.isModerator()).thenReturn(true);
+		when(roleManager.getRoleValues(SecurityConstants.FORUM)).thenReturn(forumIds);
+		when(repository.countPendingReports(forumIds)).thenReturn(10);
 
 		operation.execute();
-		mockery.assertIsSatisfied();
+		
+		assertEquals(10, mockResult.included("totalPostReports"));
 	}
 }

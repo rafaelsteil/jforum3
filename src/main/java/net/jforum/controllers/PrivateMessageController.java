@@ -137,7 +137,7 @@ public class PrivateMessageController {
 	}
 
 	/**
-	 * Shows the page ot sent messages
+	 * Shows the page to sent messages
 	 */
 	public void sent() {
 		User user = this.userSession.getUser();

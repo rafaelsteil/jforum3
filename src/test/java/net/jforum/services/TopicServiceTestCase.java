@@ -10,6 +10,9 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Collections;
 import java.util.Date;
 
@@ -23,112 +26,105 @@ import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
 import net.jforum.repository.UserRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.Sequence;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicRepository topicRepository = context.mock(TopicRepository.class);
-	private PostRepository postRepository = context.mock(PostRepository.class);
-	private ForumRepository forumRepository = context.mock(ForumRepository.class);
-	private PollService pollService = context.mock(PollService.class);
-	private AttachmentService attachmentService = context.mock(AttachmentService.class);
-    private UserRepository userRepository = context.mock(UserRepository.class);
-	private TopicService topicService = new TopicService(topicRepository, postRepository, forumRepository, attachmentService, pollService, userRepository);
+	
+	@Mock private TopicRepository topicRepository;
+	@Mock private PostRepository postRepository;
+	@Mock private ForumRepository forumRepository;
+	@Mock private PollService pollService;
+	@Mock private AttachmentService attachmentService;
+	@Mock private UserRepository userRepository;
+	@InjectMocks private TopicService topicService;
 
 	@Test
 	public void addTopicInvocationsShouldBeInOrder() {
-		final Sequence sequence = context.sequence("order");
-		final Topic t = context.mock(Topic.class);
+		final Topic t = mock(Topic.class);
 
-		context.checking(new Expectations() {{
-			allowing(t).getSubject(); will(returnValue("subject"));
-			User user = new User();
-			allowing(t).getUser(); will(returnValue(user));
-
-			Forum forum = new Forum(); forum.setId(1);
-			allowing(t).getForum(); will(returnValue(forum));
-
-			Post post = context.mock(Post.class);
-			allowing(post).getSubject(); will(returnValue("subject"));
-			allowing(post).getText(); will(returnValue("text"));
-
-			allowing(t).getFirstPost(); will(returnValue(post));
-			Date date = new Date();
-			allowing(t).getDate(); will(returnValue(date));
-
-			one(t).setFirstPost(null);
-			one(t).setHasAttachment(false);
-
-			one(topicRepository).add(t); inSequence(sequence);
-			one(post).setForum(forum); inSequence(sequence);
-			one(post).setTopic(t); inSequence(sequence);
-			one(post).setDate(date); inSequence(sequence);
-			one(post).setUser(user); inSequence(sequence);
-			one(post).setSubject("subject"); inSequence(sequence);
-
-			one(postRepository).add(post); inSequence(sequence);
-			one(t).setFirstPost(post); inSequence(sequence);
-			one(t).setLastPost(post); inSequence(sequence);
-
-			one(t).isWaitingModeration(); will(returnValue(true));
-
-			one(pollService).associatePoll(t, Collections.<PollOption>emptyList());
-			one(attachmentService).insertAttachments(Collections.<AttachedFile>emptyList(), post);
-		}});
-
+		when(t.getSubject()).thenReturn("subject");
+		User user = new User();
+		when(t.getUser()).thenReturn(user);
+	
+		Forum forum = new Forum(); forum.setId(1);
+		when(t.getForum()).thenReturn(forum);
+	
+		Post post = mock(Post.class);
+		when(post.getSubject()).thenReturn("subject");
+		when(post.getText()).thenReturn("text");
+		when(t.getFirstPost()).thenReturn(post);
+		Date date = new Date();
+		when(t.getDate()).thenReturn(date);
+		when(t.isWaitingModeration()).thenReturn(true);
+		
+		
 		topicService.addTopic(t, Collections.<PollOption>emptyList(), Collections.<AttachedFile>emptyList());
-		context.assertIsSatisfied();
+		
+	
+		verify(t).setFirstPost(null);
+		verify(t).setHasAttachment(false);
+	
+		InOrder inOrder = inOrder(topicRepository, postRepository, post, t);
+		inOrder.verify(topicRepository).add(t); 
+		inOrder.verify(post).setForum(forum); 
+		inOrder.verify(post).setTopic(t); 
+		inOrder.verify(post).setDate(date); 
+		inOrder.verify(post).setUser(user); 
+		inOrder.verify(post).setSubject("subject"); 
+	
+		inOrder.verify(postRepository).add(post);
+		inOrder.verify(t).setFirstPost(post); 
+		inOrder.verify(t).setLastPost(post); 
+	
+		verify(pollService).associatePoll(t, Collections.<PollOption>emptyList());
+		verify(attachmentService).insertAttachments(Collections.<AttachedFile>emptyList(), post);
 	}
 
 	@Test
 	public void replyPostRepositoryShouldBeCalledBeforeCurrentTopicSetLastPost() {
-		final Sequence sequence = context.sequence("order");
 		final Post post = new Post(); post.setSubject("subject"); post.setText("msg");
 		post.setUser(new User());
-
-		context.checking(new Expectations() {{
-			Topic topic = context.mock(Topic.class);
-			one(topicRepository).get(1); will(returnValue(topic));
-
-			one(postRepository).add(post); inSequence(sequence);
-			one(topic).setLastPost(post); inSequence(sequence);
-
-			allowing(topic).getForum(); will(returnValue(new Forum()));
-			one(topic).incrementTotalReplies();
-
-			one(attachmentService).insertAttachments(Collections.<AttachedFile>emptyList(), post);
-		}});
-
-		Topic topic = new Topic(); topic.setId(1);
-		topicService.reply(topic, post, Collections.<AttachedFile>emptyList());
-
-		context.assertIsSatisfied();
+		
+		Topic topic = mock(Topic.class);
+		when(topicRepository.get(1)).thenReturn(topic);
+		when(topic.getForum()).thenReturn(new Forum());
+		
+		
+		Topic topicCheck = new Topic(); topicCheck.setId(1);
+		topicService.reply(topicCheck, post, Collections.<AttachedFile>emptyList());
+		
+		
+		InOrder inOrder = inOrder(postRepository, topic);
+		inOrder.verify(postRepository).add(post); 
+		inOrder.verify(topic).setLastPost(post); 
+		
+		verify(topic).incrementTotalReplies();
+		verify(attachmentService).insertAttachments(Collections.<AttachedFile>emptyList(), post);
 	}
 
 
 	@Test
 	public void replyPostWithoutSubjectShouldUseTopicSubject() {
 		final Topic topic = new Topic(); topic.setSubject("topic subject"); topic.setId(1);
-
-		context.checking(new Expectations() {{
-			one(topicRepository).get(topic.getId()); will(returnValue(topic));
-			ignoring(postRepository);
-			one(attachmentService).insertAttachments(with(Collections.<AttachedFile>emptyList()), with(any(Post.class)));
-		}});
-
+		when(topicRepository.get(topic.getId())).thenReturn(topic);
+		
+		
 		Post post = new Post(); post.setText("122"); post.setSubject(null); post.setUser(new User());
 		topicService.reply(topic, post, Collections.<AttachedFile>emptyList());
-		context.assertIsSatisfied();
-
+		
+		
+		verify(attachmentService).insertAttachments(eq(Collections.<AttachedFile>emptyList()), any(Post.class));
 		Assert.assertEquals(topic.getSubject(), post.getSubject());
 	}
 
@@ -136,22 +132,24 @@ public class TopicServiceTestCase {
 	public void replyModeratedPostShouldNotUpdateSomeProperties() {
 		final Topic topic = this.newTopic();
 		int currentTotalReplies = topic.getTotalReplies();
-		topic.setLastPost(new Post() {{ setId(2); }});
-		Forum forum = new Forum() {{ setId(1);
-		setLastPost(new Post() {{ setId(5); }}); }};
+		Post post2 = new Post();
+		post2.setId(2);
+		Post post5 = new Post();
+		post5.setId(5);
+		
+		topic.setLastPost(post2);
+		Forum forum = new Forum(1);
+		forum.setLastPost(post5);
 
-		context.checking(new Expectations() {{
-			one(topicRepository).get(topic.getId()); will(returnValue(topic));
-			ignoring(postRepository);
-			ignoring(attachmentService);
-		}});
+		when(topicRepository.get(topic.getId())).thenReturn(topic);
 
+		
 		Post post = new Post(); post.setSubject("s1"); post.setText("t1");
 		post.setDate(null); post.setTopic(null); post.setModerate(true); post.setUser(new User());
 
 		topicService.reply(topic, post, Collections.<AttachedFile>emptyList());
-		context.assertIsSatisfied();
-
+		
+		
 		Assert.assertEquals(0, post.getUser().getTotalPosts());
 		Assert.assertEquals(topic, post.getTopic());
 		Assert.assertEquals(currentTotalReplies, topic.getTotalReplies());
@@ -163,27 +161,19 @@ public class TopicServiceTestCase {
 	public void addModeratedTopicShouldNotUpdateForumLastPost() {
 		final Topic topic = this.newTopic();
 		topic.setPendingModeration(true);
-		final Forum forum = new Forum() {{ setId(1); }};
-
-		context.checking(new Expectations() {{
-			ignoring(topicRepository);
-			ignoring(postRepository);
-			ignoring(pollService);
-			ignoring(attachmentService);
-		}});
-
+		final Forum forum = new Forum(1);
+		
 		topicService.addTopic(topic, Collections.<PollOption>emptyList(), Collections.<AttachedFile>emptyList());
-		context.assertIsSatisfied();
+		
 		Assert.assertEquals(0, topic.getUser().getTotalPosts());
 		Assert.assertNull(forum.getLastPost());
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void replyWithNullPostTextExpectsException() {
-		context.checking(new Expectations() {{
-			Topic t = new Topic(); t.setSubject("a");
-			one(topicRepository).get(0); will(returnValue(t));
-		}});
+		Topic t = new Topic(); t.setSubject("a");
+		when(topicRepository.get(0)).thenReturn(t);
+		
 
 		Post p = new Post();
 		p.setSubject("123");
@@ -198,18 +188,15 @@ public class TopicServiceTestCase {
 		post.setSubject("s1"); post.setText("t1"); post.setDate(null); post.setTopic(null);
 		final Topic current = new Topic(); current.setId(1); current.setForum(new Forum());
 		int currentTotalReplies = current.getTotalReplies();
-
-		context.checking(new Expectations() {{
-			one(topicRepository).get(1); will(returnValue(current));
-			one(postRepository).add(post);
-			ignoring(attachmentService);
-		}});
-
+		
+		when(topicRepository.get(1)).thenReturn(current);
+			
+		
 		Topic tempTopic = new Topic(); tempTopic.setId(1);
-
 		topicService.reply(tempTopic, post, Collections.<AttachedFile>emptyList());
-		context.assertIsSatisfied();
-
+		
+		
+		verify(postRepository).add(post);
 		Assert.assertEquals(1, post.getUser().getTotalPosts());
 		Assert.assertNotNull(post.getDate());
 		Assert.assertEquals(current, post.getTopic());
@@ -261,22 +248,17 @@ public class TopicServiceTestCase {
 	@Test
 	public void addNewTopicShouldSaveFirstPostAndAllRelatedObjecUpdates() {
 		final Topic topic = this.newTopic();
-
-		final Forum forum = new Forum() {{ setId(1); }};
-
-		context.checking(new Expectations() {{
-			one(forumRepository).get(1); will(returnValue(forum));
-			one(topicRepository).add(topic);
-			one(postRepository).add(topic.getFirstPost());
-			one(userRepository).getTotalPosts(topic.getUser()); will(returnValue(1));
-			ignoring(pollService);
-			ignoring(attachmentService);
-		}});
-
+		final Forum forum = new Forum(1);
+		
+		when(forumRepository.get(1)).thenReturn(forum);
+		when(userRepository.getTotalPosts(topic.getUser())).thenReturn(1);
+		
+		
 		topicService.addTopic(topic, Collections.<PollOption>emptyList(), Collections.<AttachedFile>emptyList());
-
-		context.assertIsSatisfied();
-
+		
+		
+		verify(topicRepository).add(topic);
+		verify(postRepository).add(topic.getFirstPost());
 		Assert.assertEquals(1, topic.getUser().getTotalPosts());
 		Assert.assertTrue(topic.getLastPost() == topic.getFirstPost());
 		Assert.assertTrue(topic == topic.getFirstPost().getTopic());
@@ -291,10 +273,12 @@ public class TopicServiceTestCase {
 
 	private Topic newTopic() {
 		Topic topic = new Topic();
-
+		User user = new User();
+		user.setId(1);
+		
 		topic.setSubject("topic 1");
 		topic.getForum().setId(1);
-		topic.setUser(new User() {{ setId(1); }});
+		topic.setUser(user);
 		topic.setFirstPost(new Post());
 		topic.getFirstPost().setSubject("123");
 		topic.getFirstPost().setText("some message");

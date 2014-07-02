@@ -10,60 +10,53 @@
  */
 package net.jforum.services;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 
 import net.jforum.core.exceptions.ValidationException;
 import net.jforum.entities.Category;
 import net.jforum.repository.CategoryRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CategoryServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private CategoryRepository repository = context.mock(CategoryRepository.class);
-	private CategoryService service = new CategoryService(repository);
+	
+	@Mock private CategoryRepository repository;
+	@InjectMocks private CategoryService service = new CategoryService(repository);
 
 	@Test
 	public void deleteUsingNullIdsShouldIgnore() {
-		context.checking(new Expectations() {{
-
-		}});
-
 		service.delete(null);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void delete() {
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(new Category()));
-			one(repository).get(2); will(returnValue(new Category()));
-
-			exactly(2).of(repository).remove(with(aNonNull(Category.class)));
-		}});
+		when(repository.get(1)).thenReturn(new Category());
+		when(repository.get(2)).thenReturn(new Category());
 
 		service.delete(1, 2);
-		context.assertIsSatisfied();
+		
+		verify(repository,times(2)).remove(notNull(Category.class));
 	}
 
 	@Test
 	public void add() {
 		final Category c = newCategoryWithOrder(0, 2);
-
-		context.checking(new Expectations() {{
-			one(repository).add(c);
-		}});
-
+		
 		service.add(c);
-
-		context.assertIsSatisfied();
+		
+		verify(repository).add(c);
 	}
 
 	@Test(expected = ValidationException.class)
@@ -84,14 +77,10 @@ public class CategoryServiceTestCase {
 	public void updateUsingAGoodCategoryExpectSuccess() {
 		final Category c = newCategoryWithOrder(1, 2);
 		c.setId(2);
-
-		context.checking(new Expectations() {{
-			one(repository).update(c);
-		}});
-
+		
 		service.update(c);
-
-		context.assertIsSatisfied();
+		
+		verify(repository).update(c);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -119,63 +108,50 @@ public class CategoryServiceTestCase {
 	@Test
 	public void upCategoryOrderExpectToBeInFirstPosition() {
 		final Category categoryToChange = newCategoryWithOrder(1, 2);
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(categoryToChange));
-			one(repository).getAllCategories(); will(returnValue(Arrays.asList(newCategoryWithOrder(2, 1), newCategoryWithOrder(1, 2))));
-			exactly(2).of(repository).update(with(aNonNull(Category.class)));
-		}});
-
+		
+		when(repository.get(1)).thenReturn(categoryToChange);
+		when(repository.getAllCategories()).thenReturn(Arrays.asList(newCategoryWithOrder(2, 1), newCategoryWithOrder(1, 2)));
+		
 		service.upCategoryOrder(1);
-
-		context.assertIsSatisfied();
+		
+		verify(repository,times(2)).update(notNull(Category.class));
 		Assert.assertEquals(1, categoryToChange.getDisplayOrder());
 	}
 
 	@Test
 	public void downCategoryOrderExpectToBeInLastPosition() {
 		final Category categoryToChange = newCategoryWithOrder(1, 1);
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(categoryToChange));
-			one(repository).getAllCategories(); will(returnValue(Arrays.asList(newCategoryWithOrder(1, 1), newCategoryWithOrder(2, 2))));
-			exactly(2).of(repository).update(with(aNonNull(Category.class)));
-		}});
-
+		
+		when(repository.get(1)).thenReturn(categoryToChange);
+		when(repository.getAllCategories()).thenReturn(Arrays.asList(newCategoryWithOrder(1, 1), newCategoryWithOrder(2, 2)));
+		
 		service.downCategoryOrder(1);
 
-		context.assertIsSatisfied();
+		verify(repository,times(2)).update(notNull(Category.class));
 		Assert.assertEquals(2, categoryToChange.getDisplayOrder());
 	}
 
 	@Test
 	public void upCategoryOrderCategoryAlreadyFistShouldIgnore() {
 		final Category categoryToChange = newCategoryWithOrder(1, 1);
-
-		context.checking(new Expectations() {{
-			one(repository).get(1); will(returnValue(categoryToChange));
-			one(repository).getAllCategories(); will(returnValue(Arrays.asList(newCategoryWithOrder(1, 1), newCategoryWithOrder(2, 2))));
-			exactly(0).of(repository).update(with(aNonNull(Category.class)));
-		}});
+		when(repository.get(1)).thenReturn(categoryToChange);
+		when(repository.getAllCategories()).thenReturn(Arrays.asList(newCategoryWithOrder(1, 1), newCategoryWithOrder(2, 2)));
 
 		service.upCategoryOrder(1);
-
-		context.assertIsSatisfied();
+		
+		verify(repository,never()).update(notNull(Category.class));
 	}
 
 	@Test
 	public void downCategoryOrderCategoryAlredyLastShouldIgnore() {
 		final Category categoryToChange = newCategoryWithOrder(2, 2);
-
-		context.checking(new Expectations() {{
-			one(repository).get(2); will(returnValue(categoryToChange));
-			one(repository).getAllCategories(); will(returnValue(Arrays.asList(newCategoryWithOrder(1, 1), newCategoryWithOrder(2, 2))));
-			exactly(0).of(repository).update(with(aNonNull(Category.class)));
-		}});
-
+		
+		when(repository.get(2)).thenReturn(categoryToChange);
+		when(repository.getAllCategories()).thenReturn(Arrays.asList(newCategoryWithOrder(1, 1), newCategoryWithOrder(2, 2)));
+	
 		service.downCategoryOrder(2);
 
-		context.assertIsSatisfied();
+		verify(repository,never()).update(notNull(Category.class));
 	}
 
 	private Category newCategoryWithOrder(int categoryId, int order) {

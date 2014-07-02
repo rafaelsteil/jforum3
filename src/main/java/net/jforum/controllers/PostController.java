@@ -140,10 +140,12 @@ public class PostController {
 	private void redirecToListing(Topic topic) {
 		Pagination pagination = new Pagination(this.config, 0).forTopic(topic);
 
-		final String url = new StringBuilder(pagination.getTotalPages() > 1
-			? URLBuilder.build(Domain.TOPICS, Actions.LIST, pagination.getTotalPages(), topic.getId())
-			: URLBuilder.build(Domain.TOPICS, Actions.LIST, topic.getId()))
-			.toString();
+		String url;
+		if(pagination.getTotalPages() > 1) {
+			url = URLBuilder.build(Domain.TOPICS, Actions.LIST, pagination.getTotalPages(), topic.getId());
+		} else {
+			url = URLBuilder.build(Domain.TOPICS, Actions.LIST, topic.getId());
+		}
 
 		this.result.redirectTo(url);
 	}

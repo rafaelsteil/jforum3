@@ -10,130 +10,111 @@
  */
 package net.jforum.security;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import junit.framework.Assert;
 import net.jforum.core.exceptions.AccessRuleException;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.UserRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class EditUserRuleTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private UserSession userSession = context.mock(UserSession.class);
-	private HttpServletRequest request = context.mock(HttpServletRequest.class);
-	private RoleManager roleManager = context.mock(RoleManager.class);
-    private UserRepository userRepository = context.mock(UserRepository.class);
-	private EditUserRule rule = new EditUserRule(userRepository);
-	private Map<String, String> parameterMap = new HashMap<String, String>() {/**
-		 *
-		 */
-		private static final long serialVersionUID = 1L;
 
-	{ put("userId", "1"); }};
+	@Mock private UserSession userSession;
+	@Mock private HttpServletRequest request;
+	@Mock private RoleManager roleManager;
+	@Mock private UserRepository userRepository;
+	@InjectMocks private EditUserRule rule;
+	private Map<String, String[]> parameterMap;
 
+	@Before
+	public void setup() {
+		parameterMap = new HashMap<String, String[]>();
+		parameterMap.put("userId", Arrays.asList("1").toArray(new String[1]));
+		when(request.getParameterMap()).thenReturn(parameterMap);
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+	}
+	
 	@Test
 	public void loggedSameUserIdExpectSuccess() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("userId"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
+		when(request.getParameter("userId")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(true);
 
-			User user = new User(); user.setId(1);
-			one(userSession).getUser(); will(returnValue(user));
-		}});
+		User user = new User(); user.setId(1);
+		when(userSession.getUser()).thenReturn(user);
 
-		Assert.assertTrue(rule.shouldProceed(userSession, request));
-		context.assertIsSatisfied();
+		assertTrue(rule.shouldProceed(userSession, request));
 	}
 
 	@Test
 	public void loggedDifferentUserIdIsAdministratorExpectSuccess() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("userId"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(true));
+		when(request.getParameter("userId")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(true);
 
-			User currentUser = new User(); currentUser.setId(9);
-			one(userSession).getUser(); will(returnValue(currentUser));
+		User currentUser = new User(); currentUser.setId(9);
+		when(userSession.getUser()).thenReturn(currentUser);
 
-			User user1 = new User(); user1.setId(1);
-			one(userRepository).get(1); will(returnValue(user1));
+		User user1 = new User(); user1.setId(1);
+		when(userRepository.get(1)).thenReturn(user1);
 
-			one(userSession).getRoleManager(); will(returnValue(roleManager));
-			one(roleManager).getCanEditUser(user1, currentUser.getGroups()); will(returnValue(true));
-		}});
+		when(userSession.getRoleManager()).thenReturn(roleManager);
+		when(roleManager.getCanEditUser(user1, currentUser.getGroups())).thenReturn(true);
+
 
 		boolean shouldProceed = rule.shouldProceed(userSession, request);
 
-		Assert.assertTrue(shouldProceed);
-		context.assertIsSatisfied();
+		assertTrue(shouldProceed);
 	}
 
 	@Test
 	public void notLoggedShouldDeny() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("userId"); will(returnValue("1"));
-			one(userSession).isLogged(); will(returnValue(false));
-		}});
+		when(request.getParameter("userId")).thenReturn("1");
+		when(userSession.isLogged()).thenReturn(false);
 
 		boolean shouldProceed = rule.shouldProceed(userSession, request);
 
-		Assert.assertFalse(shouldProceed);
-		context.assertIsSatisfied();
+		assertFalse(shouldProceed);
 	}
 
 	@Test(expected = AccessRuleException.class)
 	public void doestNotHaveUserIdExpectsException() {
 		parameterMap.clear();
-
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			ignoring(userSession); ignoring(roleManager);
-		}});
-
+		
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void containsUserDotId() {
-		parameterMap.clear(); parameterMap.put("user.id", "1");
-
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("user.id"); will(returnValue("1"));
-			ignoring(userSession); ignoring(roleManager);
-			allowing(userRepository).get(1); will(returnValue(new User()));
-		}});
+		parameterMap.clear(); parameterMap.put("user.id", Arrays.asList("1").toArray(new String[1]));
+		when(request.getParameter("user.id")).thenReturn("1");
+		when(userRepository.get(1)).thenReturn(new User());
 
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void containsUserId() {
-		context.checking(new Expectations() {{
-			atLeast(1).of(request).getParameterMap(); will(returnValue(parameterMap));
-			one(request).getParameter("userId"); will(returnValue("1"));
-			ignoring(userSession); ignoring(roleManager);
-			allowing(userRepository).get(1); will(returnValue(new User()));
-		}});
+		when(request.getParameter("userId")).thenReturn("1");
+		when(userRepository.get(1)).thenReturn(new User());
 
 		rule.shouldProceed(userSession, request);
-		context.assertIsSatisfied();
 	}
 
 }

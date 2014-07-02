@@ -27,7 +27,7 @@ public class Functions {
 	 * @return true if the element exist in the list
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean contains(List list, Object element) {
+	public static boolean contains(List<?> list, Object element) {
 		return list.contains(element);
 	}
 

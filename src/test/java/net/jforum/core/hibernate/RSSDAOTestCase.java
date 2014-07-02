@@ -10,9 +10,10 @@
  */
 package net.jforum.core.hibernate;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
-import junit.framework.Assert;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Topic;
 import net.jforum.repository.RSSRepository;
@@ -27,18 +28,18 @@ public class RSSDAOTestCase extends AbstractDAOTestCase<Object> {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void getForumTopics() {
-		new JDBCLoader(sessionFactory.getCurrentSession().connection())
+		new JDBCLoader(session())
 			.run("/rssdao/getForumTopics.sql");
 
 		RSSRepository dao = this.newDao();
 		Forum forum = new Forum(); forum.setId(1);
 		List<Topic> topics = dao.getForumTopics(forum, 10);
 
-		Assert.assertEquals(3, topics.size());
+		assertEquals(3, topics.size());
 
-		Assert.assertEquals(2, topics.get(0).getId());
-		Assert.assertEquals(1, topics.get(1).getId());
-		Assert.assertEquals(3, topics.get(2).getId());
+		assertEquals(2, topics.get(0).getId());
+		assertEquals(1, topics.get(1).getId());
+		assertEquals(3, topics.get(2).getId());
 	}
 
 	private RSSRepository newDao() {

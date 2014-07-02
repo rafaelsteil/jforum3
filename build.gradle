@@ -1,0 +1,94 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://www.cs.drexel.edu/~zl25/maven2/repo"
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion="1.5"
+}
+
+dependencies {
+    compile 'org.springframework:spring-webmvc:3.0.5.RELEASE'
+    compile 'commons-fileupload:commons-fileupload:1.1'
+    compile 'javax.servlet:javax.servlet-api:3.0.1'
+    compile 'org.glassfish.web:javax.servlet.jsp:2.3.1'
+    compile 'taglibs:standard:1.1.2'
+    compile 'org.hibernate:hibernate:3.2.6.ga'
+    compile 'org.hibernate:hibernate-search:3.0.1.GA'
+    compile 'org.hibernate:hibernate-annotations:3.3.1.GA'
+    compile 'javax.transaction:jta:1.1'
+    compile 'br.com.caelum:vraptor:3.4.0'
+    compile 'commons-configuration:commons-configuration:1.3'
+    compile 'org.apache.lucene:lucene-core:2.3.0'
+
+    compile 'yarfraw:yarfraw:0.92'
+    compile 'com.sun.mail:javax.mail:1.4.5'
+    compile 'org.codehaus.groovy:groovy:1.5.6'
+    compile 'org.htmlparser:htmlparser:1.6'
+
+
+
+    testCompile 'junit:junit:4.4'
+    testCompile 'org.jmock:jmock-junit4:2.5.0.1'
+    testCompile 'org.springframework:spring-test:3.0.5.RELEASE'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile('dumbster:dumbster:1.6') {
+        exclude group: 'javax.mail', module: 'mail'
+    }
+    testCompile 'org.jmock:jmock-legacy:2.5.0.1'
+    testCompile 'xmlunit:xmlunit:1.2'
+
+    testRuntime 'org.hsqldb:hsqldb:1.8.0.10'
+/*
+    compile('org.glassfish.web:jstl-impl:1.2') {
+        exclude group: 'javax.servlet', module: 'servlet-api'
+        exclude group: 'javax.el', module: 'el-api'
+    }
+        <dependency>
+        	<groupId>org.springframework</groupId>
+        	<artifactId>spring-context</artifactId>
+        	<version>3.0.5.RELEASE</version>
+        </dependency>
+        <dependency>
+        	<groupId>commons-httpclient</groupId>
+        	<artifactId>commons-httpclient</artifactId>
+        	<version>3.1</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.aspectj</groupId>
+        	<artifactId>aspectjrt</artifactId>
+        	<version>1.6.12</version>
+        </dependency>
+        <dependency>
+        	<groupId>mysql</groupId>
+        	<artifactId>mysql-connector-java</artifactId>
+        	<version>5.1.22</version>
+        	<scope>runtime</scope>
+        </dependency>
+        <dependency>
+        	<groupId>postgresql</groupId>
+        	<artifactId>postgresql</artifactId>
+        	<version>8.3-606.jdbc4</version>
+        	<scope>runtime</scope>
+        	<optional>true</optional>
+        </dependency>
+        <dependency>
+        	<groupId>c3p0</groupId>
+        	<artifactId>c3p0</artifactId>
+        	<version>0.9.1.2</version>
+        	<scope>runtime</scope>
+        </dependency>
+        <dependency>
+        	<groupId>com.thoughtworks.xstream</groupId>
+        	<artifactId>xstream</artifactId>
+        	<version>1.3.1</version>
+        </dependency>
+    </dependencies>
+*/
+}
+

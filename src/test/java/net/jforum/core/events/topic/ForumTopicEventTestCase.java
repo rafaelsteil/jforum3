@@ -10,39 +10,38 @@
  */
 package net.jforum.core.events.topic;
 
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.repository.ForumRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ForumTopicEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private ForumRepository repository = context.mock(ForumRepository.class);
-	private ForumTopicEvent event = new ForumTopicEvent(repository);
+	
+	@Mock private ForumRepository repository;
+	@InjectMocks private ForumTopicEvent event;
 
 	@Test
 	public void deleteTopicLastPostIsNullShouldForceReload() {
 		final Topic topic = this.newTopic();
 		topic.getForum().setLastPost(null);
-
-		context.checking(new Expectations() {{
-			Post post = new Post(); post.setId(11);
-			one(repository).getLastPost(topic.getForum()); will(returnValue(post));
-		}});
-
+		Post post = new Post(); post.setId(11);
+		when(repository.getLastPost(topic.getForum())).thenReturn(post);
+		
 		event.deleted(topic);
-		context.assertIsSatisfied();
-
+		
 		Post expected = new Post(); expected.setId(11);
 		Assert.assertEquals(expected, topic.getForum().getLastPost());
 	}
@@ -50,16 +49,12 @@ public class ForumTopicEventTestCase {
 	@Test
 	public void deleteTopicExpectSuccess() {
 		final Topic topic = this.newTopic();
-
-		context.checking(new Expectations() {{
-			Post post = new Post(); post.setId(11);
-			one(repository).getLastPost(topic.getForum()); will(returnValue(post));
-		}});
-
+		Post post = new Post(); post.setId(11);
+		when(repository.getLastPost(topic.getForum())).thenReturn(post);
 		topic.getLastPost().getTopic().setId(topic.getId());
+		
 		event.deleted(topic);
-		context.assertIsSatisfied();
-
+		
 		Post expected = new Post(); expected.setId(11);
 		Assert.assertEquals(expected, topic.getForum().getLastPost());
 	}
@@ -70,7 +65,6 @@ public class ForumTopicEventTestCase {
 		topic.getForum().getLastPost().getTopic().setId(9);
 
 		event.deleted(topic);
-		context.assertIsSatisfied();
 	}
 
 	private Topic newTopic() {

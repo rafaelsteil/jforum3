@@ -10,41 +10,42 @@
  */
 package net.jforum.core.events.post;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.repository.TopicRepository;
 import net.jforum.repository.UserRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TopicPostEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private TopicRepository repository = context.mock(TopicRepository.class);
-	private UserRepository userRepository = context.mock(UserRepository.class);
-	private TopicPostEvent event = new TopicPostEvent(repository, userRepository);
+	
+	@Mock private TopicRepository repository;
+	@Mock private UserRepository userRepository;
+	@InjectMocks private TopicPostEvent event;
 
 	@Test
 	public void shouldUpdateUserTotalPost() {
 		final Post post = this.newPost();
 		post.getUser().setTotalPosts(5);
-
-		context.checking(new Expectations() {{
-			one(repository).getTotalPosts(post.getTopic()); will(returnValue(1));
-			allowing(repository);
-			one(userRepository).getTotalPosts(post.getUser()); will(returnValue(2));
-		}});
-
+	
+		when(repository.getTotalPosts(post.getTopic())).thenReturn(1);
+		when(userRepository.getTotalPosts(post.getUser())).thenReturn(2);
+		when(repository.getFirstPost(any(Topic.class))).thenReturn(newPost());
+	
 		event.deleted(post);
-		context.assertIsSatisfied();
-
+		
 		Assert.assertEquals(2, post.getUser().getTotalPosts());
 	}
 
@@ -52,15 +53,12 @@ public class TopicPostEventTestCase {
 	public void emptyPostsShouldRemoveTopic() {
 		final Post post = this.newPost();
 		int totalPosts = post.getTopic().getTotalPosts();
-
-		context.checking(new Expectations() {{
-			one(repository).getTotalPosts(post.getTopic()); will(returnValue(0));
-			one(repository).remove(post.getTopic());
-		}});
-
+		
+		when(repository.getTotalPosts(post.getTopic())).thenReturn(0);
+		
 		event.deleted(post);
-		context.assertIsSatisfied();
-
+		
+		verify(repository).remove(post.getTopic());
 		Assert.assertEquals(totalPosts - 1, post.getTopic().getTotalPosts());
 	}
 
@@ -70,18 +68,15 @@ public class TopicPostEventTestCase {
 		post.getTopic().getFirstPost().setId(3);
 		post.getTopic().getLastPost().setId(4);
 		int totalPosts = post.getTopic().getTotalPosts();
-
-		context.checking(new Expectations() {{
-			Post lastPost = new Post(); lastPost.setId(5);
-			one(repository).getTotalPosts(post.getTopic()); will(returnValue(2));
-			one(repository).getLastPost(post.getTopic()); will(returnValue(lastPost));
-			one(userRepository).getTotalPosts(post.getUser());
-		}});
-
+	
+		Post lastPost = new Post(); lastPost.setId(5);
+		when(repository.getTotalPosts(post.getTopic())).thenReturn(2);
+		when(repository.getLastPost(post.getTopic())).thenReturn(lastPost);
+		
 		post.setId(4);
 		event.deleted(post);
-		context.assertIsSatisfied();
-
+		
+		verify(userRepository).getTotalPosts(post.getUser());
 		Post expected = new Post(); expected.setId(5);
 		Assert.assertEquals(expected, post.getTopic().getLastPost());
 		Assert.assertEquals(totalPosts - 1, post.getTopic().getTotalPosts());
@@ -91,19 +86,17 @@ public class TopicPostEventTestCase {
 	public void removeFirstPostOnly() {
 		final Post post = this.newPost();
 		int totalPosts = post.getTopic().getTotalPosts();
+	
+		Post newFirst = newPost(); newFirst.setId(6);
+		newFirst.getUser().setId(9);
 
-		context.checking(new Expectations() {{
-			Post newFirst = newPost(); newFirst.setId(6);
-			newFirst.getUser().setId(9);
-
-			one(repository).getTotalPosts(post.getTopic()); will(returnValue(2));
-			one(repository).getFirstPost(post.getTopic()); will(returnValue(newFirst));
-			one(userRepository).getTotalPosts(post.getUser());
-		}});
-
+		when(repository.getTotalPosts(post.getTopic())).thenReturn(2);
+		when(repository.getFirstPost(post.getTopic())).thenReturn(newFirst);
+		
 		event.deleted(post);
-		context.assertIsSatisfied();
-
+		
+		verify(userRepository).getTotalPosts(post.getUser());
+		
 		Post expected = new Post(); expected.setId(6);
 		Assert.assertEquals(expected, post.getTopic().getFirstPost());
 

@@ -3,22 +3,12 @@ JForum
 
 *jforum is a powerful and robust discussion board system implemented in Java*
 
-This README describes how to build the project.
+Right now project is in terrible condition. Do not use it on you site. It's not ready.
 
-Why we use ANT?
----------------
+To build jforum just run `mvn package`
 
-We decided to use ANT because we needed....
+You can find database initialization scripts in `src/main/resources/jforumConfig/database` folder.
 
+original :  https://github.com/rafaelsteil/jforum3
 
-Steps to build
---------------
-
-
-Issues and Tips
----------------
-
-You may use the issues feature from Github to report bugs or tips to the JForum Team.
-
-Please follow the link to do this: https://github.com/rafaelsteil/jforum3/issues
 

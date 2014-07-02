@@ -1,26 +1,43 @@
 package net.jforum.util;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SafeHtmlTestCase {
-	private String input;
-	private String expected;
-	private JForumConfig config;
+	@Mock private JForumConfig config;
+	private SafeHtml safeHtml;
 
+	@Before
+	public void setUp() throws Exception {
+		when(config.containsKey(ConfigKeys.HTML_TAGS_WELCOME)).thenReturn(true);
+		when(config.containsKey(ConfigKeys.HTML_ATTRIBUTES_WELCOME)).thenReturn(true);
+		when(config.containsKey(ConfigKeys.HTML_LINKS_ALLOW_PROTOCOLS)).thenReturn(true);
+		when(config.getValue(ConfigKeys.HTML_TAGS_WELCOME)).thenReturn("u, a, img, i, u, li, ul, font, br, p, b, hr");
+		when(config.getValue(ConfigKeys.HTML_ATTRIBUTES_WELCOME)).thenReturn("src, href, size, face, color, target, rel");
+		when(config.getValue(ConfigKeys.HTML_LINKS_ALLOW_PROTOCOLS)).thenReturn("http://, https://, mailto:, ftp://");
+		when(config.getBoolean(ConfigKeys.HTML_LINKS_ALLOW_RELATIVE)).thenReturn(true);
+		
+		safeHtml = new SafeHtml(config);
+	}
+	
 	@Test
 	public void javascriptInsideURLTagExpectItToBeRemoved() {
 		String input = "<a class=\"snap_shots\" rel=\"nofollow\" target=\"_new\" onmouseover=\"javascript:alert('test2');\" href=\"before\">test</a>";
 		String expected = "<a class=\"snap_shots\" rel=\"nofollow\" target=\"_new\"  >test</a>";
 
-		String result = this.newSafeHtml().ensureAllAttributesAreSafe(input);
+		String result = safeHtml.ensureAllAttributesAreSafe(input);
 
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 	@Test
@@ -28,28 +45,23 @@ public class SafeHtmlTestCase {
 		String input = "<img border=\"0\" onmouseover=\"javascript:alert('buuuh!!!');\"\"\" src=\"javascript:alert('hi from an alert!');\"/>";
 		String expected = "<img border=\"0\" \"\" />";
 
-		String result = this.newSafeHtml().ensureAllAttributesAreSafe(input);
+		String result = safeHtml.ensureAllAttributesAreSafe(input);
 
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 	@Test
 	public void iframe() {
 		String input = "<iframe src='http://www.google.com' onload='javascript:parent.document.body.style.display=\'none\'; alert(\'where is the forum?\'); ' style='display:none;'></iframe>";
-		String output = "&lt;iframe src='http://www.google.com' onload='javascript:parent.document.body.style.display=\'none\'; alert(\'where is the forum?\'); ' style='display:none;'&gt;&lt;/iframe&gt;";
+		String expected = "&lt;iframe src='http://www.google.com' onload='javascript:parent.document.body.style.display=\'none\'; alert(\'where is the forum?\'); ' style='display:none;'&gt;&lt;/iframe&gt;";
 
-		Assert.assertEquals(output, this.newSafeHtml().makeSafe(input));
+		String result = safeHtml.makeSafe(input);
+				
+		assertEquals(expected, result);
 	}
 
 	@Test
 	public void makeSafe() throws Exception {
-		Assert.assertEquals(expected, this.newSafeHtml().makeSafe(input));
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		config = new JForumConfig(null, null);
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a href='http://somelink'>Some Link</a>");
 		sb.append("bla <b>bla</b> <pre>code code</pre>");
@@ -62,7 +74,7 @@ public class SafeHtmlTestCase {
 		sb.append("<img src='http://some.image' onLoad=\"javascript:alert('boo')\">");
 		sb.append("<b>heeelooo, nurse</b>");
 		sb.append("<b style='some style'>1, 2, 3</b>");
-		input = sb.toString();
+		String input = sb.toString();
 
 		sb = new StringBuilder();
 		sb.append("<a href='http://somelink'>Some Link</a>");
@@ -76,10 +88,10 @@ public class SafeHtmlTestCase {
 		sb.append("<img src='http://some.image' >");
 		sb.append("<b>heeelooo, nurse</b>");
 		sb.append("<b >1, 2, 3</b>");
-		expected = sb.toString();
-	}
+		String expected = sb.toString();
 
-	private SafeHtml newSafeHtml() {
-		return new SafeHtml(config);
+		String result = safeHtml.makeSafe(input);
+				
+		assertEquals(expected, result);
 	}
 }

@@ -10,46 +10,43 @@
  */
 package net.jforum.util.mail;
 
+import static org.mockito.Mockito.*;
 import net.jforum.util.ConfigKeys;
 import net.jforum.util.JForumConfig;
 import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 
 /**
  * @author Rafael Steil
  */
 public abstract class MailTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	protected JForumConfig config = context.mock(JForumConfig.class);
+	
+	protected JForumConfig config = mock(JForumConfig.class);
 
 	@Before
 	public void setup() {
-		context.checking(new Expectations() {{
-			allowing(config).getBoolean(ConfigKeys.MAIL_SMTP_SSL); will(returnValue(false));
-			allowing(config).getValue(ConfigKeys.MAIL_SMTP_LOCALHOST); will(returnValue("localhost"));
-			allowing(config).getValue(ConfigKeys.MAIL_SMTP_AUTH); will(returnValue("true"));
-			allowing(config).getBoolean(ConfigKeys.MAIL_SMTP_AUTH); will(returnValue(true));
-			allowing(config).getValue(ConfigKeys.MAIL_SMTP_PORT); will(returnValue("25123"));
-			allowing(config).getInt(ConfigKeys.MAIL_SMTP_PORT); will(returnValue(25123));
-			allowing(config).getValue(ConfigKeys.MAIL_SMTP_HOST); will(returnValue("127.0.0.1"));
-			allowing(config).getValue(ConfigKeys.MAIL_CHARSET); will(returnValue("ISO-8859-1"));
-			allowing(config).getValue(ConfigKeys.MAIL_SMTP_USERNAME); will(returnValue("username"));
-			allowing(config).getValue(ConfigKeys.MAIL_SMTP_PASSWORD); will(returnValue("password"));
-			allowing(config).getValue(ConfigKeys.MAIL_MESSSAGE_FORMAT); will(returnValue("text"));
-			allowing(config).getInt(ConfigKeys.MAIL_SMTP_DELAY); will(returnValue(0));
-			allowing(config).getValue(ConfigKeys.FORUM_NAME); will(returnValue("forum name"));
-			allowing(config).getValue(ConfigKeys.MAIL_SENDER); will(returnValue("sender@example.com"));
-			allowing(config).getValue(ConfigKeys.FORUM_LINK); will(returnValue("http://localhost"));
-			allowing(config).getInt(ConfigKeys.POSTS_PER_PAGE); will(returnValue(10));
-			allowing(config).getValue(ConfigKeys.MAIL_NEW_ANSWER_SUBJECT); will(returnValue("new reply"));
-			allowing(config).getValue(ConfigKeys.SERVLET_EXTENSION); will(returnValue(".page"));
-			allowing(config).getValue(ConfigKeys.APPLICATION_PATH); will(returnValue(TestCaseUtils.getApplicationRoot()));
-			allowing(config).getValue(ConfigKeys.MAIL_NEW_ANSWER_MESSAGE_FILE); will(returnValue("/webapp/templates/mail/mailNewReply.txt"));
-			allowing(config).getValue(ConfigKeys.MAIL_LOST_PASSWORD_MESSAGE_FILE); will(returnValue("/webapp/templates/mail/lostPassword.txt"));
-			allowing(config).getInt(ConfigKeys.MAIL_BATCH_SIZE); will(returnValue(50));
-		}});
+		when(config.getBoolean(ConfigKeys.MAIL_SMTP_SSL)).thenReturn(false);
+		when(config.getValue(ConfigKeys.MAIL_SMTP_LOCALHOST)).thenReturn("localhost");
+		when(config.getValue(ConfigKeys.MAIL_SMTP_AUTH)).thenReturn("true");
+		when(config.getBoolean(ConfigKeys.MAIL_SMTP_AUTH)).thenReturn(true);
+		when(config.getValue(ConfigKeys.MAIL_SMTP_PORT)).thenReturn("25123");
+		when(config.getInt(ConfigKeys.MAIL_SMTP_PORT)).thenReturn(25123);
+		when(config.getValue(ConfigKeys.MAIL_SMTP_HOST)).thenReturn("127.0.0.1");
+		when(config.getValue(ConfigKeys.MAIL_CHARSET)).thenReturn("ISO-8859-1");
+		when(config.getValue(ConfigKeys.MAIL_SMTP_USERNAME)).thenReturn("username");
+		when(config.getValue(ConfigKeys.MAIL_SMTP_PASSWORD)).thenReturn("password");
+		when(config.getValue(ConfigKeys.MAIL_MESSSAGE_FORMAT)).thenReturn("text");
+		when(config.getInt(ConfigKeys.MAIL_SMTP_DELAY)).thenReturn(0);
+		when(config.getValue(ConfigKeys.FORUM_NAME)).thenReturn("forum name");
+		when(config.getValue(ConfigKeys.MAIL_SENDER)).thenReturn("sender@example.com");
+		when(config.getValue(ConfigKeys.FORUM_LINK)).thenReturn("http://localhost");
+		when(config.getInt(ConfigKeys.POSTS_PER_PAGE)).thenReturn(10);
+		when(config.getValue(ConfigKeys.MAIL_NEW_ANSWER_SUBJECT)).thenReturn("new reply");
+		when(config.getValue(ConfigKeys.SERVLET_EXTENSION)).thenReturn(".page");
+		when(config.getValue(ConfigKeys.APPLICATION_PATH)).thenReturn(TestCaseUtils.getApplicationRoot());
+		when(config.getValue(ConfigKeys.MAIL_NEW_ANSWER_MESSAGE_FILE)).thenReturn("/webapp/templates/mail/mailNewReply.txt");
+		when(config.getValue(ConfigKeys.MAIL_LOST_PASSWORD_MESSAGE_FILE)).thenReturn("/webapp/templates/mail/lostPassword.txt");
+		when(config.getInt(ConfigKeys.MAIL_BATCH_SIZE)).thenReturn(50);
 	}
 }

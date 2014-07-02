@@ -10,35 +10,37 @@
  */
 package net.jforum.core.events.post;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 
-import junit.framework.Assert;
 import net.jforum.entities.BadWord;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.repository.BadWordRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BadWordEventTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private BadWordRepository repository = context.mock(BadWordRepository.class);
-	private BadWordEvent event = new BadWordEvent(repository);
+	
+	@Mock private BadWordRepository repository;
+	@InjectMocks private BadWordEvent event;
 
 	@Test
 	public void replaceAllShouldNotReplaceInsideAnotherWord() {
-		context.checking(new Expectations() {{
-			BadWord w1 = new BadWord(); w1.setWord("abc"); w1.setReplacement("REPLACEMENT");
-
-			one(repository).getAll(); will(returnValue(Arrays.asList(w1)));
-		}});
-
+		BadWord w1 = new BadWord(); w1.setWord("abc"); w1.setReplacement("REPLACEMENT");
+	
+		when(repository.getAll()).thenReturn(Arrays.asList(w1));
+		
 		Post p = new Post();
 		Topic topic = new Topic();
 		topic.setSubject("title");
@@ -46,20 +48,17 @@ public class BadWordEventTestCase {
 		p.setText("some content wordABCeditor more content");
 
 		event.beforeAdd(p);
-		context.assertIsSatisfied();
-
-		Assert.assertEquals("some content wordABCeditor more content", p.getText());
+		
+		assertEquals("some content wordABCeditor more content", p.getText());
 	}
 
 	@Test
 	public void replaceAll() {
-		context.checking(new Expectations() {{
-			BadWord w1 = new BadWord(); w1.setWord("word1"); w1.setReplacement("replacement1");
-			BadWord w2 = new BadWord(); w2.setWord("word2"); w2.setReplacement("replacement2");
+		BadWord w1 = new BadWord(); w1.setWord("word1"); w1.setReplacement("replacement1");
+		BadWord w2 = new BadWord(); w2.setWord("word2"); w2.setReplacement("replacement2");
 
-			one(repository).getAll(); will(returnValue(Arrays.asList(w1, w2)));
-		}});
-
+		when(repository.getAll()).thenReturn(Arrays.asList(w1, w2));
+		
 		Post p = new Post();
 		Topic topic = new Topic();
 		topic.setSubject("title");
@@ -67,8 +66,7 @@ public class BadWordEventTestCase {
 		p.setText("some content of post 1. This is word1, and this is WORD2. End");
 
 		event.beforeAdd(p);
-		context.assertIsSatisfied();
-
-		Assert.assertEquals("some content of post 1. This is replacement1, and this is replacement2. End", p.getText());
+		
+		assertEquals("some content of post 1. This is replacement1, and this is replacement2. End", p.getText());
 	}
 }

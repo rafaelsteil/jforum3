@@ -20,15 +20,15 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * @author Rafael Steil
  */
-public class HttpServletRequestFactoryBean implements FactoryBean {
+public class HttpServletRequestFactoryBean implements FactoryBean<HttpServletRequest> {
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
-	public Object getObject() throws Exception {
+	public HttpServletRequest getObject() throws Exception {
 		RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
 		return ((ServletRequestAttributes)attributes).getRequest();
 	}
-
+ 
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */

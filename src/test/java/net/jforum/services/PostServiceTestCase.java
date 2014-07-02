@@ -10,6 +10,9 @@
  */
 package net.jforum.services;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,25 +23,26 @@ import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
-import net.jforum.util.TestCaseUtils;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * @author Rafael Steil
+ * @author Rafael Steil, Jonatan Cloutier
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PostServiceTestCase {
-	private Mockery context = TestCaseUtils.newMockery();
-	private PostRepository postRepository = context.mock(PostRepository.class);
-	private AttachmentService attachmentService = context.mock(AttachmentService.class);
-	private PollService pollService = context.mock(PollService.class);
-    private TopicRepository topicRepository = context.mock(TopicRepository.class);
-    private ModerationLogService moderationLogService = context.mock(ModerationLogService.class);
-    private ModerationLog moderationLog = new ModerationLog();
-	private PostService service = new PostService(postRepository, attachmentService, pollService, topicRepository, moderationLogService);
+
+	@Mock private PostRepository postRepository;
+	@Mock private AttachmentService attachmentService;
+	@Mock private PollService pollService;
+	@Mock private TopicRepository topicRepository;
+	@Mock private ModerationLogService moderationLogService;
+	private ModerationLog moderationLog = new ModerationLog();
+	@InjectMocks private PostService service;
 
 	@Test
 	public void newOptionsExpectChanges() {
@@ -49,13 +53,7 @@ public class PostServiceTestCase {
 		current.setSmiliesEnabled(false);
 		current.setSignatureEnabled(false);
 
-		context.checking(new Expectations() {{
-			ignoring(attachmentService); ignoring(pollService);
-			one(postRepository).get(1); will(returnValue(current));
-			one(postRepository).update(current);
-			one(topicRepository).update(current.getTopic());
-			ignoring(moderationLogService);
-		}});
+		when(postRepository.get(1)).thenReturn(current);
 
 		Post newPost = new Post();
 		newPost.setId(1);
@@ -68,31 +66,27 @@ public class PostServiceTestCase {
 		newPost.setTopic(new Topic());
 
 		service.update(newPost, false, null, null, moderationLog);
-		context.assertIsSatisfied();
 
-		Assert.assertEquals(true, current.isBbCodeEnabled());
-		Assert.assertEquals(true, current.isHtmlEnabled());
-		Assert.assertEquals(true, current.isSmiliesEnabled());
-		Assert.assertEquals(true, current.isSignatureEnabled());
+		verify(postRepository).update(current);
+		verify(topicRepository).update(current.getTopic());
+		assertEquals(true, current.isBbCodeEnabled());
+		assertEquals(true, current.isHtmlEnabled());
+		assertEquals(true, current.isSmiliesEnabled());
+		assertEquals(true, current.isSignatureEnabled());
 	}
 
 	@Test
 	public void changePoll() {
 		final Post currentPost = this.createCurrentPost();
-		currentPost.getTopic().setPoll(new Poll() {{ setId(1); }});
+		Poll poll = new Poll();
+		poll.setId(1);
+		currentPost.getTopic().setPoll(poll); 
 		currentPost.getTopic().getFirstPost().setId(1);
 
 		PollOption pollOption = new PollOption(); pollOption.setText("A");
 		final List<PollOption> pollOptions = Arrays.asList(pollOption);
 
-		context.checking(new Expectations() {{
-			ignoring(attachmentService);
-			one(pollService).processChanges(currentPost.getTopic().getPoll(), pollOptions);
-			one(postRepository).get(1); will(returnValue(currentPost));
-			one(postRepository).update(currentPost);
-			one(topicRepository).update(currentPost.getTopic());
-			ignoring(moderationLogService);
-		}});
+		when(postRepository.get(1)).thenReturn(currentPost);
 
 		Post newPost = new Post();
 		newPost.setId(1);
@@ -107,9 +101,11 @@ public class PostServiceTestCase {
 
 		service.update(newPost, false, pollOptions, null, moderationLog);
 
-		context.assertIsSatisfied();
-		Assert.assertEquals(10, currentPost.getTopic().getPoll().getLength());
-		Assert.assertEquals("new label", currentPost.getTopic().getPoll().getLabel());
+		verify(pollService).processChanges(currentPost.getTopic().getPoll(), pollOptions);
+		verify(postRepository).update(currentPost);
+		verify(topicRepository).update(currentPost.getTopic());
+		assertEquals(10, currentPost.getTopic().getPoll().getLength());
+		assertEquals("new label", currentPost.getTopic().getPoll().getLabel());
 	}
 
 	@Test
@@ -118,21 +114,16 @@ public class PostServiceTestCase {
 		current.getTopic().setType(Topic.TYPE_NORMAL);
 		current.getTopic().getFirstPost().setId(1);
 
-		context.checking(new Expectations() {{
-			ignoring(attachmentService); ignoring(pollService);
-			one(postRepository).get(1); will(returnValue(current));
-			one(postRepository).update(current);
-			one(topicRepository).update(current.getTopic());
-			ignoring(moderationLogService);
-		}});
+		when(postRepository.get(1)).thenReturn(current);
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
 		newPost.setTopic(new Topic()); newPost.getTopic().setType(Topic.TYPE_STICKY);
 		service.update(newPost, true, null, null, moderationLog);
 
-		context.assertIsSatisfied();
-		Assert.assertEquals(newPost.getSubject(), current.getTopic().getSubject());
-		Assert.assertEquals(Topic.TYPE_STICKY, current.getTopic().getType());
+		verify(postRepository).update(current);
+		verify(topicRepository).update(current.getTopic());
+		assertEquals(newPost.getSubject(), current.getTopic().getSubject());
+		assertEquals(Topic.TYPE_STICKY, current.getTopic().getType());
 	}
 
 	@Test
@@ -141,43 +132,33 @@ public class PostServiceTestCase {
 		current.getTopic().setType(Topic.TYPE_NORMAL);
 		current.getTopic().getFirstPost().setId(1);
 
-		context.checking(new Expectations() {{
-			ignoring(attachmentService); ignoring(pollService);
-			one(postRepository).get(1); will(returnValue(current));
-			one(postRepository).update(current);
-			one(topicRepository).update(current.getTopic());
-			ignoring(moderationLogService);
-		}});
+		when(postRepository.get(1)).thenReturn(current);
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
 		newPost.setTopic(new Topic()); newPost.getTopic().setType(Topic.TYPE_STICKY);
 		service.update(newPost, false, null, null, moderationLog);
 
-		context.assertIsSatisfied();
-		Assert.assertEquals(newPost.getSubject(), current.getTopic().getSubject());
-		Assert.assertEquals(Topic.TYPE_NORMAL, current.getTopic().getType());
+		verify(postRepository).update(current);
+		verify(topicRepository).update(current.getTopic());
+		assertEquals(newPost.getSubject(), current.getTopic().getSubject());
+		assertEquals(Topic.TYPE_NORMAL, current.getTopic().getType());
 	}
 
 	@Test
 	public void changeUpdatableProperties() {
 		final Post current = this.createCurrentPost();
 
-		context.checking(new Expectations() {{
-			ignoring(attachmentService); ignoring(pollService);
-			one(postRepository).get(1); will(returnValue(current));
-			one(postRepository).update(current);
-			one(topicRepository).update(current.getTopic());
-			ignoring(moderationLogService);
-		}});
+		when(postRepository.get(1)).thenReturn(current);
 
 		Post newPost = new Post(); newPost.setId(1); newPost.setText("new text"); newPost.setSubject("new subject");
 		service.update(newPost, false, null, null, moderationLog);
 
-		context.assertIsSatisfied();
-		Assert.assertEquals(newPost.getSubject(), current.getSubject());
-		Assert.assertEquals(newPost.getText(), current.getText());
-		Assert.assertEquals(1, current.getEditCount());
-		Assert.assertNotNull(current.getEditDate());
+		verify(postRepository).update(current);
+		verify(topicRepository).update(current.getTopic());
+		assertEquals(newPost.getSubject(), current.getSubject());
+		assertEquals(newPost.getText(), current.getText());
+		assertEquals(1, current.getEditCount());
+		assertNotNull(current.getEditDate());
 	}
 
 	@Test(expected = IllegalStateException.class)
